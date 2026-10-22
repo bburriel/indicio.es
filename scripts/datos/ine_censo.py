@@ -120,6 +120,20 @@ for code in {c for c, _ in ES}:
     if h and m and h.get(("39", "Total")) and m.get(("39", "Total")):
         put(code, "brechaSuperiores", round(pct(m.get(("39", "Educación superior")), m[("39", "Total")]) - pct(h.get(("39", "Educación superior")), h[("39", "Total")]), 1))
 
+# 8) Relación con la actividad por nacionalidad (2024): pensionistas, estudiantes y paro de la población extranjera
+N = {}
+for code, sexo, nac, rel, per, v in leer(67079):
+    if sexo == "Total" and per == "2024": N.setdefault(code, {})[(nac, rel)] = v
+for code, n in N.items():
+    t = n.get(("Total", "Total"))
+    put(code, "pensionistas", pct(n.get(("Total", "Perceptor/a pensión de incapacidad, jubilación, prejubilación")), t)); put(code, "estudiantes", pct(n.get(("Total", "Estudiante")), t))
+    paro = {}
+    for nac in ("Española", "Extranjera"):
+        o, pa = n.get((nac, "Ocupado/a")), n.get((nac, "Parado/a"))
+        if o is not None and pa is not None and o + pa >= 50: paro[nac] = pct(pa, o + pa)
+    if "Extranjera" in paro: put(code, "paroExtranjeros", paro["Extranjera"])
+    if len(paro) == 2: put(code, "brechaParoExtr", round(paro["Extranjera"] - paro["Española"], 1))
+
 INDICADORES = [
  ("empleo", "Tasa de empleo (16 a 64 años)", "Trabajo", "pct", "INE, Censo anual de población, 2024"),
  ("empleoMujeres", "Tasa de empleo de las mujeres (16 a 64 años)", "Trabajo", "pct", "INE, Censo anual de población, 2024"),
@@ -139,6 +153,10 @@ INDICADORES = [
  ("estudiosBasicos", "Solo estudios básicos (25 a 59 años)", "Educación", "pct", "INE, Censo anual de población, 2024 (primaria o ESO como máximo)"),
  ("superiores2539", "Titulados superiores de 25 a 39 años", "Educación", "pct", "INE, Censo anual de población, 2024"),
  ("brechaSuperiores", "Brecha de titulados superiores (mujeres menos hombres, 25 a 39)", "Educación", "pts", "INE, Censo anual de población, 2024 (puntos de diferencia)"),
+ ("pensionistas", "Adultos con pensión de jubilación o incapacidad", "Trabajo", "pct", "INE, Censo anual de población, 2024 (% de 16 y más años)"),
+ ("estudiantes", "Adultos que estudian", "Educación", "pct", "INE, Censo anual de población, 2024 (% de 16 y más años)"),
+ ("paroExtranjeros", "Tasa de paro de la población extranjera", "Trabajo", "pct", "INE, Censo anual de población, 2024 (solo municipios con al menos 50 activos extranjeros)"),
+ ("brechaParoExtr", "Brecha de paro entre extranjeros y españoles", "Trabajo", "pts", "INE, Censo anual de población, 2024 (puntos de diferencia entre las tasas de paro)"),
  ("casados", "Personas casadas", "Población", "pct", "INE, Censo anual de población, 2024 (% de 16 y más años)"),
  ("divorciados", "Personas divorciadas o separadas", "Población", "pct", "INE, Censo anual de población, 2024 (% de 16 y más años)"),
  ("solteros3554", "Solteros de 35 a 54 años", "Población", "pct", "INE, Censo anual de población, 2024"),

@@ -1160,6 +1160,11 @@ Object.assign(DPHRASE,{
   arraigo:["más gente que siempre ha vivido allí","menos gente que siempre ha vivido allí"],llegados:["más gente llegada de otros municipios","menos gente llegada de otros municipios"],inmigReciente:["más inmigración reciente","menos inmigración reciente"],
   afilHab:["más empleo por habitante en el municipio","menos empleo por habitante en el municipio"],afilAutonomos:["más autónomos entre los afiliados","menos autónomos entre los afiliados"],afilAgrario:["más afiliados al régimen agrario","menos afiliados al régimen agrario"],
   afilHogar:["más empleadas del hogar","menos empleadas del hogar"],afilVar:["más subida de los afiliados desde 2021","menos subida de los afiliados desde 2021"],afilVar19:["más subida de los afiliados desde 2019","menos subida de los afiliados desde 2019"],
+  superficie:["más superficie","menos superficie"],
+  paroMujeres:["más mujeres entre los parados","menos mujeres entre los parados"],paroJovenes:["más jóvenes entre los parados","menos jóvenes entre los parados"],paroMayores45:["más mayores de 45 entre los parados","menos mayores de 45 entre los parados"],paroSinEmpleo:["más parados sin empleo anterior","menos parados sin empleo anterior"],contrTemp:["más contratos nuevos temporales","menos contratos nuevos temporales"],
+  rentaMediana:["más renta mediana","menos renta mediana"],rentaAlta:["más gente con ingresos muy altos","menos gente con ingresos muy altos"],rentaBaja:["más gente con ingresos muy bajos","menos gente con ingresos muy bajos"],p80p20:["más desigualdad entre ricos y pobres","menos desigualdad entre ricos y pobres"],
+  ingSalario:["más ingresos por salarios","menos ingresos por salarios"],ingDesempleo:["más ingresos por prestaciones de desempleo","menos ingresos por prestaciones de desempleo"],ingPrestaciones:["más ingresos por otras prestaciones","menos ingresos por otras prestaciones"],ingOtros:["más ingresos de otras fuentes","menos ingresos de otras fuentes"],hogarMedio:["hogares más grandes","hogares más pequeños"],
+  pensionistas:["más adultos con pensión","menos adultos con pensión"],estudiantes:["más adultos que estudian","menos adultos que estudian"],paroExtranjeros:["más paro entre los extranjeros","menos paro entre los extranjeros"],brechaParoExtr:["más brecha de paro entre extranjeros y españoles","menos brecha de paro entre extranjeros y españoles"],
   irpfBruta:["más renta bruta por declarante","menos renta bruta por declarante"],irpfDisp:["más renta disponible por declarante","menos renta disponible por declarante"],irpfCarga:["más impuestos y cotizaciones sobre la renta","menos impuestos y cotizaciones sobre la renta"],
   irpfTrabajo:["más renta de trabajo y pensiones","menos renta de trabajo y pensiones"],irpfActiv:["más renta de actividades económicas","menos renta de actividades económicas"],irpfCapital:["más renta del capital","menos renta del capital"],
   irpfExenta:["más renta exenta","menos renta exenta"],irpfDecl:["más declarantes por habitante","menos declarantes por habitante"]});
@@ -2264,7 +2269,13 @@ const NBKEY="cifrario.cuaderno";
 const nbGet=()=>{ try{ return JSON.parse(localStorage.getItem(NBKEY)||"[]"); }catch(e){ return []; } };
 const nbSet=a=>{ try{ localStorage.setItem(NBKEY,JSON.stringify(a.slice(0,30))); return true; }catch(e){ return false; } };
 
-function renderExplorar(h){
+// los indicadores añadidos desde otras fuentes viven en data/extra.json (columnas alineadas con index.json); solo el laboratorio los necesita
+let EXTRA_P=null;
+function loadExtra(){ return EXTRA_P||(EXTRA_P=getJSON("/data/extra.json").then(ex=>{ const n=IDX[0].row.length; ex.fields.forEach((f,i)=>{ F[f]=n+i; }); IDX.forEach((o,i)=>{ const e=ex.rows[i]; for(let j=0;j<e.length;j++) o.row.push(e[j]); }); for(const k in ESMEAN) delete ESMEAN[k]; for(const k in PCTL) delete PCTL[k]; }).catch(e=>{ console.error(e); EXTRA_P=null; })); }
+async function renderExplorar(h){
+  if(!EXTRA_P&&!document.querySelector(".lb")) view.innerHTML='<p class="loading">Cargando los datos del laboratorio…</p>';
+  await loadExtra();
+  if(!/^explorar/.test(pathToKey())) return;   // el lector ya se ha ido a otra página mientras cargaban los datos
   const blank=/^explorar\/?$/.test(h);
   // /laboratorio/ abre directamente el lienzo con una relación de ejemplo; la guía de arriba propone por dónde empezar
   if(blank) EX={...EX,v:"cruce",d:["paroReg","renta"],t:"g1",p:"",c:[],o:null};

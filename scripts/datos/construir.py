@@ -7,6 +7,13 @@ HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..
 ORIGINALES = {"code", "name", "prov", "pop"}  # además de los 44 indicadores que ya traía el laboratorio (no se sobrescriben)
 FORMATOS = {"int", "pct", "pct_chg", "pts", "eur", "years", "num1", "km", "dens"}
 ix = json.load(open(os.path.join(DATA, "index.json"), encoding="utf-8")); cat = json.load(open(os.path.join(DATA, "indicadores.json"), encoding="utf-8"))
+# los indicadores añadidos viven en data/extra.json (columnas alineadas fila a fila con index.json) para no engordar el índice que carga toda la web;
+# aquí se vuelve a unir todo en una tabla y al final se separa de nuevo
+EXTRA = os.path.join(DATA, "extra.json")
+if os.path.exists(EXTRA):
+    ex = json.load(open(EXTRA, encoding="utf-8")); assert len(ex["rows"]) == len(ix["rows"])
+    ix["fields"] += ex["fields"]
+    for r, e in zip(ix["rows"], ex["rows"]): r += e
 if not os.path.exists(os.path.join(HERE, "cache", "index_original.json")):   # copia del estado inicial, para saber qué claves son de origen
     json.dump({"fields": ix["fields"], "cat": [c["k"] for c in cat]}, open(os.path.join(HERE, "cache", "index_original.json"), "w"))
 orig = json.load(open(os.path.join(HERE, "cache", "index_original.json")))
@@ -31,15 +38,15 @@ for fuente in fuentes:
         nuevos.append((fuente, k, n))
 # temas del selector del laboratorio (pestañas): reparte los indicadores, incluidos los originales, en grupos de tamaño manejable
 TEMAS = {
- "Riqueza": "renta rentaHog rentaVar rentaVar20 pobreza gini pensiones irpfBruta irpfDisp irpfCarga irpfTrabajo irpfActiv irpfCapital irpfExenta irpfDecl",
- "Trabajo": "paro paroReg paroRegVar paroReg15 paroCensal empleo empleoMujeres brechaEmpleo empleoVar temporales autonomos afilHab afilAutonomos afilAgrario afilHogar afilVar afilVar19",
+ "Riqueza": "rentaMediana rentaAlta rentaBaja p80p20 ingSalario ingDesempleo ingPrestaciones ingOtros renta rentaHog rentaVar rentaVar20 pobreza gini pensiones irpfBruta irpfDisp irpfCarga irpfTrabajo irpfActiv irpfCapital irpfExenta irpfDecl",
+ "Trabajo": "paro paroReg paroRegVar paroReg15 paroCensal paroMujeres paroJovenes paroMayores45 paroSinEmpleo contrTemp pensionistas paroExtranjeros brechaParoExtr empleo empleoMujeres brechaEmpleo empleoVar temporales autonomos afilHab afilAutonomos afilAgrario afilHogar afilVar afilVar19",
  "Sectores": "agri industria construccion comercio avanzados publico directivos elementales",
  "Población": "varPob var0525 pobVar20 edad menores18 mayores65 extr migExt migInt arraigo llegados inmigReciente",
- "Hogares": "solos casados divorciados solteros3554",
- "Educación": "superiores estudiosBasicos superiores2539 brechaSuperiores",
+ "Hogares": "hogarMedio solos casados divorciados solteros3554",
+ "Educación": "superiores estudiantes estudiosBasicos superiores2539 brechaSuperiores",
  "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio",
  "Voto": "pp psoe vox sumar part part24 salf24",
- "Territorio": "pop densidad distCiudad distCosta",
+ "Territorio": "pop densidad superficie distCiudad distCosta",
 }
 tema = {k: g for g, ks in TEMAS.items() for k in ks.split()}
 for c in cat:
@@ -49,7 +56,9 @@ assert not sin, f"indicadores sin tema en construir.py: {sin}"
 # el catálogo conserva el orden original y agrupa lo nuevo al final por grupo
 orden = {k: i for i, k in enumerate(orig["cat"])}
 cat.sort(key=lambda c: (orden.get(c["k"], 10**6),))
-json.dump(ix, open(os.path.join(DATA, "index.json"), "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
+nb = len(orig["fields"])
+json.dump({"fields": ix["fields"][:nb], "rows": [r[:nb] for r in ix["rows"]], **{k: v for k, v in ix.items() if k not in ("fields", "rows")}}, open(os.path.join(DATA, "index.json"), "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
+json.dump({"fields": ix["fields"][nb:], "rows": [r[nb:] for r in ix["rows"]]}, open(EXTRA, "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
 json.dump(cat, open(os.path.join(DATA, "indicadores.json"), "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
 total = len(ix["rows"])
 for fuente, k, n in nuevos: print(f"{fuente:10s} {k:18s} {n:5d} municipios ({n/total*100:.0f} %)")
