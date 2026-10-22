@@ -1,0 +1,16 @@
+{
+  "name": "indicio",
+  "private": true,
+  "type": "module",
+  "version": "2.0.0",
+  "description": "Indicio · Preguntas reales, respuestas con datos públicos",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node serve.mjs",
+    "snapshot": "node snapshot.mjs",
+    "release": "npm run build && npm run snapshot && npm run build"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0"
+  }
+}

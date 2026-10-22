@@ -1,0 +1,57 @@
+# Indicio · indicio.es
+
+Preguntas reales, respuestas con datos públicos. Web estática (HTML + CSS + JS sin framework, d3 para los gráficos) desplegada en Netlify.
+
+## Cómo está organizado
+
+```
+src/
+  app.js          la aplicación (rutas, páginas, laboratorio, gráficos)
+  styles.css      estilos
+  template.html   esqueleto de cada página (head, metadatos, scripts)
+  body.html       cabecera, <main>, pie
+  content.mjs     contenido editorial: preguntas (título, entradilla, método, fecha, respuesta corta), temas, textos de las páginas y datos del autor
+  sw.js           service worker (offline)
+data/             los JSON de datos (index.json, refs, provincias, secciones, topojson)
+vendor/           d3, topojson-client y d3-composite-projections (servidos desde el propio dominio)
+build.mjs         genera dist/: una página HTML por ruta + 8.139 fichas municipales + sitemap + RSS + robots
+snapshot.mjs      (opcional) pre-renderiza con un navegador las páginas editoriales en snapshots/ y crea las imágenes Open Graph en og/
+serve.mjs         servidor local que imita a Netlify
+snapshots/, og/   resultado de snapshot.mjs; se versionan para que el build no necesite navegador
+dist/             lo que se despliega (no se versiona)
+```
+
+## Flujo de trabajo
+
+```
+npm run build      # genera dist/ (segundos, sin dependencias)
+npm run serve      # prueba en http://localhost:8787
+```
+
+Para desplegar: arrastra la carpeta `dist/` a Netlify (o `netlify deploy --prod` si usas el CLI; `netlify.toml` ya apunta a `dist/`).
+
+Cuando cambies textos, datos o gráficos de las páginas editoriales, regenera los snapshots y las imágenes para compartir (necesita Playwright una vez: `npm i -D playwright && npx playwright install chromium`):
+
+```
+npm run release    # build + snapshot + build
+```
+
+Si no regeneras los snapshots no pasa nada grave: las páginas se sirven con el texto estático de `content.mjs` y la app pinta el resto al cargar.
+
+## Publicar una pregunta nueva
+
+1. Añade la entrada en `STUDIES` de `src/content.mjs` (id = URL, título, entradilla, método, tema, fecha `pub`, respuesta corta `a`). El título es único: el mismo en portada, índice y página.
+2. Escribe su función `studyX(B)` en `src/app.js` y regístrala en el mapa de `renderEstudios`.
+3. `npm run release` y despliega.
+
+La fecha `upd` (revisión) se muestra junto a la de publicación si es distinta; también actualiza `SITE.dataUpdated` cuando refresques los datos.
+
+## URLs
+
+- `/` portada · `/preguntas/` · `/preguntas/<id>/`
+- `/temas/` · `/temas/<riqueza|vivienda|poblacion|trabajo|gasto|voto>/`
+- `/laboratorio/` · `/laboratorio/<cruce|mapa|ranking|evolucion|grupos|reparto|tabla>/?d=…` · `/laboratorio/metodo/`
+- `/municipio/` · `/municipio/<código INE>-<nombre>/` (8.139 páginas) · `/comparar/<a>-<b>/`
+- `/quien-soy/` · `/quien-soy/contacto/`
+
+Los enlaces antiguos con `#` (`/#estudios-x`, `/#m46166`, `/#explorar/cruce?…`) siguen funcionando: la app los convierte a la ruta nueva. `cifrarios.netlify.app` redirige con 301 a `indicio.es` (regla en `_redirects`).

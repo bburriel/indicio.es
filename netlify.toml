@@ -1,0 +1,4 @@
+# Para Netlify CLI o un repo conectado. Con "arrastrar carpeta" basta con subir dist/ (ya lleva _redirects y _headers).
+[build]
+  command = "npm run build"
+  publish = "dist"
