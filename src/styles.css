@@ -1017,3 +1017,11 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .an-else{display:flex; gap:10px 16px; align-items:baseline; flex-wrap:wrap; margin-top:34px; padding-top:14px; border-top:1px solid var(--rule)}
 .an-otros{display:flex; gap:6px; flex-wrap:wrap} .an-otros a{border:1px solid var(--rule-2); border-radius:20px; padding:4px 13px; text-decoration:none; color:var(--ink-2); font-size:14.5px; background:var(--card)} .an-otros a:hover{border-color:var(--acc-ink); color:var(--ink)}
 .an-vacio{color:var(--ink-2); margin:14px 0}
+
+/* Laboratorio: atajos en una fila discreta, selector sin pestañas cortadas, «Quién soy» sin imagen */
+.dp-h,.dp-tabs{flex:none} .dp-tabs button{line-height:1.25}
+.lbq{display:flex; align-items:center; gap:10px; margin:0 0 14px; min-width:0}
+.lbq-l{flex:none; font-size:13px; color:var(--muted)}
+.lbq-c{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding:2px 0; -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)} .lbq-c::-webkit-scrollbar{display:none}
+.lbq-c button{flex:none; white-space:nowrap; border:1px solid var(--rule-2); background:var(--card); color:var(--ink-2); border-radius:20px; padding:3px 12px; font:inherit; font-size:13px; cursor:pointer} .lbq-c button:hover{border-color:var(--acc-ink); color:var(--ink)}
+.ab-hero{grid-template-columns:minmax(0,1fr)!important} .ab-hero>div{max-width:760px}
