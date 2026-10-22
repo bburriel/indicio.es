@@ -2886,10 +2886,21 @@ const SERVICIOS=[
 function renderSobre(sec){
   document.title="Quién soy · Indicio";
   const A=ABOUT, nm=A.nombre?esc(A.nombre):"";
+  const first=(A.nombre||"Borja").split(" ")[0];
   view.innerHTML=`<section class="ab-hero">
-      <div><span class="kk">Quién hay detrás</span><h1>${nm?`Hola, soy ${nm}`:"Hola, soy quien hace Indicio"}</h1>
-      <p class="dek">${A.frase?esc(A.frase):"Indicio es un proyecto personal e independiente: sin publicidad, sin partido y sin otra agenda que entender mejor cómo vivimos. Lo hago porque los datos públicos son de todos, pero casi nadie tiene tiempo de leerlos."}</p>
+      <div><span class="kk">Quién hay detrás</span><h1>Hola, soy ${esc(first)}</h1>
+      <p class="dek">${A.frase?esc(A.frase):"Soy analista de datos. Llevo años en empresas de producto intentando responder una pregunta sencilla: este cambio, ¿ha funcionado de verdad? Indicio es esa misma pregunta, pero hecha a los datos públicos de España."}</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
+    </section>
+    <section class="ab-story">
+      <div class="ab-st"><span class="ab-n">Estadística</span><h3>Una cifra no vale nada sin su margen de error</h3><p>Estudié un máster en Estadística. De ahí me quedó una manía que no se me ha ido: antes de creerme un número, quiero saber cuánto podría estar equivocado.</p></div>
+      <div class="ab-st"><span class="ab-n">Producto</span><h3>¿Mejora algo de verdad o solo lo parece?</h3><p>Mi trabajo como analista ha sido sobre todo <b>experimentar</b>. Cuando una empresa cambia algo (un botón, un precio, una función nueva), lo prueba con una parte de la gente y lo compara con quien no lo ha visto. La parte difícil no es medir la diferencia, sino saber <b>cuánta incertidumbre</b> tiene esa medida. Con eso se decide: lanzarlo, esperar a tener más datos o descartarlo.</p></div>
+      <div class="ab-st"><span class="ab-n">Deporte</span><h3>Datos para entender el juego</h3><p>Antes de eso hice investigación en <b>analítica deportiva</b>: usar datos para entender qué explica el rendimiento de jugadores y equipos, más allá de la intuición y de la última jugada que todos recuerdan.</p></div>
+    </section>
+    <section class="ab-why"><h2>Por qué hago Indicio</h2>
+      <p>Con los datos públicos pasa lo mismo que con un producto: es muy fácil ver que dos cosas van juntas y concluir que una causa la otra. ¿Los pueblos con más pisos turísticos pierden vecinos <i>por</i> los pisos turísticos? ¿O es que los dos pasan en los mismos sitios por otra razón?</p>
+      <p>Aquí no se pueden hacer experimentos (nadie puede subir el paro de un pueblo para ver qué pasa), pero sí se pueden usar los mismos trucos: <b>comparar con quien se parece</b>, mirar <b>los cambios y no solo los niveles</b> y decir siempre <b>cuánto de seguro</b> es lo que se ve. Eso es el <a href="/laboratorio/">laboratorio</a>: una forma de que cualquiera pueda hacerse esas preguntas sin saber estadística.</p>
+      <p>Indicio es un proyecto personal e independiente: sin publicidad, sin partido y sin más agenda que entender mejor cómo vivimos. Los datos públicos son de todos, pero casi nadie tiene tiempo de leerlos.</p>
     </section>
     <section class="ci-band"><h2>Cómo trabaja Indicio</h2><div class="ci-steps" style="padding:0">
       <div><i>1</i><span><b>Solo datos oficiales</b>INE, SEPE, Ministerio del Interior y Eurostat. Cada gráfico dice de dónde sale.</span></div>

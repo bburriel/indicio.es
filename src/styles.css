@@ -1043,3 +1043,11 @@ svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg 
 .bub circle{transition:none} svg .bub text{pointer-events:none; paint-order:stroke; stroke:var(--bg); stroke-width:3px}
 .hbars.wide .hb{grid-template-columns:minmax(90px,150px) minmax(0,1fr) 124px} .hbars.wide .hb>span:last-child{white-space:nowrap}
 .bubwrap{position:relative} .bubwrap svg{display:block; width:100%; height:auto}
+
+/* quién soy: historia */
+.ab-story{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding:10px 0 30px}
+.ab-st{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:20px 20px 18px}
+.ab-st h3{font-family:var(--serif); font-size:21px; line-height:1.2; margin:6px 0 8px} .ab-st p{margin:0; color:var(--ink-2); font-size:15.5px; line-height:1.55}
+.ab-n{font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--brand)}
+.ab-why{max-width:700px; padding:6px 0 26px} .ab-why h2{font-size:26px; margin-bottom:10px} .ab-why p{font-size:17px; line-height:1.6; color:var(--ink-2); margin:0 0 14px} .ab-why a{color:var(--brand)}
+@media (max-width:860px){ .ab-story{grid-template-columns:minmax(0,1fr)} }
