@@ -161,12 +161,21 @@ function route(){
 }
 let INIT_T=null;
 const saveMun=()=>{ try{ localStorage.setItem("cifrario.mun",lastMun); }catch(e){} };
-// menú desplegable de temas
-const DDB=document.getElementById("nav-temas"), DDM=document.getElementById("ddm-temas");
-function ddClose(){ if(DDM&&!DDM.hidden){ DDM.hidden=true; DDB.setAttribute("aria-expanded","false"); } }
-if(DDB){ DDB.addEventListener("click",e=>{ e.stopPropagation(); if(!DDM.hidden){ ddClose(); return; } const b=DDB.getBoundingClientRect(); DDM.hidden=false; DDM.style.top=(b.bottom+8)+"px"; DDM.style.left=Math.max(12,Math.min(window.innerWidth-DDM.offsetWidth-12,b.left))+"px"; DDB.setAttribute("aria-expanded","true"); });
-  document.addEventListener("click",e=>{ if(!DDM.contains(e.target)) ddClose(); }); document.addEventListener("keydown",e=>{ if(e.key==="Escape") ddClose(); }); window.addEventListener("scroll",ddClose,{passive:true}); window.addEventListener("resize",ddClose);
-  DDM.addEventListener("click",e=>{ if(e.target.closest("a")) ddClose(); }); }
+// menú de Análisis: al pasar por encima (o con la flecha, en táctil) se abre un panel con los temas y los municipios
+const TOP=document.getElementById("top"), DDB=document.getElementById("nav-an-btn"), NAVDD=document.getElementById("navdd"), MEGA=document.getElementById("mega-an");
+let MEGA_T=null;
+function megaOpen(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.add("mega-open"); if(DDB) DDB.setAttribute("aria-expanded","true"); }
+function ddClose(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.remove("mega-open"); if(DDB) DDB.setAttribute("aria-expanded","false"); const r=document.getElementById("mq-r"); if(r) r.hidden=true; }
+const megaSoon=()=>{ clearTimeout(MEGA_T); MEGA_T=setTimeout(ddClose,180); };
+if(DDB&&MEGA){
+  const HOVER=!!(window.matchMedia&&matchMedia("(hover:hover)").matches);
+  // con ratón, el panel ya se abre al pasar por encima: el clic en la flecha lo deja abierto; en táctil alterna
+  DDB.addEventListener("click",e=>{ e.stopPropagation(); (HOVER||!TOP.classList.contains("mega-open"))?megaOpen():ddClose(); });
+  if(HOVER){ [NAVDD,MEGA].forEach(x=>{ x.addEventListener("mouseenter",megaOpen); x.addEventListener("mouseleave",megaSoon); }); }
+  document.addEventListener("click",e=>{ if(TOP.classList.contains("mega-open")&&!MEGA.contains(e.target)&&!NAVDD.contains(e.target)) ddClose(); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") ddClose(); });
+  MEGA.addEventListener("click",e=>{ if(e.target.closest("a")) ddClose(); });
+}
 const go=(code,sec)=>{ navTo("m"+code+(sec?"-"+sec:"")); };
 
 // ---------- buscador (cabecera y portada) ----------
@@ -189,7 +198,7 @@ function attachSearch(input,list,combo,onPick){
     else if(e.key==="Escape"){close();} });
   document.addEventListener("click",e=>{ if(!combo.contains(e.target)) close(); });
 }
-if(document.getElementById("q")) attachSearch(document.getElementById("q"),document.getElementById("results"),document.querySelector(".top .search"));
+if(document.getElementById("mq")) attachSearch(document.getElementById("mq"),document.getElementById("mq-r"),document.getElementById("mq-s"));
 
 // ---------- geometría ----------
 const fixPoly=pl=>pl.forEach((ring,i)=>{ const big=d3.geoArea({type:"Polygon",coordinates:[ring]})>2*Math.PI; if((i===0&&big)||(i>0&&!big)) ring.reverse(); });
@@ -2291,14 +2300,42 @@ function nbDraw(){
 
 // ---------- panel lateral ----------
 const SLOTS={mapa:{n:1,l:["Color del mapa"]},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
+// ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
+const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Voto","Territorio"], COVER={};
+const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
+function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remove(); document.removeEventListener("keydown",pickKey); } }
+function pickKey(e){ if(e.key==="Escape") closePicker(); }
+function openPicker(btn,{current,excl=[],onPick}){
+  closePicker();
+  const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g));
+  let tab=(CATK[current]||{}).g||groups[0], q="";
+  const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p);
+  const avail=c=>!excl.includes(c.k)||c.k===current;
+  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
+  const draw=()=>{
+    const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k).includes(nq);
+    document.getElementById("dpt").innerHTML=groups.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${CAT.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
+    const items=CAT.filter(c=>avail(c)&&(nq?hit(c):c.g===tab));
+    document.getElementById("dpl").innerHTML=items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${nf0.format(cover(c.k))} municipios</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`;
+    p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
+    p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); }));
+  };
+  draw();
+  document.getElementById("dpq").addEventListener("input",e=>{ q=e.target.value; draw(); });
+  p.querySelector(".dp-x").addEventListener("click",closePicker);
+  document.addEventListener("keydown",pickKey);
+  // en pantallas anchas se coloca junto al botón; en móvil es una hoja que sube desde abajo (ver CSS)
+  if(window.innerWidth>900){ const r=btn.getBoundingClientRect(), h=Math.min(p.offsetHeight,window.innerHeight-16); p.style.left=Math.min(window.innerWidth-p.offsetWidth-12,r.right+10)+"px"; p.style.top=Math.max(8,Math.min(window.innerHeight-h-8,r.top-10))+"px"; }
+  setTimeout(()=>{ const i=document.getElementById("dpq"); if(i&&window.innerWidth>900) i.focus(); },20);
+}
+document.addEventListener("mousedown",e=>{ const p=document.getElementById("dpick"); if(p&&!p.contains(e.target)&&!e.target.closest(".pick")) closePicker(); });
 function exBar(){
   const bar=document.getElementById("exbar"); if(!bar) return;
-  const opts=(sel,excl)=>{ let h="",g=null; CAT.forEach(c=>{ if(excl.includes(c.k)&&c.k!==sel) return; if(c.g!==g){ if(g) h+="</optgroup>"; h+=`<optgroup label="${c.g}">`; g=c.g; } h+=`<option value="${c.k}" ${c.k===sel?"selected":""}>${esc(c.l)}</option>`; }); return h+"</optgroup>"; };
   const S=SLOTS[EX.v], isEvo=EX.v==="evolucion";
   let slots="";
   if(S){ const used=Math.min(S.n,EX.d.length), lab=i=>typeof S.l==="function"?S.l(i):S.l[i];
-    for(let i=0;i<used;i++) slots+=`<div class="slot full"><span class="nm" style="flex:1"><small>${lab(i)}</small><select data-i="${i}" aria-label="${lab(i)}">${opts(EX.d[i],EX.d)}</select></span>${(S.add&&used>1)||(EX.v==="cruce"&&false)?`<button type="button" data-x="${i}" aria-label="Quitar">×</button>`:""}</div>`;
-    if(used<S.n&&(S.add||EX.v==="cruce")) slots+=`<div class="slot"><span class="nm" style="flex:1"><small>${S.add?S.add+" (opcional)":lab(used)}</small><select data-add="1" aria-label="${S.add||lab(used)}"><option value="">+ elige un dato</option>${opts("",EX.d)}</select></span></div>`; }
+    for(let i=0;i<used;i++) slots+=`<div class="slot full"><span class="nm" style="flex:1"><small>${lab(i)}</small><button type="button" class="pick" data-i="${i}" aria-haspopup="dialog" aria-label="${lab(i)}: ${esc(labK(EX.d[i]))}. Cambiar"><span class="pv">${esc(labK(EX.d[i]))}</span><span class="pg">${esc((CATK[EX.d[i]]||{}).g||"")}</span></button></span>${(S.add&&used>1)||(EX.v==="cruce"&&false)?`<button type="button" data-x="${i}" aria-label="Quitar">×</button>`:""}</div>`;
+    if(used<S.n&&(S.add||EX.v==="cruce")) slots+=`<div class="slot"><span class="nm" style="flex:1"><small>${S.add?S.add+" (opcional)":lab(used)}</small><button type="button" class="pick add" data-add="1" aria-haspopup="dialog" aria-label="${S.add||lab(used)}"><span class="pv">+ elige un dato</span></button></span></div>`; }
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC[EX.v]}.</p></div>
@@ -2315,8 +2352,8 @@ function exBar(){
       <p class="hint">Debajo del gráfico: <b>¿causa o casualidad?</b> Marca qué igualar y mira cuánto queda de la relación.</p>`
       :`<p class="hint" style="margin:0">Para comprobar si un dato podría causar otro, pásalo a una relación.</p>${EX.d.length>=1&&!isEvo?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
-  bar.querySelectorAll("select[data-i]").forEach(s=>s.addEventListener("change",()=>{ const i=+s.dataset.i, v=s.value, j=EX.d.indexOf(v); if(j>=0&&j!==i){ EX.d[j]=EX.d[i]; } EX.d[i]=v; exUpdate(); }));
-  bar.querySelectorAll("select[data-add]").forEach(s=>s.addEventListener("change",()=>{ if(s.value){ EX.d=EX.d.filter(k=>k!==s.value); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,s.value); EX.d=EX.d.slice(0,6); exUpdate(); } }));
+  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",()=>{ const i=+b.dataset.i; openPicker(b,{current:EX.d[i],excl:EX.d,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; exUpdate(); }}); }));
+  bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",()=>{ openPicker(b,{current:null,excl:EX.d,onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,6); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-x]").forEach(b=>b.addEventListener("click",()=>{ if(EX.d.length<=1) return; EX.d.splice(+b.dataset.x,1); exUpdate(); }));
   bar.querySelectorAll("button[data-q]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.q; if(EX.v==="cruce"||EX.v==="tabla"||EX.v==="grupos"){ const S=SLOTS[EX.v]; if(EX.d.length<S.n&&EX.v!=="cruce") EX.d.push(k); else { const pos=EX.v==="cruce"?1:Math.min(EX.d.length,S.n)-1; EX.d=EX.d.filter(x=>x!==k); EX.d.splice(pos,1,k); } } else { EX.d=[k,...EX.d.filter(x=>x!==k)]; } EX.d=EX.d.slice(0,6); exUpdate(); }));
   const pv=document.getElementById("exprov"); if(pv) pv.addEventListener("change",e=>{ EX.p=e.target.value; exUpdate(); });
@@ -3075,37 +3112,37 @@ function revealObserve(root){
 new MutationObserver(()=>{ clearTimeout(revealObserve._t); revealObserve._t=setTimeout(()=>revealObserve(view),60); }).observe(view,{childList:true,subtree:true});
 
 // índice de todas las preguntas
-// ANÁLISIS: todo lo ya respondido en un sitio (preguntas, panoramas de tema y tu municipio), filtrable por tema
+// ANÁLISIS: lo ya respondido, con dos entradas (por tema y por municipio). Con ?tema=… muestra solo ese tema.
 async function renderPreguntas(){
-  document.title="Análisis · Indicio";
-  const tq=new URLSearchParams(location.search).get("tema"), tema=TOPIC_IDS.includes(tq)?tq:"";
-  view.innerHTML=pageHead("Análisis","Preguntas sobre cómo vivimos, ya respondidas con datos públicos. Filtra por tema o busca tu municipio para verlo en todas. Si tu pregunta no está, pruébala tú en el laboratorio.")+
-    `<div class="an-bar"><nav class="an-tabs" aria-label="Filtrar por tema">${[["","Todas"],...TOPIC_IDS.map(id=>[id,TOPICS[id].l])].map(([id,l])=>`<a href="/preguntas/${id?"?tema="+id:""}" data-t="${id}" ${id===tema?'aria-current="true"':""}>${l}</a>`).join("")}</nav>
-      <div class="an-mun"><span class="kk">Tu municipio</span>${bigSearchHTML("q3","Busca tu municipio…")}</div></div>
-    <div id="antema"></div><div class="qg" id="qg"><p class="loading">Cargando…</p></div>
-    <section class="ed-sec" id="anpan"><div class="ed-k">Panoramas por tema</div><h2 class="ed-h2">Lo esencial de cada tema, en cinco minutos</h2><div class="g3" style="margin-top:14px">${TOPIC_IDS.map(id=>{ const T=TOPICS[id]; return `<a class="tcard" href="/temas/${id}/"><div class="img">${tIll(id)}</div><div class="tp"><span class="kk">${T.l}</span><h3>${T.q}</h3><div class="n" data-k="${id}">…</div><div class="s" data-s="${id}"></div></div><div class="ft"><span>${TMIN[id][0]} ideas · ${TMIN[id][1]} min</span><span class="gol">Leer →</span></div></a>`; }).join("")}</div></section>
-    <section class="ed-sec ed-two"><div><div class="ed-k">¿Y la tuya?</div><h2 class="ed-h2">Si tu pregunta no está, pruébala en el laboratorio</h2><p class="ed-lead">Elige dos datos y mira si van juntos en los ${nf0.format(rowsAll().length)} municipios. Te decimos cuánto aguanta la relación cuando se compara entre iguales.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a> · <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><div></div></section>`;
-  bindBig("q3");
-  for(const id of TOPIC_IDS){ TOPICS[id].key().then(([n,s])=>{ view.querySelectorAll(`[data-k="${id}"]`).forEach(a=>a.innerHTML=n); view.querySelectorAll(`[data-s="${id}"]`).forEach(b=>b.innerHTML=s); }).catch(()=>{}); }
-  const L0=qGet(); if(L0.some(Q=>!ARTS.has(Q.id))){ try{ await loadTopo(); }catch(e){} }
+  const tq=new URLSearchParams(location.search).get("tema"), tema=TOPIC_IDS.includes(tq)?tq:"", T=TOPICS[tema];
+  document.title=(T?T.l+" · Análisis":"Análisis")+" · Indicio";
+  const tcard=id=>{ const X=TOPICS[id]; return `<a class="tcard" href="/preguntas/?tema=${id}"><div class="img">${tIll(id)}</div><div class="tp"><span class="kk">${X.l}</span><h3>${X.q}</h3><div class="n" data-k="${id}">…</div><div class="s" data-s="${id}"></div></div><div class="ft"><span>${TMIN[id][0]} ideas · ${TMIN[id][1]} min</span><span class="gol">Entrar →</span></div></a>`; };
+  const labCta=`<section class="ed-sec ed-two"><div><div class="ed-k">¿Y la tuya?</div><h2 class="ed-h2">Si tu pregunta no está, pruébala en el laboratorio</h2><p class="ed-lead">Elige dos datos y mira si van juntos en los ${nf0.format(rowsAll().length)} municipios. Te decimos cuánto aguanta la relación cuando se compara entre iguales.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a> · <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><div></div></section>`;
+  if(T){
+    view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${T.l}</nav>`+pageHead(T.l,T.q)+
+      `<a class="an-pan" href="/temas/${tema}/"><div class="img">${tIll(tema)}</div><div><span class="kk">Panorama · ${T.l}</span><h3>Lo esencial de este tema, en cinco minutos</h3><p><span class="n" data-k="${tema}">…</span> <span data-s="${tema}"></span></p></div><span class="gol">Leer el panorama · ${TMIN[tema][1]} min →</span></a>
+      <h2 class="an-h">Preguntas sobre ${low(T.l)}</h2><div class="qg" id="qg"><p class="loading">Cargando…</p></div>
+      <div class="an-else"><span class="kk">Otros temas</span><nav class="an-otros" aria-label="Otros temas">${TOPIC_IDS.filter(id=>id!==tema).map(id=>`<a href="/preguntas/?tema=${id}">${TOPICS[id].l}</a>`).join("")}</nav></div>`+labCta;
+  } else {
+    view.innerHTML=pageHead("Análisis","Lo que ya hemos averiguado con datos públicos. Entra por un tema o por tu municipio; si tu pregunta no está, pruébala tú en el laboratorio.")+
+      `<section class="ed-sec an-sec"><div class="ed-k">Por tema</div><h2 class="ed-h2">Elige un tema y lee lo esencial en cinco minutos</h2><div class="g3" style="margin-top:14px">${TOPIC_IDS.map(tcard).join("")}</div></section>
+      <section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/municipio/">Ver el mapa de municipios →</a></p></div></section>
+      <section class="ed-sec an-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que de verdad dicen los datos</h2><div class="qg" id="qg"><p class="loading">Cargando…</p></div></section>`+labCta;
+    bindBig("q3");
+  }
+  for(const id of (T?[tema]:TOPIC_IDS)){ TOPICS[id].key().then(([n,s2])=>{ view.querySelectorAll(`[data-k="${id}"]`).forEach(a=>a.innerHTML=n); view.querySelectorAll(`[data-s="${id}"]`).forEach(b=>b.innerHTML=s2); }).catch(()=>{}); }
   const L=qGet(), g=document.getElementById("qg"); if(!g) return; g.innerHTML="";
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
   const sid=href=>(String(href).match(/^\/preguntas\/([\w-]+)\/?$/)||[])[1];
-  L.forEach(Q=>{ const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; a.dataset.qid=Q.id; a.dataset.tema=S?S.tema:((QUICKQ.find(x=>x.id===Q.id)||{}).tema||""); const art=qCard(Q,320,Q.art==="swarm"?220:190); if(art) a.appendChild(art);
+  const cardTema=Q=>{ const S=byId[sid(Q.href)]; return S?S.tema:((QUICKQ.find(x=>x.id===Q.id)||{}).tema||""); };
+  let n=0;
+  L.forEach(Q=>{ if(T&&cardTema(Q)!==tema) return; n++; const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; a.dataset.qid=Q.id; const art=qCard(Q,320,Q.art==="swarm"?220:190); if(art) a.appendChild(art);
     a.insertAdjacentHTML("beforeend",`<div class="k">${Q.k}${S?` · <span class="k-m">${esc(S.m)}</span>`:""}</div><div class="q">${Q.q.replace(/<\/?em>/g,"")}</div><div class="a">${Q.a}</div><div class="go">Ver la respuesta →${S&&S.pub?`<time datetime="${S.pub}">${fechaES(S.pub)}</time>`:""}</div>`); });
   const used=new Set(L.map(Q=>sid(Q.href)).filter(Boolean));
   const SART={"tope-cataluna":"tope",pensiones:"pens","pandemia-turismo":"covid"};
-  STUDIES.filter(S=>!used.has(S.id)).forEach(S=>{ const a=add(g,"a"); a.href="/preguntas/"+S.id+"/"; a.dataset.tema=S.tema;
-    if(SART[S.id]){ try{ const n=QART[SART[S.id]](320,190); n.classList.add("qart-"+SART[S.id]); a.appendChild(n); }catch(e){ console.error(e); } }
+  STUDIES.filter(S=>!used.has(S.id)&&(!T||S.tema===tema)).forEach(S=>{ n++; const a=add(g,"a"); a.href="/preguntas/"+S.id+"/";
+    if(SART[S.id]){ try{ const x=QART[SART[S.id]](320,190); x.classList.add("qart-"+SART[S.id]); a.appendChild(x); }catch(e){ console.error(e); } }
     a.insertAdjacentHTML("beforeend",`<div class="k">${esc(TOPICL(S.tema))} · <span class="k-m">${esc(S.m)}</span></div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.d)}</div><div class="go">Ver la respuesta →${S.pub?`<time datetime="${S.pub}">${fechaES(S.pub)}</time>`:""}</div>`); });
-  // filtro por tema sin recargar: cambia la URL, oculta tarjetas y muestra el panorama del tema
-  const apply=t=>{ g.querySelectorAll("a[data-tema]").forEach(a=>a.hidden=!!t&&a.dataset.tema!==t);
-    view.querySelectorAll(".an-tabs a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.t===t));
-    const T=TOPICS[t], box=document.getElementById("antema"), n=g.querySelectorAll("a[data-tema]:not([hidden])").length;
-    box.innerHTML=T?`<a class="an-pan" href="/temas/${t}/"><div class="img">${tIll(t)}</div><div><span class="kk">Panorama · ${T.l}</span><h3>${T.q}</h3><p><span class="n" data-k="${t}">…</span> <span data-s="${t}"></span></p></div><span class="gol">Leer el panorama · ${TMIN[t][1]} min →</span></a><p class="muted an-n">${n?`${n} pregunta${n>1?"s":""} sobre ${low(T.l)}:`:`Aún no hay preguntas sobre ${low(T.l)}: lee el panorama o pruébalo en el laboratorio.`}</p>`:"";
-    if(T) T.key().then(([a,b])=>{ const x=box.querySelector("[data-k]"), y=box.querySelector("[data-s]"); if(x) x.innerHTML=a; if(y) y.innerHTML=b; }).catch(()=>{});
-    document.getElementById("anpan").hidden=!!t; };
-  view.querySelectorAll(".an-tabs a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); const t=a.dataset.t; try{ history.replaceState(null,"","/preguntas/"+(t?"?tema="+t:"")); }catch(x){} apply(t); }));
-  apply(tema);
+  if(T&&!n) g.outerHTML=`<p class="an-vacio">Todavía no hay análisis sobre ${low(T.l)}. Lee el panorama o prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`;
 }
 })();

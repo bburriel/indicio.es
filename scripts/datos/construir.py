@@ -29,6 +29,23 @@ for fuente in fuentes:
             if code in codes and d.get(k) is not None: ix["rows"][codes[code]][F[k]] = d[k]; n += 1
         cat = [c for c in cat if c["k"] != k]; cat.append({"k": k, "l": l, "g": g, "f": f, "src": src})
         nuevos.append((fuente, k, n))
+# temas del selector del laboratorio (pestañas): reparte los indicadores, incluidos los originales, en grupos de tamaño manejable
+TEMAS = {
+ "Riqueza": "renta rentaHog rentaVar rentaVar20 pobreza gini pensiones irpfBruta irpfDisp irpfCarga irpfTrabajo irpfActiv irpfCapital irpfExenta irpfDecl",
+ "Trabajo": "paro paroReg paroRegVar paroReg15 paroCensal empleo empleoMujeres brechaEmpleo empleoVar temporales autonomos afilHab afilAutonomos afilAgrario afilHogar afilVar afilVar19",
+ "Sectores": "agri industria construccion comercio avanzados publico directivos elementales",
+ "Población": "varPob var0525 pobVar20 edad menores18 mayores65 extr migExt migInt arraigo llegados inmigReciente",
+ "Hogares": "solos casados divorciados solteros3554",
+ "Educación": "superiores estudiosBasicos superiores2539 brechaSuperiores",
+ "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio",
+ "Voto": "pp psoe vox sumar part part24 salf24",
+ "Territorio": "pop densidad distCiudad distCosta",
+}
+tema = {k: g for g, ks in TEMAS.items() for k in ks.split()}
+for c in cat:
+    if c["k"] in tema: c["g"] = tema[c["k"]]
+sin = [c["k"] for c in cat if c["k"] not in tema]
+assert not sin, f"indicadores sin tema en construir.py: {sin}"
 # el catálogo conserva el orden original y agrupa lo nuevo al final por grupo
 orden = {k: i for i, k in enumerate(orig["cat"])}
 cat.sort(key=lambda c: (orden.get(c["k"], 10**6),))
