@@ -35,7 +35,8 @@ const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
 const CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
 fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js);
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS});
+const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS,arts:ARTS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 
@@ -43,6 +44,7 @@ const CONTENT=CONTENTJS;
 for(const f of ["favicon.svg","apple-touch-icon.png","icon-192.png","icon-512.png","og-image.png","manifest.webmanifest"]) if(exists(f)) fs.copyFileSync(path.join(ROOT,f),path.join(OUT,f));
 copyDir(path.join(ROOT,"vendor"),path.join(OUT,"vendor"));
 if(exists("og")) copyDir(path.join(ROOT,"og"),path.join(OUT,"og"));
+if(exists("art")) copyDir(path.join(ROOT,"art"),path.join(OUT,"art"));
 copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+CONTENT)).replace("__JS__",JS).replace("__CSS__",CSS));
@@ -66,7 +68,7 @@ function page({route,title,desc,ogTitle,main,jsonld,ogImage,type="website",robot
     .replace(/\{\{OGTITLE\}\}/g,esc(stripTags(ogTitle||title))).replace("{{OGTYPE}}",type).replace(/\{\{OGIMG\}\}/g,SITE.url+(ogImage||"/og-image.png"))
     .replace("{{ROBOTS}}",robots?`<meta name="robots" content="${robots}">`:"").replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{CONTENT}}",CONTENT)
     .replace("{{JSONLD}}",jsonld?`<script type="application/ld+json">${JSON.stringify(jsonld)}</script>`:"")
-    .replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
+    .replace("{{PRELOAD}}",(route==="/"||route==="/preguntas/")?'<link rel="preload" href="/data/municipios.topo.json" as="fetch" crossorigin>':"").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
   const dir=path.join(OUT,route); fs.mkdirSync(dir,{recursive:true}); fs.writeFileSync(path.join(dir,"index.html"),html);
 }
 const breadcrumb=items=>({"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:items.map(([n,u],i)=>({"@type":"ListItem",position:i+1,name:n,item:SITE.url+u}))});
@@ -135,7 +137,7 @@ for(const v of ["mapa","ranking","cruce","evolucion","grupos","reparto","tabla"]
 // 404
 {
   const main=`<header class="phead"><h1>No encontramos esa página</h1><p class="dek">Puede que el enlace sea antiguo. Prueba desde la portada o busca tu municipio arriba.</p></header><p><a class="ed-go" href="/">Ir a la portada →</a></p>`;
-  const html=tpl.replace("{{TITLE}}","Página no encontrada · Indicio").replace(/\{\{DESC\}\}/g,"").replace(/\{\{CANON\}\}/g,SITE.url+"/").replace(/\{\{OGTITLE\}\}/g,"Indicio").replace("{{OGTYPE}}","website").replace(/\{\{OGIMG\}\}/g,SITE.url+"/og-image.png").replace("{{ROBOTS}}",'<meta name="robots" content="noindex">').replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{CONTENT}}",CONTENT).replace("{{JSONLD}}","").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
+  const html=tpl.replace("{{PRELOAD}}","").replace("{{TITLE}}","Página no encontrada · Indicio").replace(/\{\{DESC\}\}/g,"").replace(/\{\{CANON\}\}/g,SITE.url+"/").replace(/\{\{OGTITLE\}\}/g,"Indicio").replace("{{OGTYPE}}","website").replace(/\{\{OGIMG\}\}/g,SITE.url+"/og-image.png").replace("{{ROBOTS}}",'<meta name="robots" content="noindex">').replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{CONTENT}}",CONTENT).replace("{{JSONLD}}","").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
   fs.writeFileSync(path.join(OUT,"404.html"),html);
 }
 
@@ -168,6 +170,6 @@ const rfc=d=>new Date(d+"T08:00:00+02:00").toUTCString();
 fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Indicio · Preguntas</title><link>${SITE.url}/</link><description>${esc(SITE.tagline)}</description><language>es</language><atom:link href="${SITE.url}/feed.xml" rel="self" type="application/rss+xml"/>\n${[...STUDIES].sort((a,b)=>(b.upd||b.pub).localeCompare(a.upd||a.pub)).map(S=>`<item><title>${esc(S.t)}</title><link>${SITE.url}/preguntas/${S.id}/</link><guid>${SITE.url}/preguntas/${S.id}/</guid><pubDate>${rfc(S.pub)}</pubDate><category>${esc(topicName(S.tema))}</category><description>${esc(S.a)}</description></item>`).join("\n")}\n</channel></rss>\n`);
 // Netlify: el dominio antiguo redirige al nuevo; las rutas dinámicas que no tienen HTML propio caen en la app
 fs.writeFileSync(path.join(OUT,"_redirects"),`https://${SITE.oldHost}/* ${SITE.url}/:splat 301!\nhttp://${SITE.oldHost}/* ${SITE.url}/:splat 301!\nhttps://www.indicio.es/* ${SITE.url}/:splat 301!\n/municipio/*  /municipio/index.html  200\n/comparar/*  /comparar/index.html  200\n/laboratorio/*  /laboratorio/index.html  200\n/temas/riqueza/*  /temas/riqueza/index.html  200\n`);
-fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
+fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
 console.log(`dist/ listo: ${urls.length} páginas + ${nMun} fichas municipales, ${parts.length+1} sitemaps.`);

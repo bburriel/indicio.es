@@ -19,9 +19,45 @@ fs.mkdirSync(path.join(ROOT,"snapshots"),{recursive:true}); fs.mkdirSync(path.jo
 const routes=["/","/preguntas/","/temas/",...TOPICS.map(T=>"/temas/"+T.id+"/"),...STUDIES.map(S=>"/preguntas/"+S.id+"/"),"/laboratorio/","/laboratorio/metodo/","/municipio/","/quien-soy/"];
 const fname=r=>(r==="/"?"index":r.replace(/^\/|\/$/g,"").replace(/\//g,"__"))+".html";
 const browser=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
-const ctx=await browser.newContext({viewport:{width:1280,height:900},deviceScaleFactor:1,reducedMotion:"reduce"});
+const ctx=await browser.newContext({viewport:{width:1280,height:900},deviceScaleFactor:2,reducedMotion:"reduce"});
+// dibujos de las tarjetas como imagen estática (art/<id>.jpg): aparecen al instante, sin esperar datos ni cálculos
+fs.mkdirSync(path.join(ROOT,"art"),{recursive:true});
+const artPage=await ctx.newPage(); if(process.env.OFFLINE) await artPage.route(/googleapis|gstatic/,r=>r.abort());
+await artPage.setViewportSize({width:1280,height:900});
+await artPage.goto(BASE+"/preguntas/?live=1",{waitUntil:"domcontentloaded"});
+await artPage.waitForFunction(()=>!document.querySelector("#view .loading")&&document.querySelectorAll(".qg a svg").length>=5,{timeout:30000}).catch(()=>{});
+await artPage.waitForTimeout(3500);
+await artPage.evaluate(()=>document.querySelectorAll(".qg a svg").forEach(s=>{ s.classList.add("in"); s.querySelectorAll("*").forEach(e=>{ e.style.transition="none"; }); }));
+await artPage.waitForTimeout(800);
+const cards=await artPage.$$(".qg a");
+for(const c of cards){ const id=await c.getAttribute("data-qid"); const sv=await c.$("svg"); if(!sv||!id) continue;
+  await sv.screenshot({path:path.join(ROOT,"art",id+".jpg"),type:"jpeg",quality:82,scale:"device"}); console.log("art",id); }
+// y el dibujo grande de la portada, en versión ancha y móvil, para cada pregunta destacada
+for(const [w,h,suf] of [[1280,900,""],[600,900,"-m"]]){
+  await artPage.setViewportSize({width:w,height:h});
+  await artPage.goto(BASE+"/?live=1",{waitUntil:"domcontentloaded"});
+  await artPage.waitForFunction(()=>document.querySelector("#qhart svg"),{timeout:40000}).catch(()=>{});
+  await artPage.waitForTimeout(2500);
+  const n=await artPage.evaluate(()=>document.querySelectorAll("#qhd button[data-i]").length);
+  for(let j=0;j<n;j++){
+    await artPage.evaluate(j=>document.querySelector(`#qhd button[data-i="${j}"]`).click(),j);
+    await artPage.waitForTimeout(1200);
+    await artPage.evaluate(()=>{ document.querySelectorAll("#qhart .spot,#qhart .spot-ring").forEach(e=>e.remove()); const s=document.querySelector("#qhart svg"); if(s){ s.classList.add("in"); s.querySelectorAll("*").forEach(e=>{ e.style.transition="none"; }); } });
+    const id=await artPage.evaluate(()=>document.querySelector("#qha a")?.getAttribute("href")||"");
+    const qid=await artPage.evaluate(j=>{ const L=(window.__INDICIO_HERO||[]); return L[j]; },j);
+    const sv=await artPage.$("#qhart svg"); if(!sv) continue;
+    const key=qid||("hero"+j);
+    await sv.screenshot({path:path.join(ROOT,"art","hero-"+key+suf+".jpg"),type:"jpeg",quality:84,scale:"device"}); console.log("art hero",key+suf);
+  }
+}
+await artPage.close();
+
 const page=await ctx.newPage();
 if(process.env.OFFLINE) await page.route(/googleapis|gstatic/,r=>r.abort());
+// las páginas se capturan ya con las imágenes estáticas recién generadas
+const ARTS=fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,""));
+await page.addInitScript(arts=>{ Object.defineProperty(window,"__INDICIO_ARTS",{value:arts}); document.addEventListener("DOMContentLoaded",()=>{ if(window.__INDICIO) window.__INDICIO.arts=arts; }); },ARTS);
+await page.route(/\/art\/[\w-]+\.jpg$/,r=>{ const f=path.join(ROOT,"art",r.request().url().split("/").pop()); fs.existsSync(f)?r.fulfill({path:f,contentType:"image/jpeg"}):r.continue(); });
 try{ localStorage; }catch(e){}
 for(const r of routes){
   await page.goto(BASE+r,{waitUntil:"domcontentloaded"});
@@ -43,7 +79,7 @@ for(const r of routes){
 }
 
 // imágenes Open Graph: título + respuesta corta + el dibujo de la tarjeta de cada pregunta
-await page.goto(BASE+"/preguntas/",{waitUntil:"domcontentloaded"});
+await page.goto(BASE+"/preguntas/?live=1",{waitUntil:"domcontentloaded"});
 await page.waitForFunction(()=>!document.querySelector("#view .loading"),{timeout:20000}).catch(()=>{});
 await page.waitForTimeout(3000);
 const arts=await page.evaluate(()=>Object.fromEntries([...document.querySelectorAll(".qg a")].map(a=>{ const m=(a.getAttribute("href")||"").match(/^\/preguntas\/([\w-]+)\//); const s=a.querySelector("svg"); if(s){ s.classList.add("in"); s.querySelectorAll("*").forEach(e=>{ e.style.transition="none"; e.style.opacity=""; e.style.transform=""; }); } return m?[m[1],s?s.outerHTML:""]:null; }).filter(Boolean)));

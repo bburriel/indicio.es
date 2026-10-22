@@ -40,6 +40,7 @@ const loadProv=p=>{ if(!provCache.has(p)) provCache.set(p, getJSON("/data/prov/"
 let topoP=null;
 const loadTopo=()=>{ if(!topoP) topoP=getJSON("/data/municipios.topo.json").then(t=>{ TOPO=t; prepGeo(); return t; }); return topoP; };
 
+loadTopo().catch(()=>{}); // el mapa se descarga en paralelo con el índice, no después
 Promise.all([getJSON("/data/index.json"),getJSON("/data/refs.json"),getJSON("/data/vote_refs.json"),getJSON("/data/indicadores.json")]).then(([ix,refs,vrefs,cat])=>{
   REFS=refs; VREFS=vrefs; PROVS=ix.provs; CAT=cat; cat.forEach(c=>CATK[c.k]=c);
   ix.fields.forEach((f,i)=>F[f]=i);
@@ -2915,6 +2916,9 @@ function qList(){
   return L;
 }
 let QL=null; const qGet=()=>QL||(QL=qList());
+const ARTS=new Set(/[?&]live=1/.test(location.search)?[]:(window.__INDICIO_ARTS||(window.__INDICIO&&window.__INDICIO.arts)||[]));
+// tarjeta: imagen estática generada en el build si existe (aparece al instante); si no, el dibujo en vivo
+const qCard=(Q,W,H)=>{ if(ARTS.has(Q.id)){ const im=el("img"); im.src="/art/"+Q.id+".jpg"; im.width=W; im.height=H; im.alt=""; im.decoding="async"; im.className="qimg"; return im; } return FEATS?qArt(Q,W,H):null; };
 const qArt=(Q,W,H)=>{ try{ const n=QART[Q.art](W,H); if(n) n.classList.add("rv","rv-"+Q.art); if(n&&Q.art==="swarm"&&W<500) n.querySelectorAll("text,line,circle[r=\"0\"]").forEach(t=>{ if(t.tagName!=="circle"||t.getAttribute("fill")==="none") t.remove(); }); return n; }catch(e){ console.error(e); return null; } };
 
 let QH_T=null;
@@ -2933,13 +2937,13 @@ async function renderInicio(){
   <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   bindBig("q2");
-  try{ await loadTopo(); }catch(e){ return; }
-  if(!document.getElementById("qg")) return;
   const L=qGet(), wide=view.clientWidth;
-  // tarjetas
+  // tarjetas: con imágenes estáticas no hace falta esperar al mapa
   const g=document.getElementById("qg"); g.innerHTML="";
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S])), sid=href=>(String(href).match(/^\/preguntas\/([\w-]+)\/?$/)||[])[1];
-  L.filter(Q=>Q.id!=="campo").forEach(Q=>{ const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; const art=qArt(Q,320,190); if(art) a.appendChild(art);
+  const needTopo=L.some(Q=>Q.id!=="campo"&&!ARTS.has(Q.id));
+  if(needTopo){ try{ await loadTopo(); }catch(e){ return; } if(!document.getElementById("qg")) return; }
+  L.filter(Q=>Q.id!=="campo").forEach(Q=>{ const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; a.dataset.qid=Q.id; const art=qCard(Q,320,190); if(art) a.appendChild(art);
     a.insertAdjacentHTML("beforeend",`<div class="k">${Q.k}${S?` · <span class="k-m">${esc(S.m)}</span>`:""}</div><div class="q">${Q.q.replace(/<\/?em>/g,"")}</div><div class="a">${Q.a}</div><div class="go">Ver la respuesta →${S&&S.pub?`<time datetime="${S.pub}">${fechaES(S.pub)}</time>`:""}</div>`); });
   // laboratorio: cuatro parejas
   const lab=document.getElementById("qlab");
@@ -2952,13 +2956,17 @@ async function renderInicio(){
       sv.append("line").attr("x1",0).attr("x2",W).attr("y1",H-6).attr("y2",H-6).attr("stroke",C.ink).attr("stroke-width",.7); return sv.node(); })()
       : (()=>{ const n=QART.scatter(250,120,x,y); n.querySelectorAll("circle").forEach(c=>c.setAttribute("r",.9)); return n; })();
     d.appendChild(s); d.insertAdjacentHTML("beforeend",`<div style="font-size:12.5px;color:var(--ink-2);margin-top:4px">${t}</div>`); }catch(e){ console.error(e); } });
-  // cabecera que rota
-  const H=L.filter(Q=>Q.hero), artCache=new Map(); let i=0;
+  // cabecera: el texto sale ya; el dibujo grande se calcula en vivo cuando llega el mapa
+  const H=L.filter(Q=>Q.hero), artCache=new Map(); let i=0; window.__INDICIO_HERO=H.map(Q=>Q.id);
+  { const q0=document.getElementById("qhq"), a0=document.getElementById("qha"), c0=document.getElementById("qhc"); if(q0){ q0.innerHTML=H[0].q; a0.innerHTML=`${H[0].a} <a href="${H[0].href}">Ver la respuesta →</a>`; c0.textContent=H[0].cap; } }
+  const heroStatic=H.every(Q=>ARTS.has("hero-"+Q.id));
+  if(!heroStatic){ try{ await loadTopo(); }catch(e){ return; } }
+  if(!document.getElementById("qhd")) return;
   const dots=document.getElementById("qhd");
   dots.innerHTML=H.map((Q,j)=>`<button type="button" aria-label="Pregunta ${j+1}" data-i="${j}"></button>`).join("")+`<button type="button" class="pp" id="qhpp">pausar</button>`;
-  const artFor=j=>{ if(!artCache.has(j)){ const mob=wide<700, Q=H[j]; const W=mob?720:1120, Hh=mob?520:380; artCache.set(j,qArt(Q,W,Hh)); } return artCache.get(j); };
+  const artFor=j=>{ if(!artCache.has(j)){ const mob=wide<700, Q=H[j]; const W=mob?720:1120, Hh=mob?520:380; if(ARTS.has("hero-"+Q.id)){ const im=el("img"); im.src="/art/hero-"+Q.id+(mob?"-m":"")+".jpg"; im.width=W; im.height=Hh; im.alt=""; im.decoding="async"; im.className="qimg"; artCache.set(j,im); } else artCache.set(j,qArt(Q,W,Hh)); } return artCache.get(j); };
   const show=(j,anim)=>{ i=j; const Q=H[j], f=document.getElementById("qhf"), ar=document.getElementById("qhart"), cp=document.getElementById("qhc"); if(!f) return;
-    const put=()=>{ document.getElementById("qhq").innerHTML=Q.q; document.getElementById("qha").innerHTML=`${Q.a} <a href="${Q.href}">Ver la respuesta →</a>`; ar.innerHTML=""; const n=artFor(j); if(n){ ar.appendChild(n); if(!n.__done&&n.__intro&&!reduce){ n.__intro(); } n.__done=true; } ar.style.minHeight=""; cp.textContent=Q.cap; [f,ar,cp].forEach(e=>e.classList.remove("out")); spotStart(Q,n); };
+    const put=()=>{ document.getElementById("qhq").innerHTML=Q.q; document.getElementById("qha").innerHTML=`${Q.a} <a href="${Q.href}">Ver la respuesta →</a>`; ar.innerHTML=""; const n=artFor(j); if(n){ ar.appendChild(n); n.__done=true; } ar.style.minHeight=""; cp.textContent=Q.cap; [f,ar,cp].forEach(e=>e.classList.remove("out")); spotStart(Q,n); };
     dots.querySelectorAll("button[data-i]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.i===j));
     if(anim){ [f,ar,cp].forEach(e=>e.classList.add("out")); setTimeout(put,450); } else put(); };
   const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2993,6 +3001,7 @@ function spotStart(Q,n){
 // aparición al hacer scroll
 let QIO=null;
 function revealObserve(root){
+  (root||document).querySelectorAll(".rv:not(.in)").forEach(el=>el.classList.add("in")); return;
   if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if(!("IntersectionObserver" in window)) return;
   if(!QIO) QIO=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); QIO.unobserve(e.target); } }),{rootMargin:"0px 0px -12% 0px",threshold:.15});
@@ -3005,11 +3014,11 @@ async function renderPreguntas(){
   document.title="Preguntas · Indicio";
   view.innerHTML=pageHead("Preguntas","Preguntas reales sobre cómo vivimos, respondidas con datos públicos. Cada una lleva su respuesta corta y, dentro, cómo se ha calculado, con qué método y qué se puede concluir.")+`<div class="qg" id="qg"><p class="loading">Cargando…</p></div>
     <section class="ed-sec ed-two"><div><div class="ed-k">¿Y la tuya?</div><h2 class="ed-h2">Si tu pregunta no está, pruébala en el laboratorio</h2><p class="ed-lead">Elige dos datos y mira si van juntos en los ${nf0.format(rowsAll().length)} municipios. Te decimos cuánto aguanta la relación cuando se compara entre iguales.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a> · <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><div></div></section>`;
-  try{ await loadTopo(); }catch(e){}
+  const L0=qGet(); if(L0.some(Q=>!ARTS.has(Q.id))){ try{ await loadTopo(); }catch(e){} }
   const L=qGet(), g=document.getElementById("qg"); if(!g) return; g.innerHTML="";
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
   const sid=href=>(String(href).match(/^\/preguntas\/([\w-]+)\/?$/)||[])[1];
-  L.forEach(Q=>{ const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; const art=FEATS?qArt(Q,320,Q.art==="swarm"?220:190):null; if(art) a.appendChild(art);
+  L.forEach(Q=>{ const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; a.dataset.qid=Q.id; const art=qCard(Q,320,Q.art==="swarm"?220:190); if(art) a.appendChild(art);
     a.insertAdjacentHTML("beforeend",`<div class="k">${Q.k}${S?` · <span class="k-m">${esc(S.m)}</span>`:""}</div><div class="q">${Q.q.replace(/<\/?em>/g,"")}</div><div class="a">${Q.a}</div><div class="go">Ver la respuesta →${S&&S.pub?`<time datetime="${S.pub}">${fechaES(S.pub)}</time>`:""}</div>`); });
   const used=new Set(L.map(Q=>sid(Q.href)).filter(Boolean));
   STUDIES.filter(S=>!used.has(S.id)).forEach(S=>{ const a=add(g,"a"); a.href="/preguntas/"+S.id+"/";

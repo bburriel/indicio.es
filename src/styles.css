@@ -834,7 +834,8 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .qg > a:nth-child(3n+1){padding-left:0}
 .qg > a:nth-child(3n){border-right:0; padding-right:0}
 .qg > a:nth-child(n+4){border-top:1px solid var(--rule)}
-.qg svg{display:block; width:100%; height:auto; margin-bottom:12px}
+.qh-art img.qimg{display:block; width:100%; height:auto}
+.qg svg,.qg img.qimg{display:block; width:100%; height:auto; margin-bottom:12px; background:var(--bg)}
 .qg .k{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600}
 .qg .q{font-family:var(--serif); font-size:clamp(21px,2.1vw,24px); line-height:1.2; margin:4px 0 8px; text-wrap:balance}
 .qg .a{font-family:var(--serif); font-size:16px; line-height:1.45; color:var(--ink-2)}
@@ -860,18 +861,5 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .spot b{font-family:var(--serif); font-weight:600; font-size:15px; color:var(--ink)}
 .spot span{color:var(--muted)}
 .spot:hover{border-color:var(--brand)}
-@media (prefers-reduced-motion: no-preference){
-  /* el texto y las secciones aparecen siempre; solo los dibujos tienen una entrada breve */
-  .rv-bars rect{transform-box:fill-box; transform-origin:50% 100%; transform:scaleY(0); transition:transform .9s cubic-bezier(.2,.7,.2,1)}
-  .rv-bars.in rect{transform:none}
-  .rv-bars.in rect:nth-child(4n+1){transition-delay:.05s} .rv-bars.in rect:nth-child(4n+2){transition-delay:.15s} .rv-bars.in rect:nth-child(4n+3){transition-delay:.25s} .rv-bars.in rect:nth-child(4n){transition-delay:.35s}
-  .rv-spikes g path{transform-box:fill-box; transform-origin:50% 100%; transform:scaleY(0); transition:transform 1s cubic-bezier(.2,.7,.2,1) .2s}
-  .rv-spikes.in g path{transform:none}
-  .rv-ridge path[fill="none"]{stroke-dasharray:1400; stroke-dashoffset:1400; transition:stroke-dashoffset 2.2s ease}
-  .rv-ridge.in path[fill="none"]{stroke-dashoffset:0}
-  .rv-tiles rect,.rv-turnout circle{opacity:0; transition:opacity .9s ease}
-  .rv-tiles.in rect,.rv-turnout.in circle{opacity:1}
-  .rv-tiles.in rect:nth-child(3n){transition-delay:.25s} .rv-tiles.in rect:nth-child(3n+1){transition-delay:.5s}
-  .rv-scatter line{stroke-dasharray:600; stroke-dashoffset:600; transition:stroke-dashoffset 1.4s ease .5s}
-  .rv-scatter.in line{stroke-dashoffset:0}
-}
+/* los dibujos aparecen completos, sin animación de entrada (la primera impresión manda) */
+.rv{opacity:1}
