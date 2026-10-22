@@ -958,3 +958,14 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 @media (max-width:760px){ .logo{font-size:26px} }
 /* sin buscador en la cabecera: el botón de tu municipio ocupa su sitio */
 @media (max-width:760px){ .mymun{order:2; margin-left:auto; max-width:55%} }
+
+/* Portada: eslogan, dos botones y un solo gráfico */
+.qh-claim .qh-q{max-width:19ch}
+.qh-claim .qh-a{min-height:0; max-width:700px}
+.qh-cta{display:flex; gap:10px; flex-wrap:wrap; margin-top:22px}
+.btn{display:inline-block; background:var(--ink); color:var(--bg); text-decoration:none; font-weight:700; font-size:15.5px; padding:11px 20px; border-radius:999px; border:1.5px solid var(--ink)}
+.btn:hover{background:var(--brand); border-color:var(--brand); color:#fff}
+.btn.alt{background:transparent; color:var(--ink)} .btn.alt:hover{background:var(--band); color:var(--ink); border-color:var(--ink)}
+.qh-claim .qh-art{display:block; margin-top:34px}
+.qh-claim .qh-cap{font-size:13.5px; color:var(--muted); margin-top:8px; font-style:italic; font-family:var(--serif)}
+.qh-claim .qh-cap a{color:var(--brand); font-style:normal; font-family:var(--font); font-weight:600; text-decoration:none; white-space:nowrap}

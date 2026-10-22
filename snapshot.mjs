@@ -38,9 +38,9 @@ for(const [w,h,suf] of [[1280,900,""],[600,900,"-m"]]){
   await artPage.goto(BASE+"/?live=1",{waitUntil:"domcontentloaded"});
   await artPage.waitForFunction(()=>document.querySelector("#qhart svg"),{timeout:40000}).catch(()=>{});
   await artPage.waitForTimeout(2500);
-  const n=await artPage.evaluate(()=>document.querySelectorAll("#qhd button[data-i]").length);
+  const n=Math.max(1,await artPage.evaluate(()=>document.querySelectorAll("#qhd button[data-i]").length));
   for(let j=0;j<n;j++){
-    await artPage.evaluate(j=>document.querySelector(`#qhd button[data-i="${j}"]`).click(),j);
+    await artPage.evaluate(j=>{ const b=document.querySelector(`#qhd button[data-i="${j}"]`); if(b) b.click(); },j);
     await artPage.waitForTimeout(1200);
     await artPage.evaluate(()=>{ document.querySelectorAll("#qhart .spot,#qhart .spot-ring").forEach(e=>e.remove()); const s=document.querySelector("#qhart svg"); if(s){ s.classList.add("in"); s.querySelectorAll("*").forEach(e=>{ e.style.transition="none"; }); } });
     const id=await artPage.evaluate(()=>document.querySelector("#qha a")?.getAttribute("href")||"");

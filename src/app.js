@@ -2828,6 +2828,44 @@ const qProj=(W,H,pad=4)=>d3.geoConicConformalSpain().fitExtent([[pad,pad],[W-pad
 // ---------- dibujos ----------
 const SWARM_CACHE=new Map();
 const QART={
+  // pandemia: cuánto subió el paro de 2019 a 2020 en cada provincia; en granate, las diez más turísticas
+  covid(W,H){ const C=QC(), sv=qSvg(W,H,"Subida del paro de 2019 a 2020 en cada provincia; en granate, las más turísticas"), PY=REFS.paroYears, i19=PY.indexOf(2019), i20=PY.indexOf(2020);
+    const P=Object.keys(REFS.paro.prov).filter(p=>REFS.prov[p]&&REFS.prov[p].vtp&&REFS.paro.prov[p].paro&&!["51","52"].includes(p)), vt=p=>REFS.prov[p].vtp[REFS.prov[p].vtp.length-1];
+    const TUR=new Set(P.slice().sort((a,b)=>vt(b)-vt(a)).slice(0,10));
+    const g=P.map(p=>({p,v:(REFS.paro.prov[p].paro[i20]/REFS.paro.prov[p].paro[i19]-1)*100,t:TUR.has(p)})).sort((a,b)=>b.v-a.v);
+    const w=W/g.length, hb=d3.scaleLinear().domain([0,d3.max(g,d=>d.v)]).range([0,H-34]);
+    sv.append("g").selectAll("rect").data(g).join("rect").attr("x",(d,i)=>i*w+w*.14).attr("y",d=>H-20-hb(Math.max(0,d.v))).attr("width",w*.72).attr("height",d=>hb(Math.max(0,d.v))).attr("rx",Math.min(2,w*.3)).attr("fill",d=>d.t?C.br:C.rule2);
+    sv.append("line").attr("x1",0).attr("x2",W).attr("y1",H-20).attr("y2",H-20).attr("stroke",C.ink).attr("stroke-width",.8);
+    qTxt(sv,0,H-4,"Más subida del paro en 2020",{sans:true,s:11,c:C.mute}); qTxt(sv,W,H-4,"menos",{sans:true,s:11,c:C.mute,a:"end"});
+    return sv.node(); },
+  // tope del alquiler: Cataluña frente a España desde 2015, con la marca del tope
+  tope(W,H){ const C=QC(), sv=qSvg(W,H,"Precio del alquiler declarado en Cataluña y en España desde 2015, con la marca de 2024"), Y=REFS.ipvaYears, i0=Y.indexOf(2015);
+    const cat=Y.map((y,i)=>d3.mean(CATP,p=>REFS.prov[p]&&REFS.prov[p].ipva?REFS.prov[p].ipva[i]:null)), es=REFS.es.ipva;
+    const s1=Y.slice(i0).map((y,j)=>({y,c:cat[i0+j]/cat[i0]*100,e:es[i0+j]/es[i0]*100}));
+    const X=d3.scaleLinear().domain([2015,Y[Y.length-1]]).range([10,W-70]), V=d3.scaleLinear().domain([97,d3.max(s1,d=>Math.max(d.c,d.e))+2]).range([H-22,10]);
+    [104,112,120].forEach(v=>{ if(v<V.domain()[1]) sv.append("line").attr("x1",10).attr("x2",W-70).attr("y1",V(v)).attr("y2",V(v)).attr("stroke",C.rule).attr("stroke-width",1); });
+    const xt=X(2024); sv.append("rect").attr("x",xt).attr("y",6).attr("width",W-70-xt).attr("height",H-28).attr("fill",C.br).attr("fill-opacity",.07);
+    sv.append("line").attr("x1",xt).attr("x2",xt).attr("y1",6).attr("y2",H-22).attr("stroke",C.br).attr("stroke-dasharray","3 3");
+    qTxt(sv,xt-4,18,"tope",{s:12,c:C.br,a:"end"});
+    const ln=k=>d3.line().x(d=>X(d.y)).y(d=>V(d[k])).curve(d3.curveMonotoneX)(s1);
+    sv.append("path").attr("d",ln("e")).attr("fill","none").attr("stroke",C.mute).attr("stroke-width",2);
+    sv.append("path").attr("d",ln("c")).attr("fill","none").attr("stroke",C.br).attr("stroke-width",3);
+    const L=s1[s1.length-1]; qTxt(sv,X(L.y)+6,V(L.c)+(L.c>=L.e?-2:10),"Cataluña",{sans:true,s:11.5,c:C.br}); qTxt(sv,X(L.y)+6,V(L.e)+(L.c>=L.e?10:-2),"España",{sans:true,s:11.5,c:C.mute});
+    sv.append("line").attr("x1",10).attr("x2",W-70).attr("y1",H-22).attr("y2",H-22).attr("stroke",C.ink).attr("stroke-width",.8);
+    qTxt(sv,10,H-6,"2015",{sans:true,s:11,c:C.mute}); qTxt(sv,W-70,H-6,String(L.y),{sans:true,s:11,c:C.mute,a:"end"});
+    return sv.node(); },
+  // pensiones: cómo se reparte el peso de los mayores de 65 entre los municipios
+  pens(W,H){ const C=QC(), sv=qSvg(W,H,"Cuántos municipios hay según el porcentaje de mayores de 65 años"), vals=qRows(r=>r[F.mayores65]!=null).map(r=>r[F.mayores65]);
+    const X=d3.scaleLinear().domain([5,55]).range([4,W-4]).clamp(true), bins=d3.bin().domain(X.domain()).thresholds(40)(vals.filter(v=>v>=5&&v<=55));
+    const Yc=d3.scaleLinear().domain([0,d3.max(bins,b=>b.length)]).range([H-22,10]);
+    const id="pg"+Math.round(Math.random()*1e6), df=sv.append("defs").append("linearGradient").attr("id",id).attr("x1",0).attr("x2",1);
+    [[0,"#e8cfd1"],[.5,"#b45e6c"],[1,"#5a1a26"]].forEach(([o,c])=>df.append("stop").attr("offset",o).attr("stop-color",c));
+    const ar=d3.area().x(b=>X((b.x0+b.x1)/2)).y0(H-22).y1(b=>Yc(b.length)).curve(d3.curveBasis);
+    sv.append("path").attr("d",ar(bins)).attr("fill",`url(#${id})`);
+    const m=esMean("mayores65"); if(m!=null){ sv.append("line").attr("x1",X(m)).attr("x2",X(m)).attr("y1",8).attr("y2",H-22).attr("stroke",C.ink).attr("stroke-dasharray","3 3"); qTxt(sv,X(m)+5,18,"España",{sans:true,s:11,c:C.ink}); }
+    sv.append("line").attr("x1",0).attr("x2",W).attr("y1",H-22).attr("y2",H-22).attr("stroke",C.ink).attr("stroke-width",.8);
+    qTxt(sv,0,H-6,"menos mayores de 65",{sans:true,s:11,c:C.mute}); qTxt(sv,W,H-6,"más",{sans:true,s:11,c:C.mute,a:"end"});
+    return sv.node(); },
   // horizonte de pueblos: cuánto han ganado o perdido desde 2005, coloreado por edad
   swarm(W,H){ const C=QC(), sv=qSvg(W,H,"Cada municipio como un punto según cuánta población ha ganado o perdido desde 2005, coloreado por su edad media"), mid=H/2+6, mob=W<800;
     const X0=d3.scaleLinear().domain([-70,100]).range([16,W-(mob?60:110)]), X=v=>v<=100?X0(Math.max(-70,v)):X0(100)+Math.log(v/100)*(mob?20:38);
@@ -2949,10 +2987,12 @@ const qArt=(Q,W,H)=>{ try{ const n=QART[Q.art](W,H); if(n) n.classList.add("rv",
 let QH_T=null;
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
-  view.innerHTML=`<section class="qh"><div class="kk2">Preguntas reales. Respuestas con datos públicos.</div>
-    <div class="qh-fade" id="qhf"><h1 class="qh-q" id="qhq"></h1><p class="qh-a" id="qha"></p></div>
-    <div class="qh-dots" id="qhd"></div>
-    <div class="qh-art qh-fade" id="qhart" style="min-height:200px"></div><p class="qh-cap qh-fade" id="qhc"></p></section>
+  // cabecera: qué hacemos, en una frase, y un solo gráfico de análisis (la nube de municipios del campo)
+  view.innerHTML=`<section class="qh qh-claim"><div class="kk2">Datos públicos de los ${nf0.format(rowsAll().length)} municipios de España</div>
+    <h1 class="qh-q">Preguntas sobre cómo vivimos, <em>respondidas con datos</em></h1>
+    <p class="qh-a">Cogemos preguntas reales —¿se vacía el campo?, ¿encarecen el alquiler los pisos turísticos?— y las respondemos con datos públicos, municipio a municipio y con el método a la vista. Y si tienes otra, en el laboratorio compruebas tú si algo es causa o casualidad.</p>
+    <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
+    <a class="qh-art" id="qhart" href="/preguntas/cerca-ciudad/" aria-label="¿Se vacía el campo por la distancia o por la edad?"></a><p class="qh-cap" id="qhc"></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que de verdad dicen los datos</h2><div class="qg" id="qg"><p class="loading">Cargando…</p></div>
     <p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
   <section class="ed-sec ed-two"><a class="ed-ill" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
@@ -2981,26 +3021,11 @@ async function renderInicio(){
       sv.append("line").attr("x1",0).attr("x2",W).attr("y1",H-6).attr("y2",H-6).attr("stroke",C.ink).attr("stroke-width",.7); return sv.node(); })()
       : (()=>{ const n=QART.scatter(250,120,x,y); n.querySelectorAll("circle").forEach(c=>c.setAttribute("r",.9)); return n; })();
     d.appendChild(s); d.insertAdjacentHTML("beforeend",`<div style="font-size:12.5px;color:var(--ink-2);margin-top:4px">${t}</div>`); }catch(e){ console.error(e); } });
-  // cabecera: el texto sale ya; el dibujo grande se calcula en vivo cuando llega el mapa
-  const H=L.filter(Q=>Q.hero), artCache=new Map(); let i=0; window.__INDICIO_HERO=H.map(Q=>Q.id);
-  { const q0=document.getElementById("qhq"), a0=document.getElementById("qha"), c0=document.getElementById("qhc"); if(q0){ q0.innerHTML=H[0].q; a0.innerHTML=`${H[0].a} <a href="${H[0].href}">Ver la respuesta →</a>`; c0.textContent=H[0].cap; } }
-  const heroStatic=H.every(Q=>ARTS.has("hero-"+Q.id));
-  if(!heroStatic){ try{ await loadTopo(); }catch(e){ return; } }
-  if(!document.getElementById("qhd")) return;
-  const dots=document.getElementById("qhd");
-  dots.innerHTML=H.map((Q,j)=>`<button type="button" aria-label="Pregunta ${j+1}" data-i="${j}"></button>`).join("")+`<button type="button" class="pp" id="qhpp">pausar</button>`;
-  const artFor=j=>{ if(!artCache.has(j)){ const mob=wide<700, Q=H[j]; const W=mob?720:1120, Hh=mob?520:380; if(ARTS.has("hero-"+Q.id)){ const im=el("img"); im.src="/art/hero-"+Q.id+(mob?"-m":"")+".jpg"; im.width=W; im.height=Hh; im.alt=""; im.decoding="async"; im.className="qimg"; artCache.set(j,im); } else artCache.set(j,qArt(Q,W,Hh)); } return artCache.get(j); };
-  const show=(j,anim)=>{ i=j; const Q=H[j], f=document.getElementById("qhf"), ar=document.getElementById("qhart"), cp=document.getElementById("qhc"); if(!f) return;
-    const put=()=>{ document.getElementById("qhq").innerHTML=Q.q; document.getElementById("qha").innerHTML=`${Q.a} <a href="${Q.href}">Ver la respuesta →</a>`; ar.innerHTML=""; const n=artFor(j); if(n){ ar.appendChild(n); n.__done=true; } ar.style.minHeight=""; cp.textContent=Q.cap; [f,ar,cp].forEach(e=>e.classList.remove("out")); spotStart(Q,n); };
-    dots.querySelectorAll("button[data-i]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.i===j));
-    if(anim){ [f,ar,cp].forEach(e=>e.classList.add("out")); setTimeout(put,450); } else put(); };
-  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-  setTimeout(()=>show(0,false),30);
-  const pp=document.getElementById("qhpp"), stop=()=>{ if(QH_T){ clearInterval(QH_T); QH_T=null; } pp.textContent="seguir"; }, start=()=>{ stop(); pp.textContent="pausar"; QH_T=setInterval(()=>{ if(!document.body.contains(dots)){ stop(); return; } show((i+1)%H.length,true); },9000); };
-  dots.querySelectorAll("button[data-i]").forEach(b=>b.addEventListener("click",()=>{ stop(); show(+b.dataset.i,true); }));
-  pp.addEventListener("click",()=>{ QH_T?stop():start(); });
-  pp.hidden=true; // la portada no rota sola: el lector elige con los puntos
-  setTimeout(()=>{ for(let j=1;j<H.length;j++) artFor(j); },1500);
+  const Q=L.find(x=>x.id==="campo"); window.__INDICIO_HERO=["campo"];
+  const ar=document.getElementById("qhart"), cp=document.getElementById("qhc"); if(!ar||!Q) return;
+  cp.innerHTML=`${esc(Q.cap)} <a href="${Q.href}">¿Se vacía el campo por la distancia o por la edad? →</a>`;
+  if(ARTS.has("hero-campo")){ const mob=wide<700, im=el("img"); im.src="/art/hero-campo"+(mob?"-m":"")+".jpg"; im.width=mob?720:1120; im.height=mob?520:380; im.alt=""; im.decoding="async"; im.className="qimg"; ar.appendChild(im); }
+  else { try{ await loadTopo(); }catch(e){ return; } const n=qArt(Q,wide<700?720:1120,wide<700?520:380); if(n&&document.body.contains(ar)) ar.appendChild(n); }
 }
 
 // un pueblo al azar, señalado sobre el dibujo
@@ -3054,7 +3079,9 @@ async function renderPreguntas(){
   L.forEach(Q=>{ const S=byId[sid(Q.href)]; const a=add(g,"a"); a.href=Q.href; a.dataset.qid=Q.id; a.dataset.tema=S?S.tema:((QUICKQ.find(x=>x.id===Q.id)||{}).tema||""); const art=qCard(Q,320,Q.art==="swarm"?220:190); if(art) a.appendChild(art);
     a.insertAdjacentHTML("beforeend",`<div class="k">${Q.k}${S?` · <span class="k-m">${esc(S.m)}</span>`:""}</div><div class="q">${Q.q.replace(/<\/?em>/g,"")}</div><div class="a">${Q.a}</div><div class="go">Ver la respuesta →${S&&S.pub?`<time datetime="${S.pub}">${fechaES(S.pub)}</time>`:""}</div>`); });
   const used=new Set(L.map(Q=>sid(Q.href)).filter(Boolean));
+  const SART={"tope-cataluna":"tope",pensiones:"pens","pandemia-turismo":"covid"};
   STUDIES.filter(S=>!used.has(S.id)).forEach(S=>{ const a=add(g,"a"); a.href="/preguntas/"+S.id+"/"; a.dataset.tema=S.tema;
+    if(SART[S.id]){ try{ const n=QART[SART[S.id]](320,190); n.classList.add("qart-"+SART[S.id]); a.appendChild(n); }catch(e){ console.error(e); } }
     a.insertAdjacentHTML("beforeend",`<div class="k">${esc(TOPICL(S.tema))} · <span class="k-m">${esc(S.m)}</span></div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.d)}</div><div class="go">Ver la respuesta →${S.pub?`<time datetime="${S.pub}">${fechaES(S.pub)}</time>`:""}</div>`); });
   // filtro por tema sin recargar: cambia la URL, oculta tarjetas y muestra el panorama del tema
   const apply=t=>{ g.querySelectorAll("a[data-tema]").forEach(a=>a.hidden=!!t&&a.dataset.tema!==t);
