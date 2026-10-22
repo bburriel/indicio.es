@@ -354,7 +354,7 @@ async function renderSpain(){
     <section class="finding" id="mapa"></section>
     ${methodNote()}`;
   attachSearch(document.getElementById("q2"),document.getElementById("results2"),document.getElementById("bigsearch"));
-  view.querySelectorAll(".homeq a").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const [l,v,o]=EXQ[+x.dataset.q]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null}; if(o.e){ ES_.sel=o.e.slice(); ES_.base=null; } navTo(exHash()); }));
+  view.querySelectorAll(".homeq a").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const [l,v,o]=EXQ[+x.dataset.q]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null,sz:"",col:"",q:0}; if(o.e){ ES_.sel=o.e.slice(); ES_.base=null; } navTo(exHash()); }));
   const H=document.getElementById("hall");
 
   // 1. Riqueza por comunidades
@@ -1243,7 +1243,27 @@ function pairPts(x,y,{minPop=0,prov=null,logX=false,logY=false,weighted=true}={}
 }
 
 // gráfico de dispersión: canvas para los puntos, svg para ejes y anotaciones
-function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,diag=false,height,weighted=true,compact=false,title,source,hideSay=false}){
+// tercera variable: tamaño y color de los puntos
+const ENC_SZ=[["","Habitantes"],["1","Todos iguales"]], ENC_COL=[["","Ninguno"],["tam","Tamaño del municipio"],["costa","Costa o interior"]];
+const ENC_PAL=()=>[css("--slate"),css("--rust"),css("--olive"),css("--mustard"),css("--plum")];
+function encOK(k,kind){ return kind==="sz"?(k===""||k==="1"||!!CATK[k]):(k===""||k==="tam"||k==="costa"||!!CATK[k]); }
+const encLab=(k,kind)=>(kind==="sz"?ENC_SZ:ENC_COL).find(o=>o[0]===k)?.[1]||labK(k);
+function makeEnc(rows,{sz="",col=""}){
+  const out={};
+  if(sz&&sz!=="1"&&CATK[sz]&&F[sz]!=null){ const v=rows.map(r=>r[F[sz]]).filter(a=>a!=null).sort(d3.ascending), n=v.length;
+    out.r=r=>{ const a=r[F[sz]]; if(a==null) return 1.5; return 1.5+9.5*Math.sqrt(d3.bisectLeft(v,a)/Math.max(1,n-1)); }; out.rl=`Tamaño: ${labK(sz)}`; }
+  else if(sz==="1"){ out.r=()=>3.2; out.rl="Todos del mismo tamaño"; }
+  if(col){ const P=ENC_PAL();
+    if(col==="tam"){ const B=[[0,500,"menos de 500"],[500,5000,"500 a 5.000"],[5000,50000,"5.000 a 50.000"],[50000,1e9,"más de 50.000"]]; const cs=[P[0],P[2],P[3],P[1]];
+      out.c=r=>{ const a=r[F.pop]||0, i=B.findIndex(b=>a>=b[0]&&a<b[1]); return cs[Math.max(0,i)]; }; out.cl=B.map((b,i)=>[cs[i],b[2]+" hab."]); }
+    else if(col==="costa"){ out.c=r=>r[F.distCosta]==null?P[4]:r[F.distCosta]<=10?P[0]:P[3]; out.cl=[[P[0],"Costa (a menos de 10 km)"],[P[3],"Interior"]]; }
+    else if(CATK[col]&&F[col]!=null){ const v=rows.map(r=>r[F[col]]).filter(a=>a!=null).sort(d3.ascending), t1=d3.quantile(v,1/3), t2=d3.quantile(v,2/3), cs=[P[0],css("--stone"),P[1]], fm=fmtK(col);
+      out.c=r=>{ const a=r[F[col]]; return a==null?css("--rule-2"):a<=t1?cs[0]:a<=t2?cs[1]:cs[2]; };
+      out.cl=[[cs[0],`${labK(col)}: bajo (hasta ${fm(t1)})`],[cs[1],"medio"],[cs[2],`alto (desde ${fm(t2)})`]]; } }
+  out.legend=()=>{ const parts=[]; if(out.cl) parts.push(...out.cl.map(([c,l])=>`<span><i style="background:${c}"></i>${esc(l)}</span>`)); if(out.rl&&sz!=="1") parts.push(`<span class="sz"><i class="s1"></i><i class="s2"></i><i class="s3"></i>${esc(out.rl.replace("Tamaño: ","Tamaño: más grande = más "))}</span>`); return parts.length?`<div class="enclg">${parts.join("")}</div>`:""; };
+  return out;
+}
+function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,diag=false,height,weighted=true,compact=false,title,source,hideSay=false,enc=null,quad=false}){
   const fx=fmtK(x), fy=fmtK(y), xl=labK(x), yl=labK(y);
   const pts=pairPts(x,y,{minPop,logX,logY,weighted});
   const c=wcorr(pts);
@@ -1270,13 +1290,18 @@ function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,
   else if(c&&Math.abs(c.r)>=0.1){ const [a,b]=X.domain(), tx=v=>logX?Math.log10(v):v, ty=v=>logY?Math.pow(10,v):v; const N=24, line=d3.range(N+1).map(i=>{ const xv=logX?a*Math.pow(b/a,i/N):a+(b-a)*i/N; return [X(xv),Y(ty(c.a+c.b*tx(xv)))]; });
     svg.append("path").attr("d",d3.line()(line)).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-width",1.3).attr("stroke-dasharray","5 4"); }
   const base=css("--rust"), hl=css("--slate"), ink=css("--ink");
-  const sorted=pts.slice().sort((a,b)=>(b.r[F.pop]||0)-(a.r[F.pop]||0));
+  const E=enc&&(enc.sz||enc.col)?makeEnc(pts.map(p=>p.r),enc):null, rad=r=>E&&E.r?E.r(r):Rr(r[F.pop]||1);
+  const sorted=pts.slice().sort((a,b)=>rad(b.r)-rad(a.r));
+  if(quad&&c){ const mx_=d3.mean(pts,p=>p.x0), my_=d3.mean(pts,p=>p.y0); const [x0_]=X.range(), qx=logX?X(Math.pow(10,d3.mean(pts,p=>Math.log10(p.x0)))):X(mx_), qy=Y(my_);
+    svg.append("line").attr("class","quad").attr("x1",qx).attr("x2",qx).attr("y1",m.t).attr("y2",H-m.b); svg.append("line").attr("class","quad").attr("x1",m.l).attr("x2",W-m.r).attr("y1",qy).attr("y2",qy);
+    const T=(tx,ty,an,t)=>svg.append("text").attr("class","lab quadt").attr("x",tx).attr("y",ty).attr("text-anchor",an).text(t);
+    const sh=k=>labK(k).toLowerCase(); T(m.l+6,m.t+12,"start",`menos ${sh(x)} · más ${sh(y)}`.slice(0,46)); T(W-m.r-4,m.t+12,"end",`más ${sh(x)} · más ${sh(y)}`.slice(0,46)); T(m.l+6,H-m.b-6,"start",`menos ${sh(x)} · menos ${sh(y)}`.slice(0,46)); T(W-m.r-4,H-m.b-6,"end",`más ${sh(x)} · menos ${sh(y)}`.slice(0,46)); }
   function paint(focus){
     ctx.clearRect(0,0,W,H);
-    for(const p of sorted){ const isP=prov&&p.r[F.prov]===prov; ctx.beginPath(); ctx.arc(X(p.x0),Y(p.y0),Rr(p.r[F.pop]||1),0,7); ctx.fillStyle=isP?hl:base; ctx.globalAlpha=prov?(isP?.8:.10):.30; ctx.fill(); }
+    for(const p of sorted){ const isP=prov&&p.r[F.prov]===prov; ctx.beginPath(); ctx.arc(X(p.x0),Y(p.y0),rad(p.r),0,7); ctx.fillStyle=E&&E.c&&!prov?E.c(p.r):isP?hl:base; ctx.globalAlpha=prov?(isP?.8:.10):E&&E.c?.5:.30; ctx.fill(); }
     ctx.globalAlpha=1;
     for(const code of [mark,(typeof MUN2!=="undefined"?MUN2:null),focus].filter(Boolean)){ const p=pts.find(q=>q.r[F.code]===code); if(!p) continue; const px=X(p.x0), py=Y(p.y0);
-      ctx.beginPath(); ctx.arc(px,py,Math.max(5,Rr(p.r[F.pop]||1)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke();
+      ctx.beginPath(); ctx.arc(px,py,Math.max(5,rad(p.r)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke();
       ctx.font="600 12.5px 'Libre Franklin', Arial, sans-serif"; ctx.fillStyle=ink; const nm=dispName(p.r[F.name]), tw=ctx.measureText(nm).width; ctx.fillText(nm,px+tw+12>W?px-tw-9:px+9,py-8); }
   }
   paint();
@@ -1285,12 +1310,13 @@ function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,
   const at=ev=>{ const bb=cv.getBoundingClientRect(); return [bb,qt.find((ev.clientX-bb.left)*W/bb.width,(ev.clientY-bb.top)*H/bb.height,16)]; };
   wrap.addEventListener("pointermove",ev=>{ const [bb,p]=at(ev);
     if(!p){ tip.hidden=true; paint(); wrap.style.cursor=""; return; } wrap.style.cursor="pointer";
-    tip.innerHTML=`<b>${esc(p.r[F.name])}</b><br>${esc(xl)}: ${fx(p.x0)}<br>${esc(yl)}: ${fy(p.y0)}`; tip.hidden=false;
+    tip.innerHTML=`<b>${esc(p.r[F.name])}</b><br>${esc(xl)}: ${fx(p.x0)}<br>${esc(yl)}: ${fy(p.y0)}${enc&&enc.sz&&enc.sz!=="1"&&CATK[enc.sz]&&p.r[F[enc.sz]]!=null?`<br>${esc(labK(enc.sz))}: ${fmtK(enc.sz)(p.r[F[enc.sz]])}`:""}${enc&&CATK[enc.col]&&p.r[F[enc.col]]!=null?`<br>${esc(labK(enc.col))}: ${fmtK(enc.col)(p.r[F[enc.col]])}`:""}`; tip.hidden=false;
     tip.style.left=Math.max(tip.offsetWidth/2+4,Math.min(bb.width-tip.offsetWidth/2-4,(X(p.x0)/W)*bb.width))+"px"; tip.style.top=(Y(p.y0)/H*bb.height-6)+"px"; paint(p.r[F.code]); });
   wrap.addEventListener("pointerleave",()=>{ tip.hidden=true; paint(); });
   wrap.addEventListener("click",ev=>{ const [,p]=at(ev); if(p){ go(p.r[F.code]); window.scrollTo(0,0); } });
   if(!source){ const n=add(f,"figcaption",null,""); n.textContent=`${nf0.format(pts.length)} municipios${minPop?` de ${nf0.format(minPop)} habitantes o más`:""}.`; }
-  else f._cap.textContent+=` Cada círculo es un municipio, más grande cuanta más población. Pulsa uno para abrir su ficha.`;
+  else f._cap.textContent+=` Cada círculo es un municipio${E&&E.r?"":", más grande cuanta más población"}. Pulsa uno para abrir su ficha.`;
+  if(E&&E.legend().length){ const lg=el("div",null,E.legend()); f.body.after(lg.firstChild); }
   return c;
 }
 
@@ -1299,7 +1325,7 @@ const MATRIX=["renta","pobreza","gini","pensiones","paroReg","superiores","alqui
 const TRIVIAL=new Set(["migExt|extr","migExt|varPob","migInt|varPob","renta|rentaHog","edad|mayores65","edad|menores18","mayores65|menores18","varPob|var0525","edad|pensiones","mayores65|pensiones","pp|psoe","pp|vox","pp|sumar","psoe|vox","psoe|sumar","sumar|vox"]);
 const isTrivial=(a,b)=>TRIVIAL.has([a,b].sort().join("|"));
 const SUGG=[["superiores","renta","¿Más estudios, más renta?"],["vt","alquiler","¿Pisos turísticos y alquiler?"],["edad","pensiones","¿Edad y pensiones?"],["extr","varPob","¿Crecen los que atraen extranjeros?"],["renta","part","¿Votan más los ricos?"],["edad","vox","¿Edad y voto a Vox?"],["paro","pobreza","¿Paro y pobreza?"],["rentaVar","alqVar","¿Renta y alquiler desde 2015?"],["solos","edad","¿Quién vive solo?"],["paroReg","renta","¿Más paro, menos renta?"],["renta","migInt","¿Adónde se muda la gente?"]];
-let XS={x:"superiores",y:"renta",minPop:1000,prov:"",weighted:true,logX:false};
+let XS={x:"superiores",y:"renta",minPop:1000,prov:"",weighted:true,logX:false,sz:"",col:"",quad:0};
 let MATC=null;
 
 function renderRelaciones(x,y){
@@ -1342,7 +1368,7 @@ const unitTxt=(k,v)=>{ const f=(CATK[k]||{}).f; const a=Math.abs(v);
 function drawRel(){
   const S=XS, x=S.x, y=S.y, xl=labK(x), yl=labK(y), fx=fmtK(x), fy=fmtK(y);
   const box=document.getElementById("cplot"); box.innerHTML="";
-  const c=scatter(box,{x,y,minPop:S.minPop,prov:S.prov||null,logX:S.logX,weighted:S.weighted,mark:lastMun,hideSay:true,diag:x==="rentaVar"&&y==="alqVar",
+  const c=scatter(box,{x,y,minPop:S.minPop,prov:S.prov||null,logX:S.logX,weighted:S.weighted,mark:lastMun,hideSay:true,diag:x==="rentaVar"&&y==="alqVar",enc:{sz:S.sz,col:S.col},quad:!!S.quad,
     source:`Fuentes: ${CATK[x].src} (horizontal) y ${CATK[y].src} (vertical).`});
   const pts=pairPts(x,y,{minPop:S.minPop,logX:S.logX,weighted:S.weighted});
   const say=document.getElementById("csay");
@@ -1580,7 +1606,7 @@ const CCAA_OF={"01":"País Vasco","20":"País Vasco","48":"País Vasco","02":"Ca
 const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si podría ser causa"],["evolucion","Evolución","Cuánto ha crecido cada dato desde un año"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Reparto","Cómo se reparte un dato entre la población"]];
 const EXSIZES=[["","Todos los tamaños",0,Infinity],["s1","Menos de 1.000 hab.",0,1000],["s2","1.000 a 10.000 hab.",1000,10000],["s3","10.000 a 50.000 hab.",10000,50000],["s4","Más de 50.000 hab.",50000,Infinity],["g1","1.000 hab. o más",1000,Infinity],["g10","10.000 hab. o más",10000,Infinity]];
 const EXQ=[["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Suben los sueldos como los precios?","evolucion",{e:["salMed","alq","ipc"]}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}],["¿Dónde pesa más la brecha de empleo entre hombres y mujeres?","mapa",{d:["brechaEmpleo","empleoMujeres"]}],["¿Más estudios, menos contratos temporales?","cruce",{d:["superiores2539","temporales"],t:"g1"}],["¿Quién vive de qué? Renta de trabajo frente a renta del capital","cruce",{d:["irpfTrabajo","irpfBruta"],t:"g1"}]];
-let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0};
+let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0};
 
 function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=...&b=2015&r=1
   const m=h.match(/^explorar(?:\/([a-z]+))?(?:\?(.*))?$/); if(!m) return;
@@ -1589,12 +1615,14 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(q.has("d")) EX.d=q.get("d").split(",").filter(k=>CATK[k]).slice(0,6);
   if(q.has("p")) EX.p=q.get("p"); if(q.has("t")) EX.t=q.get("t"); if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
   if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx");
+  if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0;
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=q.get("lv");
 }
 function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParams();
   if(S.d&&S.d.length) q.set("d",S.d.join(",")); if(S.p) q.set("p",S.p); if(S.t) q.set("t",S.t); if(S.m) q.set("m",S.m); if(S.c&&S.c.length) q.set("c",S.c.join(","));
   if(S.v==="grupos") q.set("gb",S.gb); if(S.o) q.set("o",S.o); if(!S.w) q.set("w","0"); if(S.lx) q.set("lx","1");
+  if(S.v==="cruce"){ if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es") q.set("lv",ES_.lev); }
   return "/laboratorio/"+S.v+"/"+(q.toString()?"?"+q.toString().replace(/%2C/g,","):""); }
 // enlace desde los informes
@@ -2185,10 +2213,9 @@ async function topicDecorate(id){
   const hs=[...body.querySelectorAll(":scope > .finding > h2, :scope > section.finding > h2")];
   const words=[...view.querySelectorAll(".txt, .phead .dek")].map(e=>e.textContent).join(" ").split(/\s+/).length+hs.length*40, mins=Math.max(2,Math.round(words/230));
   ph.insertAdjacentHTML("afterbegin",`<div class="tp-crumb"><a href="/preguntas/">Análisis</a> › <a href="/preguntas/?tema=${id}">${T.l}</a> · ${hs.length} ideas · ${mins} minutos de lectura</div>`);
-  const ess=el("section","tp-ess",`<h2>Lo esencial</h2><div class="g4" id="essg"></div><div id="mestrip"></div><nav class="toc" aria-label="Ideas de este tema">${hs.map((h,i)=>{ h.id="idea-"+(i+1); let t=h.textContent; if(t.length>46) t=t.slice(0,44).replace(/\s+\S*$/,"")+"…"; return `<a href="#" data-i="${i+1}">${i+1} · ${esc(t)}</a>`; }).join("")}</nav>`);
+  const ess=el("section","tp-ess",`<h2>Lo esencial</h2><div class="g4" id="essg"></div><div id="mestrip"></div>`);
   ph.after(ess);
-  hs.forEach((h,i)=>{ h.insertAdjacentHTML("afterbegin",`<span class="muted" style="font-weight:600">${i+1} · </span>`); });
-  ess.querySelectorAll(".toc a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); const h=document.getElementById("idea-"+a.dataset.i); if(h) window.scrollTo({top:h.getBoundingClientRect().top+window.scrollY-(document.getElementById("top").offsetHeight+16),behavior:"smooth"}); }));
+  hs.forEach((h,i)=>{ h.id="idea-"+(i+1); });
   meStrip(id);
   // siguiente paso y cómo se mide
   const m=view.querySelector("footer.method");
@@ -2316,18 +2343,20 @@ const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educaci
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
 function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remove(); document.removeEventListener("keydown",pickKey); } }
 function pickKey(e){ if(e.key==="Escape") closePicker(); }
-function openPicker(btn,{current,excl=[],onPick}){
+function openPicker(btn,{current,excl=[],onPick,extras=null}){
   closePicker();
   const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g));
-  let tab=(CATK[current]||{}).g||groups[0], q="";
+  let tab=extras&&!(CATK[current]||{}).g?"Opciones":(CATK[current]||{}).g||groups[0], q="";
+  const EXG="Opciones", tabs=extras?[EXG,...groups]:groups;
   const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p);
   const avail=c=>!excl.includes(c.k)||c.k===current;
   p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
   const draw=()=>{
     const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k).includes(nq);
-    document.getElementById("dpt").innerHTML=groups.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${CAT.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
-    const items=CAT.filter(c=>avail(c)&&(nq?hit(c):c.g===tab));
-    document.getElementById("dpl").innerHTML=items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${nf0.format(cover(c.k))} municipios</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`;
+    document.getElementById("dpt").innerHTML=tabs.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${g===EXG?extras.length:CAT.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
+    const ex=extras&&!nq&&tab===EXG?extras.map(([k,l])=>`<li><button type="button" data-k="${k}" class="${k===current?"on":""}"><b>${esc(l)}</b></button></li>`).join(""):"";
+    const items=tab===EXG&&!nq?[]:CAT.filter(c=>avail(c)&&(nq?hit(c):c.g===tab));
+    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${nf0.format(cover(c.k))} municipios</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
     p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
     p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); }));
   };
@@ -2346,11 +2375,12 @@ function exBar(){
   let slots="";
   if(S){ const used=Math.min(S.n,EX.d.length), lab=i=>typeof S.l==="function"?S.l(i):S.l[i];
     for(let i=0;i<used;i++) slots+=`<div class="slot full"><span class="nm" style="flex:1"><small>${lab(i)}</small><button type="button" class="pick" data-i="${i}" aria-haspopup="dialog" aria-label="${lab(i)}: ${esc(labK(EX.d[i]))}. Cambiar"><span class="pv">${esc(labK(EX.d[i]))}</span><span class="pg">${esc((CATK[EX.d[i]]||{}).g||"")}</span></button></span>${(S.add&&used>1)||(EX.v==="cruce"&&false)?`<button type="button" data-x="${i}" aria-label="Quitar">×</button>`:""}</div>`;
-    if(used<S.n&&(S.add||EX.v==="cruce")) slots+=`<div class="slot"><span class="nm" style="flex:1"><small>${S.add?S.add+" (opcional)":lab(used)}</small><button type="button" class="pick add" data-add="1" aria-haspopup="dialog" aria-label="${S.add||lab(used)}"><span class="pv">+ elige un dato</span></button></span></div>`; }
+    if(EX.v==="cruce"&&used>=2) slots+=["sz","col"].map(kd=>{ const k=EX[kd], on=!!k&&!(kd==="sz"&&k==="1"&&false); return `<div class="slot enc"><span class="nm" style="flex:1"><small>${kd==="sz"?"Tamaño del punto":"Color del punto"} (opcional)</small><button type="button" class="pick${k?"":" add"}" data-enc="${kd}" aria-haspopup="dialog"><span class="pv">${k?esc(encLab(k,kd)):kd==="sz"?"Habitantes":"+ elige un dato"}</span>${k&&CATK[k]?`<span class="pg">${esc(CATK[k].g)}</span>`:""}</button></span>${k&&kd==="col"||k&&kd==="sz"?`<button type="button" data-xenc="${kd}" aria-label="Quitar">×</button>`:""}</div>`; }).join("");
+    if(used<S.n&&(S.add||EX.v==="cruce")&&!(EX.v==="cruce"&&used>=2)) slots+=`<div class="slot"><span class="nm" style="flex:1"><small>${S.add?S.add+" (opcional)":lab(used)}</small><button type="button" class="pick add" data-add="1" aria-haspopup="dialog" aria-label="${S.add||lab(used)}"><span class="pv">+ elige un dato</span></button></span></div>`; }
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC[EX.v]}.</p></div>
-    <div class="lb-step"><h4><i>2</i>Qué datos</h4>${isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
+    <div class="lb-step"><h4><i>2</i>Qué datos</h4>${EX.v==="cruce"?"":""}${isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
     ${isEvo?"":`<div class="lb-step"><h4><i>3</i>Qué municipios</h4>
       <select class="sel" id="exprov" aria-label="Provincia">${`<option value="">Toda España</option>`+Object.keys(PROVS).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")).map(p=>`<option value="${p}" ${p===EX.p?"selected":""}>${esc(provShort(PROVS[p]))}</option>`).join("")}</select>
       <select class="sel" id="exsize" aria-label="Tamaño">${EXSIZES.map(([k,l])=>`<option value="${k}" ${k===EX.t?"selected":""}>${l}</option>`).join("")}</select>
@@ -2358,6 +2388,7 @@ function exBar(){
       <p class="hint" id="excount"></p></div>`}
     <div class="lb-step"><h4><i>${isEvo?3:4}</i>Comprobar</h4>${EX.v==="cruce"?`
       <label class="chk"><input type="checkbox" id="exw" ${EX.w?"checked":""}> Contar según la población</label>
+      <label class="chk"><input type="checkbox" id="exq" ${EX.q?"checked":""}> Marcar cuadrantes (por encima y por debajo de la media)</label>
       <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Escala logarítmica en horizontal</label>
       <button type="button" class="sel" id="exswap" style="margin-top:6px">⇄ Intercambiar ejes</button>
       <p class="hint">Debajo del gráfico: <b>¿causa o casualidad?</b> Marca qué igualar y mira cuánto queda de la relación.</p>`
@@ -2371,6 +2402,9 @@ function exBar(){
   const sz=document.getElementById("exsize"); if(sz) sz.addEventListener("change",e=>{ EX.t=e.target.value; exUpdate(); });
   const lm=document.getElementById("lbmy"); if(lm){ const op=e=>{ e.stopPropagation(); const b=document.getElementById("mymun"); myPop(); }; lm.addEventListener("click",op); lm.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); op(e); } }); }
   if(document.getElementById("exm-q")) attachSearch(document.getElementById("exm-q"),document.getElementById("exm-r"),document.getElementById("exm-s"),r=>{ EX.m=r[F.code]; lastMun=EX.m; saveMun(); exUpdate(); });
+  bar.querySelectorAll("button.pick[data-enc]").forEach(b=>b.addEventListener("click",()=>{ const kd=b.dataset.enc; openPicker(b,{current:EX[kd]||null,excl:EX.d,extras:kd==="sz"?ENC_SZ.slice(1):ENC_COL.slice(1),onPick:v=>{ EX[kd]=v; exUpdate(); }}); }));
+  bar.querySelectorAll("button[data-xenc]").forEach(b=>b.addEventListener("click",()=>{ EX[b.dataset.xenc]=""; exUpdate(); }));
+  const eq=document.getElementById("exq"); if(eq) eq.addEventListener("change",e=>{ EX.q=e.target.checked?1:0; exUpdate(); });
   const w=document.getElementById("exw"); if(w) w.addEventListener("change",e=>{ EX.w=e.target.checked?1:0; exUpdate(); });
   const lx=document.getElementById("exlx"); if(lx) lx.addEventListener("change",e=>{ EX.lx=e.target.checked?1:0; exUpdate(); });
   const sw=document.getElementById("exswap"); if(sw) sw.addEventListener("click",()=>{ EX.d=[EX.d[1],EX.d[0],...EX.d.slice(2)]; exUpdate(); });
@@ -2454,13 +2488,15 @@ async function exPNG(){
 // =====================================================================
 // RELACIÓN + ¿CAUSA O CASUALIDAD? (etiquetas, barra que encoge, gemelos)
 // =====================================================================
-const CTAGS=[["lpop","🏘️","Entre pueblos de tamaño parecido"],["edad","👵","A igual edad"],["renta","💶","A igual renta"],["superiores","🎓","A igual nivel de estudios"],["prov","🗺️","Dentro de cada provincia"]];
-const CNAME={lpop:"el tamaño",edad:"la edad",renta:"la renta",superiores:"los estudios",prov:"la provincia"};
+const CTAGS=[["lpop","🏘️","Entre pueblos de tamaño parecido"],["edad","👵","A igual edad"],["renta","💶","A igual renta"],["superiores","🎓","A igual nivel de estudios"],["distCosta","🌊","A igual distancia al mar"],["distCiudad","🏙️","A igual distancia a una gran ciudad"],["prov","🗺️","Dentro de cada provincia"]];
+const CKNOWN={lpop:"el tamaño",edad:"la edad",renta:"la renta",superiores:"los estudios",prov:"la provincia",distCosta:"la distancia al mar",distCiudad:"la distancia a una gran ciudad"};
+const CSHORT={lpop:"tamaño",edad:"edad",renta:"renta",superiores:"estudios",prov:"provincia",distCosta:"distancia al mar",distCiudad:"distancia a una ciudad"};
+const CNAME=new Proxy(CKNOWN,{get:(o,k)=>typeof k!=="string"?undefined:o[k]||(CATK[k]?`el dato «${low(labK(k))}»`:undefined)});
 let LBPOS=null, CZ=null;
 
 function exCruce(out){
   if(EX.d.length<2){ out.innerHTML='<p class="loading">Pon un segundo dato en el hueco «Vertical» para cruzarlo con el primero.</p>'; return; }
-  const [x,y]=EX.d; XS={...XS,x,y,minPop:0,prov:"",weighted:!!EX.w,logX:!!EX.lx};
+  const [x,y]=EX.d; XS={...XS,x,y,minPop:0,prov:"",weighted:!!EX.w,logX:!!EX.lx,sz:EX.sz,col:EX.col,quad:EX.q};
   LBPOS=null;
   out.innerHTML=`<div id="ctlnote"></div><div id="cplot"></div>`;
   const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" aria-label="¿Causa o casualidad?"><div class="czc-l" id="czl"></div><div class="czc-r"><p class="czc-q" id="cztags"></p><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><p class="czc-m"><button type="button" class="lnk" id="czmore" aria-expanded="false" aria-controls="lbcausal">Entender esta relación a fondo ↓</button> <span class="muted">las pruebas una a una, municipios gemelos y provincia a provincia</span> · <a href="/laboratorio/metodo/">Guía: cómo buscar causas →</a></p></div></section>`;
@@ -2481,7 +2517,8 @@ function czRefresh(animate){
   if(!CZ) return; const {x,y,w,base}=CZ, cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]);
   const tg=document.getElementById("cztags"); if(!tg) return;
   // las etiquetas son casillas dentro de una frase
-  tg.innerHTML=`Comparar solo municipios con igual ${CTAGS.filter(([k])=>k!==x&&k!==y).map(([k])=>`<label class="czk${k===CZ.suspect?" sus":""}"><input type="checkbox" data-k="${k}" ${cs.includes(k)?"checked":""}> ${({lpop:"tamaño",edad:"edad",renta:"renta",superiores:"estudios",prov:"provincia"})[k]}${k===CZ.suspect?' <small>· sospechoso</small>':""}</label>`).join(" ")}`;
+  tg.innerHTML=`Comparar solo municipios con igual ${CTAGS.filter(([k])=>k!==x&&k!==y).map(([k])=>`<label class="czk${k===CZ.suspect?" sus":""}"><input type="checkbox" data-k="${k}" ${cs.includes(k)?"checked":""}> ${CSHORT[k]}${k===CZ.suspect?' <small>· sospechoso</small>':""}</label>`).join(" ")}${cs.filter(k=>!CKNOWN[k]).map(k=>` <label class="czk"><input type="checkbox" data-k="${k}" checked> ${esc(low(labK(k)))}</label>`).join("")} <button type="button" class="czadd" id="czadd">+ otra variable</button>`;
+  document.getElementById("czadd").addEventListener("click",e=>openPicker(e.currentTarget,{current:null,excl:[x,y,...EX.c],onPick:v=>{ EX.c=[...EX.c.filter(c=>c!==v),v]; exSetHash(); czRefresh(true); }}));
   tg.querySelectorAll("input[data-k]").forEach(b=>b.addEventListener("change",()=>{ const k=b.dataset.k; EX.c=b.checked?[...EX.c.filter(c=>c!==k),k]:EX.c.filter(c=>c!==k); exSetHash(); czRefresh(true); }));
   // gráfico
   const note=document.getElementById("ctlnote"), plot=document.getElementById("cplot");
@@ -2520,9 +2557,11 @@ function adjScatter(box,x,y,cs,w,animate){
   if(c&&Math.abs(c.r)>=0.05){ const [a,b]=X.domain(); line.attr("x1",X(a)).attr("y1",Y(c.a+c.b*a)).attr("x2",X(b)).attr("y2",Y(c.a+c.b*b)); }
   const mxP=d3.max(pts,p=>p.r[F.pop]||1), Rr=d3.scaleSqrt().domain([0,mxP]).range([1.5,Math.max(4,Math.min(16,16*Math.sqrt(mxP/2e6)))]), base=css("--rust"), ink=css("--ink");
   const sorted=pts.slice().sort((a,b)=>(b.r[F.pop]||0)-(a.r[F.pop]||0));
-  const paint=t=>{ ctx.clearRect(0,0,W,H); ctx.fillStyle=base; ctx.globalAlpha=.3;
-    for(const p of sorted){ const px=p.x0+(p.x1-p.x0)*t, py=p.y0+(p.y1-p.y0)*t; ctx.beginPath(); ctx.arc(X(px),Y(py),Rr(p.r[F.pop]||1),0,7); ctx.fill(); }
-    ctx.globalAlpha=1; for(const mc of [lastMun,MUN2].filter(Boolean)){ const mk=pts.find(p=>p.r[F.code]===mc); if(!mk) continue; const px=X(mk.x0+(mk.x1-mk.x0)*t), py=Y(mk.y0+(mk.y1-mk.y0)*t); ctx.beginPath(); ctx.arc(px,py,Math.max(5,Rr(mk.r[F.pop]||1)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke(); ctx.font="600 12.5px 'Libre Franklin', Arial, sans-serif"; ctx.fillStyle=ink; ctx.fillText(dispName(mk.r[F.name]),px+9,py-8); } };
+  const E=(EX.sz||EX.col)?makeEnc(pts.map(p=>p.r),{sz:EX.sz,col:EX.col}):null, rad=r=>E&&E.r?E.r(r):Rr(r[F.pop]||1);
+  sorted.sort((a,b)=>rad(b.r)-rad(a.r)); if(E&&E.legend().length) box.querySelector("figure").insertAdjacentHTML("beforeend",E.legend());
+  const paint=t=>{ ctx.clearRect(0,0,W,H); ctx.fillStyle=base; ctx.globalAlpha=E&&E.c?.5:.3;
+    for(const p of sorted){ const px=p.x0+(p.x1-p.x0)*t, py=p.y0+(p.y1-p.y0)*t; ctx.beginPath(); ctx.arc(X(px),Y(py),rad(p.r),0,7); if(E&&E.c) ctx.fillStyle=E.c(p.r); ctx.fill(); }
+    ctx.globalAlpha=1; for(const mc of [lastMun,MUN2].filter(Boolean)){ const mk=pts.find(p=>p.r[F.code]===mc); if(!mk) continue; const px=X(mk.x0+(mk.x1-mk.x0)*t), py=Y(mk.y0+(mk.y1-mk.y0)*t); ctx.beginPath(); ctx.arc(px,py,Math.max(5,rad(mk.r)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke(); ctx.font="600 12.5px 'Libre Franklin', Arial, sans-serif"; ctx.fillStyle=ink; ctx.fillText(dispName(mk.r[F.name]),px+9,py-8); } };
   const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(animate&&!reduce){ const tm=d3.timer(el=>{ const t=Math.min(1,el/750); paint(d3.easeCubicInOut(t)); if(t>=1){ tm.stop(); line.transition().duration(300).attr("opacity",1); } }); }
   else { paint(1); line.attr("opacity",1); }
@@ -2567,7 +2606,7 @@ function exCausal(x,y){
   const holds=p=>p&&Math.abs(p.r)>=a0*0.5&&Math.sign(p.r)===sign;
   const how=p=>{ const a=Math.abs(p.r); if(Math.sign(p.r)!==sign&&a>=0.1) return "cambia de sentido"; if(a<0.1) return "casi desaparece"; if(a<a0*0.5) return "se debilita mucho"; if(a<a0*0.85) return "se debilita algo, pero sigue ahí"; if(a>a0*1.15) return "incluso se refuerza"; return "sigue igual"; };
   // principal sospechoso
-  const cand=["lpop","edad","renta","superiores","prov"].filter(c=>c!==x&&c!==y).map(c=>({c,p:partialR(x,y,[c],w)})).filter(o=>o.p).map(o=>({...o,drop:a0-Math.abs(o.p.r)*(Math.sign(o.p.r)===sign?1:-1)})).sort((a,b)=>b.drop-a.drop);
+  const cand=["lpop","edad","renta","superiores","distCosta","distCiudad","prov"].filter(c=>c!==x&&c!==y).map(c=>({c,p:partialR(x,y,[c],w)})).filter(o=>o.p).map(o=>({...o,drop:a0-Math.abs(o.p.r)*(Math.sign(o.p.r)===sign?1:-1)})).sort((a,b)=>b.drop-a.drop);
   const top=cand[0];
   CZ={x,y,w,base,suspect:top&&top.drop>=a0*0.15?top.c:null};
   const czl=document.getElementById("czl");
@@ -2586,7 +2625,7 @@ function exCausal(x,y){
   if(ST&&ST.length===5){ const up=d3.range(4).filter(i=>(ST[i+1]-ST[i])*sign>0).length; T.push({k:"st",ok:up>=3,t:"Sube de forma ordenada",d:`De un grupo al siguiente, ${yl} va en la dirección esperada en <b>${up} de 4</b> escalones.`,why:"Si «cuanto más, más» se cumple de forma ordenada, y no solo en los extremos, la pista es más creíble.",extra:miniBars(ST.map((v,i)=>[v,i===0||i===4?"--rust":"--stone"]),{h:34})}); }
   const done=T.filter(t=>!t.na), passed=done.filter(t=>t.ok).length, frac=done.length?passed/done.length:0;
   const lev=frac<0.3?0:frac<0.55?1:frac<0.85?2:3;
-  const sus=!CZ.suspect?`Ninguno de los sospechosos habituales (tamaño, edad, renta, estudios o provincia) cambia mucho la relación por sí solo.`
+  const sus=!CZ.suspect?`Ninguno de los sospechosos habituales (tamaño, edad, renta, estudios, distancia al mar o a una ciudad, o provincia) cambia mucho la relación por sí solo.`
     :top.c==="prov"?`<b>La provincia.</b> Comparando solo municipios de la misma provincia, la relación pasa de ${rFmt(base.r)} a ${rFmt(top.p.r)}. Buena parte es la diferencia entre unas zonas de España y otras.`
     :`<b>${cap(CNAME[top.c])}.</b> Comparando municipios con ${CNAME[top.c].replace(/^(el|la|los) /,"")} parecid${/^la /.test(CNAME[top.c])?"a":/^los /.test(CNAME[top.c])?"os":"o"}, la relación pasa de ${rFmt(base.r)} a ${rFmt(top.p.r)}. Puede que ${CNAME[top.c]} influya a la vez en ${xl} y en ${yl}.`;
   const em=t=>t.na?"⚪":t.ok?"✅":"❌";
