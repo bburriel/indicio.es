@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Montones de monedas de distinta altura"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<circle class="c" cx="250" cy="62" r="40"/>
+<path class="k" d="M20 172h280"/>
+<g><ellipse class="a" cx="80" cy="166" rx="26" ry="7"/><path class="a" d="M54 152v14h52v-14z"/><ellipse class="a" cx="80" cy="152" rx="26" ry="7"/><path class="k" d="M54 152v14M106 152v14"/><ellipse class="k" cx="80" cy="152" rx="26" ry="7"/><path class="k" d="M54 166a26 7 0 0 0 52 0"/></g>
+<g><path class="r" d="M134 110v56h52v-56z"/><ellipse class="r" cx="160" cy="166" rx="26" ry="7"/><ellipse class="a" cx="160" cy="110" rx="26" ry="7"/><path class="k" d="M134 110v56M186 110v56M134 166a26 7 0 0 0 52 0M134 124a26 7 0 0 0 52 0M134 138a26 7 0 0 0 52 0M134 152a26 7 0 0 0 52 0"/><ellipse class="k" cx="160" cy="110" rx="26" ry="7"/></g>
+<g><path class="g" d="M214 58v108h52v-108z"/><ellipse class="g" cx="240" cy="166" rx="26" ry="7"/><ellipse class="a" cx="240" cy="58" rx="26" ry="7"/><path class="k" d="M214 58v108M266 58v108M214 166a26 7 0 0 0 52 0"/><path d="M214 72a26 7 0 0 0 52 0M214 86a26 7 0 0 0 52 0M214 100a26 7 0 0 0 52 0M214 114a26 7 0 0 0 52 0M214 128a26 7 0 0 0 52 0M214 142a26 7 0 0 0 52 0M214 156a26 7 0 0 0 52 0" fill="none" stroke="#f4ebd9" stroke-width="1.5" opacity=".6"/><ellipse class="k" cx="240" cy="58" rx="26" ry="7"/></g>
+<g transform="rotate(-18 112 64)"><ellipse class="m" cx="112" cy="64" rx="14" ry="14"/><ellipse class="k" cx="112" cy="64" rx="14" ry="14"/><path class="k" d="M118 58.5a7 7 0 1 0 0 11M104 62h10M104 66.5h10"/></g>
+<path class="k" d="M98 84l-8 8M128 82l6 7" opacity=".5"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Una mesa con un casco de obra, un portátil y una taza"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<circle class="c" cx="246" cy="64" r="42"/>
+<path class="a" d="M24 150h272v10H24z"/><path class="k" d="M24 150h272M24 160h272M44 160v30M276 160v30"/>
+<g><path class="w" d="M120 84h88v60h-88z"/><path class="k" d="M120 84h88v60h-88z"/><path class="v" d="M128 92h72v44h-72z"/><path d="M134 126l14-12 12 6 16-16 18 8" fill="none" stroke="#8a1c2d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path class="c" d="M108 144h112l-8 6h-96z"/><path class="k" d="M108 144h112l-8 6h-96z"/></g>
+<g><path class="m" d="M38 150c0-30 16-46 38-46s38 16 38 46z"/><path class="m" d="M30 146h92v6H30z"/><path class="k" d="M38 146c0-28 16-42 38-42s38 14 38 42M30 146h92v5H30zM76 104v16M60 112l4 30M92 112l-4 30"/></g>
+<g><path class="g" d="M234 120h28v30h-28z"/><path class="k" d="M234 120h28v30h-28zM262 126h6a6 6 0 0 1 0 12h-6"/><path class="k" d="M242 112c-3-5 3-7 0-12M252 112c-3-5 3-7 0-12" opacity=".6"/></g>
+</svg>

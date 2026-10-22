@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Una urna con una papeleta entrando"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<circle class="c" cx="160" cy="92" r="70"/>
+<path class="k" d="M30 172h260"/><g transform="rotate(10 252 140)"><path class="w" d="M236 120h32v46h-32z"/><path class="k" d="M236 120h32v46h-32z"/><path d="M242 130h20M242 138h14" stroke="#c77a6c" stroke-width="3" stroke-linecap="round"/></g><g transform="rotate(-12 66 148)"><path class="w" d="M52 128h30v40H52z"/><path class="k" d="M52 128h30v40H52z"/><path d="M58 138h18M58 146h12" stroke="#c77a6c" stroke-width="3" stroke-linecap="round"/></g>
+<path class="w" d="M96 96h128v76H96z"/><path class="g" d="M96 96h128v14H96z"/><path class="k" d="M96 96h128v76H96zM96 110h128"/><path class="i" d="M138 101h44v4h-44z"/>
+<path d="M120 136h80" stroke="#ebd0ae" stroke-width="10" stroke-linecap="round"/>
+<g transform="rotate(-8 160 60)"><path class="w" d="M138 34h44v66h-44z"/><path class="k" d="M138 34h44v66h-44z"/><path d="M146 46h28M146 56h22M146 66h26" stroke="#c77a6c" stroke-width="3" stroke-linecap="round"/><path class="k" d="M150 82l6 6 12-14" stroke="#8a1c2d" stroke-width="3"/></g>
+</svg>

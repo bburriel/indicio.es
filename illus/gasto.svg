@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Un edificio público del que salen monedas hacia sanidad, educación y pensiones"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<path class="k" d="M16 172h288"/>
+<g><path class="c" d="M40 70l60-30 60 30z"/><path class="k" d="M40 70l60-30 60 30zM36 70h128"/><path class="w" d="M44 70h112v10H44z"/><path class="k" d="M44 80h112"/>
+<g class="a"><rect x="52" y="80" width="12" height="74"/><rect x="78" y="80" width="12" height="74"/><rect x="110" y="80" width="12" height="74"/><rect x="136" y="80" width="12" height="74"/></g>
+<path class="k" d="M52 80v74M64 80v74M78 80v74M90 80v74M110 80v74M122 80v74M136 80v74M148 80v74"/><path class="g" d="M36 154h128v18H36z"/><path class="k" d="M36 154h128v18H36zM36 163h128"/><circle class="m" cx="100" cy="58" r="6"/></g>
+<path d="M168 92c30-24 60-30 96-26M168 112c34-6 66 0 96 12M168 132c30 14 60 20 96 20" fill="none" stroke="#c77a6c" stroke-width="2" stroke-dasharray="4 6" stroke-linecap="round"/>
+<g class="m"><circle cx="200" cy="74" r="7"/><circle cx="214" cy="108" r="7"/><circle cx="206" cy="146" r="7"/></g><g class="k"><circle cx="200" cy="74" r="7"/><circle cx="214" cy="108" r="7"/><circle cx="206" cy="146" r="7"/></g>
+<g transform="translate(0 -10)"><circle class="w" cx="282" cy="64" r="18"/><circle class="k" cx="282" cy="64" r="18"/><path d="M282 54v20M272 64h20" stroke="#8a1c2d" stroke-width="5" stroke-linecap="round"/></g>
+<g transform="translate(0 -18)"><circle class="w" cx="282" cy="124" r="18"/><circle class="k" cx="282" cy="124" r="18"/><path class="v" d="M271 117l11 4 11-4v13l-11 4-11-4z"/><path class="k" d="M271 117l11 4 11-4v13l-11 4-11-4zM282 121v13"/></g>
+
+<g transform="translate(0 4)"><circle class="w" cx="282" cy="156" r="18"/><circle class="k" cx="282" cy="156" r="18"/><circle class="g" cx="278" cy="146" r="3.5"/><path class="k" d="M278 150v10l-4 8M278 160l4 8M278 153l6 3M286 154v14" stroke-width="2.4"/></g>
+</svg>

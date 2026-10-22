@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Una chincheta sobre un pueblo"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<path class="v" d="M0 150c60-30 120-32 180-16s100 8 140-6v72H0z"/>
+<path class="c" d="M0 200v-26c80-14 200-14 320 0v26z"/>
+<g><path class="w" d="M70 128h24v24H70z"/><path class="r" d="M66 130l16-14 16 14z"/><path class="k" d="M70 130v22h24v-22M66 130l16-14 16 14"/>
+<path class="w" d="M100 120h30v32h-30z"/><path class="a" d="M96 122l19-16 19 16z"/><path class="k" d="M100 122v30h30v-30M96 122l19-16 19 16"/>
+<path class="w" d="M136 96h16v56h-16z"/><path class="g" d="M134 98l10-22 10 22z"/><path class="k" d="M136 98v54h16V98M134 98l10-22 10 22"/><circle class="m" cx="144" cy="112" r="4"/>
+<path class="w" d="M158 126h28v26h-28z"/><path class="r" d="M154 128l18-14 18 14z"/><path class="k" d="M158 128v24h28v-24M154 128l18-14 18 14"/>
+<path class="w" d="M192 132h22v20h-22z"/><path class="a" d="M188 134l15-12 15 12z"/><path class="k" d="M192 134v18h22v-18M188 134l15-12 15 12"/>
+<g class="c"><rect x="77" y="136" width="8" height="8"/><rect x="108" y="130" width="8" height="8"/><rect x="166" y="134" width="8" height="8"/></g><path class="k" d="M60 152h170"/></g>
+<g transform="translate(224 26)"><path class="g" d="M30 0c17 0 30 13 30 30 0 22-30 52-30 52S0 52 0 30C0 13 13 0 30 0z"/><path class="k" d="M30 0c17 0 30 13 30 30 0 22-30 52-30 52S0 52 0 30C0 13 13 0 30 0z"/><circle class="c" cx="30" cy="29" r="11"/><path d="M14 92c8 4 24 4 32 0" stroke="#1d1c1a" stroke-width="2" stroke-linecap="round" opacity=".35"/></g>
+</svg>

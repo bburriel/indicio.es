@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Un bloque de pisos con un cartel de se alquila y una llave"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<circle class="c" cx="70" cy="70" r="44"/>
+<path class="k" d="M16 172h288"/>
+<path class="a" d="M200 92h80v80h-80z"/><path class="k" d="M200 92h80v80h-80z"/>
+<path class="g" d="M110 34h96v138h-96z"/><path class="k" d="M110 34h96v138h-96zM104 34h108"/>
+<g class="c"><rect x="122" y="48" width="18" height="20"/><rect x="149" y="48" width="18" height="20"/><rect x="176" y="48" width="18" height="20"/><rect x="122" y="80" width="18" height="20"/><rect x="176" y="80" width="18" height="20"/><rect x="122" y="112" width="18" height="20"/><rect x="149" y="112" width="18" height="20"/></g>
+<rect class="m" x="149" y="80" width="18" height="20"/><rect class="m" x="176" y="112" width="18" height="20"/>
+<path class="w" d="M147 144h22v28h-22z"/><path class="k" d="M147 144h22v28h-22z"/>
+<g class="c"><rect x="212" y="104" width="16" height="16"/><rect x="252" y="104" width="16" height="16"/><rect x="212" y="134" width="16" height="16"/></g>
+<path class="k" d="M118 100v14M140 100v14"/><path class="w" d="M108 114h44v18h-44z"/><path class="k" d="M108 114h44v18h-44z"/>
+<path d="M114 120h32M114 126h20" stroke="#8a1c2d" stroke-width="2.4" stroke-linecap="round"/>
+<g transform="rotate(-30 60 150)"><circle class="m" cx="40" cy="150" r="13"/><circle class="c" cx="40" cy="150" r="5"/><path class="m" d="M52 146h40v8H52z"/><path class="m" d="M78 154h6v8h-6zM88 154h4v6h-4z"/><path class="k" d="M53 146h39v8H53zM78 154v8h6v-8M88 154v6h4v-6"/><circle class="k" cx="40" cy="150" r="13"/><circle class="k" cx="40" cy="150" r="5"/></g>
+</svg>

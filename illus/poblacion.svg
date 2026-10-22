@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Una carretera que va de un pueblo a la ciudad, con una maleta"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
+<path class="v" d="M0 132c50-30 100-34 150-14v82H0z"/>
+<path class="c" d="M0 200V150c80-10 200-14 320-4v54z"/>
+<path class="a" d="M118 200c20-30 50-48 96-58h8c-34 12-52 32-58 58z"/>
+<path class="k" d="M118 200c20-30 50-48 96-58M164 200c6-26 24-46 58-58"/>
+<path d="M150 186l5-5M172 168l7-4M196 154l8-3" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+<g><path class="w" d="M30 104h22v20H30z"/><path class="g" d="M27 106l14-14 14 14z"/><path class="k" d="M30 106v18h22v-18M27 106l14-14 14 14"/><path class="w" d="M62 112h18v14H62z"/><path class="r" d="M59 114l12-11 12 11z"/><path class="k" d="M62 114v12h18v-12M59 114l12-11 12 11"/><path class="w" d="M84 92h8v34h-8z"/><path class="k" d="M84 126V94l4-8 4 8v32"/></g>
+<g><path class="a" d="M220 70h22v76h-22z"/><path class="g" d="M246 40h26v106h-26z"/><path class="r" d="M276 86h22v60h-22z"/><path class="a" d="M300 104h18v42h-18z"/>
+<path class="k" d="M220 146V70h22v76M246 146V40h26v106M276 146V86h22v60M300 146v-42h18"/>
+<path d="M252 52h4M262 52h4M252 64h4M262 64h4M252 76h4M262 76h4M252 88h4M262 88h4M252 100h4M262 100h4M226 82h3M234 82h3M226 94h3M234 94h3M282 98h3M290 98h3M282 110h3M290 110h3" stroke="#f4ebd9" stroke-width="3"/></g>
+<g transform="translate(150 118)"><path class="g" d="M0 8h34v26H0z"/><path class="k" d="M0 8h34v26H0zM11 8V2h12v6M0 18h34"/><circle class="i" cx="6" cy="37" r="2.5"/><circle class="i" cx="28" cy="37" r="2.5"/><path class="m" d="M14 15h6v6h-6z"/></g>
+</svg>
