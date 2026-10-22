@@ -950,3 +950,11 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .an-pan .img:has(img){height:auto; aspect-ratio:16/10; border-radius:8px; overflow:hidden}
 .ed-ill{display:block; background:var(--band); border-radius:16px; overflow:hidden; aspect-ratio:16/10}
 .ed-ill.sm{max-width:320px; margin-top:18px; border-radius:12px}
+
+/* Logotipo: «Indicio» en Fraunces, tinta, con el punto de la última i en granate */
+.logo,.logo:hover{font-family:"Fraunces",var(--serif); font-weight:600; font-variation-settings:"opsz" 144,"SOFT" 0,"WONK" 0; font-size:29px; letter-spacing:-.025em; line-height:1; color:var(--ink); gap:0}
+.logo .lg-i{position:relative; display:inline; width:auto; height:auto; padding:0; background:none; border-radius:0}
+.logo .lg-i:after{content:""; position:absolute; left:50%; top:.3em; width:.165em; height:.165em; border-radius:50%; background:var(--brand-2); transform:translateX(-50%)}
+@media (max-width:760px){ .logo{font-size:26px} }
+/* sin buscador en la cabecera: el botón de tu municipio ocupa su sitio */
+@media (max-width:760px){ .mymun{order:2; margin-left:auto; max-width:55%} }

@@ -87,11 +87,11 @@ const css=fs.readFileSync(path.join(ROOT,"src/styles.css"),"utf8");
 const ogPage=await ctx.newPage(); await ogPage.setViewportSize({width:1200,height:630});
 for(const S of STUDIES){
   const art=arts[S.id]||"";
-  const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><style>${css}
+  const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Libre+Franklin:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,500&display=block"><style>${css}
   html,body{margin:0;background:var(--bg);width:1200px;height:630px;overflow:hidden}
   .og{position:relative;width:1200px;height:630px;padding:56px 64px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:48px;align-items:center}
-  .og .brand{position:absolute;left:64px;top:44px;font-family:var(--serif);font-size:30px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:10px}
-  .og .brand svg{width:34px;height:34px}
+  .og .brand{position:absolute;left:64px;top:40px;font-family:"Fraunces",var(--serif);font-size:38px;font-weight:600;font-variation-settings:"opsz" 144;letter-spacing:-.025em;color:var(--ink)}
+  .og .brand .lg-i{position:relative} .og .brand .lg-i:after{content:"";position:absolute;left:50%;top:.3em;width:.165em;height:.165em;border-radius:50%;background:var(--brand-2);transform:translateX(-50%)}
   .og .k{font-family:"Libre Franklin",Arial,sans-serif;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-bottom:14px}
   .og h1{font-family:var(--serif);font-size:${S.t.length>42?52:60}px;line-height:1.05;letter-spacing:-.015em;color:var(--ink);margin:0 0 20px;font-weight:500}
   .og p{font-family:var(--serif);font-size:25px;line-height:1.35;color:var(--ink-2);margin:0;max-width:640px}
@@ -102,11 +102,11 @@ for(const S of STUDIES){
   .og .foot{position:absolute;left:64px;bottom:40px;font-family:"Libre Franklin",Arial,sans-serif;font-size:17px;color:var(--muted)}
   .rv-bars rect,.rv-spikes g path,.rv-tiles rect,.rv-turnout circle{opacity:1!important;transform:none!important}.rv-ridge path[fill="none"],.rv-scatter line{stroke-dashoffset:0!important}
   </style></head><body><div class="og">
-  <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><clipPath id="c"><circle cx="14" cy="13" r="8.2"/></clipPath></defs><path d="M1 22 L7 18 L11 20 L15 12 L19 15 L24 7 L31 9" fill="none" stroke="#1c1b19" stroke-opacity=".35" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><g clip-path="url(#c)"><path d="M1 22 L7 18 L11 20 L15 12 L19 15 L24 7 L31 9" fill="none" stroke="#8a2232" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g><circle cx="14" cy="13" r="9.4" fill="none" stroke="#1c1b19" stroke-width="2.4"/><path d="M20.8 19.8l7.6 7.6" stroke="#1c1b19" stroke-width="3.6" stroke-linecap="round"/></svg>Indicio</div>
+  <div class="brand">Indic<span class="lg-i">ı</span>o</div>
   <div style="padding-top:40px"><div class="k">${(TOPICS.find(T=>T.id===S.tema)||{}).l||""} · ${S.m}</div><h1>${S.t}</h1><p><b>${S.a.split(". ")[0]}.</b> ${S.a.split(". ").slice(1).join(". ")}</p></div>
   <div class="art">${art}</div>
   <div class="foot">indicio.es · Preguntas reales, respuestas con datos públicos</div></div></body></html>`;
-  await ogPage.setContent(html,{waitUntil:"domcontentloaded"}); await ogPage.waitForTimeout(600);
+  await ogPage.setContent(html,{waitUntil:"networkidle"}); await ogPage.evaluate(()=>document.fonts.ready); await ogPage.waitForTimeout(600);
   await ogPage.screenshot({path:path.join(ROOT,"og",S.id+".png"),type:"png"});
   console.log("og",S.id);
 }

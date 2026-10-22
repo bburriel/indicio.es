@@ -189,7 +189,7 @@ function attachSearch(input,list,combo,onPick){
     else if(e.key==="Escape"){close();} });
   document.addEventListener("click",e=>{ if(!combo.contains(e.target)) close(); });
 }
-attachSearch(document.getElementById("q"),document.getElementById("results"),document.querySelector(".top .search"));
+if(document.getElementById("q")) attachSearch(document.getElementById("q"),document.getElementById("results"),document.querySelector(".top .search"));
 
 // ---------- geometría ----------
 const fixPoly=pl=>pl.forEach((ring,i)=>{ const big=d3.geoArea({type:"Polygon",coordinates:[ring]})>2*Math.PI; if((i===0&&big)||(i>0&&!big)) ring.reverse(); });
@@ -2769,7 +2769,8 @@ function rerender(){ const y=window.scrollY; const h=pathToKey(); if(/^explorar/
 // botón de la cabecera
 function myHeader(){
   let b=document.getElementById("mymun");
-  if(!b){ const s=document.querySelector(".top .search"); if(!s) return; b=el("button","mymun"); b.id="mymun"; b.type="button"; b.setAttribute("aria-haspopup","dialog"); s.before(b); b.addEventListener("click",e=>{ e.stopPropagation(); myPop(); }); }
+  // la cabecera solo tiene este botón: fija tu municipio (y desde su ventana se abre su ficha)
+  if(!b){ const s=document.querySelector(".top-in"); if(!s) return; b=el("button","mymun"); b.id="mymun"; b.type="button"; b.setAttribute("aria-haspopup","dialog"); s.appendChild(b); b.addEventListener("click",e=>{ e.stopPropagation(); myPop(); }); }
   b.innerHTML=myOk(lastMun)?`<span aria-hidden="true">📍</span><span class="t">${esc(myName(lastMun))}${myOk(MUN2)?` <small>y ${esc(myName(MUN2))}</small>`:""}</span><span class="c" aria-hidden="true">▾</span>`:`<span aria-hidden="true">📍</span><span class="t t-long">Elige tu municipio</span><span class="t t-short" aria-hidden="true">Tu municipio</span>`;
   b.title=myOk(lastMun)?"Tu municipio: se destaca en temas, mapas y gráficos. Pulsa para cambiarlo.":"Elige tu municipio y lo verás destacado en toda la web";
 }
