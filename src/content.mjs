@@ -11,7 +11,7 @@ export const SITE={
   description:"Indicio: preguntas reales sobre cómo vivimos, respondidas con datos públicos de los 8.139 municipios de España. Y un laboratorio para que compruebes tú si es causa o casualidad.",
   dataUpdated:"2026-10-22",
   author:{name:"Borja Burriel",url:"https://indicio.es/quien-soy/",
-    bio:"Soy analista de datos. Llevo años en empresas de producto intentando responder una pregunta sencilla: este cambio, ¿ha funcionado de verdad? Indicio es esa misma pregunta, pero hecha a los datos públicos de España.",
+    bio:"Me dedico a los datos. En mi trabajo intento averiguar si un cambio ha salido bien de verdad o solo lo parece. Indicio es hacer esa misma pregunta con los datos públicos de España, para que cualquiera pueda entenderlos.",
     linkedin:"", web:"", foto:""},
   oldHost:"cifrarios.netlify.app"
 };
@@ -59,7 +59,7 @@ export const PAGES={
   "/laboratorio/":{t:"Laboratorio · Indicio",d:"Tu lienzo para los datos de España: elige un gráfico, cruza dos datos en los 8.139 municipios y comprueba en tres pasos si es causa o casualidad."},
   "/laboratorio/metodo/":{t:"Cómo buscar causas con datos públicos · Indicio",d:"Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede."},
   "/municipio/":{t:"Municipios · Indicio",d:"Busca tu municipio y mira cómo sale en renta, población, paro, vivienda y voto, comparado con España."},
-  "/quien-soy/":{t:"Quién soy · Indicio",d:"Soy Borja Burriel, analista de datos en empresas de producto (Domestika, Wallapop, Northius) y máster en Estadística. Indicio lleva la experimentación y el rigor con la incertidumbre a los datos públicos."},
+  "/quien-soy/":{t:"Quién soy · Indicio",d:"Soy Borja Burriel. Trabajo con datos en empresas como Domestika, Wallapop y Northius, y en Indicio intento explicar los datos públicos de España de forma sencilla y honesta."},
   "/quien-soy/contacto/":{t:"Escríbeme · Indicio",d:"Una pregunta sobre los datos, un error, una idea o un trabajo a medida: escríbeme."},
   "/comparar/":{t:"Comparar dos municipios · Indicio",d:"Elige dos municipios y compáralos dato a dato."}
 };
