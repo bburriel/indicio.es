@@ -59,7 +59,7 @@ export const PAGES={
   "/laboratorio/":{t:"Laboratorio · Indicio",d:"Tu lienzo para los datos de España: elige un gráfico, cruza dos datos en los 8.139 municipios y comprueba en tres pasos si es causa o casualidad."},
   "/laboratorio/metodo/":{t:"Cómo buscar causas con datos públicos · Indicio",d:"Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede."},
   "/municipio/":{t:"Municipios · Indicio",d:"Busca tu municipio y mira cómo sale en renta, población, paro, vivienda y voto, comparado con España."},
-  "/quien-soy/":{t:"Quién soy · Indicio",d:"Soy Borja Burriel, analista de datos en empresas de producto y máster en Estadística. Indicio lleva la experimentación y el rigor con la incertidumbre a los datos públicos."},
+  "/quien-soy/":{t:"Quién soy · Indicio",d:"Soy Borja Burriel, analista de datos en empresas de producto (Domestika, Wallapop, Northius) y máster en Estadística. Indicio lleva la experimentación y el rigor con la incertidumbre a los datos públicos."},
   "/quien-soy/contacto/":{t:"Escríbeme · Indicio",d:"Una pregunta sobre los datos, un error, una idea o un trabajo a medida: escríbeme."},
   "/comparar/":{t:"Comparar dos municipios · Indicio",d:"Elige dos municipios y compáralos dato a dato."}
 };
