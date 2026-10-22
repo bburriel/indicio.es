@@ -1033,3 +1033,13 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .enclg .sz i{background:var(--stone)} .enclg .sz .s1{width:5px;height:5px} .enclg .sz .s2{width:9px;height:9px} .enclg .sz .s3{width:14px;height:14px}
 svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg text.quadt{fill:var(--muted); font-size:11.5px; font-weight:500}
 .czadd{font:inherit; font-size:13.5px; font-weight:600; color:var(--ink-2); background:none; border:1.5px dashed var(--rule-2); border-radius:99px; padding:1px 10px; cursor:pointer} .czadd:hover{border-color:var(--ink); color:var(--ink)}
+
+/* mapa de dos datos, comunidad a comunidad, burbujas */
+.bvleg{display:flex; flex-direction:column; gap:6px; align-items:flex-start} .bvg{display:grid; grid-template-columns:repeat(3,34px); grid-auto-rows:34px} .bvg i{display:block}
+.bvt{display:flex; justify-content:space-between; width:102px; font-size:11px; color:var(--muted)} .bvt span{white-space:nowrap} .bvleg .bvt{width:auto; gap:18px}
+.smgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px 12px; margin-top:12px} .sm b{display:block; font-size:12.5px} .sm svg{display:block; width:100%; border-bottom:1px solid var(--rule)} .sm small{color:var(--muted); font-size:12px}
+.okc{color:var(--ok); font-weight:700} .koc{color:var(--ko); font-weight:700}
+.bubctl{display:flex; align-items:center; gap:12px; margin:6px 0 10px} .bubctl input[type=range]{flex:1; max-width:340px; accent-color:var(--rust)} .bubctl b{font:600 20px var(--serif,Georgia),serif; min-width:3ch}
+.bub circle{transition:none} svg .bub text{pointer-events:none; paint-order:stroke; stroke:var(--bg); stroke-width:3px}
+.hbars.wide .hb{grid-template-columns:minmax(90px,150px) minmax(0,1fr) 124px} .hbars.wide .hb>span:last-child{white-space:nowrap}
+.bubwrap{position:relative} .bubwrap svg{display:block; width:100%; height:auto}
