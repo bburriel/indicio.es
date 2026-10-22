@@ -13,8 +13,11 @@ src/
   content.mjs     contenido editorial: preguntas (título, entradilla, método, fecha, respuesta corta), temas, textos de las páginas y datos del autor
   sw.js           service worker (offline)
 data/             los JSON de datos (index.json, refs, provincias, secciones, topojson)
+                  estudios.json: series por municipio para los estudios (lo genera scripts/datos/series_estudios.py)
+                  ext.json: datos externos de los estudios (zonas tensionadas, ERTE, estaciones AV, restricciones a pisos turísticos)
 vendor/           d3, topojson-client y d3-composite-projections (servidos desde el propio dominio)
 build.mjs         genera dist/: una página HTML por ruta + 8.139 fichas municipales + sitemap + RSS + robots
+tools/check.mjs   abre estudios en un navegador sin cabeza y vuelca su texto y errores (CHROMIUM=<ruta> node tools/check.mjs <id> …)
 snapshot.mjs      (opcional) pre-renderiza con un navegador las páginas editoriales en snapshots/ y crea las imágenes Open Graph en og/
 serve.mjs         servidor local que imita a Netlify
 snapshots/, og/   resultado de snapshot.mjs; se versionan para que el build no necesite navegador
@@ -37,6 +40,18 @@ npm run release    # build + snapshot + build
 ```
 
 Si no regeneras los snapshots no pasa nada grave: las páginas se sirven con el texto estático de `content.mjs` y la app pinta el resto al cargar.
+
+## Método y datos de los estudios
+
+Cada estudio termina en una **ficha técnica** (unidad, variables, ponderación, modelo) y la página `/laboratorio/metodo/` explica el cálculo exacto detrás de cada etiqueta (correlación parcial por residuos, efectos fijos de provincia, gemelos, intervalos por bootstrap, placebos, discontinuidad). Las correlaciones de los estudios llevan intervalo del 95 % por remuestreo de municipios (`partialRCI`, `bootCI` en `src/app.js`).
+
+Los estudios que necesitan series por municipio cargan `data/estudios.json` al abrirse. Para regenerarlo tras actualizar `data/prov/*.json`:
+
+```
+python3 scripts/datos/series_estudios.py
+```
+
+`data/ext.json` se monta a mano a partir de `scripts/datos/externos/` (listas con fuente y fecha: municipios tensionados del BOE, ERTE por provincia de abril de 2020, estaciones de alta velocidad abiertas 2021–2023 y restricciones municipales a las viviendas turísticas, con grado de confianza). Si añades o corriges una entrada, vuelve a montar `ext.json`.
 
 ## Publicar una pregunta nueva
 

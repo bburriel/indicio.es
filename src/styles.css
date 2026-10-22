@@ -1018,6 +1018,19 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .an-otros{display:flex; gap:6px; flex-wrap:wrap} .an-otros a{border:1px solid var(--rule-2); border-radius:20px; padding:4px 13px; text-decoration:none; color:var(--ink-2); font-size:14.5px; background:var(--card)} .an-otros a:hover{border-color:var(--acc-ink); color:var(--ink)}
 .an-vacio{color:var(--ink-2); margin:14px 0}
 
+/* ---------- ficha técnica e intervalos (auditoría de los estudios) ---------- */
+details.ficha{margin-top:18px; border:1px solid var(--rule-2); border-radius:8px; padding:0 16px; background:var(--card); max-width:760px}
+details.ficha > summary{cursor:pointer; padding:12px 0; font-weight:700; font-size:15px; color:var(--ink-2)}
+details.ficha dl{display:grid; grid-template-columns:minmax(110px,160px) 1fr; gap:6px 14px; padding:4px 0 14px; font-size:13.5px; line-height:1.45}
+details.ficha dt{font-weight:600; color:var(--ink-2)}
+details.ficha dd{color:var(--ink-2)}
+.ci{font-weight:400; color:var(--muted); font-size:.92em; white-space:nowrap}
+.placebo{display:flex; flex-wrap:wrap; gap:4px; align-items:flex-end; height:84px; margin-top:8px}
+.placebo i{display:block; width:14px; background:var(--stone); border-radius:2px 2px 0 0}
+.placebo i.me{background:var(--rust)}
+.rdplot{max-width:760px}
+@media (max-width:600px){ details.ficha dl{grid-template-columns:1fr} }
+
 /* Laboratorio: atajos en una fila discreta, selector sin pestañas cortadas, «Quién soy» sin imagen */
 .dp-h,.dp-tabs{flex:none} .dp-tabs button{line-height:1.25}
 .lbq{display:flex; align-items:center; gap:10px; margin:0 0 14px; min-width:0}

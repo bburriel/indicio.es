@@ -1,0 +1,178 @@
+{
+ "fuente": "https://lamoncloa.gob.es/serviciosdeprensa/notasprensa/trabajo14/Documents/2020/050520-Afiliación a la Seguridad Social - Abril 2020.pdf",
+ "nota": "Tabla 'Trabajadores en situación de ERTE a fecha 30 de Abril' (nota de prensa Afiliación a la Seguridad Social, abril 2020, Ministerio de Inclusión/Trabajo, 5-may-2020). Personas afiliadas en situación de ERTE (fuerza mayor + no fuerza mayor) a último día del mes (30/04/2020), datos provisionales; total nacional 3.386.785. No es media mensual. Cifra posteriormente revisada por la Seguridad Social (serie revisada a 30/04/2020: 3.576.157). Solo se ha podido extraer abril 2020: el resto de meses por provincia están únicamente en Excel (revista.seg-social.es / lamoncloa 'Información estadística') y en PxWeb (w6.seg-social.es, 'Afiliados en ERTE vinculados al COVID-19 (Marzo 2020-Octubre 2021)'), no legibles con WebFetch.",
+ "meses": [
+  "2020-04"
+ ],
+ "prov": {
+  "04": [
+   32276
+  ],
+  "11": [
+   69320
+  ],
+  "14": [
+   36169
+  ],
+  "18": [
+   50382
+  ],
+  "21": [
+   20713
+  ],
+  "23": [
+   26008
+  ],
+  "29": [
+   130113
+  ],
+  "41": [
+   112411
+  ],
+  "22": [
+   12053
+  ],
+  "44": [
+   6129
+  ],
+  "50": [
+   68804
+  ],
+  "33": [
+   59221
+  ],
+  "07": [
+   141614
+  ],
+  "35": [
+   127409
+  ],
+  "38": [
+   104128
+  ],
+  "39": [
+   35547
+  ],
+  "02": [
+   22053
+  ],
+  "13": [
+   21377
+  ],
+  "16": [
+   9071
+  ],
+  "19": [
+   13281
+  ],
+  "45": [
+   33560
+  ],
+  "05": [
+   6961
+  ],
+  "09": [
+   24269
+  ],
+  "24": [
+   22153
+  ],
+  "34": [
+   10899
+  ],
+  "37": [
+   17726
+  ],
+  "40": [
+   8533
+  ],
+  "42": [
+   5875
+  ],
+  "47": [
+   42961
+  ],
+  "49": [
+   6128
+  ],
+  "08": [
+   532800
+  ],
+  "17": [
+   65934
+  ],
+  "25": [
+   27522
+  ],
+  "43": [
+   52428
+  ],
+  "03": [
+   132883
+  ],
+  "12": [
+   35356
+  ],
+  "46": [
+   181395
+  ],
+  "10": [
+   14716
+  ],
+  "06": [
+   25173
+  ],
+  "15": [
+   69530
+  ],
+  "27": [
+   15982
+  ],
+  "32": [
+   17755
+  ],
+  "36": [
+   61771
+  ],
+  "28": [
+   566307
+  ],
+  "30": [
+   79686
+  ],
+  "31": [
+   49757
+  ],
+  "01": [
+   28112
+  ],
+  "20": [
+   51801
+  ],
+  "48": [
+   72959
+  ],
+  "26": [
+   21618
+  ],
+  "51": [
+   2787
+  ],
+  "52": [
+   3369
+  ]
+ },
+ "nacional_fin_de_mes": {
+  "2020-03": 3108494,
+  "2020-04": 3576157,
+  "2020-05": 2605039,
+  "2020-06": 1450280,
+  "2020-07": 868589,
+  "2020-08": 768675,
+  "2020-09": 706129,
+  "2020-10": 728474,
+  "2020-11": 851220,
+  "2020-12": 755613,
+  "fuente": "CCOO Informe de Coyuntura Laboral dic-2020 (https://www.ccoo.es/fe8c18a896b9b6e683da73dae8e472d9000001.pdf) con datos Seguridad Social, serie revisada a fin de mes"
+ }
+}

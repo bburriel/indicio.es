@@ -1,0 +1,1412 @@
+{
+ "fuente": "https://www.boe.es/boe/dias/2024/03/15/pdfs/BOE-A-2024-5214.pdf (Resolución de 14 de marzo de 2024, SEVAU; BOE 15/03/2024, núm. 66)",
+ "vigencia": "2024-03-16",
+ "vigencia_hasta": "2027-03-15",
+ "municipios": [
+  {
+   "code": "08001",
+   "name": "Abrera"
+  },
+  {
+   "code": "08003",
+   "name": "Alella"
+  },
+  {
+   "code": "43014",
+   "name": "Amposta"
+  },
+  {
+   "code": "08006",
+   "name": "Arenys de Mar"
+  },
+  {
+   "code": "08007",
+   "name": "Arenys de Munt"
+  },
+  {
+   "code": "08009",
+   "name": "Argentona"
+  },
+  {
+   "code": "08015",
+   "name": "Badalona"
+  },
+  {
+   "code": "08904",
+   "name": "Badia del Vallès"
+  },
+  {
+   "code": "25040",
+   "name": "Balaguer"
+  },
+  {
+   "code": "17015",
+   "name": "Banyoles"
+  },
+  {
+   "code": "08252",
+   "name": "Barberà del Vallès"
+  },
+  {
+   "code": "08019",
+   "name": "Barcelona"
+  },
+  {
+   "code": "08022",
+   "name": "Berga"
+  },
+  {
+   "code": "17022",
+   "name": "Bisbal d'Empordà, La"
+  },
+  {
+   "code": "17023",
+   "name": "Blanes"
+  },
+  {
+   "code": "08029",
+   "name": "Cabrera de Mar"
+  },
+  {
+   "code": "08030",
+   "name": "Cabrils"
+  },
+  {
+   "code": "08033",
+   "name": "Caldes de Montbui"
+  },
+  {
+   "code": "08032",
+   "name": "Caldes d'Estrac"
+  },
+  {
+   "code": "08035",
+   "name": "Calella"
+  },
+  {
+   "code": "08037",
+   "name": "Calldetenes"
+  },
+  {
+   "code": "43038",
+   "name": "Cambrils"
+  },
+  {
+   "code": "08040",
+   "name": "Canet de Mar"
+  },
+  {
+   "code": "43907",
+   "name": "Canonja, La"
+  },
+  {
+   "code": "08041",
+   "name": "Canovelles"
+  },
+  {
+   "code": "08046",
+   "name": "Cardedeu"
+  },
+  {
+   "code": "08051",
+   "name": "Castellar del Vallès"
+  },
+  {
+   "code": "08054",
+   "name": "Castellbisbal"
+  },
+  {
+   "code": "08056",
+   "name": "Castelldefels"
+  },
+  {
+   "code": "08266",
+   "name": "Cerdanyola del Vallès"
+  },
+  {
+   "code": "08068",
+   "name": "Cervelló"
+  },
+  {
+   "code": "25072",
+   "name": "Cervera"
+  },
+  {
+   "code": "08072",
+   "name": "Corbera de Llobregat"
+  },
+  {
+   "code": "08073",
+   "name": "Cornellà de Llobregat"
+  },
+  {
+   "code": "08074",
+   "name": "Cubelles"
+  },
+  {
+   "code": "08076",
+   "name": "Esparreguera"
+  },
+  {
+   "code": "08077",
+   "name": "Esplugues de Llobregat"
+  },
+  {
+   "code": "43055",
+   "name": "Falset"
+  },
+  {
+   "code": "17066",
+   "name": "Figueres"
+  },
+  {
+   "code": "08086",
+   "name": "Franqueses del Vallès, Les"
+  },
+  {
+   "code": "08088",
+   "name": "Garriga, La"
+  },
+  {
+   "code": "08089",
+   "name": "Gavà"
+  },
+  {
+   "code": "17079",
+   "name": "Girona"
+  },
+  {
+   "code": "08096",
+   "name": "Granollers"
+  },
+  {
+   "code": "25110",
+   "name": "Guissona"
+  },
+  {
+   "code": "08101",
+   "name": "Hospitalet de Llobregat, L'"
+  },
+  {
+   "code": "08102",
+   "name": "Igualada"
+  },
+  {
+   "code": "08105",
+   "name": "Llagosta, La"
+  },
+  {
+   "code": "25120",
+   "name": "Lleida"
+  },
+  {
+   "code": "08106",
+   "name": "Llinars del Vallès"
+  },
+  {
+   "code": "17095",
+   "name": "Lloret de Mar"
+  },
+  {
+   "code": "08110",
+   "name": "Malgrat de Mar"
+  },
+  {
+   "code": "08112",
+   "name": "Manlleu"
+  },
+  {
+   "code": "08113",
+   "name": "Manresa"
+  },
+  {
+   "code": "08118",
+   "name": "Masnou, El"
+  },
+  {
+   "code": "08120",
+   "name": "Matadepera"
+  },
+  {
+   "code": "08121",
+   "name": "Mataró"
+  },
+  {
+   "code": "08123",
+   "name": "Molins de Rei"
+  },
+  {
+   "code": "25137",
+   "name": "Mollerussa"
+  },
+  {
+   "code": "08124",
+   "name": "Mollet del Vallès"
+  },
+  {
+   "code": "08125",
+   "name": "Montcada i Reixac"
+  },
+  {
+   "code": "08126",
+   "name": "Montgat"
+  },
+  {
+   "code": "08135",
+   "name": "Montmeló"
+  },
+  {
+   "code": "08136",
+   "name": "Montornès del Vallès"
+  },
+  {
+   "code": "43094",
+   "name": "Móra la Nova"
+  },
+  {
+   "code": "08147",
+   "name": "Olesa de Montserrat"
+  },
+  {
+   "code": "17114",
+   "name": "Olot"
+  },
+  {
+   "code": "08155",
+   "name": "Palafolls"
+  },
+  {
+   "code": "17117",
+   "name": "Palafrugell"
+  },
+  {
+   "code": "17118",
+   "name": "Palamós"
+  },
+  {
+   "code": "08156",
+   "name": "Palau-solità i Plegamans"
+  },
+  {
+   "code": "08158",
+   "name": "Papiol, El"
+  },
+  {
+   "code": "08159",
+   "name": "Parets del Vallès"
+  },
+  {
+   "code": "08163",
+   "name": "Pineda de Mar"
+  },
+  {
+   "code": "08167",
+   "name": "Polinyà"
+  },
+  {
+   "code": "17137",
+   "name": "Porqueres"
+  },
+  {
+   "code": "08169",
+   "name": "Prat de Llobregat, El"
+  },
+  {
+   "code": "08230",
+   "name": "Premià de Dalt"
+  },
+  {
+   "code": "08172",
+   "name": "Premià de Mar"
+  },
+  {
+   "code": "17141",
+   "name": "Puigcerdà"
+  },
+  {
+   "code": "43123",
+   "name": "Reus"
+  },
+  {
+   "code": "17147",
+   "name": "Ripoll"
+  },
+  {
+   "code": "08180",
+   "name": "Ripollet"
+  },
+  {
+   "code": "08181",
+   "name": "Roca del Vallès, La"
+  },
+  {
+   "code": "43133",
+   "name": "Roquetes"
+  },
+  {
+   "code": "08184",
+   "name": "Rubí"
+  },
+  {
+   "code": "08187",
+   "name": "Sabadell"
+  },
+  {
+   "code": "43905",
+   "name": "Salou"
+  },
+  {
+   "code": "17155",
+   "name": "Salt"
+  },
+  {
+   "code": "08194",
+   "name": "Sant Adrià de Besòs"
+  },
+  {
+   "code": "08197",
+   "name": "Sant Andreu de Llavaneres"
+  },
+  {
+   "code": "08200",
+   "name": "Sant Boi de Llobregat"
+  },
+  {
+   "code": "08202",
+   "name": "Sant Celoni"
+  },
+  {
+   "code": "08204",
+   "name": "Sant Climent de Llobregat"
+  },
+  {
+   "code": "08205",
+   "name": "Sant Cugat del Vallès"
+  },
+  {
+   "code": "08208",
+   "name": "Sant Esteve Sesrovires"
+  },
+  {
+   "code": "17160",
+   "name": "Sant Feliu de Guíxols"
+  },
+  {
+   "code": "08211",
+   "name": "Sant Feliu de Llobregat"
+  },
+  {
+   "code": "08209",
+   "name": "Sant Fost de Campsentelles"
+  },
+  {
+   "code": "08213",
+   "name": "Sant Fruitós de Bages"
+  },
+  {
+   "code": "08217",
+   "name": "Sant Joan Despí"
+  },
+  {
+   "code": "08221",
+   "name": "Sant Just Desvern"
+  },
+  {
+   "code": "08231",
+   "name": "Sant Pere de Ribes"
+  },
+  {
+   "code": "08235",
+   "name": "Sant Pol de Mar"
+  },
+  {
+   "code": "08238",
+   "name": "Sant Quirze del Vallès"
+  },
+  {
+   "code": "08240",
+   "name": "Sant Sadurní d'Anoia"
+  },
+  {
+   "code": "08264",
+   "name": "Sant Vicenç de Montalt"
+  },
+  {
+   "code": "08263",
+   "name": "Sant Vicenç dels Horts"
+  },
+  {
+   "code": "08244",
+   "name": "Santa Coloma de Cervelló"
+  },
+  {
+   "code": "17180",
+   "name": "Santa Coloma de Farners"
+  },
+  {
+   "code": "08245",
+   "name": "Santa Coloma de Gramenet"
+  },
+  {
+   "code": "08250",
+   "name": "Santa Margarida de Montbui"
+  },
+  {
+   "code": "08260",
+   "name": "Santa Perpètua de Mogoda"
+  },
+  {
+   "code": "08261",
+   "name": "Santa Susanna"
+  },
+  {
+   "code": "17186",
+   "name": "Sarrià de Ter"
+  },
+  {
+   "code": "25203",
+   "name": "Seu d'Urgell, La"
+  },
+  {
+   "code": "08270",
+   "name": "Sitges"
+  },
+  {
+   "code": "25207",
+   "name": "Solsona"
+  },
+  {
+   "code": "25209",
+   "name": "Sort"
+  },
+  {
+   "code": "43148",
+   "name": "Tarragona"
+  },
+  {
+   "code": "25217",
+   "name": "Tàrrega"
+  },
+  {
+   "code": "08281",
+   "name": "Teià"
+  },
+  {
+   "code": "08279",
+   "name": "Terrassa"
+  },
+  {
+   "code": "08282",
+   "name": "Tiana"
+  },
+  {
+   "code": "08283",
+   "name": "Tona"
+  },
+  {
+   "code": "08285",
+   "name": "Torelló"
+  },
+  {
+   "code": "43153",
+   "name": "Torredembarra"
+  },
+  {
+   "code": "08289",
+   "name": "Torrelles de Llobregat"
+  },
+  {
+   "code": "43155",
+   "name": "Tortosa"
+  },
+  {
+   "code": "25234",
+   "name": "Tremp"
+  },
+  {
+   "code": "08295",
+   "name": "Vallirana"
+  },
+  {
+   "code": "43161",
+   "name": "Valls"
+  },
+  {
+   "code": "43163",
+   "name": "Vendrell, El"
+  },
+  {
+   "code": "08298",
+   "name": "Vic"
+  },
+  {
+   "code": "08301",
+   "name": "Viladecans"
+  },
+  {
+   "code": "08305",
+   "name": "Vilafranca del Penedès"
+  },
+  {
+   "code": "08302",
+   "name": "Vilanova del Camí"
+  },
+  {
+   "code": "08307",
+   "name": "Vilanova i la Geltrú"
+  },
+  {
+   "code": "08214",
+   "name": "Vilassar de Dalt"
+  },
+  {
+   "code": "08219",
+   "name": "Vilassar de Mar"
+  }
+ ],
+ "ampliacion": {
+  "vigencia": "2024-10-10",
+  "vigencia_hasta": "2027-10-09",
+  "fuente": "https://www.boe.es/boe/dias/2024/10/09/pdfs/BOE-A-2024-20576.pdf (Resolución de 8 de octubre de 2024, SEVAU; BOE 09/10/2024, núm. 244; declaración catalana: Resolució TER/2408/2024, DOGC 9196 de 03/07/2024)",
+  "municipios": [
+   {
+    "code": "08014",
+    "name": "Aiguafreda"
+   },
+   {
+    "code": "43002",
+    "name": "Albinyana"
+   },
+   {
+    "code": "43004",
+    "name": "Alcanar"
+   },
+   {
+    "code": "25011",
+    "name": "Alcarràs"
+   },
+   {
+    "code": "43005",
+    "name": "Alcover"
+   },
+   {
+    "code": "43904",
+    "name": "Aldea, L'"
+   },
+   {
+    "code": "25019",
+    "name": "Almacelles"
+   },
+   {
+    "code": "25023",
+    "name": "Alpicat"
+   },
+   {
+    "code": "43012",
+    "name": "Altafulla"
+   },
+   {
+    "code": "43013",
+    "name": "Ametlla de Mar, L'"
+   },
+   {
+    "code": "08005",
+    "name": "Ametlla del Vallès, L'"
+   },
+   {
+    "code": "43906",
+    "name": "Ampolla, L'"
+   },
+   {
+    "code": "17008",
+    "name": "Anglès"
+   },
+   {
+    "code": "43016",
+    "name": "Arboç, L'"
+   },
+   {
+    "code": "17009",
+    "name": "Arbúcies"
+   },
+   {
+    "code": "08010",
+    "name": "Artés"
+   },
+   {
+    "code": "25034",
+    "name": "Artesa de Segre"
+   },
+   {
+    "code": "08016",
+    "name": "Bagà"
+   },
+   {
+    "code": "08020",
+    "name": "Begues"
+   },
+   {
+    "code": "17013",
+    "name": "Begur"
+   },
+   {
+    "code": "25050",
+    "name": "Bellpuig"
+   },
+   {
+    "code": "25051",
+    "name": "Bellver de Cerdanya"
+   },
+   {
+    "code": "17019",
+    "name": "Besalú"
+   },
+   {
+    "code": "08023",
+    "name": "Bigues i Riells del Fai"
+   },
+   {
+    "code": "43028",
+    "name": "Bisbal del Penedès, La"
+   },
+   {
+    "code": "25058",
+    "name": "Borges Blanques, Les"
+   },
+   {
+    "code": "17027",
+    "name": "Breda"
+   },
+   {
+    "code": "17032",
+    "name": "Cadaqués"
+   },
+   {
+    "code": "08031",
+    "name": "Calaf"
+   },
+   {
+    "code": "43037",
+    "name": "Calafell"
+   },
+   {
+    "code": "17033",
+    "name": "Caldes de Malavella"
+   },
+   {
+    "code": "17034",
+    "name": "Calonge i Sant Antoni"
+   },
+   {
+    "code": "08043",
+    "name": "Canyelles"
+   },
+   {
+    "code": "17044",
+    "name": "Cassà de la Selva"
+   },
+   {
+    "code": "08058",
+    "name": "Castellet i la Gornal"
+   },
+   {
+    "code": "08061",
+    "name": "Castellgalí"
+   },
+   {
+    "code": "17047",
+    "name": "Castelló d'Empúries"
+   },
+   {
+    "code": "17048",
+    "name": "Castell d'Aro, Platja d'Aro i s'Agaró"
+   },
+   {
+    "code": "08064",
+    "name": "Castellterçol"
+   },
+   {
+    "code": "17049",
+    "name": "Celrà"
+   },
+   {
+    "code": "08067",
+    "name": "Centelles"
+   },
+   {
+    "code": "43050",
+    "name": "Creixell"
+   },
+   {
+    "code": "43051",
+    "name": "Cunit"
+   },
+   {
+    "code": "43901",
+    "name": "Deltebre"
+   },
+   {
+    "code": "08075",
+    "name": "Dosrius"
+   },
+   {
+    "code": "17062",
+    "name": "Escala, L'"
+   },
+   {
+    "code": "08254",
+    "name": "Esquirol, L'"
+   },
+   {
+    "code": "08083",
+    "name": "Folgueroles"
+   },
+   {
+    "code": "17073",
+    "name": "Fornells de la Selva"
+   },
+   {
+    "code": "08091",
+    "name": "Gelida"
+   },
+   {
+    "code": "08092",
+    "name": "Gironella"
+   },
+   {
+    "code": "17083",
+    "name": "Hostalric"
+   },
+   {
+    "code": "25122",
+    "name": "Linyola"
+   },
+   {
+    "code": "17092",
+    "name": "Llançà"
+   },
+   {
+    "code": "08107",
+    "name": "Lliçà d'Amunt"
+   },
+   {
+    "code": "08108",
+    "name": "Lliçà de Vall"
+   },
+   {
+    "code": "17103",
+    "name": "Maçanet de la Selva"
+   },
+   {
+    "code": "08119",
+    "name": "Masquefa"
+   },
+   {
+    "code": "08138",
+    "name": "Moià"
+   },
+   {
+    "code": "08127",
+    "name": "Monistrol de Montserrat"
+   },
+   {
+    "code": "43086",
+    "name": "Montblanc"
+   },
+   {
+    "code": "43088",
+    "name": "Montbrió del Camp"
+   },
+   {
+    "code": "43092",
+    "name": "Mont-roig del Camp"
+   },
+   {
+    "code": "43093",
+    "name": "Móra d'Ebre"
+   },
+   {
+    "code": "43095",
+    "name": "Morell, El"
+   },
+   {
+    "code": "08141",
+    "name": "Navàs"
+   },
+   {
+    "code": "08143",
+    "name": "Òdena"
+   },
+   {
+    "code": "08145",
+    "name": "Olèrdola"
+   },
+   {
+    "code": "08146",
+    "name": "Olesa de Bonesvalls"
+   },
+   {
+    "code": "08148",
+    "name": "Olivella"
+   },
+   {
+    "code": "08157",
+    "name": "Pallejà"
+   },
+   {
+    "code": "08905",
+    "name": "Palma de Cervelló, La"
+   },
+   {
+    "code": "17124",
+    "name": "Pals"
+   },
+   {
+    "code": "17132",
+    "name": "Peralada"
+   },
+   {
+    "code": "08161",
+    "name": "Piera"
+   },
+   {
+    "code": "43111",
+    "name": "Pobla de Montornès, La"
+   },
+   {
+    "code": "25173",
+    "name": "Pont de Suert, El"
+   },
+   {
+    "code": "25172",
+    "name": "Ponts"
+   },
+   {
+    "code": "08171",
+    "name": "Prats de Lluçanès"
+   },
+   {
+    "code": "08175",
+    "name": "Puig-reig"
+   },
+   {
+    "code": "43136",
+    "name": "Ràpita, La"
+   },
+   {
+    "code": "17146",
+    "name": "Riells i Viabrea"
+   },
+   {
+    "code": "17148",
+    "name": "Riudarenes"
+   },
+   {
+    "code": "43129",
+    "name": "Riudoms"
+   },
+   {
+    "code": "43131",
+    "name": "Roda de Berà"
+   },
+   {
+    "code": "08183",
+    "name": "Roda de Ter"
+   },
+   {
+    "code": "17152",
+    "name": "Roses"
+   },
+   {
+    "code": "08198",
+    "name": "Sant Antoni de Vilamajor"
+   },
+   {
+    "code": "08203",
+    "name": "Sant Cebrià de Vallalta"
+   },
+   {
+    "code": "08207",
+    "name": "Sant Esteve de Palautordera"
+   },
+   {
+    "code": "08210",
+    "name": "Sant Feliu de Codines"
+   },
+   {
+    "code": "08215",
+    "name": "Sant Hipòlit de Voltregà"
+   },
+   {
+    "code": "43137",
+    "name": "Sant Jaume dels Domenys"
+   },
+   {
+    "code": "43902",
+    "name": "Sant Jaume d'Enveja"
+   },
+   {
+    "code": "08218",
+    "name": "Sant Joan de Vilatorrada"
+   },
+   {
+    "code": "17169",
+    "name": "Sant Julià de Ramis"
+   },
+   {
+    "code": "08222",
+    "name": "Sant Llorenç d'Hortons"
+   },
+   {
+    "code": "08223",
+    "name": "Sant Llorenç Savall"
+   },
+   {
+    "code": "08227",
+    "name": "Sant Martí Sarroca"
+   },
+   {
+    "code": "08232",
+    "name": "Sant Pere de Riudebitlles"
+   },
+   {
+    "code": "08233",
+    "name": "Sant Pere de Torelló"
+   },
+   {
+    "code": "08234",
+    "name": "Sant Pere de Vilamajor"
+   },
+   {
+    "code": "17178",
+    "name": "Sant Pere Pescador"
+   },
+   {
+    "code": "08237",
+    "name": "Sant Quirze de Besora"
+   },
+   {
+    "code": "43138",
+    "name": "Santa Bàrbara"
+   },
+   {
+    "code": "43139",
+    "name": "Santa Coloma de Queralt"
+   },
+   {
+    "code": "17181",
+    "name": "Santa Cristina d'Aro"
+   },
+   {
+    "code": "08248",
+    "name": "Santa Eulàlia de Ronçana"
+   },
+   {
+    "code": "08259",
+    "name": "Santa Maria de Palautordera"
+   },
+   {
+    "code": "43140",
+    "name": "Santa Oliva"
+   },
+   {
+    "code": "08192",
+    "name": "Santpedor"
+   },
+   {
+    "code": "43145",
+    "name": "Selva del Camp, La"
+   },
+   {
+    "code": "43044",
+    "name": "Sénia, La"
+   },
+   {
+    "code": "08267",
+    "name": "Sentmenat"
+   },
+   {
+    "code": "08269",
+    "name": "Seva"
+   },
+   {
+    "code": "17193",
+    "name": "Sils"
+   },
+   {
+    "code": "08274",
+    "name": "Súria"
+   },
+   {
+    "code": "08278",
+    "name": "Taradell"
+   },
+   {
+    "code": "08288",
+    "name": "Torrelles de Foix"
+   },
+   {
+    "code": "17199",
+    "name": "Torroella de Montgrí"
+   },
+   {
+    "code": "17202",
+    "name": "Tossa de Mar"
+   },
+   {
+    "code": "43156",
+    "name": "Ulldecona"
+   },
+   {
+    "code": "08291",
+    "name": "Vacarisses"
+   },
+   {
+    "code": "08294",
+    "name": "Vallgorguina"
+   },
+   {
+    "code": "17213",
+    "name": "Vidreres"
+   },
+   {
+    "code": "25243",
+    "name": "Vielha e Mijaran"
+   },
+   {
+    "code": "08300",
+    "name": "Viladecavalls"
+   },
+   {
+    "code": "17221",
+    "name": "Vilafant"
+   },
+   {
+    "code": "08902",
+    "name": "Vilanova del Vallès"
+   },
+   {
+    "code": "17233",
+    "name": "Vilobí d'Onyar"
+   },
+   {
+    "code": "43178",
+    "name": "Vinyols i els Arcs"
+   }
+  ]
+ },
+ "revision_2026": {
+  "estado": "aprobada por el Govern (DOGC julio 2026); PENDIENTE de publicación en BOE a 2026-10-22, por tanto NO en vigor todavía",
+  "fuente": [
+   "https://www.3cat.cat/3catinfo/el-govern-amplia-el-mercat-residencial-tensionat-fins-a-302-municipis-aixi-queda-el-nou-mapa/noticia/3422490/",
+   "https://www.diaripublic.cat/societat/mes-municipis-amb-topall-lloguer-pero-menys-persones-viuran-zones-regulades-quins-entren-quins-surten-llista.html",
+   "https://www.catalunyapress.cat/article/societat/2026-07-29/5969191-catalunya-ajusta-topall-als-lloguers-aquests-els-municipis-entren-i-surten-zones-tensionadas"
+  ],
+  "total_previsto": 302,
+  "entran": [
+   {
+    "code": "25003",
+    "name": "Agramunt"
+   },
+   {
+    "code": "25140",
+    "name": "Montferrer i Castellbò"
+   },
+   {
+    "code": "08193",
+    "name": "Sant Iscle de Vallalta"
+   },
+   {
+    "code": "17016",
+    "name": "Bàscara"
+   },
+   {
+    "code": "43090",
+    "name": "Montmell, El"
+   },
+   {
+    "code": "17167",
+    "name": "Sant Joan de les Abadesses"
+   },
+   {
+    "code": "43024",
+    "name": "Bellvei"
+   },
+   {
+    "code": "08140",
+    "name": "Navarcles"
+   },
+   {
+    "code": "17185",
+    "name": "Sant Joan les Fonts"
+   },
+   {
+    "code": "08038",
+    "name": "Callús"
+   },
+   {
+    "code": "17116",
+    "name": "Osor"
+   },
+   {
+    "code": "08224",
+    "name": "Sant Martí de Centelles"
+   },
+   {
+    "code": "43903",
+    "name": "Camarles"
+   },
+   {
+    "code": "17121",
+    "name": "Palau-sator"
+   },
+   {
+    "code": "08262",
+    "name": "Sant Vicenç de Castellet"
+   },
+   {
+    "code": "17036",
+    "name": "Campdevànol"
+   },
+   {
+    "code": "43108",
+    "name": "Pla de Santa Maria, El"
+   },
+   {
+    "code": "08246",
+    "name": "Santa Eugènia de Berga"
+   },
+   {
+    "code": "08044",
+    "name": "Capellades"
+   },
+   {
+    "code": "43109",
+    "name": "Pobla de Mafumet, La"
+   },
+   {
+    "code": "08251",
+    "name": "Santa Margarida i els Monjos"
+   },
+   {
+    "code": "08047",
+    "name": "Cardona"
+   },
+   {
+    "code": "25171",
+    "name": "Pobla de Segur, La"
+   },
+   {
+    "code": "25223",
+    "name": "Torà"
+   },
+   {
+    "code": "08053",
+    "name": "Castellbell i el Vilar"
+   },
+   {
+    "code": "17140",
+    "name": "Port de la Selva, El"
+   },
+   {
+    "code": "08284",
+    "name": "Tordera"
+   },
+   {
+    "code": "43047",
+    "name": "Constantí"
+   },
+   {
+    "code": "25175",
+    "name": "Prats i Sansor"
+   },
+   {
+    "code": "25228",
+    "name": "Torrefarrera"
+   },
+   {
+    "code": "17058",
+    "name": "Crespià"
+   },
+   {
+    "code": "17139",
+    "name": "Preses, Les"
+   },
+   {
+    "code": "17204",
+    "name": "Ullà"
+   },
+   {
+    "code": "43054",
+    "name": "Espluga de Francolí, L'"
+   },
+   {
+    "code": "25185",
+    "name": "Ribera d'Urgellet"
+   },
+   {
+    "code": "25240",
+    "name": "Vallfogona de Balaguer"
+   },
+   {
+    "code": "08134",
+    "name": "Figaró-Montmany"
+   },
+   {
+    "code": "25189",
+    "name": "Rosselló"
+   },
+   {
+    "code": "43162",
+    "name": "Vandellòs i l'Hospitalet de l'Infant"
+   },
+   {
+    "code": "08162",
+    "name": "Hostalets de Pierola, Els"
+   },
+   {
+    "code": "08191",
+    "name": "Sallent"
+   },
+   {
+    "code": "08306",
+    "name": "Vilalba Sasserra"
+   },
+   {
+    "code": "17086",
+    "name": "Jonquera, La"
+   },
+   {
+    "code": "43135",
+    "name": "Salomó"
+   },
+   {
+    "code": "43171",
+    "name": "Vila-seca"
+   },
+   {
+    "code": "17089",
+    "name": "Llagostera"
+   },
+   {
+    "code": "08196",
+    "name": "Sant Andreu de la Barca"
+   },
+   {
+    "code": "17097",
+    "name": "Madremanya"
+   },
+   {
+    "code": "17161",
+    "name": "Sant Feliu de Pallerols"
+   },
+   {
+    "code": "08114",
+    "name": "Martorell"
+   },
+   {
+    "code": "17163",
+    "name": "Sant Gregori"
+   },
+   {
+    "code": "43079",
+    "name": "Masllorenç"
+   },
+   {
+    "code": "17164",
+    "name": "Sant Hilari Sacalm"
+   }
+  ],
+  "salen": [
+   {
+    "code": "17015",
+    "name": "Banyoles"
+   },
+   {
+    "code": "17066",
+    "name": "Figueres"
+   },
+   {
+    "code": "08159",
+    "name": "Parets del Vallès"
+   },
+   {
+    "code": "08022",
+    "name": "Berga"
+   },
+   {
+    "code": "08086",
+    "name": "Franqueses del Vallès, Les"
+   },
+   {
+    "code": "43123",
+    "name": "Reus"
+   },
+   {
+    "code": "08029",
+    "name": "Cabrera de Mar"
+   },
+   {
+    "code": "08096",
+    "name": "Granollers"
+   },
+   {
+    "code": "08204",
+    "name": "Sant Climent de Llobregat"
+   },
+   {
+    "code": "08032",
+    "name": "Caldes d'Estrac"
+   },
+   {
+    "code": "25110",
+    "name": "Guissona"
+   },
+   {
+    "code": "08213",
+    "name": "Sant Fruitós de Bages"
+   },
+   {
+    "code": "08037",
+    "name": "Calldetenes"
+   },
+   {
+    "code": "25120",
+    "name": "Lleida"
+   },
+   {
+    "code": "08250",
+    "name": "Santa Margarida de Montbui"
+   },
+   {
+    "code": "08041",
+    "name": "Canovelles"
+   },
+   {
+    "code": "08124",
+    "name": "Mollet del Vallès"
+   },
+   {
+    "code": "43155",
+    "name": "Tortosa"
+   },
+   {
+    "code": "08068",
+    "name": "Cervelló"
+   },
+   {
+    "code": "08135",
+    "name": "Montmeló"
+   },
+   {
+    "code": "25072",
+    "name": "Cervera"
+   },
+   {
+    "code": "08158",
+    "name": "Papiol, El"
+   }
+  ]
+ },
+ "sin_mapear": []
+}
