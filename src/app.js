@@ -2956,8 +2956,8 @@ async function renderInicio(){
     <p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
   <section class="ed-sec ed-two"><a class="ed-ill" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
     <div><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rowsAll().length)} municipios. Te ayudamos a saber si es causa o casualidad.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></div></section>
-  <section class="ed-sec ed-two"><div><div class="ed-k">O mira un lugar concreto</div><h2 class="ed-h2" style="font-size:clamp(24px,2.8vw,30px)">¿Cómo sale tu municipio en estas preguntas?</h2></div>
-    <div>${bigSearchHTML("q2","Escribe un municipio…")}${exampleChips()}<div class="ed-ill sm" aria-hidden="true">${tIll("municipio")}</div></div></section>
+  <section class="ed-sec ed-two"><div><div class="ed-k">O mira un lugar concreto</div><h2 class="ed-h2" style="font-size:clamp(24px,2.8vw,30px)">¿Cómo sale tu municipio en estas preguntas?</h2><div class="ed-ill sm" aria-hidden="true">${tIll("municipio")}</div></div>
+    <div>${bigSearchHTML("q2","Escribe un municipio…")}${exampleChips()}</div></section>
   <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   bindBig("q2");

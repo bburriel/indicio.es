@@ -45,7 +45,7 @@ for(const f of ["favicon.svg","apple-touch-icon.png","icon-192.png","icon-512.pn
 copyDir(path.join(ROOT,"vendor"),path.join(OUT,"vendor"));
 if(exists("og")) copyDir(path.join(ROOT,"og"),path.join(OUT,"og"));
 if(exists("art")) copyDir(path.join(ROOT,"art"),path.join(OUT,"art"));
-if(exists("illus")) copyDir(path.join(ROOT,"illus"),path.join(OUT,"illus"));
+if(exists("illus")){ fs.mkdirSync(path.join(OUT,"illus"),{recursive:true}); for(const f of fs.readdirSync(path.join(ROOT,"illus")).filter(f=>f.endsWith(".svg"))) fs.copyFileSync(path.join(ROOT,"illus",f),path.join(OUT,"illus",f)); }
 copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+CONTENT)).replace("__JS__",JS).replace("__CSS__",CSS));

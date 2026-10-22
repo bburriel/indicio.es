@@ -1,7 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Una urna con una papeleta entrando"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
-<circle class="c" cx="160" cy="92" r="70"/>
-<path class="k" d="M30 172h260"/><g transform="rotate(10 252 140)"><path class="w" d="M236 120h32v46h-32z"/><path class="k" d="M236 120h32v46h-32z"/><path d="M242 130h20M242 138h14" stroke="#c77a6c" stroke-width="3" stroke-linecap="round"/></g><g transform="rotate(-12 66 148)"><path class="w" d="M52 128h30v40H52z"/><path class="k" d="M52 128h30v40H52z"/><path d="M58 138h18M58 146h12" stroke="#c77a6c" stroke-width="3" stroke-linecap="round"/></g>
-<path class="w" d="M96 96h128v76H96z"/><path class="g" d="M96 96h128v14H96z"/><path class="k" d="M96 96h128v76H96zM96 110h128"/><path class="i" d="M138 101h44v4h-44z"/>
-<path d="M120 136h80" stroke="#ebd0ae" stroke-width="10" stroke-linecap="round"/>
-<g transform="rotate(-8 160 60)"><path class="w" d="M138 34h44v66h-44z"/><path class="k" d="M138 34h44v66h-44z"/><path d="M146 46h28M146 56h22M146 66h26" stroke="#c77a6c" stroke-width="3" stroke-linecap="round"/><path class="k" d="M150 82l6 6 12-14" stroke="#8a1c2d" stroke-width="3"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Una urna con una papeleta entrando y otras dos al lado"><defs>
+<filter id="soft" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
+<feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="7" result="w"/>
+<feDisplacementMap in="SourceGraphic" in2="w" scale="2" xChannelSelector="R" yChannelSelector="G" result="d"/>
+<feTurbulence type="fractalNoise" baseFrequency="1.7" numOctaves="2" seed="3" stitchTiles="stitch" result="n"/>
+<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.4 1.8" result="dots"/>
+<feComposite in="dots" in2="d" operator="in" result="dk"/>
+<feFlood flood-color="#4a3a30" flood-opacity=".17"/><feComposite in2="dk" operator="in" result="grain"/>
+<feMerge><feMergeNode in="d"/><feMergeNode in="grain"/></feMerge>
+</filter>
+<linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c5d6bf"/><stop offset="1" stop-color="#9fbb98"/></linearGradient>
+<linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9d3e3"/><stop offset="1" stop-color="#9fb0cb"/></linearGradient>
+<linearGradient id="gn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecdcc3"/><stop offset="1" stop-color="#dcc39d"/></linearGradient>
+<linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8c4c0"/><stop offset="1" stop-color="#cf9a98"/></linearGradient>
+<linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9b4a55"/><stop offset="1" stop-color="#7d3843"/></linearGradient>
+<linearGradient id="go" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3c27f"/><stop offset="1" stop-color="#cfa456"/></linearGradient>
+</defs><g filter="url(#soft)"><rect x="-10" y="-10" width="340" height="220" fill="#f2eee6"/><path d="M60 160c-34-14 -40-60-10-90 26-26 60-24 92-34 40-12 92-8 112 26 22 38 6 82-38 98-34 12-64 6-96 8-26 2-44 0-60-8z" fill="url(#gn)"/><ellipse cx="160" cy="160" rx="80" ry="5" fill="#56504a" opacity=".12"/><rect x="112" y="92" width="96" height="66" rx="4" fill="#fbf7f0"/><rect x="112" y="92" width="96" height="16" rx="4" fill="url(#gw)"/><rect x="138" y="98" width="44" height="4" rx="2" fill="#7d3843"/><path d="M130 132h60" stroke="#ecdcc3" stroke-width="9" stroke-linecap="round"/><g transform="translate(146 46) rotate(-6)"><rect width="30" height="44" rx="2" fill="#fff"/><path d="M6 10h18M6 17h12" stroke="#cf9a98" stroke-width="2.4" stroke-linecap="round"/><path d="M8 30l5 5 9-10" stroke="#9b4a55" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(70 118) rotate(-14)"><rect width="26" height="36" rx="2" fill="#fbf7f0"/><path d="M5 9h16M5 15h10" stroke="#9fb0cb" stroke-width="2.2" stroke-linecap="round"/></g><g transform="translate(224 112) rotate(12)"><rect width="26" height="36" rx="2" fill="#fbf7f0"/><path d="M5 9h16M5 15h10" stroke="#7e9f78" stroke-width="2.2" stroke-linecap="round"/></g></g></svg>

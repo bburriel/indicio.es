@@ -1,13 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Un bloque de pisos con un cartel de se alquila y una llave"><style>.k{fill:none;stroke:#1d1c1a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.g{fill:#8a1c2d}.r{fill:#c77a6c}.a{fill:#ebd0ae}.c{fill:#f4ebd9}.v{fill:#a9c9a4}.m{fill:#d9a23a}.w{fill:#fff}.i{fill:#1d1c1a}</style>
-<circle class="c" cx="70" cy="70" r="44"/>
-<path class="k" d="M16 172h288"/>
-<path class="a" d="M200 92h80v80h-80z"/><path class="k" d="M200 92h80v80h-80z"/>
-<path class="g" d="M110 34h96v138h-96z"/><path class="k" d="M110 34h96v138h-96zM104 34h108"/>
-<g class="c"><rect x="122" y="48" width="18" height="20"/><rect x="149" y="48" width="18" height="20"/><rect x="176" y="48" width="18" height="20"/><rect x="122" y="80" width="18" height="20"/><rect x="176" y="80" width="18" height="20"/><rect x="122" y="112" width="18" height="20"/><rect x="149" y="112" width="18" height="20"/></g>
-<rect class="m" x="149" y="80" width="18" height="20"/><rect class="m" x="176" y="112" width="18" height="20"/>
-<path class="w" d="M147 144h22v28h-22z"/><path class="k" d="M147 144h22v28h-22z"/>
-<g class="c"><rect x="212" y="104" width="16" height="16"/><rect x="252" y="104" width="16" height="16"/><rect x="212" y="134" width="16" height="16"/></g>
-<path class="k" d="M118 100v14M140 100v14"/><path class="w" d="M108 114h44v18h-44z"/><path class="k" d="M108 114h44v18h-44z"/>
-<path d="M114 120h32M114 126h20" stroke="#8a1c2d" stroke-width="2.4" stroke-linecap="round"/>
-<g transform="rotate(-30 60 150)"><circle class="m" cx="40" cy="150" r="13"/><circle class="c" cx="40" cy="150" r="5"/><path class="m" d="M52 146h40v8H52z"/><path class="m" d="M78 154h6v8h-6zM88 154h4v6h-4z"/><path class="k" d="M53 146h39v8H53zM78 154v8h6v-8M88 154v6h4v-6"/><circle class="k" cx="40" cy="150" r="13"/><circle class="k" cx="40" cy="150" r="5"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Un bloque de pisos con cartel de se alquila, una casa pequeña y una llave"><defs>
+<filter id="soft" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
+<feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="7" result="w"/>
+<feDisplacementMap in="SourceGraphic" in2="w" scale="2" xChannelSelector="R" yChannelSelector="G" result="d"/>
+<feTurbulence type="fractalNoise" baseFrequency="1.7" numOctaves="2" seed="3" stitchTiles="stitch" result="n"/>
+<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.4 1.8" result="dots"/>
+<feComposite in="dots" in2="d" operator="in" result="dk"/>
+<feFlood flood-color="#4a3a30" flood-opacity=".17"/><feComposite in2="dk" operator="in" result="grain"/>
+<feMerge><feMergeNode in="d"/><feMergeNode in="grain"/></feMerge>
+</filter>
+<linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c5d6bf"/><stop offset="1" stop-color="#9fbb98"/></linearGradient>
+<linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9d3e3"/><stop offset="1" stop-color="#9fb0cb"/></linearGradient>
+<linearGradient id="gn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecdcc3"/><stop offset="1" stop-color="#dcc39d"/></linearGradient>
+<linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8c4c0"/><stop offset="1" stop-color="#cf9a98"/></linearGradient>
+<linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9b4a55"/><stop offset="1" stop-color="#7d3843"/></linearGradient>
+<linearGradient id="go" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3c27f"/><stop offset="1" stop-color="#cfa456"/></linearGradient>
+</defs><g filter="url(#soft)"><rect x="-10" y="-10" width="340" height="220" fill="#f2eee6"/><path d="M36 120c-6-44 34-78 84-80 34-1 56 14 92 8 40-6 76 16 76 52 0 42-38 62-84 64-36 2-60-8-96-4-40 4-68-8-72-40z" fill="url(#gs)"/><ellipse cx="160" cy="156" rx="96" ry="5" fill="#56504a" opacity=".12"/><rect x="120" y="44" width="62" height="112" rx="3" fill="url(#gw)"/><rect x="130" y="56" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="130" y="82" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="130" y="100" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="130" y="118" width="11" height="12" rx="1.2" fill="#e3c27f"/><rect x="146" y="56" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="146" y="82" width="11" height="12" rx="1.2" fill="#e3c27f"/><rect x="146" y="100" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="162" y="56" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="162" y="82" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="162" y="100" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="162" y="118" width="11" height="12" rx="1.2" fill="#fbf7f0"/><rect x="144" y="132" width="15" height="24" rx="1.5" fill="#fbf7f0"/><path d="M130 100v-6M170 100v-6" stroke="#56504a" stroke-width="1.2" opacity=".6"/><rect x="120" y="97" width="0" height="0"/><g transform="translate(186 92) rotate(4)"><path d="M10 0v8M30 0v8" stroke="#56504a" stroke-width="1.2" opacity=".6"/><rect y="8" width="40" height="18" rx="2" fill="#fbf7f0"/><path d="M6 14h28M6 20h17" stroke="#9b4a55" stroke-width="2.2" stroke-linecap="round"/></g><rect x="64" y="118" width="34" height="38" rx="1.5" fill="#e8c4c0"/><path d="M61 119L81.0 99.3L101 119z" fill="#cf9a98"/><rect x="71.5" y="131.3" width="6.8" height="11.4" rx=".8" fill="#fbf7f0"/><rect x="83.0" y="137.0" width="7.5" height="19.0" rx=".8" fill="#cf9a98"/><rect x="212" y="128" width="30" height="28" rx="1.5" fill="#fbf7f0"/><path d="M209 129L227.0 111.5L245 129z" fill="#9fb0cb"/><rect x="218.6" y="137.8" width="6.0" height="8.4" rx=".8" fill="#dcc39d"/><rect x="228.8" y="142.0" width="6.6" height="14.0" rx=".8" fill="#9fb0cb"/><g transform="translate(244 108) rotate(58)"><circle r="10" fill="url(#go)"/><circle r="4" fill="#9fbb98"/><path d="M9 -3h30v6H9zM28 3h5v7h-5zM35 3h3v5h-3z" fill="url(#go)"/></g></g></svg>
