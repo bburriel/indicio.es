@@ -213,10 +213,22 @@ const fechaES=d=>{ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${+dd}
 const byline=S=>`<span class="by-who">Por <a href="/quien-soy/">${esc((window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author.name)||"Indicio")}</a></span> · <time datetime="${S.pub||""}">${fechaES(S.pub)}</time>${S.upd&&S.upd!==S.pub?` · <span class="by-upd">Revisado el ${fechaES(S.upd)}</span>`:""} · <span class="by-m">${esc(S.m)}</span>`;
 function finding(parent,title,text){ const s=add(parent,"section","finding"); if(title) add(s,"h2",null,title); if(text) add(s,"div","txt",text); return s; }
 function fig(parent,{title,sub,source}={}){ const f=add(parent,"figure"); if(title) add(f,"div","ct",title); if(sub) add(f,"div","cs",sub); const body=add(f,"div"); if(source){ const c=add(f,"figcaption",null,source); f._cap=c; } f.body=body; return f; }
-function methodNote(){
+// Fuentes: cada estudio lista solo las que usa (methodNote(["atlas","padron"])); sin argumento, todas
+const SRC={
+  atlas:`INE: Atlas de Distribución de Renta de los Hogares 2015–2024 (los años 2015–2023 a través del proyecto abierto <a href="https://github.com/pablogguz/ineAtlas.data" target="_blank" rel="noopener">ineAtlas.data</a>)`,
+  padron:"INE: padrón municipal 1996–2025", censo:"INE: Censo de Población y Viviendas 2021", mig:"INE: Estadística de Migraciones y Cambios de Residencia 2021–2024",
+  ipva:"INE: Índice de Precios de Vivienda en Alquiler (alquileres declarados a Hacienda), por municipio y, por antigüedad del contrato, por provincia", vt:"INE: medición de viviendas turísticas (agosto de 2020 a mayo de 2026)",
+  salarios:"INE: Encuesta de Estructura Salarial", ipc:"INE: IPC", sepe:"SEPE: paro registrado por municipio, 2015–septiembre de 2026", interior:"Ministerio del Interior: generales de 2019 y 2023, municipales de 2019 y 2023 y europeas de 2024",
+  idealista:"idealista: precio medio de los anuncios de alquiler", eurostat:"Eurostat: cuentas públicas, pensiones y proyecciones de población",
+  tensionadas:"BOE: resoluciones de 14 de marzo y 8 de octubre de 2024 con los municipios catalanes declarados zona de mercado residencial tensionado", erte:"Seguridad Social: trabajadores en ERTE por provincia a 30 de abril de 2020 (nota de afiliación de abril de 2020)",
+  ave:"Adif, Renfe y prensa: estaciones con servicio de alta velocidad abierto entre 2021 y 2023 (lista en el repositorio)", vut:"Boletines oficiales y prensa: municipios con moratoria o prohibición de nuevas viviendas turísticas, con fecha (lista en el repositorio)",
+  geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN"
+};
+function methodNote(keys){
+  const ks=keys||Object.keys(SRC).filter(k=>!["tensionadas","erte","ave","vut","eurostat"].includes(k));
   return `<footer class="method">
-    <p><b>De dónde salen los datos.</b> INE: Atlas de Distribución de Renta de los Hogares 2015–2024 (los años 2015–2023 a través del proyecto abierto <a href="https://github.com/pablogguz/ineAtlas.data" target="_blank" rel="noopener">ineAtlas.data</a>), padrón municipal 1996–2025, Censo de Población y Viviendas 2021, Estadística de Migraciones y Cambios de Residencia 2021–2024, Índice de Precios de Vivienda en Alquiler, viviendas turísticas, Encuesta de Estructura Salarial e IPC. SEPE: paro registrado por municipio, 2015–septiembre de 2026. Ministerio del Interior: generales de 2019 y 2023, municipales de 2019 y 2023 y europeas de 2024. idealista: precio medio de los anuncios de alquiler.</p>
-    <p><b>Cómo leerlos.</b> La renta sale de las declaraciones de la renta y no incluye la economía sumergida. Salvo que se indique «descontando la inflación», los euros son de cada año. Las cifras de provincia y de España son medias de sus municipios ponderadas por población. En los municipios muy pequeños el INE no publica todos los datos.</p>
+    <p><b>De dónde salen los datos.</b> ${ks.map(k=>SRC[k]).join(". ")}.</p>
+    <p><b>Cómo leerlos.</b> La renta sale de las declaraciones de la renta y no incluye la economía sumergida. Salvo que se indique «descontando la inflación», los euros son de cada año. Las cifras de provincia y de España son medias de sus municipios ponderadas por población. En los municipios muy pequeños el INE no publica todos los datos. El cálculo exacto detrás de cada etiqueta («a igual edad», «entre iguales», «explica») está en <a href="/laboratorio/metodo/">la guía del método</a>, y el código en <a href="https://github.com/bburriel/indicio.es" target="_blank" rel="noopener">GitHub</a>.</p>
   </footer>`;
 }
 
@@ -1676,20 +1688,88 @@ function wresid(y,Z,w){ const n=y.length, k=Z[0]?Z[0].length:0, p=k+1; const X=y
   const beta=b.map((v,i)=>v/(A[i][i]||1e-12)); return y.map((v,i)=>v-X[i].reduce((s,x,j)=>s+x*beta[j],0)); }
 function demeanBy(v,g,w){ const S={},W={}; v.forEach((x,i)=>{ S[g[i]]=(S[g[i]]||0)+w[i]*x; W[g[i]]=(W[g[i]]||0)+w[i]; }); return v.map((x,i)=>x-S[g[i]]/W[g[i]]); }
 // datos ajustados: cada municipio, quitando lo que explican los controles (se suma la media para no perder las unidades)
-function adjData(x,y,ctrls,weighted){
+function adjData(x,y,ctrls,weighted,rowsIn){
   const cs=ctrls.filter(c=>c!==x&&c!==y);
-  const rs=rowsAll().filter(r=>exOK(r)&&r[F[x]]!=null&&r[F[y]]!=null&&(r[F.pop]||0)>0&&cs.every(c=>c==="lpop"||c==="prov"?true:r[F[c]]!=null));
+  const rs=rowsIn||rowsAll().filter(r=>exOK(r)&&r[F[x]]!=null&&r[F[y]]!=null&&(r[F.pop]||0)>0&&cs.every(c=>c==="lpop"||c==="prov"?true:c==="lpop20"?r[F.pop20]>0:r[F[c]]!=null));
   if(rs.length<20) return null;
   const w=rs.map(r=>weighted?(r[F.pop]||1):1), W=d3.sum(w);
   const X0=rs.map(r=>r[F[x]]), Y0=rs.map(r=>r[F[y]]); let X=X0.slice(), Y=Y0.slice();
   if(cs.includes("prov")){ const g=rs.map(r=>r[F.prov]); X=demeanBy(X,g,w); Y=demeanBy(Y,g,w); }
   const num=cs.filter(c=>c!=="prov");
-  if(num.length){ const Z=rs.map(r=>num.map(c=>c==="lpop"?Math.log10(r[F.pop]):r[F[c]])); X=wresid(X,Z,w); Y=wresid(Y,Z,w); }
+  if(num.length){ const Z=rs.map(r=>num.map(c=>c==="lpop"?Math.log10(r[F.pop]):c==="lpop20"?Math.log10(r[F.pop20]):r[F[c]])); X=wresid(X,Z,w); Y=wresid(Y,Z,w); }
   if(cs.length){ const mx=d3.sum(X0,(v,i)=>v*w[i])/W, my=d3.sum(Y0,(v,i)=>v*w[i])/W, ax=d3.sum(X,(v,i)=>v*w[i])/W, ay=d3.sum(Y,(v,i)=>v*w[i])/W; X=X.map(v=>v-ax+mx); Y=Y.map(v=>v-ay+my); }
   const c=wcorr(X.map((v,i)=>({x:v,y:Y[i],w:w[i]})));
   return {rs,w,X0,Y0,X,Y,c,cs};
 }
 function partialR(x,y,ctrls,weighted){ const d=adjData(x,y,ctrls,weighted); return d&&d.c?{r:d.c.r,n:d.rs.length}:null; }
+// =====================================================================
+// INCERTIDUMBRE: intervalos por remuestreo (bootstrap) y fichas técnicas
+// =====================================================================
+// Generador determinista (misma semilla → mismos intervalos en cada carga)
+function rng(seed){ let s=seed>>>0||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+// Remuestrea municipios con reemplazo y recalcula la estadística `stat(rows)`; devuelve [p2.5, p97.5]
+function bootCI(rows,stat,{B=200,seed=7}={}){
+  const R=rng(seed), n=rows.length, out=[];
+  for(let b=0;b<B;b++){ const s=new Array(n); for(let i=0;i<n;i++) s[i]=rows[(R()*n)|0]; const v=stat(s); if(v!=null&&isFinite(v)) out.push(v); }
+  if(out.length<20) return null; out.sort((a,b)=>a-b); return [out[Math.floor(out.length*0.025)],out[Math.ceil(out.length*0.975)-1]];
+}
+// Correlación parcial con intervalo: {r,n,ci}
+// (el remuestreo se hace sobre los pares de residuos ya calculados: con miles de municipios, la incertidumbre de estimar los controles es despreciable frente a la de la correlación)
+function partialRCI(x,y,ctrls,weighted,{B=200}={}){
+  const d=adjData(x,y,ctrls,weighted); if(!d||!d.c) return null;
+  const pts=d.X.map((v,i)=>({x:v,y:d.Y[i],w:d.w[i]}));
+  const ci=bootCI(pts,s=>{ const c=wcorr(s); return c?c.r:null; },{B});
+  return {r:d.c.r,n:d.rs.length,ci};
+}
+const ciFmt=ci=>ci?` <span class="ci" title="Intervalo del 95 % por remuestreo de municipios">[${rFmt(ci[0])}; ${rFmt(ci[1])}]</span>`:"";
+const rCI=c=>c?`r = ${rFmt(c.r)}${ciFmt(c.ci)}`:"—";
+const ciZero=c=>!c||!c.ci||(c.ci[0]<=0&&c.ci[1]>=0);
+// Ficha técnica plegable al final de cada estudio
+function ficha(parent,items){
+  const d=add(parent,"details","ficha"); d.innerHTML=`<summary>Ficha técnica</summary><dl>${items.filter(x=>x&&x[1]).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>`; return d;
+}
+const FICHA_R=`Correlación de Pearson; «entre iguales» o «a igual X» es la correlación parcial: se regresan las dos variables sobre los controles (mínimos cuadrados, con constante) y se correlacionan los residuos. «Dentro de cada provincia» resta a cada variable la media de su provincia antes. «Explica» es r². Los intervalos son del 95 % por remuestreo de municipios (200 réplicas).`;
+const FICHA_DID=`Diferencias en diferencias: (cambio en el grupo afectado) − (cambio en el grupo de comparación). Sin error estándar formal: la incertidumbre se mide con placebos, repitiendo el cálculo como si el tratamiento hubiera caído en cada uno de los otros grupos.`;
+// Distribución de placebos: dónde cae el efecto real entre los efectos "falsos"
+function placeboRank(real,others){ const a=others.filter(v=>v!=null); if(a.length<5) return null; const below=a.filter(v=>v<=real).length; return {n:a.length,below,share:below/a.length,min:d3.min(a),max:d3.max(a),sd:d3.deviation(a)}; }
+// Datos por municipio para los estudios (series): se cargan solo al abrir un estudio
+let SER=null, SF={}, SBY=new Map(), EXT=null;
+async function loadSeries(){ if(SER) return SER; const [s,e]=await Promise.all([getJSON("/data/estudios.json"),getJSON("/data/ext.json")]); SER=s; EXT=e; s.fields.forEach((f,i)=>SF[f]=i); s.rows.forEach(r=>SBY.set(r[0],r)); deriveSeries(); return s; }
+const ser=(code,k)=>{ const r=SBY.get(code); return r?r[SF[k]]:null; };
+window.__indicioDebug=()=>({F,rows:rowsAll(),SER,SF,SBY,EXT});
+// columna derivada en el índice (para poder usarla en partialR, scatter, etc.)
+function addCol(k,fn,meta){ if(F[k]!=null) return; const i=Object.keys(F).length; F[k]=i; rowsAll().forEach(r=>{ const v=fn(r,SBY.get(r[F.code])); r[i]=v==null||!isFinite(v)?null:v; }); if(meta){ const c={k,...meta}; CAT.push(c); CATK[k]=c; } }
+const pctg=(a,b)=>a&&b?(b/a-1)*100:null;
+function deriveSeries(){
+  const Y=SER.years, P=SER.vtPeriods, PY=SER.paroYears, PD=SER.padYears, IY=SER.ipvaYears;
+  const yi=(arr,y)=>arr.indexOf(y);
+  addCol("vtp24",(r,s)=>s&&s[SF.vtp]?s[SF.vtp][yi(P,"2024M08")]:null,{l:"Pisos turísticos en agosto de 2024",g:"Vivienda",f:"pct",src:"INE, viviendas turísticas, agosto de 2024 (% de las viviendas)"});
+  addCol("vtCambio21",(r,s)=>{ const v=s&&s[SF.vtp]; return v&&v[yi(P,"2021M08")]!=null&&v[yi(P,"2024M08")]!=null?v[yi(P,"2024M08")]-v[yi(P,"2021M08")]:null; },{l:"Cambio de los pisos turísticos 2021–2024",g:"Vivienda",f:"pts",src:"INE, viviendas turísticas, agosto de 2021 a agosto de 2024 (puntos de % de las viviendas)"});
+  addCol("vtCambio22",(r,s)=>{ const v=s&&s[SF.vtp]; return v&&v[yi(P,"2022M08")]!=null&&v[yi(P,"2024M08")]!=null?v[yi(P,"2024M08")]-v[yi(P,"2022M08")]:null; },{l:"Cambio de los pisos turísticos 2022–2024",g:"Vivienda",f:"pts",src:"INE, viviendas turísticas, agosto de 2022 a agosto de 2024"});
+  addCol("alqVar21",(r,s)=>{ const v=s&&s[SF.ipva]; return v?pctg(v[yi(IY,2021)],v[yi(IY,2024)]):null; },{l:"Subida del alquiler 2021–2024",g:"Vivienda",f:"pct_chg",src:"INE, Índice de Precios de Vivienda en Alquiler, 2021–2024"});
+  addCol("alqVar22",(r,s)=>{ const v=s&&s[SF.ipva]; return v?pctg(v[yi(IY,2022)],v[yi(IY,2024)]):null; },{l:"Subida del alquiler 2022–2024",g:"Vivienda",f:"pct_chg",src:"INE, Índice de Precios de Vivienda en Alquiler, 2022–2024"});
+  addCol("renta19",(r,s)=>s&&s[SF.renta]?s[SF.renta][yi(Y,2019)]:null,{l:"Renta por persona en 2019",g:"Riqueza",f:"eur",src:"INE, Atlas de Renta, 2019"});
+  addCol("edad19",(r,s)=>s&&s[SF.edad]?s[SF.edad][yi(Y,2019)]:null,{l:"Edad media en 2019",g:"Población",f:"years",src:"INE, Atlas de Renta, 2019"});
+  addCol("mayores6519",(r,s)=>s&&s[SF.mayores65]?s[SF.mayores65][yi(Y,2019)]:null,{l:"Mayores de 65 años en 2019",g:"Población",f:"pct",src:"INE, Atlas de Renta, 2019"});
+  addCol("paroReg19",(r,s)=>{ const v=s&&s[SF.paro]; return v&&r[F.paroReg]!=null&&v[yi(PY,2025)]?r[F.paroReg]*v[yi(PY,2019)]/v[yi(PY,2025)]:null; },{l:"Paro registrado en 2019",g:"Trabajo",f:"pct",src:"SEPE, media de 2019, sobre la población de 16 a 64 años"});
+  addCol("vtp20",(r,s)=>s&&s[SF.vtp]?s[SF.vtp][0]:null,{l:"Pisos turísticos en agosto de 2020",g:"Vivienda",f:"pct",src:"INE, viviendas turísticas, agosto de 2020 (% de las viviendas)"});
+  addCol("pop20",(r,s)=>s&&s[SF.pad]?s[SF.pad][yi(PD,2020)]:null,{l:"Población en 2020",g:"Población",f:"int",src:"INE, padrón 2020"});
+  addCol("renta16",(r,s)=>s&&s[SF.renta]?s[SF.renta][yi(Y,2016)]:null,{l:"Renta por persona en 2016",g:"Riqueza",f:"eur",src:"INE, Atlas de Renta, 2016"});
+  addCol("rentaVar1724",(r,s)=>{ const v=s&&s[SF.renta]; return v?pctg(v[yi(Y,2017)],v[yi(Y,2024)]):null; },{l:"Subida de la renta 2017–2024",g:"Riqueza",f:"pct_chg",src:"INE, Atlas de Renta, 2017–2024"});
+  addCol("rentaVar1923",(r,s)=>{ const v=s&&s[SF.renta]; return v?pctg(v[yi(Y,2019)],v[yi(Y,2023)]):null; },{l:"Subida de la renta 2019–2023",g:"Riqueza",f:"pct_chg",src:"INE, Atlas de Renta, 2019–2023"});
+  addCol("paroVar1923",(r,s)=>{ const v=s&&s[SF.paro]; return v?pctg(v[yi(PY,2019)],v[yi(PY,2023)]):null; },{l:"Cambio del paro registrado 2019–2023",g:"Trabajo",f:"pct_chg",src:"SEPE, media anual de 2019 y de 2023"});
+  addCol("paroVar1920",(r,s)=>{ const v=s&&s[SF.paro]; return v?pctg(v[yi(PY,2019)],v[yi(PY,2020)]):null; },{l:"Subida del paro registrado en 2020",g:"Trabajo",f:"pct_chg",src:"SEPE, media anual de 2019 y de 2020"});
+  addCol("pobVar1925",(r,s)=>{ const v=s&&s[SF.pad]; return v?pctg(v[yi(PD,2019)],v[yi(PD,2025)]):null; },{l:"Cambio de la población 2019–2025",g:"Población",f:"pct_chg",src:"INE, padrón 2019 y 2025"});
+  addCol("migExtT",(r,s)=>{ const m=s&&s[SF.mig], p=r[F.pop]; return m&&p?d3.sum(m,a=>a[1])/p*1000/m.length:null; },null);
+  addCol("migIntT",(r,s)=>{ const m=s&&s[SF.mig], p=r[F.pop]; return m&&p?d3.sum(m,a=>a[2])/p*1000/m.length:null; },null);
+  // voto en generales: participación y cambio 2019→2023
+  const G=SER.gen, gi=k=>G.indexOf(k), P4=SER.partidos;
+  addCol("part19",(r,s)=>{ const g=s&&s[SF.gen]; return g&&g[0]?g[0][0]:null; },{l:"Participación en las generales de noviembre de 2019",g:"Voto",f:"pct",src:"Ministerio del Interior, generales de noviembre de 2019"});
+  addCol("partCambio",(r,s)=>{ const g=s&&s[SF.gen]; return g&&g[0]&&g[1]?g[1][0]-g[0][0]:null; },{l:"Cambio de la participación 2019–2023",g:"Voto",f:"pts",src:"Ministerio del Interior, generales de noviembre de 2019 y julio de 2023 (puntos)"});
+  const dchaIdx=g=>g?(g[1]||0)+(g[3]||0):null; // PP + Vox
+  addCol("dchaCambio",(r,s)=>{ const g=s&&s[SF.gen]; return g&&g[0]&&g[1]?dchaIdx(g[1])-dchaIdx(g[0]):null; },{l:"Cambio del voto a PP y Vox 2019–2023",g:"Voto",f:"pts",src:"Ministerio del Interior, generales de 2019 y 2023 (puntos de % de votos)"});
+  addCol("edadCambio",(r,s)=>{ const e=s&&s[SF.edad]; return e&&e[yi(Y,2019)]&&e[yi(Y,2023)]?e[yi(Y,2023)]-e[yi(Y,2019)]:null; },null);
+}
 
 // ---------- evolución ----------
 function exEvo(out){
@@ -1755,6 +1835,9 @@ function exDist(out){
 const STUDIES=(window.__INDICIO&&window.__INDICIO.studies||[]).map(x=>({...x}));
 const QUICKQ=(window.__INDICIO&&window.__INDICIO.quick||[]);
 const CATP=["08","17","25","43"];
+// fuentes que usa cada estudio (para el pie de página)
+const STUDY_SRC={"tope-cataluna":["ipva","padron","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo"],"cerca-ciudad":["padron","atlas","mig","geo"],"votar-pueblos":["interior","atlas","padron"],
+  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -1762,65 +1845,149 @@ const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2
 <section class="finding"><h2>4. Buscar un antes y un después</h2><div class="txt"><p>Cuando una ley o un suceso afecta a unos lugares y a otros no, se compara cómo cambian los afectados con cómo cambian los demás. Si antes iban parejos y después se separan, esa separación es la mejor pista de un efecto. Se llama <b>diferencias en diferencias</b>; el estudio del <a href="/preguntas/tope-cataluna/">tope del alquiler en Cataluña</a> es un ejemplo.</p></div></section>
 <section class="finding"><h2>5. Pensar en la causa al revés</h2><div class="txt"><p>¿Los pisos turísticos suben el alquiler, o los pisos turísticos van a donde el alquiler ya era caro? Con datos de un solo momento no se puede saber. Ayuda preguntarse qué pasó antes.</p></div></section>
 <section class="finding"><h2>6. Desconfiar de uno mismo</h2><div class="txt"><p>Siempre puede quedar un factor que no hemos medido. Un buen análisis dice lo que no puede descartar. Y son datos de municipios: no dicen nada de cómo se comporta cada persona.</p>
-<p>Para aprender más: <i>The Effect</i>, de Nick Huntington-Klein, y <i>Causal Inference: The Mixtape</i>, de Scott Cunningham. Los dos se pueden leer gratis en internet.</p></div></section>`;
+<p>Para aprender más: <i>The Effect</i>, de Nick Huntington-Klein, y <i>Causal Inference: The Mixtape</i>, de Scott Cunningham. Los dos se pueden leer gratis en internet.</p></div></section>
+<section class="finding" id="calculo"><h2>7. Qué cálculo hay detrás de cada etiqueta</h2><div class="txt">
+<p>Para que cualquiera pueda rehacer las cuentas, esto es exactamente lo que hace cada etiqueta de los estudios y del laboratorio:</p>
+<ul class="defs">
+<li><b>«Relación (r)».</b> Coeficiente de correlación de Pearson entre los municipios. Cuando se dice «ponderado por población», cada municipio pesa lo que sus habitantes; si no, cada municipio cuenta igual. Las dos cosas se indican en la ficha técnica de cada estudio, y pueden dar resultados distintos: la ponderada responde a «qué pasa a la gente», la otra a «qué pasa a los pueblos».</li>
+<li><b>«A igual edad», «a igual renta», «entre iguales».</b> Correlación parcial: se ajusta una regresión lineal (mínimos cuadrados, con constante) de cada una de las dos variables sobre los controles, y se correlacionan los residuos. Es lo mismo que el coeficiente de un modelo lineal con todos los controles a la vez, expresado en escala de correlación. El tamaño del municipio entra siempre en logaritmo.</li>
+<li><b>«Dentro de cada provincia».</b> Antes de todo lo anterior, a cada variable se le resta la media de su provincia (efectos fijos de provincia). Así solo se comparan municipios entre sí dentro de la misma provincia.</li>
+<li><b>«Explica».</b> Es r², la parte de la varianza de una variable que va asociada a la otra. No es una parte «causada».</li>
+<li><b>«Municipios gemelos».</b> Para cada municipio de 1.000 habitantes o más se busca, en su misma provincia, el más parecido en tamaño (logaritmo), edad media y renta (distancia euclídea sobre variables estandarizadas, umbral 0,6 desviaciones) que a la vez se diferencie en la variable de interés en al menos media desviación típica. Cada municipio entra como mucho en una pareja.</li>
+<li><b>Intervalos [a; b].</b> Intervalo del 95 % por remuestreo (bootstrap) de municipios: se recalcula la estadística 200 veces con muestras al azar con reemplazo y se toman los percentiles 2,5 y 97,5. En las correlaciones parciales se remuestrean los pares de residuos ya ajustados (con miles de municipios, la incertidumbre de estimar los controles es despreciable); en los diseños con parejas o gemelos se remuestrean las parejas. Si el intervalo incluye el cero, los datos no distinguen la relación de ninguna relación.</li>
+<li><b>Diferencias en diferencias.</b> (Cambio del grupo afectado después − antes) − (cambio del grupo de comparación después − antes). Como hay pocos grupos y un solo periodo «después», en vez de un error estándar se usan <b>placebos</b>: se repite el cálculo como si la medida hubiera caído en cada uno de los otros grupos (otras comunidades, otras provincias) y se mira dónde queda el efecto real en esa distribución.</li>
+<li><b>Discontinuidad.</b> En las elecciones ajustadas se comparan municipios donde una lista ganó por poco con municipios donde perdió por poco, con rectas distintas a cada lado del empate ajustadas dentro de una ventana de ±10 puntos.</li>
+</ul>
+<p>Todo el código está en <a href="https://github.com/bburriel/indicio.es" target="_blank" rel="noopener">github.com/bburriel/indicio.es</a>; los cálculos se hacen en el navegador, con los mismos datos que descargas desde el laboratorio.</p></div></section>`;
 function renderEstudios(id){
   const S=STUDIES.find(s=>s.id===id);
   if(id==="metodo"){ document.title="Cómo buscar causas · Indicio"; view.innerHTML=LABNAV("metodo")+pageHead("Cómo buscar causas con datos públicos","Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede.")+METODO+methodNote(); return; }
   if(!S){ renderPreguntas(); return; }
   document.title=S.t+" · Indicio";
-  view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(TOPICL(S.tema))} › ${S.m}</nav>`+pageHead(S.t,S.d,"",`<p class="byline">${byline(S)}</p>`)+`<div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote()}`;
-  ({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"cerca-ciudad":studyCerca,"votar-pueblos":studyVotar})[S.id](document.getElementById("sbody"));
+  view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(TOPICL(S.tema))} › ${S.m}</nav>`+pageHead(S.t,S.d,"",`<p class="byline">${byline(S)}</p>`)+`<div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
+  const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"cerca-ciudad":studyCerca,"votar-pueblos":studyVotar,
+    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan})[S.id];
+  const B=document.getElementById("sbody");
+  // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
+  const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos"].includes(S.id);
+  const run=()=>Promise.resolve(fn(B)).catch(e=>{ console.error(e); B.insertAdjacentHTML("beforeend",'<p class="loading">No se pudo calcular una parte de este estudio.</p>'); });
+  if(needSeries){ B.innerHTML='<p class="loading">Cargando los datos del estudio…</p>'; loadSeries().then(()=>{ B.innerHTML=""; return run(); }).catch(e=>{ console.error(e); B.innerHTML='<p class="loading">No se pudieron cargar los datos del estudio.</p>'; }); }
+  else run();
+}
+
+// helpers de series para los estudios
+const SY=k=>SER[k]; // años de cada serie
+// crecimiento anual medio ponderado por población de una serie índice, por año: devuelve {years:[...], g:[...]} (g en %)
+function groupGrowth(codes,key,years,{from=null}={}){
+  const rows=codes.map(c=>SBY.get(c)).filter(r=>r&&r[SF[key]]);
+  const g=years.map((y,i)=>{ if(i===0||(from&&y<=from)) return null; let s=0,w=0; rows.forEach(r=>{ const a=r[SF[key]][i-1], b=r[SF[key]][i], p=BYCODE.get(r[0])&&BYCODE.get(r[0])[F.pop]; if(a&&b&&p){ s+=p*(b/a-1)*100; w+=p; } }); return w?s/w:null; });
+  return {years,g,n:rows.length};
+}
+const chain=(g,base)=>{ const out=[]; let v=100; g.forEach((x,i)=>{ if(i>0&&x!=null) v*=1+x/100; out.push(x==null&&i>0?null:v); }); if(base!=null){ const b=out[base]; return out.map(v=>v==null?null:v/b*100); } return out; };
+const mean=a=>{ const b=a.filter(v=>v!=null); return b.length?d3.sum(b)/b.length:null; };
+// gráfico de placebos: barras ordenadas, la real en granate
+function placeboBars(parent,vals,real,{label="",fmt=v=>pts(v)}={}){
+  const all=vals.map(v=>({v:v.v,n:v.n,me:false})).concat([{v:real,n:label,me:true}]).sort((a,b)=>a.v-b.v);
+  const lo=Math.min(0,d3.min(all,a=>a.v)), hi=Math.max(0,d3.max(all,a=>a.v)), H=70;
+  const box=add(parent,"div","placebo"); box.setAttribute("role","img"); box.setAttribute("aria-label","Distribución de placebos");
+  all.forEach(a=>{ const i=add(box,"i",a.me?"me":null); i.style.height=Math.max(3,(a.v-lo)/(hi-lo||1)*H+3)+"px"; i.title=`${a.n}: ${fmt(a.v)}`; i.setAttribute("aria-label",`${a.n}: ${fmt(a.v)}`); });
+  add(parent,"p","muted",`De ${fmt(lo)} (izquierda) a ${fmt(hi)} (derecha); pasa el ratón para ver cada grupo.`).style.cssText="font-size:12.5px;margin-top:4px";
 }
 
 function studyTope(B){
+  const TENS=new Set(EXT.tensionadas.codes), AMPL=new Set(EXT.tensionadas.ampliacion.codes);
+  const Y=SY("ipvaYears"), i21=Y.indexOf(2021), i23=Y.indexOf(2023), i24=Y.indexOf(2024);
+  const ok=r=>r[SF.ipva]&&r[SF.ipva][i21]&&r[SF.ipva][i23]&&r[SF.ipva][i24]&&BYCODE.get(r[0])&&BYCODE.get(r[0])[F.pop]>=10000;
+  const all=SER.rows.filter(ok), isCat=r=>CATP.includes(r[1]);
+  const tens=all.filter(r=>TENS.has(r[0])), rcat=all.filter(r=>isCat(r)&&!TENS.has(r[0])), res=all.filter(r=>!isCat(r));
+  // crecimiento anual de un grupo (ponderado por población): pre = media 2022 y 2023, post = 2024
+  const gr=(rows,i)=>{ let s=0,w=0; rows.forEach(r=>{ const p=BYCODE.get(r[0])[F.pop]; s+=p*(r[SF.ipva][i]/r[SF.ipva][i-1]-1)*100; w+=p; }); return w?s/w:null; };
+  const pre=rows=>(gr(rows,i23-1)+gr(rows,i23))/2, post=rows=>gr(rows,i24);
+  const did=(a,b)=>(post(a)-pre(a))-(post(b)-pre(b));
+  const d1=did(tens,rcat), d2=did(tens,res);
+  // gemelos fuera de Cataluña: para cada tensionado, el municipio del resto de España más parecido en tamaño (log) y en subida previa del alquiler (2021–2023)
+  const feat=r=>[Math.log10(BYCODE.get(r[0])[F.pop]),(r[SF.ipva][i23]/r[SF.ipva][i21]-1)*100];
+  const sdF=[d3.deviation(all,r=>feat(r)[0])||1,d3.deviation(all,r=>feat(r)[1])||1];
+  const pairs=tens.map(t=>{ const ft=feat(t); let best=null; res.forEach(c=>{ const fc=feat(c); const d=Math.hypot((ft[0]-fc[0])/sdF[0],(ft[1]-fc[1])/sdF[1]); if(!best||d<best.d) best={d,c}; }); return {t,c:best.c,d:best.d}; });
+  const dPair=ps=>{ const T=ps.map(p=>p.t), C=ps.map(p=>p.c); return did(T,C); };
+  const d3v=dPair(pairs), ci3=bootCI(pairs,dPair,{B:300});
+  // provincias: contratos nuevos, Cataluña frente al resto y placebo con cada comunidad
   const ia=REFS.ipvaAntig, padW=p=>{ const a=REFS.prov[p]&&REFS.prov[p].pad; return a?a[a.length-1]:0; };
-  const rest=Object.keys(ia.prov).filter(p=>!CATP.includes(p)&&ia.prov[p].n);
+  const PV=Object.keys(ia.prov).filter(p=>ia.prov[p].n&&!["51","52"].includes(p));
   const wavg=(ps,k,i)=>d3.sum(ps,p=>ia.prov[p][k][i]*padW(p))/d3.sum(ps,p=>padW(p));
-  const yrs=[2021,2022,2023,2024], idx=[6,7,8,9];
-  const cat=idx.map(i=>wavg(CATP,"n",i)), oth=idx.map(i=>wavg(rest,"n",i));
+  const yrs=[2021,2022,2023,2024], idx=yrs.map(y=>ia.years.indexOf(y));
+  const serie=ps=>idx.map(i=>wavg(ps,"n",i));
   const g=(a,i,j)=>(a[j]/a[i]-1)*100;
-  const preC=g(cat,0,2)/2, preO=g(oth,0,2)/2, postC=g(cat,2,3), postO=g(oth,2,3), did=(postC-preC)-(postO-preO);
-  // municipios: todos los contratos
-  const mun=rowsAll().filter(r=>r[F.alq2223]!=null&&r[F.alq2324]!=null&&r[F.pop]);
-  const wm=(rs,k)=>d3.sum(rs,r=>r[F[k]]*r[F.pop])/d3.sum(rs,r=>r[F.pop]);
-  const mc=mun.filter(r=>CATP.includes(r[F.prov])), mo=mun.filter(r=>!CATP.includes(r[F.prov]));
-  const mPreC=wm(mc,"alq2223"), mPostC=wm(mc,"alq2324"), mPreO=wm(mo,"alq2223"), mPostO=wm(mo,"alq2324"), mDid=(mPostC-mPreC)-(mPostO-mPreO);
-  const s1=finding(B,"La pregunta",`<p>En marzo de 2024 entró en vigor en Cataluña el tope a los alquileres de la ley de vivienda: en los municipios declarados zona tensionada, el precio de un contrato nuevo no puede superar el anterior ni el índice de referencia. ¿Hizo que el alquiler subiera menos?</p>
-    <p>No basta con mirar si el alquiler en Cataluña subió poco en 2024: quizá habría subido poco de todas formas. Hace falta un <b>grupo de comparación</b>, lugares parecidos donde no hubo tope, y comprobar que antes del tope los dos grupos iban parejos.</p>`);
-  const s2=finding(B,"El método: diferencias en diferencias",`<p>Se calcula cuánto cambió la subida del alquiler en Cataluña después del tope, y se le resta cuánto cambió en el resto de España en el mismo tiempo. Lo que queda es la parte que se puede atribuir al tope, si se cumple una condición: que sin el tope los dos grupos habrían seguido evolucionando igual. Eso no se puede comprobar del todo, pero ayuda ver que antes iban a la par.</p>`);
-  const s3=finding(B,"Contratos nuevos: Cataluña y el resto de España",`<p>Índice de alquiler de los contratos firmados cada año, que es lo que el tope limita. Entre 2021 y 2023 subía un ${nf1.format(preC)}${NB}% al año en Cataluña y un ${nf1.format(preO)}${NB}% en el resto. En 2024, un ${nf1.format(postC)}${NB}% y un ${nf1.format(postO)}${NB}%.</p>`);
-  lineChart(s3,{title:"Alquiler de contratos nuevos, 2021 = 100",source:"Cataluña: media de sus cuatro provincias; resto: media de las demás. Ponderadas por población. Fuente: INE, Índice de Precios de Vivienda en Alquiler por antigüedad del contrato.",series:[{n:"Cataluña",v:cat,c:"--rust",main:true},{n:"Resto de España",v:oth,c:"--slate"}],years:yrs,xticks:yrs,index:true,height:260});
-  const s4=finding(B,"El resultado",`<p class="big" style="font-size:20px;font-weight:600;max-width:760px">El alquiler de los contratos nuevos se aceleró en 2024 en toda España, pero en Cataluña ${did<0?"algo menos":"algo más"}: unos <mark>${nf1.format(Math.abs(did))} puntos</mark> ${did<0?"menos":"más"} que en el resto.</p>
-    <p>Con todos los contratos y municipio a municipio (${nf0.format(mc.length)} catalanes frente a ${nf0.format(mo.length)} del resto, todos de más de 10.000 habitantes), el resultado es parecido: antes del tope subían casi igual (${nf1.format(mPreC)}${NB}% y ${nf1.format(mPreO)}${NB}% en 2023) y en 2024 Cataluña subió ${nf1.format(Math.abs(mDid))} puntos ${mDid<0?"menos":"más"} (${nf1.format(mPostC)}${NB}% frente a ${nf1.format(mPostO)}${NB}%).</p>`);
-  const f=fig(s4,{title:"Subida anual del alquiler, todos los contratos",source:"Municipios de más de 10.000 habitantes, media ponderada por población. Fuente: INE, Índice de Precios de Vivienda en Alquiler."});
-  const mx=Math.max(mPreC,mPostC,mPreO,mPostO);
-  const w=add(f.body,"div","cmp"); w.innerHTML=`<div class="keys"><span><i style="background:var(--rust)"></i>Cataluña</span><span><i style="background:var(--slate)"></i>Resto de España</span></div>`+[["2023, antes del tope",mPreC,mPreO],["2024, con el tope desde marzo",mPostC,mPostO]].map(([l,a,b])=>`<div class="cmp-row"><div class="n">${l}</div><div class="bars">${[[a,"--rust"],[b,"--slate"]].map(([v,c])=>`<div class="b"><span style="width:${v/mx*100}%;background:var(${c})"></span><em>${sgn(v)}</em></div>`).join("")}</div></div>`).join("");
+  const didProv=(ps)=>{ const rest=PV.filter(p=>!ps.includes(p)); const c=serie(ps), o=serie(rest); return (g(c,2,3)-g(c,0,2)/2)-(g(o,2,3)-g(o,0,2)/2); };
+  const cat=serie(CATP), oth=serie(PV.filter(p=>!CATP.includes(p)));
+  const preC=g(cat,0,2)/2, preO=g(oth,0,2)/2, postC=g(cat,2,3), postO=g(oth,2,3), didN=didProv(CATP);
+  const CC=d3.groups(PV,p=>CCAA_OF[p]).filter(([c])=>c!=="Cataluña");
+  const plac=CC.map(([c,ps])=>({n:c,v:didProv(ps)})); const pr=placeboRank(didN,plac.map(p=>p.v));
+  finding(B,"La pregunta",`<p>En marzo de 2024 entró en vigor en Cataluña el tope a los alquileres de la ley de vivienda. No en toda Cataluña: en los <b>${nf0.format(TENS.size)} municipios declarados zona tensionada</b> (el ${pc0(d3.sum([...TENS],c=>BYCODE.get(c)?BYCODE.get(c)[F.pop]:0)/d3.sum(rowsAll().filter(r=>CATP.includes(r[F.prov])),r=>r[F.pop])*100)} de la población catalana), el precio de un contrato nuevo no puede superar el anterior ni el índice de referencia. En octubre de 2024 se añadieron ${nf0.format(AMPL.size)} municipios más. ¿Hizo que el alquiler subiera menos?</p>
+    <p>No basta con mirar si el alquiler subió poco en 2024: quizá habría subido poco de todas formas. Hace falta un <b>grupo de comparación</b> sin tope, y comprobar que antes del tope iban parejos.</p>`);
+  finding(B,"El método: diferencias en diferencias, tres veces",`<p>Se calcula cuánto cambió la subida del alquiler en los municipios con tope en 2024 respecto a los dos años anteriores, y se le resta el mismo cambio en un grupo sin tope. Lo que queda es atribuible al tope <i>si</i> sin él los dos grupos habrían seguido igual. Como ningún grupo de comparación es perfecto, se usan tres:</p>
+    <ul class="defs"><li><b>El resto de Cataluña:</b> mismo mercado, mismas leyes, pero solo ${nf0.format(rcat.length)} municipios con datos de alquiler, y ${nf0.format(rcat.filter(r=>AMPL.has(r[0])).length)} de ellos entraron en el tope en octubre de 2024.</li>
+    <li><b>Municipios gemelos del resto de España:</b> para cada municipio tensionado, el más parecido en tamaño y en subida del alquiler entre 2021 y 2023 fuera de Cataluña.</li>
+    <li><b>Cataluña frente al resto de España, contratos nuevos:</b> el índice provincial de los contratos firmados cada año, que es lo que el tope limita. Para medir la incertidumbre se repite el cálculo como si el tope hubiera caído en cada una de las otras comunidades (<b>placebos</b>).</li></ul>`);
+  // 1. municipio a municipio
+  const s3=finding(B,"Municipio a municipio: tensionados, resto de Cataluña y gemelos",`<p>Subida anual del índice de alquiler del INE (todos los contratos), ponderada por población, en municipios de más de 10.000 habitantes. Antes del tope, los tensionados subían como sus gemelos; en 2024 todos aceleraron, los tensionados algo menos.</p>`);
+  const rowsT=[["Municipios tensionados",tens],["Resto de Cataluña",rcat],["Gemelos del resto de España",pairs.map(p=>p.c)],["Resto de España",res]];
+  const t=add(s3,"div"); t.innerHTML=`<table class="glance" style="max-width:720px"><thead><tr><th>Grupo</th><th class="r">Municipios</th><th class="r">2022</th><th class="r">2023</th><th class="r">2024</th><th class="r">Cambio</th></tr></thead><tbody>${rowsT.map(([l,rs])=>`<tr><td>${l}</td><td class="r num">${nf0.format(rs.length)}</td><td class="r num">${sgn(gr(rs,i23-1))}</td><td class="r num">${sgn(gr(rs,i23))}</td><td class="r num"><b>${sgn(post(rs))}</b></td><td class="r num">${pts(post(rs)-pre(rs))} pts</td></tr>`).join("")}</tbody></table>`;
+  add(s3,"p",null,`Diferencia en diferencias: <b>${pts(d1)} puntos</b> frente al resto de Cataluña, <b>${pts(d3v)} puntos</b> frente a los gemelos${ci3?` (intervalo del 95 %: ${pts(ci3[0])} a ${pts(ci3[1])})`:""} y ${pts(d2)} frente a todo el resto de España.`).style.cssText="max-width:720px;margin-top:10px";
+  // serie larga: índice 2019=100
+  const YI=Y.filter(y=>y>=2019), from=Y.indexOf(2019);
+  const idxS=rs=>chain(YI.map((y,k)=>k===0?null:gr(rs,from+k)),0);
+  lineChart(s3,{title:"Índice de alquiler, todos los contratos, 2019 = 100",source:"Media ponderada por población de la subida anual de cada municipio. Fuente: INE, Índice de Precios de Vivienda en Alquiler por municipio; zonas tensionadas según el BOE.",series:[{n:"Tensionados",v:idxS(tens),c:"--rust",main:true},{n:"Gemelos",v:idxS(pairs.map(p=>p.c)),c:"--mustard"},{n:"Resto de España",v:idxS(res),c:"--slate"}],years:YI,xticks:YI,index:true,height:260});
+  // 2. contratos nuevos y placebos
+  const s4=finding(B,"Contratos nuevos: Cataluña frente al resto, y qué pasa si el tope hubiera caído en otra comunidad",`<p>Índice de alquiler de los contratos firmados cada año. Entre 2021 y 2023 subía un ${nf1.format(preC)}${NB}% al año en Cataluña y un ${nf1.format(preO)}${NB}% en el resto. En 2024, un ${nf1.format(postC)}${NB}% y un ${nf1.format(postO)}${NB}%: <b>${pts(didN)} puntos</b> en diferencias en diferencias.</p>
+    <p>${pr?`Repitiendo la cuenta con cada una de las otras ${pr.n} comunidades como si fueran la tratada, los «efectos» placebo van de ${pts(pr.min)} a ${pts(pr.max)} puntos${pr.sd?` (desviación típica ${nf1.format(pr.sd)})`:""}; ${pr.below} de ${pr.n} quedan por debajo del de Cataluña. ${pr.share<=0.1?"Cataluña está en el extremo bajo: es una pista de efecto real, aunque pequeño.":pr.share<=0.3?"Cataluña queda entre las más bajas, pero no fuera de lo que pasa en comunidades sin tope: la pista es débil.":"Lo de Cataluña entra de lleno en lo que pasa en comunidades sin tope: con estos datos no se distingue de ninguna diferencia."}`:""}</p>`);
+  const g2=add(s4,"div","cols2");
+  lineChart(g2,{title:"Alquiler de contratos nuevos, 2021 = 100",source:"Cataluña: media de sus cuatro provincias; resto: media de las demás, ponderadas por población. Fuente: INE, IPVA por antigüedad del contrato (solo desde 2021).",series:[{n:"Cataluña",v:cat,c:"--rust",main:true},{n:"Resto de España",v:oth,c:"--slate"}],years:yrs,xticks:yrs,index:true,height:240});
+  const fp=fig(g2,{title:"Placebos: el mismo cálculo para cada comunidad",source:"Cada barra es una comunidad tratada «como si»; en granate, Cataluña. Puntos de diferencia en diferencias, contratos nuevos, 2024 frente a 2021–2023."});
+  placeboBars(fp.body,plac,didN,{label:"Cataluña"});
   finding(B,"Qué se puede concluir y qué no",`<ul class="defs">
-    <li><b>El efecto, si existe, es pequeño en estos datos:</b> alrededor de un punto menos de subida en un año. El tope solo empezó en marzo y solo en las zonas tensionadas, así que 2024 recoge una parte del efecto. Habrá que repetirlo con los datos de 2025.</li>
-    <li><b>Solo vemos alquileres declarados a Hacienda.</b> Si parte de los contratos dejaron de declararse o se pasaron a alquiler de temporada, este índice no lo recoge.</li>
+    <li><b>El efecto, si existe, es pequeño:</b> entre ${nf1.format(Math.min(Math.abs(d1),Math.abs(d3v),Math.abs(didN)))} y ${nf1.format(Math.max(Math.abs(d1),Math.abs(d3v),Math.abs(didN)))} puntos menos de subida en 2024, según el grupo de comparación, y los placebos dicen que un resultado así ${pr&&pr.share<=0.1?"es raro sin tope":"no es raro sin tope"}. El tope empezó en marzo, así que 2024 recoge solo parte del efecto, y es posible que se firmaran contratos a toda prisa antes (anticipación). Habrá que repetirlo con los datos de 2025.</li>
+    <li><b>Solo vemos alquileres declarados a Hacienda.</b> Si parte de los contratos dejaron de declararse o pasaron a alquiler de temporada, este índice no lo recoge; esa es, de hecho, la crítica más repetida al tope.</li>
     <li><b>No vemos cuántos pisos se alquilan.</b> Un tope puede bajar el precio y, a la vez, reducir la oferta. Con estos datos no se puede medir.</li>
-    <li><b>El grupo de comparación no es perfecto:</b> el resto de España incluye zonas con mercados muy distintos. Un estudio más fino compararía con municipios parecidos en tamaño, renta y presión turística.</li></ul>
+    <li><b>Los gemelos corrigen el tamaño y la tendencia previa, no todo:</b> presión turística, renta y crecimiento de población también pueden diferir.</li></ul>
     <p style="margin-top:10px">${exLink("evolucion",{e:["alqNuevo","alq","salMed","ipc"]},"Mira la evolución por provincia en el explorador")}</p>`);
+  ficha(B,[["Unidad","Municipios de más de 10.000 habitantes con índice de alquiler del INE (todos los contratos); provincias para los contratos nuevos"],["Tratamiento",`${nf0.format(TENS.size)} municipios declarados zona tensionada el 16 de marzo de 2024 (${nf0.format(tens.length)} con datos); la ampliación de octubre de 2024 (${nf0.format(AMPL.size)} municipios) se trata como no tratada en 2024`],["Periodos","Antes: subida media anual de 2022 y 2023. Después: 2024"],["Ponderación","Por población del padrón de 2025"],["Modelo",FICHA_DID+" Gemelos: para cada tensionado, el municipio del resto de España más cercano en tamaño (log) y subida del alquiler 2021–2023 (distancia estandarizada); intervalo por remuestreo de parejas (300 réplicas)."],["Placebos",`${CC.length} comunidades autónomas tratadas «como si», con el índice de contratos nuevos`]]);
 }
 
 function studyVT(B){
   const x="vtCambio", y="alqVar20";
-  const pts=pairPts(x,y,{weighted:true});
-  const base=partialR(x,y,[],true), c1=partialR(x,y,["lpop"],true), c2=partialR(x,y,["lpop","rentaVar20","pobVar20"],true), c3=partialR(x,y,["lpop","rentaVar20","pobVar20","prov"],true);
-  const lv=wcorr(pairPts("vt","alqVar",{weighted:true}));
+  const EF={prov:"",min:10000,max:Infinity};
+  const run=(xx,yy,cs)=>withEXF(EF,()=>partialRCI(xx,yy,cs,true));
+  const base=run(x,y,[]), c1=run(x,y,["lpop"]), c2=run(x,y,["lpop","rentaVar20","pobVar20"]), c3=run(x,y,["lpop","rentaVar20","pobVar20","prov"]);
+  const lv=withEXF(EF,()=>wcorr(pairPts("vt","alqVar",{weighted:true})));
+  // otras bases: 2021 y 2022 (el agosto de 2020 es el suelo de la pandemia)
+  const b21=run("vtCambio21","alqVar21",["lpop","rentaVar20","pobVar20","prov"]), b22=run("vtCambio22","alqVar22",["lpop","rentaVar20","pobVar20","prov"]);
+  // ¿y donde los pisos turísticos pesan de verdad? tramos por nivel de 2024
+  const rows=withEXF(EF,()=>rowsAll().filter(r=>exOK(r)&&r[F.vtp24]!=null&&r[F[x]]!=null&&r[F[y]]!=null));
+  const cut=wq(rows,r=>r[F.vtp24],.9), hiRows=rows.filter(r=>r[F.vtp24]>=cut), loRows=rows.filter(r=>r[F.vtp24]<cut);
+  const cHi=adjData(x,y,["lpop","rentaVar20","pobVar20"],true,hiRows), cLo=adjData(x,y,["lpop","rentaVar20","pobVar20"],true,loRows);
+  const ciHi=cHi?bootCI(hiRows,s=>{ const a=adjData(x,y,["lpop","rentaVar20","pobVar20"],true,s); return a&&a.c?a.c.r:null; }):null;
+  // provincias que mandan en la relación bruta
+  const byP=d3.rollups(rows,v=>({vt:d3.sum(v,r=>r[F[x]]*r[F.pop])/d3.sum(v,r=>r[F.pop]),alq:d3.sum(v,r=>r[F[y]]*r[F.pop])/d3.sum(v,r=>r[F.pop])}),r=>r[F.prov]).sort((a,b)=>b[1].vt-a[1].vt).slice(0,4);
   finding(B,"La pregunta",`<p>Se suele decir que los pisos turísticos encarecen el alquiler: cada piso que pasa a alquilarse por días es un piso menos para vivir. Pero los pisos turísticos se concentran donde hay turismo, empleo, gente que llega y renta que sube, y todo eso también empuja el alquiler. ¿Cuánto queda de la relación cuando se tienen en cuenta esas otras cosas?</p>`);
-  finding(B,"El método: cambios, y comparar entre iguales",`<p>En vez de comparar municipios con muchos y pocos pisos turísticos, que son muy distintos entre sí, se compara <b>cuánto cambió</b> en cada municipio el peso de los pisos turísticos entre 2020 y 2024 con <b>cuánto subió</b> el alquiler en esos años. Así desaparece lo que es fijo en cada lugar. Después se descuentan, paso a paso, el tamaño, la subida de la renta, el crecimiento de la población y la provincia.</p>`);
+  finding(B,"El método: cambios, y comparar entre iguales",`<p>En vez de comparar municipios con muchos y pocos pisos turísticos, que son muy distintos entre sí, se compara <b>cuánto cambió</b> en cada municipio el peso de los pisos turísticos entre 2020 y 2024 con <b>cuánto subió</b> el alquiler en esos años. Así desaparece lo que es fijo en cada lugar. Después se descuentan, paso a paso, el tamaño, la subida de la renta, el crecimiento de la población y la provincia. Y como agosto de 2020 es el suelo de la pandemia, se repite con 2021 y 2022 como punto de partida.</p>`);
   const s3=finding(B,"Lo que dicen los datos",`<p>Cada punto es un municipio de más de 10.000 habitantes. En horizontal, cuántos puntos ganó o perdió el peso de los pisos turísticos sobre el total de viviendas; en vertical, cuánto subió el alquiler declarado.</p>`);
-  scatter(s3,{x,y,title:"Cambio en los pisos turísticos y subida del alquiler, 2020–2024",source:"Fuente: INE, viviendas turísticas (agosto de 2020 y de 2024) e Índice de Precios de Vivienda en Alquiler.",hideSay:true});
-  const rows=[["Sin descontar nada",base],["Descontando el tamaño",c1],["… y la subida de la renta y de la población",c2],["… y comparando solo dentro de cada provincia",c3]].filter(r=>r[1]);
-  const s4=finding(B,"El resultado",`<p class="big" style="font-size:20px;font-weight:600;max-width:760px">La relación es débil desde el principio (r = ${rFmt(base.r)}) y ${Math.abs(c3?c3.r:base.r)<Math.abs(base.r)*0.6?"se debilita":"se mantiene"} al comparar municipios parecidos (r = ${rFmt((c3||base).r)}).</p>`);
-  const t=add(s4,"div"); t.innerHTML=`<table class="glance" style="max-width:640px"><thead><tr><th>Comparación</th><th class="r">Relación (r)</th><th class="r">Explica</th></tr></thead><tbody>${rows.map(([l,c])=>`<tr><td>${l}</td><td class="r num"><b>${rFmt(c.r)}</b></td><td class="r num">${nf0.format(c.r*c.r*100)}${NB}%</td></tr>`).join("")}</tbody></table><p class="muted" style="font-size:13.5px;margin-top:6px">${nf0.format(base.n)} municipios, ponderados por población. «Explica» es la parte de las diferencias en la subida del alquiler que va asociada a los pisos turísticos.</p>`;
+  withEXF(EF,()=>scatter(s3,{x,y,title:"Cambio en los pisos turísticos y subida del alquiler, 2020–2024",source:"Fuente: INE, viviendas turísticas (agosto de 2020 y de 2024) e Índice de Precios de Vivienda en Alquiler.",hideSay:true}));
+  const rowsT=[["Sin descontar nada",base],["Descontando el tamaño",c1],["… y la subida de la renta y de la población",c2],["… y comparando solo dentro de cada provincia",c3]].filter(r=>r[1]);
+  const s4=finding(B,"El resultado",`<p class="big" style="font-size:20px;font-weight:600;max-width:760px">La relación es débil desde el principio (${rCI(base)}) y ${c3&&Math.abs(c3.r)<Math.abs(base.r)*0.6?"desaparece":"se mantiene"} al comparar municipios parecidos dentro de la misma provincia (${rCI(c3||base)}).</p>`);
+  const t=add(s4,"div"); t.innerHTML=`<table class="glance" style="max-width:700px"><thead><tr><th>Comparación</th><th class="r">Relación (r)</th><th class="r">Explica (r²)</th></tr></thead><tbody>${rowsT.map(([l,c])=>`<tr><td>${l}</td><td class="r num"><b>${rFmt(c.r)}</b>${ciFmt(c.ci)}</td><td class="r num">${nf0.format(c.r*c.r*100)}${NB}%</td></tr>`).join("")}</tbody></table><p class="muted" style="font-size:13.5px;margin-top:6px">${nf0.format(base.n)} municipios, ponderados por población. Entre corchetes, el intervalo del 95 % por remuestreo. «Explica» es r², la parte de las diferencias en la subida del alquiler que va asociada a los pisos turísticos.</p>`;
+  const s5=finding(B,"Tres comprobaciones",`<ul class="defs">
+    <li><b>Con otro año de partida.</b> Desde agosto de 2021, descontando lo mismo y dentro de cada provincia: ${rCI(b21)}. Desde 2022: ${rCI(b22)}. ${b21&&b22&&ciZero(b21)&&ciZero(b22)?"El resultado no depende de haber empezado en el suelo de la pandemia.":"Cambiar el punto de partida cambia la lectura: conviene mirar las dos."}</li>
+    <li><b>Donde los pisos turísticos pesan de verdad.</b> En el 10${NB}% de municipios con más pisos turísticos en 2024 (más del ${pc(cut)} de las viviendas, ${nf0.format(hiRows.length)} municipios), la relación entre su crecimiento y la subida del alquiler, descontando tamaño, renta y población, es ${cHi&&cHi.c?`r = ${rFmt(cHi.c.r)}${ciFmt(ciHi)}`:"—"}; en el resto, ${cLo&&cLo.c?`r = ${rFmt(cLo.c.r)}`:"—"}. ${cHi&&cHi.c&&ciHi&&ciHi[0]>0?"Ahí sí aparece algo: el efecto, si existe, no es lineal, sino de saturación.":"Tampoco ahí aparece una relación clara a escala municipal."}</li>
+    <li><b>Quién manda en la relación bruta.</b> La relación sin descontar nada la sostienen sobre todo unas pocas provincias donde los pisos turísticos crecieron mucho y el alquiler también: ${byP.map(([p,v])=>`${provShort(PROVS[p])} (${pts(v.vt)} puntos de pisos turísticos, ${sgn(v.alq)} de alquiler)`).join(", ")}. Por eso se diluye al comparar dentro de cada provincia: lo que diferencia a Baleares o Málaga del resto no es solo el turismo.</li></ul>`);
   finding(B,"Qué se puede concluir y qué no",`<ul class="defs">
     <li><b>A escala de municipio, la huella es pequeña:</b> los municipios donde más crecieron los pisos turísticos no son, en general, donde más subió el alquiler declarado. ${lv?`Comparando niveles en vez de cambios pasa lo mismo (r = ${rFmt(lv.r)}).`:""}</li>
-    <li><b>Eso no quiere decir que no tengan efecto.</b> El efecto puede estar en barrios concretos, que aquí se diluyen en la media del municipio. Estudios a escala de barrio en Barcelona sí han encontrado subidas del alquiler asociadas a la llegada de pisos turísticos.</li>
-    <li><b>El alquiler declarado reacciona despacio,</b> porque incluye contratos antiguos. El precio de los anuncios podría mostrar una relación más fuerte, pero no hay datos públicos por municipio.</li>
-    <li><b>En muchas zonas turísticas hay poco alquiler de larga duración,</b> así que el índice se basa en pocos contratos.</li></ul>
+    <li><b>Eso no quiere decir que no tengan efecto.</b> El efecto puede estar en barrios concretos, que aquí se diluyen en la media del municipio. Estudios a escala de barrio en Barcelona sí han encontrado subidas del alquiler asociadas a la llegada de pisos turísticos. También puede ir al revés: los pisos turísticos van a donde el alquiler ya subía.</li>
+    <li><b>El alquiler declarado reacciona despacio,</b> porque incluye contratos antiguos. El precio de los anuncios podría mostrar una relación más fuerte, pero no hay una serie pública de anuncios por municipio y año que permita repetir este cálculo (los precios de idealista de la web son solo el último dato).</li>
+    <li><b>En muchas zonas turísticas hay poco alquiler de larga duración,</b> así que el índice se basa en pocos contratos.</li>
+    <li>Qué pasa cuando un ayuntamiento <b>prohíbe nuevos pisos turísticos</b>: <a href="/preguntas/prohibir-pisos-turisticos/">lo medimos en otro estudio</a>.</li></ul>
     <p style="margin-top:10px">${exLink("cruce",{d:["vtCambio","alqVar20"],t:"g10",c:["lpop","rentaVar20"]},"Repite el análisis en el explorador")}</p>`);
+  ficha(B,[["Unidad",`${nf0.format(base.n)} municipios de más de 10.000 habitantes con índice de alquiler del INE`],["Variables","X: puntos de cambio del % de viviendas turísticas (agosto de 2020 a agosto de 2024). Y: subida del índice de alquiler 2020–2024. Controles: log del padrón, subida de la renta 2020–2024, cambio de población 2020–2025, provincia"],["Ponderación","Por población"],["Modelo",FICHA_R]]);
 }
 // =====================================================================
 // DINERO PÚBLICO y estudio de las pensiones
@@ -1887,13 +2054,17 @@ async function studyPens(B){
   const gdpY=y=>GOV.gdp[gy(y)];
   // descomposición: gasto/PIB = (pensionistas/ocupados) × (pensión media / PIB por ocupado)
   const y0=Math.max(2009,yrs.find(y=>ben(y)&&emp(y))), D=y=>({r:ben(y)/emp(y), g:(ex(y)/100*gdpY(y)*1e6/ben(y))/(gdpY(y)*1e6/emp(y))});
-  const a=D(y0), b=D(Y);
+  const a=D(y0), b=D(Y), m=D(2019);
+  // 2009 es el año en que se hunde el empleo: arrancar ahí infla el primer factor. Se separan dos tramos: crisis (2009–2019) y después (2019–hoy)
+  const share=(p,q)=>{ const lr=Math.log(q.r/p.r), lg=Math.log(q.g/p.g); return {r:lr/(lr+lg)*100,g:lg/(lr+lg)*100,tot:(q.r*q.g)/(p.r*p.g)-1}; };
+  const sh1=share(a,m), sh2=share(m,b), shT=share(a,b);
   finding(B,"La pregunta",`<p>El gasto en pensiones ha pasado del ${pc(ex(yrs[0]))} del PIB en ${yrs[0]} al ${pc(ex(Y))} en ${Y}. En los próximos años se jubilan las generaciones del baby boom, nacidas entre finales de los cincuenta y los setenta. ¿Por qué ha crecido el gasto, y cuánto puede crecer?</p>`);
   finding(B,"El método: separar el gasto en sus piezas",`<p>El gasto en pensiones sobre el PIB se puede escribir como la multiplicación de dos cosas:</p>
     <ul class="defs"><li><b>Pensionistas por cada persona ocupada.</b> Cuántas pensiones sostiene cada trabajador. Depende de la demografía y de cuánta gente trabaja.</li>
     <li><b>Pensión media frente a lo que produce cada ocupado</b> (PIB por ocupado). Mide cuánto «pesa» cada pensión. Depende de las carreras de cotización y de las reglas.</li></ul>
     <p>Separarlas permite ver qué parte del aumento viene de que hay más pensionistas y qué parte de que cada pensión es relativamente más alta.</p>`);
-  const s3=finding(B,"Lo que dicen los datos",`<p>Entre ${y0} y ${Y}, los pensionistas por cada ocupado pasaron de ${nf2.format(a.r)} a ${nf2.format(b.r)} (${b.r>a.r?"más":"menos"} pensionistas por trabajador), y el peso de cada pensión frente al PIB por ocupado pasó de ${pc(a.g*100)} a ${pc(b.g*100)}. ${Math.abs(b.g/a.g-1)>Math.abs(b.r/a.r-1)?"El peso de cada pensión ha empujado más que el número de pensionistas: quienes se jubilan ahora tienen carreras más largas y salarios más altos que quienes fallecen.":"El número de pensionistas por trabajador ha empujado más que el peso de cada pensión."}</p>`);
+  const s3=finding(B,"Lo que dicen los datos",`<p>Entre ${y0} y ${Y}, los pensionistas por cada ocupado pasaron de ${nf2.format(a.r)} a ${nf2.format(b.r)}, y el peso de cada pensión frente al PIB por ocupado pasó de ${pc(a.g*100)} a ${pc(b.g*100)}. ${Math.abs(b.g/a.g-1)>Math.abs(b.r/a.r-1)?"El peso de cada pensión ha empujado más que el número de pensionistas: quienes se jubilan ahora tienen carreras más largas y salarios más altos que quienes fallecen.":"El número de pensionistas por trabajador ha empujado más que el peso de cada pensión."}</p>
+    <p><b>Pero el año de partida engaña.</b> ${y0} es el año en que se hundió el empleo, así que los pensionistas por ocupado arrancan ya hinchados por la crisis, y eso hace parecer que la demografía ha importado poco. Separando en dos tramos: ${[[y0,2019,sh1,a,m],[2019,Y,sh2,m,b]].map(([p0,p1,sh,A,Bq])=>`entre ${p0} y ${p1} ${sh.r<0?`los pensionistas por ocupado <i>bajaron</i> (de ${nf2.format(A.r)} a ${nf2.format(Bq.r)}: el empleo creció más que las pensiones) y todo el aumento vino del peso de cada pensión`:sh.g<0?`el peso de cada pensión <i>bajó</i> y todo el aumento vino de los pensionistas por ocupado`:sh.g>50?`el ${nf0.format(sh.g)}${NB}% del aumento vino del peso de cada pensión`:`el ${nf0.format(sh.r)}${NB}% del aumento vino de los pensionistas por ocupado`}`).join("; ")}. Desde ahora, con el baby boom jubilándose, el primer factor es el que manda.</p>`);
   const ys=yrs.filter(y=>y>=y0&&ben(y)&&emp(y)), g2=add(s3,"div","cols2");
   lineChart(g2,{title:"Pensionistas por cada ocupado",source:"Pensionistas: personas que cobran alguna pensión. Ocupados de 20 a 64 años (EPA). Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>D(y).r),c:"--rust",main:true}],years:ys,xticks:[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]],fmt:v=>nf2.format(v),tickFmt:v=>nf2.format(v)});
   lineChart(g2,{title:"Pensión media frente al PIB por ocupado",source:"Gasto en pensiones por pensionista, dividido entre el PIB por ocupado. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>D(y).g*100),c:"--slate",main:true}],years:ys,xticks:[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]],fmt:pc,tickFmt:v=>nf0.format(v)+"%"});
@@ -1903,7 +2074,7 @@ async function studyPens(B){
     `<p>Es la tasa de dependencia: mayores de 65 por cada 100 personas de 15 a 64 años. Según las proyecciones de Eurostat, en España subirá más deprisa que en la media de la UE y la superará hacia 2040. Las proyecciones suponen una llegada de inmigrantes y una natalidad concretas: si cambian, cambia la cifra.</p>`);
   lineChart(s4,{title:"Mayores de 65 por cada 100 personas de 15 a 64",source:"Hasta 2025, datos; después, proyección base de Eurostat (EUROPOP2023).",series:[{n:"España",v:dy.map(y=>dep(y)),c:"--rust",main:true},{n:"UE-27",v:dy.map(y=>P.olddepEU[y]??P.projEU[y]),c:"--slate"}],years:dy,xticks:[1995,2025,2050,2070],fmt:v=>nf1.format(v),height:280});
   // calculadora
-  const s5=finding(B,"Calcula tú: ¿cuánto gastaríamos en 2050?",`<p>Una cuenta sencilla: si todo lo demás se quedara igual, el gasto crecería en la misma proporción que la tasa de dependencia, del ${nf0.format(P.olddep[2025]??P.olddep[2024])} al ${nf0.format(P.proj[2050])}. Mueve los mandos para ver qué compensaría ese aumento. No es una previsión: sirve para ver qué palancas importan y cuánto.</p>`);
+  const s5=finding(B,"Calcula tú: ¿cuánto gastaríamos en 2050?",`<p>Una cuenta sencilla: si todo lo demás se quedara igual, el gasto crecería en la misma proporción que la tasa de dependencia, del ${nf0.format(P.olddep[2025]??P.olddep[2024])} al ${nf0.format(P.proj[2050])}. Eso es el escenario «sin cambios», y no es lo que prevé nadie: las reformas de 2021–2023 ya aprobadas (revalorización con el IPC mientras los salarios suben más, retraso de la edad de jubilación, incentivos a seguir trabajando) mueven estas mismas palancas. La AIReF y la Comisión Europea, con modelos completos, sitúan el gasto de 2050 entre el 16 y el 17,5${NB}% del PIB. Mueve los mandos para ver qué palancas acercan a esa cifra. No es una previsión: sirve para ver qué palancas importan y cuánto.</p>`);
   const calc=add(s5,"div","calc");
   const d0=P.olddep[2025]??P.olddep[2024], d1=P.proj[2050];
   const draw=()=>{ const base=ex(Y)*d1/d0, e=1+PSC.emp/100, bb=1+PSC.ben/100, c=1-PSC.cov/100, g=ex(Y)*(d1/d0)*c*bb/e;
@@ -1913,17 +2084,19 @@ async function studyPens(B){
     <label>Más gente trabajando (ocupados por cada persona en edad de trabajar) <output data-k="emp"></output><input type="range" min="0" max="30" step="1" value="${PSC.emp}" data-k="emp"><small>España tiene una tasa de empleo de las más bajas de la UE: acercarse a la media supondría más de un +10 %.</small></label>
     <label>Pensión media frente a lo que produce cada ocupado <output data-k="ben"></output><input type="range" min="-30" max="10" step="1" value="${PSC.ben}" data-k="ben"><small>Negativo: las pensiones crecen menos que la productividad (por ejemplo, si se revalorizan solo con el IPC y los salarios crecen más).</small></label>
     <label>Menos pensionistas por cada mayor (jubilación más tardía) <output data-k="cov"></output><input type="range" min="0" max="20" step="1" value="${PSC.cov}" data-k="cov"><small>Retrasar la jubilación efectiva unos dos años reduce aproximadamente un 10 % los pensionistas.</small></label>
-  </div><div id="cres" class="res"></div>`;
-  calc.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{ PSC[i.dataset.k]=+i.value; draw(); })); draw();
+  </div><div id="cres" class="res"></div><p class="muted" style="font-size:13.5px;margin-top:8px">Atajos: <button type="button" class="lnk" data-pre="0,0,0">sin cambios</button> · <button type="button" class="lnk" data-pre="10,-20,10">parecido a las reformas aprobadas (empleo +10, pensión −20, jubilación +10)</button></p>`;
+  calc.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{ PSC[i.dataset.k]=+i.value; draw(); }));
+  calc.querySelectorAll("button[data-pre]").forEach(b=>b.addEventListener("click",()=>{ const [e,bb,c]=b.dataset.pre.split(",").map(Number); PSC={emp:e,ben:bb,cov:c}; calc.querySelectorAll("input").forEach(i=>i.value=PSC[i.dataset.k]); draw(); })); draw();
   // cotizaciones
   const cot=GOV.main.D61REC.pib[gy(Y)];
   finding(B,"Qué se puede concluir y qué no",`<ul class="defs">
     <li><b>El gasto ha crecido sobre todo porque cada pensión pesa más,</b> no solo porque haya más pensionistas: las nuevas pensiones son más altas que las que desaparecen.</li>
-    <li><b>Lo más difícil está por venir:</b> la proporción de mayores casi se duplicará hasta 2050. Sin cambios, el gasto subiría a niveles nunca vistos en España.</li>
+    <li><b>Lo más difícil está por venir:</b> la proporción de mayores casi se duplicará hasta 2050. Sin ningún cambio, el gasto subiría a niveles nunca vistos en España; con las reformas ya aprobadas, las previsiones oficiales lo dejan en torno al 16–17${NB}% del PIB, que sigue siendo bastante más que hoy.</li>
     <li><b>Hay palancas que compensan:</b> más empleo, jubilación más tardía, inmigración y la forma de actualizar las pensiones. Cada una tiene costes y la calculadora solo muestra su tamaño.</li>
     <li><b>Las cotizaciones sociales no son solo para pensiones:</b> en ${Y} supusieron el ${pc(cot)} del PIB, pero también financian paro, bajas y otras prestaciones. La parte que no cubren sale de los impuestos o de la deuda.</li>
     <li><b>Es una cuenta simplificada.</b> Las previsiones oficiales (Comisión Europea, AIReF) usan modelos mucho más completos y llegan a cifras distintas según sus supuestos.</li></ul>
     <p style="margin-top:10px"><a class="exlink" href="/temas/gasto/">Ver en qué se gasta todo el dinero público →</a></p>`);
+  ficha(B,[["Unidad","España, cuentas nacionales (Eurostat)"],["Descomposición",`Gasto en pensiones / PIB = (pensionistas / ocupados de 20 a 64) × (gasto por pensionista / PIB por ocupado). Tramos ${y0}–2019 y 2019–${Y}; el reparto entre factores se hace con logaritmos (exacto para un producto)`],["Calculadora",`Gasto en 2050 = gasto de ${Y} × (dependencia 2050 / dependencia actual) × (1 + pensión) × (1 − jubilación tardía) / (1 + empleo). Es un modelo de una línea: no modela carreras de cotización, inmigración ni productividad`],["Referencias","AIReF (escenario de políticas constantes) y Comisión Europea (Ageing Report 2024): gasto en pensiones de España en 2050 entre el 16 y el 17,5 % del PIB"]]);
   const ft=document.querySelector("footer.method"); if(ft) ft.outerHTML=govNote();
 }
 // =====================================================================
@@ -2634,8 +2807,12 @@ function studyConv(B){
   const rows=rowsAll().filter(r=>r[F.renta15]!=null&&r[F.renta]!=null&&(r[F.pop]||0)>=1000);
   const q=(k,p)=>wq(rows,r=>r[F[k]],p);
   const r90a=q("renta15",.9)/q("renta15",.1), r90b=q("renta",.9)/q("renta",.1);
-  const c=withEXF({prov:"",min:1000,max:Infinity},()=>wcorr(pairPts("renta15","rentaVar",{weighted:true})));
-  const cp=withEXF({prov:"",min:1000,max:Infinity},()=>partialR("renta15","rentaVar",["prov"],true));
+  const EF={prov:"",min:1000,max:Infinity};
+  const c=withEXF(EF,()=>partialRCI("renta15","rentaVar",[],true));
+  const cp=withEXF(EF,()=>partialRCI("renta15","rentaVar",["prov"],true));
+  // regresión a la media: el nivel de 2015 entra también en el crecimiento 2015–2024 (y su error de medida, con signo contrario).
+  // Comprobación: nivel de 2015 frente al crecimiento de un periodo que no lo contiene (2017–2024)
+  const cl=withEXF(EF,()=>partialRCI("renta15","rentaVar1724",[],true)), clp=withEXF(EF,()=>partialRCI("renta15","rentaVar1724",["prov"],true));
   // grupos por renta de partida
   const s=rows.slice().sort((a,b)=>a[F.renta15]-b[F.renta15]), tot=d3.sum(s,r=>r[F.pop]); let acc=0; const G=[[],[],[],[],[]];
   s.forEach(r=>{ G[Math.min(4,Math.floor((acc+r[F.pop]/2)/tot*5))].push(r); acc+=r[F.pop]; });
@@ -2646,77 +2823,109 @@ function studyConv(B){
   finding(B,"La pregunta",`<p>Entre 2015 y 2024 la renta por persona subió en casi toda España. Pero no es lo mismo que suba un 30${NB}% donde se ingresaban 9.000${NB}€ que donde se ingresaban 18.000${NB}€. ¿Han crecido más los municipios que partían de abajo? Si es así, la distancia entre ricos y pobres se estrecha: los economistas lo llaman <b>convergencia</b>.</p>`);
   finding(B,"El método: dos preguntas distintas",`<ul class="defs"><li><b>¿Crecen más los de abajo?</b> Se compara la renta de cada municipio en 2015 con cuánto ha subido hasta 2024. Si la nube de puntos baja hacia la derecha, los pobres crecen más deprisa.</li>
     <li><b>¿Se estrecha la distancia?</b> Se mide cuántas veces más ingresa el municipio del 10${NB}% más rico que el del 10${NB}% más pobre, en 2015 y en 2024. Lo primero no garantiza lo segundo: algunos de abajo pueden adelantar a otros sin que el reparto cambie.</li></ul>`);
-  const s3=finding(B,"Renta de partida y subida",`<p>Cada punto es un municipio de 1.000 habitantes o más. ${c?corrSentence(c.r,"renta en 2015","subida de la renta"):""} ${c?`(r = ${rFmt(c.r)}).`:""}</p>`);
+  const s3=finding(B,"Renta de partida y subida",`<p>Cada punto es un municipio de 1.000 habitantes o más. ${c?corrSentence(c.r,"renta en 2015","subida de la renta"):""} ${c?`(${rCI(c)}).`:""}</p>
+    <p><b>Ojo, esa cifra está inflada.</b> La renta de 2015 aparece en los dos ejes: como punto de partida y, restando, dentro del crecimiento. Cualquier error o año raro en 2015 crea por sí solo una relación negativa (regresión a la media). La comprobación honesta es comparar la renta de 2015 con el crecimiento de un periodo que no la contiene, 2017–2024: ${cl?`${rCI(cl)}`:"—"}${clp?`, y dentro de cada provincia ${rCI(clp)}`:""}. ${cl&&Math.abs(cl.r)>=0.3?"Sigue habiendo convergencia clara, aunque menos espectacular que la primera cifra.":cl&&Math.abs(cl.r)>=0.1?"Queda una convergencia moderada: la primera cifra exageraba bastante.":"Casi toda la relación era regresión a la media."}</p>`);
   scatter(s3,{x:"renta15",y:"rentaVar",minPop:1000,title:"Renta por persona en 2015 y subida hasta 2024",source:"Fuente: INE, Atlas de Distribución de Renta de los Hogares.",hideSay:true});
   const f=fig(s3,{title:"Subida de la renta 2015–2024, según la renta de partida",source:"Municipios repartidos en cinco grupos con la misma población, de menos a más renta en 2015. Medias ponderadas por población."});
   f.body.dataset.w="1"; hbars(f.body,["20 % más pobre en 2015","Segundo 20 %","20 % central","Cuarto 20 %","20 % más rico en 2015"].map((l,i)=>({l,v:gv[i]})),{fmt:sgn,color:"--rust",min:0}); f.body.querySelectorAll(".hb").forEach(h=>h.style.gridTemplateColumns="minmax(150px,210px) minmax(0,1fr) 70px");
   const s4=finding(B,"¿Se estrecha la distancia?",`<p>En 2015, el municipio que marca el 10${NB}% más rico ingresaba <b>${nf1.format(r90a)} veces</b> lo que el que marca el 10${NB}% más pobre. En 2024, <b>${nf1.format(r90b)} veces</b>. ${r90b<r90a-0.03?"La distancia se ha estrechado un poco.":r90b>r90a+0.03?"La distancia se ha agrandado.":"La distancia apenas ha cambiado."} Entre provincias pasa lo mismo: la dispersión de la renta ${cv[cv.length-1]<cv[0]-0.5?"ha bajado":cv[cv.length-1]>cv[0]+0.5?"ha subido":"casi no ha cambiado"} desde 2015.</p>`);
   lineChart(s4,{title:"Diferencias de renta entre provincias",sub:"Coeficiente de variación: cuánto se alejan de la media, en % de la media",source:"Media ponderada por población. Fuente: INE, Atlas de Renta.",series:[{n:"Dispersión",v:cv,c:"--slate",main:true}],fmt:v=>nf1.format(v)+NB+"%",tickFmt:v=>nf0.format(v)+"%",height:220});
-  finding(B,"Qué se puede concluir y qué no",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">${gv[0]>gv[4]+2?`Sí hay convergencia: los municipios que partían de abajo subieron un ${nf0.format(gv[0])}${NB}% y los de arriba un ${nf0.format(gv[4])}${NB}%.`:gv[0]<gv[4]-2?`No: los municipios que partían de arriba subieron más (${nf0.format(gv[4])}${NB}% frente a ${nf0.format(gv[0])}${NB}%).`:`Los de abajo y los de arriba subieron parecido (${nf0.format(gv[0])}${NB}% y ${nf0.format(gv[4])}${NB}%).`}${cp?` Dentro de cada provincia la relación es ${Math.abs(cp.r)<0.1?"casi nula":`de r = ${rFmt(cp.r)}`}.`:""}</p>
-    <ul class="defs"><li><b>Ojo con la regresión a la media.</b> Un municipio que tuvo un año 2015 anormalmente malo «sube» después aunque nada cambie. En los pueblos pequeños pasa mucho; por eso aquí solo se usan los de 1.000 habitantes o más.</li>
+  finding(B,"Qué se puede concluir y qué no",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">${gv[0]>gv[4]+2?`Sí hay convergencia: los municipios que partían de abajo subieron un ${nf0.format(gv[0])}${NB}% y los de arriba un ${nf0.format(gv[4])}${NB}%.`:gv[0]<gv[4]-2?`No: los municipios que partían de arriba subieron más (${nf0.format(gv[4])}${NB}% frente a ${nf0.format(gv[0])}${NB}%).`:`Los de abajo y los de arriba subieron parecido (${nf0.format(gv[0])}${NB}% y ${nf0.format(gv[4])}${NB}%).`}${cp?` Dentro de cada provincia la relación es ${Math.abs(cp.r)<0.1?"casi nula":`de ${rCI(cp)}`}${clp?` (${rCI(clp)} con el crecimiento 2017–2024, que no arrastra el punto de partida)`:""}.`:""}</p>
+    <ul class="defs"><li><b>Ojo con la regresión a la media.</b> Un municipio que tuvo un año 2015 anormalmente malo «sube» después aunque nada cambie. En los pueblos pequeños pasa mucho; por eso aquí solo se usan los de 1.000 habitantes o más, y por eso se da también la correlación con el crecimiento 2017–2024, que es la cifra de referencia.</li>
     <li><b>La renta de un municipio cambia también porque cambia quién vive en él.</b> Si se van los jóvenes y quedan los pensionistas, la renta por persona puede subir sin que nadie gane más.</li>
-    <li><b>El salario mínimo y las pensiones</b> subieron mucho en estos años y pesan más en los municipios de renta baja: son buenos candidatos a explicar la convergencia, pero aquí no se pueden separar.</li></ul>
+    <li><b>El salario mínimo y las pensiones</b> subieron mucho en estos años y pesan más en los municipios de renta baja: son buenos candidatos a explicar la convergencia. El Atlas separa la renta por fuentes (salarios, pensiones, prestaciones), así que <a href="/preguntas/renta-fuentes/">lo medimos en otro estudio</a>.</li></ul>
     <p style="margin-top:10px">${exLink("cruce",{d:["renta15","rentaVar"],t:"g1",c:[]},"Ponlo a prueba en el laboratorio")}</p>`);
+  ficha(B,[["Unidad",`${nf0.format(rows.length)} municipios de 1.000 habitantes o más con renta en 2015 y 2024`],["Variables","Renta neta media por persona del Atlas de Renta, en euros corrientes (la inflación afecta igual a todos y no cambia las comparaciones). Grupos: quintiles de población ordenados por la renta de 2015"],["Ponderación","Por población"],["Modelo",FICHA_R+" Comprobación de regresión a la media: el nivel de 2015 frente al crecimiento 2017–2024."]]);
 }
 
 // ---------- pandemia y turismo ----------
 function studyCovid(B){
   const P=Object.keys(REFS.paro.prov).filter(p=>REFS.prov[p]&&REFS.prov[p].vtp&&REFS.paro.prov[p].paro&&!["51","52"].includes(p));
-  const vt=p=>REFS.prov[p].vtp[REFS.prov[p].vtp.length-1], PY=REFS.paroYears, i19=PY.indexOf(2019), i20=PY.indexOf(2020), i23=PY.indexOf(2023);
+  const vt=p=>REFS.prov[p].vtp[0], PY=REFS.paroYears, i17=PY.indexOf(2017), i19=PY.indexOf(2019), i20=PY.indexOf(2020), i23=PY.indexOf(2023);
   const ranked=P.slice().sort((a,b)=>vt(b)-vt(a)), TUR=ranked.slice(0,10), REST=ranked.slice(10);
   const sumP=(g,i)=>d3.sum(g,p=>REFS.paro.prov[p].paro[i]);
   const idx=g=>PY.map((y,i)=>sumP(g,i)/sumP(g,i19)*100);
   const jT=(sumP(TUR,i20)/sumP(TUR,i19)-1)*100, jR=(sumP(REST,i20)/sumP(REST,i19)-1)*100;
   const rT=(sumP(TUR,i23)/sumP(TUR,i19)-1)*100, rR=(sumP(REST,i23)/sumP(REST,i19)-1)*100;
+  // tendencia previa 2017–2019 (cambio anual medio) y DiD descontándola
+  const trend=g=>((sumP(g,i19)/sumP(g,i17))**(1/2)-1)*100;
+  const tT=trend(TUR), tR=trend(REST), didRaw=jT-jR, didTrend=(jT-tT)-(jR-tR);
   const pw=p=>{ const a=REFS.prov[p].pad; return a[a.length-1]; }, y19=YEARS.indexOf(2019), y20=YEARS.indexOf(2020);
   const rch=g=>d3.sum(g,p=>(REFS.prov[p].net_income_pc[y20]/REFS.prov[p].net_income_pc[y19]-1)*100*pw(p))/d3.sum(g,pw);
   const iT=rch(TUR), iR=rch(REST);
   const jump=p=>(REFS.paro.prov[p].paro[i20]/REFS.paro.prov[p].paro[i19]-1)*100;
   const c=wcorr(P.map(p=>({x:vt(p),y:jump(p),w:pw(p)})));
+  // placebo: 10 provincias al azar en vez de las 10 más turísticas (distribución de la diferencia)
+  const R=rng(11), plac=[]; for(let b=0;b<300;b++){ const sh=P.slice(); for(let i=sh.length-1;i>0;i--){ const j=(R()*(i+1))|0; [sh[i],sh[j]]=[sh[j],sh[i]]; } const A=sh.slice(0,10), Bq=sh.slice(10); plac.push({n:"azar",v:(sumP(A,i20)/sumP(A,i19)-sumP(Bq,i20)/sumP(Bq,i19))*100}); }
+  const pr=placeboRank(didRaw,plac.map(x=>x.v));
+  // ERTE: trabajadores en ERTE a 30 de abril de 2020 por cada 100 afiliados (afiliados: suma municipal de afiliados por habitante × población)
+  const afil=p=>{ const a=REFS.prov[p]&&REFS.prov[p].pad; return a?a[REFS.padYears.indexOf(2020)]:0; }; // habitantes en 2020
+  const erte=EXT.erte&&EXT.erte.prov, ertePct=p=>erte&&erte[p]&&afil(p)?erte[p]/afil(p)*100:null;
+  const eT=d3.sum(TUR,p=>erte[p]||0)/d3.sum(TUR,afil)*100, eR=d3.sum(REST,p=>erte[p]||0)/d3.sum(REST,afil)*100;
+  const ce=wcorr(P.map(p=>({x:vt(p),y:ertePct(p),w:pw(p)})).filter(o=>o.y!=null));
+  // municipios: dosis-respuesta con los 8.139
+  const EF={prov:"",min:1000,max:Infinity};
+  const m0=withEXF(EF,()=>partialRCI("vtp20","paroVar1920",[],true)), m1=withEXF(EF,()=>partialRCI("vtp20","paroVar1920",["lpop20","renta19","paroReg19","prov"],true));
+  const mrows=withEXF(EF,()=>rowsAll().filter(r=>exOK(r)&&r[F.vtp20]!=null&&r[F.paroVar1920]!=null&&r[F.pop]));
+  const qs=[0,.5,.8,.9,.97,1], cuts=qs.map(q=>wq(mrows,r=>r[F.vtp20],q));
+  const bins=[["Mitad con menos pisos turísticos",0,1],["Del 50 al 80 %",1,2],["Del 80 al 90 %",2,3],["Del 90 al 97 %",3,4],["3 % más turístico",4,5]].map(([l,a,b])=>{ const s=mrows.filter(r=>r[F.vtp20]>=cuts[a]&&(b===5?true:r[F.vtp20]<cuts[b])); return {l,n:s.length,v:d3.sum(s,r=>r[F.paroVar1920]*r[F.pop])/d3.sum(s,r=>r[F.pop]),vt:d3.sum(s,r=>r[F.vtp20]*r[F.pop])/d3.sum(s,r=>r[F.pop])}; });
   const nm=p=>provShort(PROVS[p]);
   finding(B,"La pregunta",`<p>En marzo de 2020 se cerraron fronteras, hoteles y restaurantes. Las zonas que viven del turismo deberían haberlo notado más. ¿Fue así? ¿Y se han recuperado?</p><p>Para saberlo no basta con mirar el paro de las zonas turísticas en 2020: el paro subió en toda España. Hay que compararlas con el resto y comprobar que antes de la pandemia iban parejas.</p>`);
-  finding(B,"El método: antes y después, con grupo de comparación",`<p>Separamos las <b>10 provincias más turísticas</b> —las que tienen más viviendas turísticas sobre el total: ${TUR.map(nm).join(", ")}— del resto. Comparamos cómo cambió el paro registrado y la renta en cada grupo entre 2019 y 2020, y cómo se recuperaron después. Es la misma lógica de <b>diferencias en diferencias</b> que el estudio del tope del alquiler.</p>`);
-  const s3=finding(B,`En 2020 el paro subió un ${nf0.format(jT)}${NB}% en las provincias turísticas y un ${nf0.format(jR)}${NB}% en el resto`,`<p>Paro registrado de cada grupo, con 2019 = 100. ${(()=>{ const a=idx(TUR)[0], b=idx(REST)[0]; return `Antes de la pandemia el paro bajaba en los dos grupos, aunque algo más deprisa en el resto (de ${nf0.format(b)} a 100, frente a ${nf0.format(a)} a 100 en las turísticas): la comparación no es perfecta, pero el salto de 2020 es mucho más brusco que esa diferencia.`; })()} En 2020 se separan. En 2023 las turísticas estaban un ${nf0.format(Math.abs(rT))}${NB}% ${rT<0?"por debajo":"por encima"} de 2019 y el resto, un ${nf0.format(Math.abs(rR))}${NB}% ${rR<0?"por debajo":"por encima"}.</p>`);
+  finding(B,"El método: antes y después, con grupo de comparación, a dos escalas",`<p>Primero por provincias: separamos las <b>10 provincias más turísticas</b> —las que tenían más viviendas turísticas sobre el total en agosto de 2020: ${TUR.map(nm).join(", ")}— del resto, y comparamos cómo cambió el paro registrado y la renta en cada grupo entre 2019 y 2020 (<b>diferencias en diferencias</b>). Como los dos grupos no iban exactamente en paralelo antes, se descuenta también la tendencia de 2017–2019 de cada uno. Después a escala de <b>municipio</b>, con los 8.139: cuanto más pesan los pisos turísticos, ¿más subió el paro? Eso es una <b>dosis-respuesta</b>, y permite descontar tamaño, renta y paro previo, y comparar dentro de cada provincia. Y como el paro registrado no cuenta los ERTE, miramos también los ERTE.</p>`);
+  const s3=finding(B,`En 2020 el paro subió un ${nf0.format(jT)}${NB}% en las provincias turísticas y un ${nf0.format(jR)}${NB}% en el resto`,`<p>Paro registrado de cada grupo, con 2019 = 100. Antes de la pandemia el paro bajaba en los dos grupos, un ${nf1.format(Math.abs(tR))}${NB}% al año en el resto y un ${nf1.format(Math.abs(tT))}${NB}% en las turísticas: la comparación no es perfecta. Descontando esa tendencia, la diferencia de 2020 pasa de ${nf1.format(didRaw)} a <b>${nf1.format(didTrend)} puntos</b>. En 2023 las turísticas estaban un ${nf0.format(Math.abs(rT))}${NB}% ${rT<0?"por debajo":"por encima"} de 2019 y el resto, un ${nf0.format(Math.abs(rR))}${NB}% ${rR<0?"por debajo":"por encima"}.</p>`);
   lineChart(s3,{title:"Paro registrado, 2019 = 100",source:"Media anual; 2026, de enero a septiembre. Fuente: SEPE; viviendas turísticas del INE para elegir las provincias.",series:[{n:"10 más turísticas",v:idx(TUR),c:"--rust",main:true},{n:"Resto de España",v:idx(REST),c:"--slate"}],years:PY,xticks:[2015,2019,2020,2023,2026],fmt:v=>nf1.format(v),height:280});
-  const s4=finding(B,"Provincia a provincia",`<p>Cuánto subió el paro registrado entre 2019 y 2020 en cada provincia. En granate, las diez más turísticas. ${c?`Entre provincias, la relación entre el peso del turismo y la subida del paro es ${strength(Math.abs(c.r))} (r = ${rFmt(c.r)}).`:""}</p>`);
-  const f=fig(s4,{title:"Subida del paro registrado, 2019–2020",source:"Fuente: SEPE."});
+  add(s3,"p",null,`¿Podría salir una diferencia así por casualidad? Eligiendo 300 veces 10 provincias al azar en vez de las 10 más turísticas, la diferencia va de ${pts(pr.min)} a ${pts(pr.max)} puntos; ${pr.n-pr.below} de 300 superan la real. ${pr.share>=0.97?"Es un resultado muy raro sin un efecto del turismo.":"No es un resultado raro: con 10 provincias, la casualidad pesa."}`).style.cssText="max-width:680px;margin-top:8px";
+  const s4=finding(B,"Provincia a provincia, y los ERTE",`<p>Cuánto subió el paro registrado entre 2019 y 2020 en cada provincia. En granate, las diez más turísticas. ${c?`Entre provincias, la relación entre el peso del turismo y la subida del paro es ${strength(Math.abs(c.r))} (r = ${rFmt(c.r)}).`:""} ${erte?`Los <b>ERTE</b> cuentan lo que el paro registrado no ve: a 30 de abril de 2020 había ${nf1.format(eT)} trabajadores en ERTE por cada 100 habitantes en las provincias turísticas y ${nf1.format(eR)} en el resto${ce?`, y la relación con el peso del turismo es ${strength(Math.abs(ce.r))} (r = ${rFmt(ce.r)})`:""}. El golpe real al empleo fue mucho mayor que lo que muestra el paro.`:""}</p>`);
+  const g4=add(s4,"div","cols2");
+  const f=fig(g4,{title:"Subida del paro registrado, 2019–2020",source:"Fuente: SEPE."});
   hbars(f.body,P.slice().sort((a,b)=>jump(b)-jump(a)).map(p=>({l:nm(p),v:jump(p),c:TUR.includes(p)?"--rust":"--stone"})),{fmt:sgn,scroll:true,min:0});
-  finding(B,"El resultado",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">Sí: el paro subió en las provincias turísticas <mark>${nf0.format(jT-jR)} puntos más</mark> que en el resto, y la renta por persona ${iT<iR?`cayó más (${sgn(iT)} frente a ${sgn(iR)})`:`se movió parecido (${sgn(iT)} frente a ${sgn(iR)})`}. ${rT<=rR+3?"Pero la recuperación fue completa: en 2023 ya estaban como el resto o mejor.":"Y la recuperación tardó más."}</p>
-    <ul class="defs"><li><b>El paro registrado se quedó corto.</b> Los trabajadores en ERTE no contaban como parados. En las zonas turísticas hubo muchos: el golpe real al empleo fue mayor de lo que muestra este dato.</li>
-    <li><b>Las provincias turísticas no son iguales al resto en otras cosas</b> (empleo temporal, tamaño de las empresas, clima). Por eso importa que antes de 2020 los dos grupos se movieran parecido: es lo que hace creíble la comparación.</li>
-    <li><b>Es un análisis por provincias.</b> Dentro de cada una, los municipios de costa y los de interior vivieron la pandemia de forma muy distinta.</li></ul>
+  if(erte){ const fe=fig(g4,{title:"Trabajadores en ERTE por cada 100 habitantes, 30 de abril de 2020",source:"Fuente: Seguridad Social, nota de afiliación de abril de 2020 (dato provisional); padrón de 2020."});
+    hbars(fe.body,P.filter(p=>ertePct(p)!=null).sort((a,b)=>ertePct(b)-ertePct(a)).map(p=>({l:nm(p),v:ertePct(p),c:TUR.includes(p)?"--rust":"--stone"})),{fmt:v=>nf1.format(v),scroll:true,min:0}); }
+  const s5=finding(B,"Municipio a municipio: cuanto más turístico, más subió el paro",`<p>Con los municipios de 1.000 habitantes o más, agrupados por el peso de los pisos turísticos en agosto de 2020. La relación es ${m0?strength(Math.abs(m0.r)):"—"} sin descontar nada (${rCI(m0)}) y ${m1?strength(Math.abs(m1.r)):"—"} entre municipios de la misma provincia, tamaño, renta y paro previo (${rCI(m1)}). ${m1&&!ciZero(m1)&&m1.r>0?"Aguanta: no es solo que las provincias turísticas sean distintas, es que dentro de cada provincia los municipios turísticos sufrieron más.":"Dentro de cada provincia la relación se diluye: la diferencia es sobre todo entre provincias."}</p>`);
+  const fb=fig(s5,{title:"Subida del paro registrado en 2020, según el peso de los pisos turísticos",source:"Grupos con la misma población, media ponderada. Fuente: SEPE e INE (viviendas turísticas)."});
+  hbars(fb.body,bins.map(b=>({l:`${b.l} (${nf1.format(b.vt)}${NB}% de las viviendas)`,v:b.v})),{fmt:sgn,color:"--rust",min:0});
+  fb.body.querySelectorAll(".hb").forEach(h=>h.style.gridTemplateColumns="minmax(150px,300px) minmax(0,1fr) 64px");
+  finding(B,"El resultado",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">Sí: el paro subió en las provincias turísticas <mark>${nf0.format(didTrend)} puntos más</mark> que en el resto (descontando la tendencia previa), y la renta por persona ${iT<iR?`cayó más (${sgn(iT)} frente a ${sgn(iR)})`:`se movió parecido (${sgn(iT)} frente a ${sgn(iR)})`}. ${rT<=rR+3?"La recuperación fue completa: en 2023 ya estaban como el resto o mejor.":"Y la recuperación tardó más."}</p>
+    <ul class="defs"><li><b>El paro registrado se quedó corto.</b> Los trabajadores en ERTE no contaban como parados${erte?`, y en abril de 2020 eran ${nf1.format(eT)} por cada 100 habitantes en las provincias turísticas, frente a ${nf1.format(eR)} en el resto`:""}: el golpe real al empleo fue mayor de lo que muestra este dato. Solo hay datos públicos de ERTE por provincia para algunos meses.</li>
+    <li><b>Las provincias turísticas no son iguales al resto en otras cosas</b> (empleo temporal, tamaño de las empresas, clima). Por eso se descuenta la tendencia previa y se repite el análisis dentro de cada provincia.</li>
+    <li><b>La renta de 2020 incluye las prestaciones</b> (paro, ERTE), que amortiguaron la caída: el golpe a los salarios fue mayor.</li></ul>
     <p style="margin-top:10px">${exLink("evolucion",{e:["paro","pob"]},"Mira el paro de tu provincia en el laboratorio")}</p>`);
+  ficha(B,[["Unidad","50 provincias (sin Ceuta y Melilla); municipios de 1.000 habitantes o más para la dosis-respuesta"],["Tratamiento","10 provincias con más viviendas turísticas sobre el total en agosto de 2020; a escala municipal, el % de viviendas turísticas en agosto de 2020 como dosis"],["Periodos","Antes: 2019 (tendencia 2017–2019). Después: 2020; recuperación hasta 2023. Paro registrado como media anual"],["Ponderación","Provincias: suma de parados (equivale a ponderar por paro). Municipios: por población"],["Modelo",FICHA_DID+" Placebo: 300 elecciones al azar de 10 provincias. "+FICHA_R]]);
 }
 
 // ---------- qué hace crecer a un pueblo ----------
 function studyGrow(B){
-  const Y="pobVar20", FAC=[["renta","Renta por persona"],["edad","Edad media"],["superiores","Estudios superiores"],["paroReg","Paro registrado"],["alquiler","Hogares de alquiler"],["vt","Pisos turísticos"],["distCiudad","Distancia a una ciudad grande"],["distCosta","Distancia a la costa"],["lpop","Tamaño del pueblo"]];
+  const Y="pobVar20", FAC=[["renta19","Renta por persona (2019)"],["edad19","Edad media (2019)"],["superiores","Estudios superiores (2021)"],["paroReg19","Paro registrado (2019)"],["alquiler","Hogares de alquiler (2021)"],["vtp20","Pisos turísticos (2020)"],["distCiudad","Distancia a una ciudad grande"],["distCosta","Distancia a la costa"],["lpop20","Tamaño del pueblo (2020)"]];
   const EF={prov:"",min:1000,max:20000};
   const res=withEXF(EF,()=>FAC.map(([k,l])=>{ const others=FAC.map(f=>f[0]).filter(x=>x!==k);
-    const simple=k==="lpop"?wcorr(rowsAll().filter(r=>exOK(r)&&r[F[Y]]!=null&&r[F.pop]).map(r=>({x:Math.log10(r[F.pop]),y:r[F[Y]],w:1}))):wcorr(pairPts(k,Y,{weighted:false}));
-    const pr=k==="lpop"?lpopPartial(Y,others):partialR(k,Y,[...others,"prov"],false);
-    return {k,l,s:simple?simple.r:null,p:pr?pr.r:null,n:pr?pr.n:0}; }));
+    const simple=k==="lpop20"?wcorr(rowsAll().filter(r=>exOK(r)&&r[F[Y]]!=null&&r[F.pop20]).map(r=>({x:Math.log10(r[F.pop20]),y:r[F[Y]],w:1}))):wcorr(pairPts(k,Y,{weighted:false}));
+    const pr=k==="lpop20"?lpopPartial(Y,others,"pop20"):partialRCI(k,Y,[...others,"prov"],false);
+    return {k,l,s:simple?simple.r:null,p:pr?pr.r:null,ci:pr?pr.ci:null,n:pr?pr.n:0}; }));
   const n=withEXF(EF,()=>rowsAll().filter(r=>exOK(r)&&r[F[Y]]!=null).length);
   const ok=res.filter(r=>r.p!=null).sort((a,b)=>Math.abs(b.p)-Math.abs(a.p));
-  const top=ok[0], sec=ok[1];
+  const top=ok[0], sec=ok[1], gone=res.filter(r=>r.s!=null&&r.p!=null&&Math.abs(r.s)>=0.1&&Math.abs(r.p)<0.05);
   finding(B,"La pregunta",`<p>Entre 2020 y 2025, ${nf0.format(n)} municipios de entre 1.000 y 20.000 habitantes han vivido destinos muy distintos: unos ganan vecinos y otros se vacían. ¿Qué tienen en común los que crecen? ¿Renta, juventud, estudios, poco paro, turismo?</p>`);
-  finding(B,"El método: todos los sospechosos a la vez",`<p>Si miramos cada factor por separado nos engañamos, porque van juntos: los pueblos ricos suelen ser también más jóvenes y con más estudios. Por eso, para cada factor medimos su relación con el crecimiento <b>comparando pueblos iguales en todos los demás</b> y de la misma provincia. Así cada factor compite con los otros.</p>`);
-  const s3=finding(B,"Por separado y entre iguales",`<p>La primera columna es la relación de cada factor con el crecimiento por sí solo; la segunda, la que queda al comparar entre pueblos iguales en todo lo demás. Cuanto más lejos de cero, más fuerte.</p>`);
-  const t=add(s3,"div","extable"); t.innerHTML=`<table class="glance" style="max-width:700px"><thead><tr><th>Factor</th><th class="r">Por sí solo</th><th class="r">Entre iguales</th><th>Qué queda</th></tr></thead><tbody>${res.map(r=>`<tr><td class="lab"><b>${r.l}</b></td><td class="r num">${r.s==null?"—":rFmt(r.s)}</td><td class="r num"><b>${r.p==null?"—":rFmt(r.p)}</b></td><td>${r.p==null?"":`<span style="display:inline-block;height:9px;border-radius:2px;width:${Math.round(Math.abs(r.p)*160)}px;background:var(${r.p>0?"--rust":"--slate"})"></span>`}</td></tr>`).join("")}</tbody></table>`;
-  add(s3,"p","muted","Granate: los pueblos con más de ese factor crecen más. Azul: crecen menos. Municipios de 1.000 a 20.000 habitantes, cada uno cuenta igual.").style.cssText="font-size:13.5px;margin-top:8px";
-  finding(B,"Qué se puede concluir y qué no",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">Entre pueblos parecidos, lo que más pesa es ${top?`<mark>${low(top.l)}</mark>: cuanto ${top.p>0?"mayor":"menor"}, más crece (r = ${rFmt(top.p)})`:"—"}${sec?`. Le sigue ${low(sec.l)}: cuanto ${sec.p>0?"mayor":"menor"}, más crece (r = ${rFmt(sec.p)})`:""}.</p>
-    <ul class="defs"><li><b>La causa puede ir al revés.</b> Un pueblo que crece porque llegan familias jóvenes se vuelve más joven: la edad media baja <i>porque</i> crece, no al revés. Con la edad hay que ser especialmente prudente.</li>
+  finding(B,"El método: todos los sospechosos a la vez, medidos antes",`<p>Si miramos cada factor por separado nos engañamos, porque van juntos: los pueblos ricos suelen ser también más jóvenes y con más estudios. Por eso, para cada factor medimos su relación con el crecimiento <b>comparando pueblos iguales en todos los demás</b> y de la misma provincia. Así cada factor compite con los otros. Y todos los factores se miden <b>al principio del periodo</b> (2019 o 2020, salvo los del Censo, que es de 2021), para que no sean consecuencia del crecimiento que queremos explicar.</p>`);
+  const s3=finding(B,"Por separado y entre iguales",`<p>La primera columna es la relación de cada factor con el crecimiento por sí solo; la segunda, la que queda al comparar entre pueblos iguales en todo lo demás, con su intervalo del 95 %. Cuanto más lejos de cero, más fuerte.</p>`);
+  const t=add(s3,"div","extable"); t.innerHTML=`<table class="glance" style="max-width:760px"><thead><tr><th>Factor</th><th class="r">Por sí solo</th><th class="r">Entre iguales</th><th>Qué queda</th></tr></thead><tbody>${res.map(r=>`<tr><td class="lab"><b>${r.l}</b></td><td class="r num">${r.s==null?"—":rFmt(r.s)}</td><td class="r num"><b>${r.p==null?"—":rFmt(r.p)}</b>${ciFmt(r.ci)}</td><td>${r.p==null?"":`<span style="display:inline-block;height:9px;border-radius:2px;width:${Math.round(Math.abs(r.p)*160)}px;background:var(${r.p>0?"--rust":"--slate"})" title="${rFmt(r.p)}"></span>`}</td></tr>`).join("")}</tbody></table>`;
+  add(s3,"p","muted","Granate: los pueblos con más de ese factor crecen más. Azul: crecen menos. Municipios de 1.000 a 20.000 habitantes, cada uno cuenta igual. Entre corchetes, el intervalo del 95 % por remuestreo.").style.cssText="font-size:13.5px;margin-top:8px";
+  finding(B,"Qué se puede concluir y qué no",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">Entre pueblos parecidos, lo que más pesa es ${top?`<mark>${low(top.l.replace(/ \(\d{4}\)/,""))}</mark>: cuanto ${top.p>0?"mayor":"menor"}, más crece (${rCI({r:top.p,ci:top.ci})})`:"—"}${sec?`. Le sigue ${low(sec.l.replace(/ \(\d{4}\)/,""))}: cuanto ${sec.p>0?"mayor":"menor"}, más crece (${rCI({r:sec.p,ci:sec.ci})})`:""}.${gone.length?` ${cap(gone.map(g=>low(g.l.replace(/ \(\d{4}\)/,""))).join(", ").replace(/, ([^,]*)$/," y $1"))} ${gone.length>1?"parecían importar y dejan de hacerlo":"parecía importar y deja de hacerlo"} al comparar entre iguales.`:""}</p>
+    <ul class="defs"><li><b>La causa puede ir al revés.</b> Un pueblo que crece porque llegan familias jóvenes se vuelve más joven: medir la edad en 2019 ayuda, pero un pueblo que ya crecía antes de 2020 ya era más joven en 2019. Con la edad hay que ser especialmente prudente.</li>
+    <li><b>La costa importa por sí sola, no entre iguales:</b> los pueblos de costa son más jóvenes, más ricos y más turísticos, y es eso lo que crece. Comparando entre iguales, estar en la costa no añade nada.</li>
     <li><b>Faltan sospechosos importantes:</b> el tren o la autovía, los servicios del pueblo o el precio de la vivienda en la ciudad cercana. No están en estos datos. La distancia se mide en línea recta, no en tiempo de viaje.</li>
     <li><b>Son relaciones entre lugares, no entre personas.</b> No dicen por qué se muda cada familia.</li></ul>
-    <p style="margin-top:10px">${exLink("cruce",{d:[top?top.k==="lpop"?"pop":top.k:"renta",Y],t:"s2",c:[]},"Ponlo a prueba en el laboratorio")}</p>`);
+    <p style="margin-top:10px">${exLink("cruce",{d:[top?top.k==="lpop20"?"pop":top.k:"renta",Y],t:"s2",c:[]},"Ponlo a prueba en el laboratorio")}</p>`);
+  ficha(B,[["Unidad",`${nf0.format(n)} municipios de 1.000 a 20.000 habitantes (padrón de 2025)`],["Variable explicada","Cambio del padrón 2020–2025"],["Factores","Renta por persona y edad media de 2019 (Atlas), estudios superiores y hogares de alquiler del Censo de 2021, paro registrado de 2019 (media anual sobre población de 16 a 64), pisos turísticos de agosto de 2020, distancias en línea recta, log del padrón de 2020. Cada factor se mide descontando todos los demás y la provincia"],["Ponderación","Ninguna: cada municipio cuenta igual"],["Modelo",FICHA_R]]);
 }
 // relación entre el tamaño (log) y el crecimiento, descontando el resto
-function lpopPartial(Y,others){
-  const cs=others.filter(c=>c!=="lpop"&&c!=="prov");
-  const rs=rowsAll().filter(r=>exOK(r)&&r[F[Y]]!=null&&(r[F.pop]||0)>0&&cs.every(c=>r[F[c]]!=null)); if(rs.length<30) return null;
+function lpopPartial(Y,others,popKey="pop",rowsIn){
+  const cs=others.filter(c=>c!=="lpop"&&c!=="lpop20"&&c!=="prov");
+  const rs=rowsIn||rowsAll().filter(r=>exOK(r)&&r[F[Y]]!=null&&(r[F[popKey]]||0)>0&&cs.every(c=>r[F[c]]!=null)); if(rs.length<30) return null;
   const w=rs.map(()=>1), g=rs.map(r=>r[F.prov]); const cols=cs.map(c=>demeanBy(rs.map(r=>r[F[c]]),g,w)), Z=rs.map((r,i)=>cols.map(col=>col[i]));
-  let X=demeanBy(rs.map(r=>Math.log10(r[F.pop])),g,w), YY=demeanBy(rs.map(r=>r[F[Y]]),g,w); if(cs.length){ X=wresid(X,Z,w); YY=wresid(YY,Z,w); }
-  const c=wcorr(X.map((v,i)=>({x:v,y:YY[i],w:1}))); return c?{r:c.r,n:rs.length}:null;
+  let X=demeanBy(rs.map(r=>Math.log10(r[F[popKey]])),g,w), YY=demeanBy(rs.map(r=>r[F[Y]]),g,w); if(cs.length){ X=wresid(X,Z,w); YY=wresid(YY,Z,w); }
+  const pts=X.map((v,i)=>({x:v,y:YY[i],w:1})), c=wcorr(pts); if(!c) return null;
+  const ci=rowsIn?null:bootCI(pts,s=>{ const a=wcorr(s); return a?a.r:null; });
+  return {r:c.r,n:rs.length,ci};
 }
 
 // ---------- cerca de la ciudad ----------
@@ -2724,27 +2933,37 @@ function studyCerca(B){
   const rows=rowsAll().filter(r=>r[F.pobVar20]!=null&&r[F.distCiudad]!=null&&(r[F.pop]||0)>=200&&(r[F.pop]||0)<20000&&r[F.distCiudad]>0);
   const bands=[[0,15,"Menos de 15 km"],[15,30,"15 a 30 km"],[30,50,"30 a 50 km"],[50,80,"50 a 80 km"],[80,1e9,"Más de 80 km"]];
   const wm=(rs,k)=>{ const s=rs.filter(r=>r[F[k]]!=null&&r[F.pop]); const w=d3.sum(s,r=>r[F.pop]); return w?d3.sum(s,r=>r[F[k]]*r[F.pop])/w:null; };
+  const um=(rs,k)=>{ const s=rs.filter(r=>r[F[k]]!=null); return s.length?d3.mean(s,r=>r[F[k]]):null; };
   const share=rs=>rs.filter(r=>r[F.pobVar20]>0).length/rs.length*100;
-  const B5=bands.map(([a,b,l])=>{ const s=rows.filter(r=>r[F.distCiudad]>=a&&r[F.distCiudad]<b); return {l,n:s.length,g:wm(s,"pobVar20"),sh:share(s),edad:wm(s,"edad")}; });
+  const B5=bands.map(([a,b,l])=>{ const s=rows.filter(r=>r[F.distCiudad]>=a&&r[F.distCiudad]<b); return {l,n:s.length,g:wm(s,"pobVar20"),gu:um(s,"pobVar20"),sh:share(s),edad:wm(s,"edad"),ext:um(s,"migExtT"),int:um(s,"migIntT")}; });
   const EF={prov:"",min:200,max:20000};
-  const base=withEXF(EF,()=>partialR("distCiudad","pobVar20",[],false)), c1=withEXF(EF,()=>partialR("distCiudad","pobVar20",["lpop","edad"],false)), c2=withEXF(EF,()=>partialR("distCiudad","pobVar20",["lpop","edad","renta","prov"],false));
+  const run=cs=>withEXF(EF,()=>partialRCI("distCiudad","pobVar20",cs,false));
+  const base=run([]), c1=run(["lpop","edad19"]), c2=run(["lpop","edad19","renta19","prov"]), c2p=run(["lpop","edad19","renta19"]), cprov=run(["prov"]);
   const coast=rows.filter(r=>r[F.distCosta]===0), inland=rows.filter(r=>r[F.distCosta]>0);
+  const cc0=withEXF(EF,()=>partialRCI("distCosta","pobVar20",[],false)), cc1=withEXF(EF,()=>partialRCI("distCosta","pobVar20",["lpop","edad19","renta19","prov"],false));
   finding(B,"La pregunta",`<p>Desde 2020 se habla de la vuelta al pueblo: teletrabajo, alquileres imposibles en la ciudad, ganas de espacio. Pero ¿a qué pueblos? Si la gente se va a vivir fuera sin dejar de trabajar en la ciudad, deberían crecer sobre todo los que quedan cerca. Medimos la distancia en línea recta de cada municipio a la ciudad de más de 100.000 habitantes más próxima.</p>`);
-  const s2=finding(B,`Cerca de una ciudad crecen ${nf0.format(B5[0].sh)} de cada 100 pueblos; a más de 80 km, ${nf0.format(B5[4].sh)}`,`<p>Municipios de menos de 20.000 habitantes, agrupados por su distancia a una ciudad grande. Cuanto más lejos, menos crecen.</p>`);
+  const s2=finding(B,`Cerca de una ciudad crecen ${nf0.format(B5[0].sh)} de cada 100 pueblos; a más de 80 km, ${nf0.format(B5[4].sh)}`,`<p>Municipios de 200 a 20.000 habitantes, agrupados por su distancia a una ciudad grande. Cuanto más lejos, menos pueblos crecen. El crecimiento medio también cae con la distancia, con una excepción: ${B5[1].g>B5[0].g?`los pueblos de 15 a 30 km crecen de media algo más que los de menos de 15 km (${sgn(B5[1].g)} frente a ${sgn(B5[0].g)}), porque entre los más cercanos pesan mucho algunos municipios grandes del cinturón de las ciudades que ya no crecen`:"ninguna"}.</p>`);
   const g=add(s2,"div","cols2");
-  const fa=fig(g,{title:"Pueblos que han ganado población desde 2020",source:"% de municipios de cada grupo. Fuente: INE, padrón 2020–2025; distancia calculada en Indicio."});
+  const fa=fig(g,{title:"Pueblos que han ganado población desde 2020",source:"% de municipios de cada grupo (cada pueblo cuenta igual). Fuente: INE, padrón 2020–2025; distancia calculada en Indicio."});
   hbars(fa.body,B5.map(b=>({l:b.l,v:b.sh})),{fmt:pc0,color:"--olive",min:0,max:100});
-  const fb=fig(g,{title:"Crecimiento medio de la población, 2020–2025",source:"Media ponderada por población."});
+  const fb=fig(g,{title:"Crecimiento medio de la población, 2020–2025",source:"Media ponderada por población (cada persona cuenta igual). Sin ponderar: "+B5.map(b=>`${b.l.toLowerCase()} ${sgn(b.gu)}`).join(", ")+"."});
   hbars(fb.body,B5.map(b=>({l:b.l,v:b.g})),{fmt:sgn,color:"--rust"});
-  const s3=finding(B,"¿Es la distancia, o es que los pueblos lejanos son más viejos?",`<p>Los pueblos alejados tienen también más edad media (${nf1.format(B5[4].edad)} años, frente a ${nf1.format(B5[0].edad)} cerca de las ciudades), y la edad por sí sola hace que un pueblo pierda gente. Así que comparamos entre pueblos iguales:</p>`);
-  const rws=[["Sin descontar nada",base],["A igual tamaño y edad",c1],["… y a igual renta, dentro de cada provincia",c2]].filter(x=>x[1]);
-  add(s3,"div",null,`<table class="glance" style="max-width:600px"><thead><tr><th>Comparación</th><th class="r">Relación (r)</th></tr></thead><tbody>${rws.map(([l,c])=>`<tr><td>${l}</td><td class="r num"><b>${rFmt(c.r)}</b></td></tr>`).join("")}</tbody></table>`);
-  add(s3,"p",null,c2&&Math.abs(c2.r)>=Math.abs(base.r)*0.5?`La relación aguanta: incluso entre pueblos de la misma edad, tamaño y renta, los que están más lejos de una ciudad crecen menos.`:`La relación se debilita mucho: buena parte de lo que parecía efecto de la distancia era la edad de los pueblos alejados.`).style.cssText="max-width:680px;margin-top:10px;font-weight:600";
-  finding(B,"¿Y la costa?",`<p>Los municipios con costa han crecido de media un ${sgn(wm(coast,"pobVar20"))} desde 2020; los de interior, un ${sgn(wm(inland,"pobVar20"))}. Han ganado población ${nf0.format(share(coast))} de cada 100 pueblos costeros y ${nf0.format(share(inland))} de cada 100 de interior.</p>`);
+  const s3=finding(B,"¿Es la distancia, o es que los pueblos lejanos son más viejos?",`<p>Los pueblos alejados tienen también más edad media (${nf1.format(B5[4].edad)} años, frente a ${nf1.format(B5[0].edad)} cerca de las ciudades), y la edad por sí sola hace que un pueblo pierda gente. Así que comparamos entre pueblos iguales. La comparación que importa es <b>dentro de cada provincia</b>: la «ciudad grande» de un pueblo de Soria no es la de uno de Madrid, y comparar distancias entre provincias mezcla cosas muy distintas.</p>`);
+  const rws=[["Sin descontar nada",base],["Dentro de cada provincia",cprov],["A igual tamaño y edad",c1],["A igual tamaño, edad y renta",c2p],["… y dentro de cada provincia",c2]].filter(x=>x[1]);
+  add(s3,"div",null,`<table class="glance" style="max-width:640px"><thead><tr><th>Comparación</th><th class="r">Relación (r)</th></tr></thead><tbody>${rws.map(([l,c])=>`<tr><td>${l}</td><td class="r num"><b>${rFmt(c.r)}</b>${ciFmt(c.ci)}</td></tr>`).join("")}</tbody></table>`);
+  add(s3,"p",null,c2&&Math.abs(c2.r)>=Math.abs(base.r)*0.5?`La relación aguanta: incluso entre pueblos de la misma edad, tamaño y renta, los que están más lejos de una ciudad crecen menos.`:`La relación se debilita mucho: buena parte de lo que parecía efecto de la distancia era la edad de los pueblos alejados. Queda una relación pequeña (${rCI(c2)}) que ${ciZero(c2)?"los datos no distinguen de cero":"sigue siendo distinguible de cero"}.`).style.cssText="max-width:680px;margin-top:10px;font-weight:600";
+  add(s3,"p",null,`Nótese que al añadir la renta y la provincia la relación ${c2&&c1&&Math.abs(c2.r)>Math.abs(c1.r)?"sube un poco respecto a descontar solo tamaño y edad":"baja"}: ${c2&&c1&&Math.abs(c2.r)>Math.abs(c1.r)?"comparar solo dentro de cada provincia quita el ruido de comparar Soria con Madrid. Por eso la cifra de referencia es la última fila, no la anterior.":"la edad es lo que más explica."}`).style.cssText="max-width:680px;margin-top:6px";
+  // quién llega
+  const s4=finding(B,`¿Quién llega? ${B5[0].int>B5[4].int*2?"De otras partes de España, solo cerca de las ciudades; del extranjero, en todas partes":"Del extranjero y de otras partes de España"}`,`<p>La Estadística de Migraciones permite separar el saldo con el extranjero del saldo con el resto de España (2021–2024, por cada 1.000 habitantes y año, media simple de los pueblos de cada grupo). El saldo con el resto de España cae con la distancia: ${nf1.format(B5[0].int)} por mil al año a menos de 15 km, ${nf1.format(B5[4].int)} a más de 80. Ese es el rastro de la «vuelta al pueblo» desde la ciudad, y se queda cerca. El saldo con el extranjero es positivo en todas las distancias${B5[4].ext>B5[0].ext?` y, de hecho, mayor lejos de las ciudades (${nf1.format(B5[4].ext)} frente a ${nf1.format(B5[0].ext)})`:""}: es lo que sostiene a muchos pueblos alejados.</p>`);
+  const fm=fig(s4,{title:"Saldo migratorio anual por cada 1.000 habitantes, 2021–2024",source:"Media simple de los municipios de cada grupo. Fuente: INE, Estadística de Migraciones y Cambios de Residencia."});
+  const w=add(fm.body,"div","cmp"); const mx=d3.max(B5,b=>Math.max(Math.abs(b.ext),Math.abs(b.int)))||1;
+  w.innerHTML=`<div class="keys"><span><i style="background:var(--rust)"></i>Con el resto de España</span><span><i style="background:var(--slate)"></i>Con el extranjero</span></div>`+B5.map(b=>`<div class="cmp-row"><div class="n">${b.l}</div><div class="bars">${[[b.int,"--rust"],[b.ext,"--slate"]].map(([v,c])=>`<div class="b"><span style="width:${Math.abs(v)/mx*100}%;background:var(${c})"></span><em>${(v>0?"+":"")+nf1.format(v)}</em></div>`).join("")}</div></div>`).join("");
+  finding(B,"¿Y la costa?",`<p>Los municipios con costa han crecido de media un ${sgn(wm(coast,"pobVar20"))} desde 2020; los de interior, un ${sgn(wm(inland,"pobVar20"))}. Han ganado población ${nf0.format(share(coast))} de cada 100 pueblos costeros y ${nf0.format(share(inland))} de cada 100 de interior. Pero la costa también es más joven y más rica: entre pueblos de la misma provincia, tamaño, edad y renta, la relación entre distancia a la costa y crecimiento pasa de ${cc0?rFmt(cc0.r):"—"} a ${cc1?rFmt(cc1.r)+ciFmt(cc1.ci):"—"}${cc1&&ciZero(cc1)?": se queda en nada":""}.</p>`);
   finding(B,"Qué se puede concluir y qué no",`<ul class="defs"><li><b>La distancia es en línea recta,</b> no en tiempo de viaje. Un pueblo a 40 km con tren de cercanías está «más cerca» que uno a 25 km por una carretera de montaña.</li>
-    <li><b>No sabemos quién llega.</b> El crecimiento puede venir de familias que salen de la ciudad o de inmigración extranjera, que también se concentra en el área de influencia de las ciudades.</li>
+    <li><b>La «vuelta al pueblo» desde la ciudad existe, pero se queda a menos de 30 km;</b> lo que llega a los pueblos lejanos es sobre todo inmigración extranjera, que no depende de la distancia a una ciudad.</li>
     <li><b>Es un periodo corto</b> y con la pandemia en medio. Habrá que ver si se mantiene.</li></ul>
     <p style="margin-top:10px">${exLink("cruce",{d:["distCiudad","pobVar20"],t:"s2",c:["edad"]},"Ponlo a prueba en el laboratorio")}</p>`);
+  ficha(B,[["Unidad",`${nf0.format(rows.length)} municipios de 200 a 20.000 habitantes`],["Variables","X: distancia en línea recta a la ciudad de más de 100.000 habitantes más cercana. Y: cambio del padrón 2020–2025. Controles medidos antes del periodo: log del padrón, edad media y renta por persona de 2019 (Atlas de Renta), provincia"],["Ponderación","Las correlaciones no van ponderadas (cada pueblo cuenta igual); el gráfico de crecimiento medio sí, y en su pie se dan las medias sin ponderar"],["Modelo",FICHA_R]]);
 }
 function studyVotar(B){
   const k=VG(), rows=rowsAll().filter(r=>r[F.part]!=null&&r[F.pop]);
@@ -2752,23 +2971,198 @@ function studyVotar(B){
   const wm=(rs,kk)=>{ const s=rs.filter(r=>r[F[kk]]!=null&&r[F.pop]); const w=d3.sum(s,r=>r[F.pop]); return w?d3.sum(s,r=>r[F[kk]]*r[F.pop])/w:null; };
   const B5=bands.map(([a,b,l])=>{ const s=rows.filter(r=>r[F.pop]>=a&&r[F.pop]<b); return {l:l+" hab.",p:wm(s,"part"),e:wm(s,"edad")}; });
   const EF={prov:"",min:0,max:Infinity};
-  const sz0=withEXF(EF,()=>lpopPartial("part",[])), sz1=withEXF(EF,()=>lpopPartial("part",["edad"])), sz2=withEXF(EF,()=>lpopPartial("part",["edad","renta"]));
-  const ed0=withEXF(EF,()=>partialR("edad","part",["prov"],false)), ed1=withEXF(EF,()=>partialR("edad","part",["lpop","prov"],false));
+  const sz0=withEXF(EF,()=>lpopPartial("part",[])), sz1=withEXF(EF,()=>lpopPartial("part",["edad"])), sz2=withEXF(EF,()=>lpopPartial("part",["edad","renta"])), sz3=withEXF(EF,()=>lpopPartial("part",["mayores65","renta"]));
+  const ed0=withEXF(EF,()=>partialRCI("edad","part",["prov"],false)), ed1=withEXF(EF,()=>partialRCI("edad","part",["lpop","prov"],false));
+  const m0=withEXF(EF,()=>partialRCI("mayores65","part",["prov"],false)), m1=withEXF(EF,()=>partialRCI("mayores65","part",["lpop","prov"],false));
+  // cambios dentro de cada municipio, 2019 → 2023: lo fijo del lugar desaparece
+  const ch0=withEXF(EF,()=>lpopPartial("partCambio",[])), ch1=withEXF(EF,()=>lpopPartial("partCambio",["edadCambio"]));
+  const rowsCh=withEXF(EF,()=>rowsAll().filter(r=>exOK(r)&&r[F.partCambio]!=null&&r[F.pop]));
+  const chB=bands.map(([a,b,l])=>{ const s=rowsCh.filter(r=>r[F.pop]>=a&&r[F.pop]<b); return {l:l+" hab.",v:wm(s,"partCambio")}; });
   finding(B,"La pregunta",`<p>En las ${ELNAME(k)}, en los pueblos de menos de 500 habitantes votó el ${pc(B5[0].p)} del censo; en las ciudades de más de 50.000, el ${pc(B5[4].p)}. Hay dos explicaciones posibles: en un pueblo todo el mundo se conoce y votar es casi un acto social, o simplemente en los pueblos hay más gente mayor, y los mayores votan más en todas partes.</p>`);
   const s2=finding(B,"Participación y edad, según el tamaño",`<p>Cuanto más pequeño el municipio, más se vota y más mayor es su población. Las dos cosas van juntas, así que hay que separarlas.</p>`);
   const g=add(s2,"div","cols2");
   const fa=fig(g,{title:`Participación, ${ELSHORT(k)}`,source:"% del censo. Fuente: Ministerio del Interior."}); hbars(fa.body,B5.map(b=>({l:b.l,v:b.p})),{fmt:pc,color:"--slate",min:0,max:100});
   const fb=fig(g,{title:"Edad media",source:"Fuente: INE, Atlas de Renta."}); hbars(fb.body,B5.map(b=>({l:b.l,v:b.e})),{fmt:v=>nf1.format(v)+NB+"años",color:"--mustard",min:0});
   const s3=finding(B,"El método: comparar pueblos de la misma edad",`<p>Medimos la relación entre el tamaño del municipio y la participación tres veces: sin más, entre municipios con la misma edad media, y además con la misma renta. Y al revés: la relación entre edad y participación entre municipios del mismo tamaño. Todo dentro de cada provincia.</p>`);
-  add(s3,"div",null,`<table class="glance" style="max-width:640px"><thead><tr><th>Relación con la participación</th><th class="r">r</th></tr></thead><tbody>
-    ${[["Tamaño (cuanto más grande…)",sz0],["Tamaño, a igual edad",sz1],["Tamaño, a igual edad y renta",sz2],["Edad media",ed0],["Edad media, a igual tamaño",ed1]].filter(x=>x[1]).map(([l,c])=>`<tr><td>${l}</td><td class="r num"><b>${rFmt(c.r)}</b></td></tr>`).join("")}</tbody></table>`);
+  add(s3,"div",null,`<table class="glance" style="max-width:680px"><thead><tr><th>Relación con la participación</th><th class="r">r</th></tr></thead><tbody>
+    ${[["Tamaño (cuanto más grande…)",sz0],["Tamaño, a igual edad media",sz1],["Tamaño, a igual edad media y renta",sz2],["Tamaño, a igual % de mayores de 65 y renta",sz3],["Edad media",ed0],["Edad media, a igual tamaño",ed1],["% de mayores de 65",m0],["% de mayores de 65, a igual tamaño",m1]].filter(x=>x[1]).map(([l,c])=>`<tr><td>${l}</td><td class="r num"><b>${rFmt(c.r)}</b>${ciFmt(c.ci)}</td></tr>`).join("")}</tbody></table>`);
+  add(s3,"p",null,`La edad media mezcla dos cosas (pocos niños y muchos mayores); el porcentaje de mayores de 65 es la medida más directa de «población mayor», y da ${m1&&ed1&&Math.abs(m1.r)>Math.abs(ed1.r)?"una relación algo más fuerte":"una relación parecida"}.`).style.cssText="max-width:680px;margin-top:8px;font-size:14.5px;color:var(--ink-2)";
   const keep=sz0&&sz2?Math.abs(sz2.r)/Math.abs(sz0.r):null;
+  // cambios 2019 → 2023
+  const s3b=finding(B,"Otra prueba: cómo cambió la participación de 2019 a 2023 en cada municipio",`<p>Entre las generales de noviembre de 2019 y las de julio de 2023 la participación ${REFS&&VREFS.es["02202307"].turnout>VREFS.es["02201911"].turnout?"subió":"bajó"} en España. Mirando el <b>cambio</b> dentro de cada municipio desaparece todo lo que es fijo del lugar (su cultura de voto, su censo inflado). Si los pueblos pequeños votan más por ser pequeños, cabe esperar que su participación aguante mejor en una elección en pleno julio.</p>`);
+  const fc=fig(s3b,{title:"Cambio de la participación, 2019 → 2023, según el tamaño",source:"Puntos de participación sobre el censo, media ponderada. Fuente: Ministerio del Interior."});
+  hbars(fc.body,chB.map(b=>({l:b.l,v:b.v})),{fmt:v=>pts(v)+" pts",color:"--plum"});
+  add(s3b,"p",null,`Relación entre el tamaño y el cambio de participación, dentro de cada provincia: ${ch0?rCI(ch0):"—"}${ch1?`; descontando cómo cambió la edad media, ${rCI(ch1)}`:""}. ${ch0&&!ciZero(ch0)&&ch0.r<0?"Los pequeños aguantaron mejor: refuerza que el tamaño importa por sí mismo.":ch0&&!ciZero(ch0)?"Los grandes recuperaron más participación en 2023: lo que vimos arriba puede ser en parte un rasgo fijo de cada lugar, no del tamaño.":"Los datos no distinguen el cambio de participación por tamaño."}`).style.cssText="max-width:680px;margin-top:8px";
   finding(B,"El resultado",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">${keep==null?"":keep>=0.6?`Las dos cosas cuentan, pero el tamaño pesa por sí solo: incluso entre municipios de la misma edad y renta, cuanto más pequeño, más se vota.`:keep>=0.3?`Una parte es la edad, pero no toda: entre municipios de la misma edad y renta, los pequeños siguen votando algo más.`:`Casi todo es la edad: entre municipios de la misma edad y renta, el tamaño apenas importa.`}</p>
     <ul class="defs"><li><b>El censo de los pueblos pequeños puede estar «inflado»</b> con gente empadronada que vive fuera y no vota, lo que bajaría su participación. Aun así votan más.</li>
     <li><b>Son datos de municipios, no de personas.</b> No dicen que cada persona mayor vote más, sino que los municipios con más edad media tienen más participación.</li>
     <li><b>Sin voto exterior:</b> los residentes en el extranjero no están en estos datos.</li></ul>
     <p style="margin-top:10px">${exLink("cruce",{d:["densidad","part"],t:"",c:["edad"],lx:1},"Ponlo a prueba en el laboratorio")}</p>`);
+  ficha(B,[["Unidad",`${nf0.format(rows.length)} municipios con datos de participación`],["Variables",`Participación sobre el censo en las ${ELNAME(k)}; tamaño en log del padrón; edad media y % de mayores de 65 (Atlas de Renta, 2023); renta por persona (2024). Cambio 2019–2023: puntos de participación entre las generales de noviembre de 2019 y julio de 2023`],["Ponderación","Las correlaciones no van ponderadas; las medias por tamaño sí"],["Modelo",FICHA_R]]);
 }
+// =====================================================================
+// ESTUDIOS NUEVOS (auditoría 2026): renta por fuentes, quién gobierna (discontinuidad), AVE, prohibir pisos turísticos
+// =====================================================================
+const km=(a,b)=>{ const R=6371, dLat=(b[1]-a[1])*Math.PI/180, dLon=(b[0]-a[0])*Math.PI/180, x=Math.sin(dLat/2)**2+Math.cos(a[1]*Math.PI/180)*Math.cos(b[1]*Math.PI/180)*Math.sin(dLon/2)**2; return 2*R*Math.asin(Math.sqrt(x)); };
+// quintiles de población según una variable
+function quintiles(rows,val,w=r=>r[F.pop]){ const s=rows.slice().sort((a,b)=>val(a)-val(b)), tot=d3.sum(s,w); let acc=0; const G=[[],[],[],[],[]]; s.forEach(r=>{ G[Math.min(4,Math.floor((acc+w(r)/2)/tot*5))].push(r); acc+=w(r); }); return G; }
+// gemelos: para cada tratado, el candidato más cercano en las variables dadas (estandarizadas), sin repetir
+function matchTwins(treated,pool,feat,{maxD=1.2}={}){
+  const all=treated.concat(pool), K=feat(all[0]).length, sd=Array.from({length:K},(_,k)=>d3.deviation(all,r=>feat(r)[k])||1);
+  const used=new Set(), out=[];
+  treated.forEach(t=>{ const ft=feat(t); let best=null; pool.forEach(c=>{ if(used.has(c)) return; const fc=feat(c); const d=Math.sqrt(d3.sum(ft,(v,k)=>((v-fc[k])/sd[k])**2)); if(!best||d<best.d) best={d,c}; }); if(best&&best.d<=maxD){ used.add(best.c); out.push({t,c:best.c,d:best.d}); } });
+  return out;
+}
+// tabla sencilla
+function table(parent,head,rows,{max=760}={}){ const t=add(parent,"div","extable"); t.innerHTML=`<table class="glance" style="max-width:${max}px"><thead><tr>${head.map((h,i)=>`<th${i?' class="r"':""}>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td${i?' class="r num"':""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`; return t; }
+
+// ---------- renta por fuentes: ¿quién ha subido la renta de los pueblos pobres? ----------
+function studyFuentes(B){
+  const Y=SER.years, NS=SER.fuentes.length, iy=y=>Y.indexOf(y), LAB=["Salarios","Pensiones","Prestaciones por desempleo","Otras prestaciones (IMV, ayudas…)","Otros ingresos (capital, autónomos…)"], COL=["--rust","--slate","--mustard","--plum","--stone"];
+  // euros por persona de cada fuente y año (renta × %)
+  const M=[]; SER.rows.forEach(r=>{ const re=r[SF.renta], fu=r[SF.fuentes], x=BYCODE.get(r[0]); if(!re||!fu||!x||(x[F.pop]||0)<1000) return; const ok=[2015,2019,2023].every(y=>re[iy(y)]&&fu.every(f=>f[iy(y)]!=null)); if(!ok) return;
+    M.push({code:r[0],prov:r[1],pop:x[F.pop],re,eur:fu.map(f=>re.map((v,i)=>v&&f[i]!=null?v*f[i]/100:null))}); });
+  const G=quintiles(M,m=>m.re[iy(2015)],m=>m.pop), gl=["20 % más pobre en 2015","Segundo 20 %","20 % central","Cuarto 20 %","20 % más rico en 2015"];
+  const wmean=(g,fn)=>d3.sum(g,m=>fn(m)*m.pop)/d3.sum(g,m=>m.pop);
+  // contribución de cada fuente al crecimiento 2015–2023, en puntos de la renta de 2015
+  const contrib=(g,y0,y1)=>{ const base=wmean(g,m=>m.re[iy(y0)]); return {tot:(wmean(g,m=>m.re[iy(y1)])/base-1)*100, parts:Array.from({length:NS},(_,k)=>(wmean(g,m=>m.eur[k][iy(y1)])-wmean(g,m=>m.eur[k][iy(y0)]))/base*100)}; };
+  const C=G.map(g=>contrib(g,2015,2023));
+  // tres golpes: SMI 2019, prestaciones 2020, pensiones 2023. Para cada uno, relación entre la exposición y el salto de esa fuente, en el año del golpe y en los demás (placebo)
+  const yrsG=Y.slice(1,9); // 2016..2023
+  const jumpR=(k,expo,y)=>{ const pts=M.map(m=>{ const a=m.eur[k][iy(y)-1], b=m.eur[k][iy(y)]; return a&&b!=null?{r:m,x:expo(m),y:(b-a)/m.re[iy(y)-1]*100,w:m.pop}:null; }).filter(Boolean); const g=pts.map(p=>p.r.prov), w=pts.map(p=>p.w); const X=demeanBy(pts.map(p=>p.x),g,w), YY=demeanBy(pts.map(p=>p.y),g,w); const c=wcorr(X.map((v,i)=>({x:v,y:YY[i],w:w[i]}))); return c?c.r:null; };
+  const SH=[{n:"Subida del salario mínimo (+22 % en 2019)",k:0,y:2019,expo:m=>-m.re[iy(2018)],el:"menor renta en 2018"},{n:"Prestaciones de la pandemia e Ingreso Mínimo Vital (2020)",k:2,y:2020,expo:m=>-m.re[iy(2019)],el:"menor renta en 2019"},{n:"Revalorización de las pensiones con el IPC (+8,5 % en 2023)",k:1,y:2023,expo:m=>m.eur[1][iy(2022)]/m.re[iy(2022)],el:"mayor peso de las pensiones en 2022"}];
+  SH.forEach(h=>{ h.rows=yrsG.map(y=>({y,r:jumpR(h.k,h.expo,y)})); h.real=h.rows.find(x=>x.y===h.y).r; h.pl=placeboRank(h.real,h.rows.filter(x=>x.y!==h.y).map(x=>x.r)); });
+  finding(B,"La pregunta",`<p>Los municipios pobres han crecido en renta más que los ricos desde 2015 (<a href="/preguntas/convergencia/">lo medimos aquí</a>). La pregunta siguiente es <b>de dónde ha salido ese dinero</b>: ¿de que la gente gana más en el trabajo, o de pensiones y prestaciones que suben por ley y pesan más donde la renta es baja? El Atlas de Renta del INE reparte la renta de cada municipio en cinco fuentes, y eso permite contestar.</p>`);
+  finding(B,"El método: descomponer el crecimiento, y buscar los tres golpes",`<p>Para cada municipio se calcula cuántos euros por persona vienen de salarios, pensiones, paro, otras prestaciones y otros ingresos, cada año de 2015 a 2023. Agrupando los municipios en cinco quintos según su renta de 2015, el crecimiento de cada grupo se reparte entre las fuentes. Después se buscan tres medidas concretas con fecha: la subida del salario mínimo de 2019, las prestaciones de 2020 (ERTE, paro, Ingreso Mínimo Vital) y la revalorización de las pensiones de 2023. Si una medida explica la convergencia, el salto de <i>esa</i> fuente en <i>ese</i> año tiene que ser mayor donde más expuestos estaban, y no en los otros años (que sirven de placebo).</p>`);
+  const s3=finding(B,"Quién puso el dinero en cada grupo",`<p>Crecimiento de la renta por persona entre 2015 y 2023, en % de la renta de 2015, repartido entre las cinco fuentes. ${C[0].parts[1]+C[0].parts[3]>C[4].parts[1]+C[4].parts[3]?`En el quinto más pobre, pensiones y otras prestaciones aportan ${nf0.format(C[0].parts[1]+C[0].parts[3])} puntos de los ${nf0.format(C[0].tot)} de crecimiento; en el más rico, ${nf0.format(C[4].parts[1]+C[4].parts[3])} de ${nf0.format(C[4].tot)}.`:""} ${C[0].parts[0]>C[4].parts[0]?`Pero los salarios también aportan más en los pobres (${nf0.format(C[0].parts[0])} puntos frente a ${nf0.format(C[4].parts[0])}): no es solo transferencia.`:`Los salarios aportan parecido o menos en los pobres (${nf0.format(C[0].parts[0])} puntos frente a ${nf0.format(C[4].parts[0])}): la convergencia es sobre todo transferencia.`}</p>`);
+  const f=fig(s3,{title:"De dónde viene el crecimiento de la renta, 2015–2023",source:"Municipios de 1.000 habitantes o más, en cinco grupos con la misma población según la renta de 2015. Puntos de la renta de 2015. Fuente: INE, Atlas de Distribución de Renta de los Hogares (renta por fuentes)."});
+  const mx=d3.max(C,c=>d3.sum(c.parts,v=>Math.max(0,v)))||1;
+  const w=add(f.body,"div","cmp"); w.innerHTML=`<div class="keys">${LAB.map((l,k)=>`<span><i style="background:var(${COL[k]})"></i>${l}</span>`).join("")}</div>`+C.map((c,i)=>`<div class="cmp-row"><div class="n">${gl[i]}<small>${sgn(c.tot)} en total</small></div><div class="bars"><div class="b" style="display:flex;gap:1px;height:16px;align-items:stretch">${c.parts.map((v,k)=>v>0?`<span style="width:${v/mx*100}%;background:var(${COL[k]});display:block" title="${LAB[k]}: ${pts(v)} puntos"></span>`:"").join("")}</div></div></div>`).join("");
+  table(s3,["Fuente","20 % más pobre","20 % más rico"],LAB.map((l,k)=>[l,pts(C[0].parts[k])+" pts",pts(C[4].parts[k])+" pts"]).concat([["<b>Total</b>","<b>"+sgn(C[0].tot)+"</b>","<b>"+sgn(C[4].tot)+"</b>"]]),{max:560});
+  const s4=finding(B,"Tres medidas con fecha",`<p>Para cada medida: relación (dentro de cada provincia, ponderada por población) entre lo expuesto que estaba cada municipio y cuánto saltó esa fuente de renta en el año de la medida, en puntos de la renta del año anterior. Y lo mismo en los demás años, como placebo.</p>`);
+  SH.forEach(h=>{ const mxr=d3.max(h.rows,x=>Math.abs(x.r||0))||1; const ff=fig(s4,{title:h.n,source:`Relación entre ${h.el} y el salto de «${low(LAB[h.k])}» en cada año. En granate, el año de la medida.`});
+    hbars(ff.body,h.rows.map(x=>({l:String(x.y),v:x.r,c:x.y===h.y?"--rust":"--stone"})),{fmt:v=>rFmt(v)});
+    add(s4,"p",null,`${h.y}: r = ${rFmt(h.real)}. ${h.pl?(h.pl.below===h.pl.n?"Es el año con la relación más fuerte de toda la serie: la medida llegó donde más falta hacía.":h.pl.share>=0.75?"Está entre los años con relación más fuerte, pero no es único.":"No destaca frente a los otros años: la medida no se ve en estos datos, o se diluye entre otras cosas que pasaron ese año."):""}`).style.cssText="max-width:680px;margin:-6px 0 14px;font-size:14.5px"; });
+  finding(B,"Qué se puede concluir y qué no",`<ul class="defs">
+    <li><b>Las pensiones y las prestaciones explican una parte grande de la convergencia,</b> pero los salarios también suben más en los municipios pobres: parte es política de rentas y parte es mercado de trabajo (y el salario mínimo está en medio de las dos).</li>
+    <li>${(()=>{ const hit=SH.filter(h=>h.pl&&h.pl.share>=0.75), miss=SH.filter(h=>!(h.pl&&h.pl.share>=0.75)); return `<b>${hit.length?`Dejan huella: ${hit.map(h=>h.n.toLowerCase()).join("; ")}.`:"Ninguna de las tres medidas deja una huella clara."}</b> ${miss.length?`${cap(miss.map(h=>h.n.toLowerCase()).join("; "))}: ${miss.length>1?"no destacan":"no destaca"} frente a los otros años, porque la medida afectó a casi todos por igual o se mezcló con otras cosas.`:""} Son saltos de un año concreto en la fuente concreta, lo más parecido a una huella que permiten estos datos.`; })()}</li>
+    <li><b>La renta del Atlas es renta declarada,</b> y «otros ingresos» mezcla capital y actividades por cuenta propia. Un municipio puede cambiar de renta también porque cambia quién vive en él.</li>
+    <li><b>El Atlas de 2024 todavía no trae el reparto por fuentes,</b> así que el estudio llega hasta 2023.</li></ul>`);
+  ficha(B,[["Unidad",`${nf0.format(M.length)} municipios de 1.000 habitantes o más con renta por fuentes completa en 2015, 2019 y 2023`],["Variables","Renta neta media por persona (Atlas) multiplicada por el % de cada fuente = euros por persona y fuente. Grupos: quintiles de población por renta de 2015"],["Golpes","Salario mínimo 2019: exposición = renta de 2018 (negativa); prestaciones 2020: renta de 2019 (negativa); pensiones 2023: peso de las pensiones en 2022. Resultado: salto de la fuente en el año, en % de la renta del año anterior. Placebo: los demás años 2016–2023"],["Ponderación","Por población"],["Modelo",FICHA_R]]);
+}
+
+// ---------- ¿importa quién gobierna? discontinuidad en las municipales de 2019 ----------
+function studyGobierna(B){
+  const OUT=[["pobVar1925","Población, 2019 → 2025"],["paroVar1923","Paro registrado, 2019 → 2023"],["rentaVar1923","Renta por persona, 2019 → 2023"],["dchaCambio","Voto a PP y Vox en las generales, 2019 → 2023 (puntos)"]];
+  // municipios donde PP y PSOE fueron las dos listas más votadas en 2019
+  const M=[]; SER.rows.forEach(r=>{ const m=r[SF.mun]&&r[SF.mun][0], x=BYCODE.get(r[0]); if(!m||!x||(x[F.pop]||0)<250) return; const fam=m.map(l=>l[0]); if(!(fam.includes("PP")&&fam.includes("PSOE"))) return; const pp=m.find(l=>l[0]==="PP")[1], ps=m.find(l=>l[0]==="PSOE")[1]; M.push({code:r[0],row:x,m:ps-pp,win:ps>pp?"PSOE":"PP"}); });
+  const H=10; // ventana: ±10 puntos
+  const W=M.filter(d=>Math.abs(d.m)<=H);
+  // salto en el corte: rectas distintas a cada lado (ajuste por mínimos cuadrados, sin ponderar), dentro de la ventana
+  const fitLine=pts=>{ const n=pts.length, mx=d3.mean(pts,p=>p.x), my=d3.mean(pts,p=>p.y); let sxy=0,sxx=0; pts.forEach(p=>{ sxy+=(p.x-mx)*(p.y-my); sxx+=(p.x-mx)**2; }); const b=sxx?sxy/sxx:0; return {a:my-b*mx,b,n}; };
+  const jumpAt=(pts,c)=>{ const L=pts.filter(p=>p.x<c&&p.x>=c-H), R=pts.filter(p=>p.x>=c&&p.x<=c+H); if(L.length<30||R.length<30) return null; const l=fitLine(L), r=fitLine(R); return {j:(r.a+r.b*c)-(l.a+l.b*c),l,r,nL:L.length,nR:R.length}; };
+  const res=OUT.map(([k,l])=>{ const pts=M.filter(d=>d.row[F[k]]!=null).map(d=>({x:d.m,y:d.row[F[k]]})); const j=jumpAt(pts,0); const ci=j?bootCI(pts,s=>{ const q=jumpAt(s,0); return q?q.j:null; },{B:200}):null;
+    const pl=[-6,-4,4,6].map(c=>{ const q=jumpAt(pts,c); return q?q.j:null; }).filter(v=>v!=null);
+    const naive=(()=>{ const A=M.filter(d=>d.win==="PSOE"&&d.row[F[k]]!=null), Bq=M.filter(d=>d.win==="PP"&&d.row[F[k]]!=null); return d3.mean(A,d=>d.row[F[k]])-d3.mean(Bq,d=>d.row[F[k]]); })();
+    return {k,l,pts,j,ci,pl,naive}; });
+  const fmtJ=(k,v)=>v==null?"—":(k==="dchaCambio"?pts(v)+" pts":pts(v)+" pts");
+  finding(B,"La pregunta",`<p>¿Cambia algo en un municipio según qué partido gane las elecciones? Comparar los municipios gobernados por unos y por otros no sirve: el PP gana donde ya había más renta y el PSOE donde había más paro, y eso ya estaba antes de votar. Hace falta algo más parecido a un experimento.</p>`);
+  finding(B,"El método: elecciones ajustadas como experimento",`<p>Entre los municipios donde PP y PSOE fueron las dos listas más votadas en las municipales de 2019, los que se decidieron por un puñado de votos son <b>casi iguales en todo</b> salvo en quién ganó: que ganara uno u otro fue, en la práctica, cuestión de suerte. Comparando los que ganó el PSOE por poco con los que ganó el PP por poco, la diferencia en lo que pasó después es atribuible al ganador. Es una <b>discontinuidad</b>: se ajusta una recta a cada lado del empate (ventana de ±${H} puntos) y se mide el salto en el cero. Se comprueba además que no hay saltos parecidos en cortes falsos (±4 y ±6 puntos).</p>`);
+  const s3=finding(B,`${nf0.format(M.length)} municipios con PP y PSOE como las dos listas más votadas; ${nf0.format(W.length)} decididos por menos de ${H} puntos`,`<p>Cada gráfico: en horizontal, la ventaja del PSOE sobre el PP en 2019 (negativa si ganó el PP); en vertical, lo que pasó después, en medias por tramos de 2 puntos, con la recta de cada lado.</p>`);
+  const grid=add(s3,"div","cols2");
+  res.forEach(o=>{ const fg=fig(grid,{title:o.l,source:`Salto en el empate: <b>${fmtJ(o.k,o.j&&o.j.j)}</b>${o.ci?` [${pts(o.ci[0])}; ${pts(o.ci[1])}]`:""}. Comparación ingenua PSOE − PP, todos los municipios: ${fmtJ(o.k,o.naive)}.`}); rdPlot(fg.body,o,H); });
+  const sig=res.filter(o=>o.ci&&(o.ci[0]>0||o.ci[1]<0));
+  finding(B,"Qué se puede concluir y qué no",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">${sig.length?`Donde ganó el PSOE por poco, ${sig.map(o=>`${low(o.l.split(",")[0])} ${o.j.j>0?"subió":"bajó"} ${nf1.format(Math.abs(o.j.j))} puntos más`).join(" y ")} que donde ganó el PP por poco. En lo demás, los datos no distinguen ninguna diferencia.`:"Que ganara el PP o el PSOE por poco no cambia, en estos datos, cómo evolucionaron la población, el paro, la renta ni el voto del municipio: los intervalos incluyen el cero."}</p>
+    <ul class="defs"><li><b>«Lista más votada» no siempre es «alcalde».</b> En muchos municipios gobierna una coalición o la segunda lista. Lo que se mide es el efecto de quedar primero, que en los pueblos suele coincidir con la alcaldía pero no siempre.</li>
+    <li><b>Un ayuntamiento manda poco sobre la renta o el paro.</b> Que no se vea diferencia no significa que dé igual quién gobierne: puede importar en cosas que no están en estos datos (servicios, urbanismo, impuestos locales).</li>
+    <li><b>Cuatro años es poco,</b> y 2019–2023 incluye una pandemia. Habrá que repetirlo con las municipales de 2023 cuando haya datos de 2027.</li>
+    <li><b>Solo PP contra PSOE.</b> Donde las dos primeras listas son otras (Cataluña, País Vasco, listas locales) la comparación es distinta y hay menos casos.</li></ul>`);
+  ficha(B,[["Unidad",`${nf0.format(M.length)} municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en las municipales de mayo de 2019`],["Variable de corte","Ventaja del PSOE sobre el PP en puntos de % de votos; tratamiento = el PSOE fue la lista más votada"],["Resultados","Cambio del padrón 2019–2025; cambio del paro registrado 2019–2023 (medias anuales); cambio de la renta por persona 2019–2023 (Atlas); cambio del voto a PP y Vox en las generales de 2019 y 2023"],["Modelo",`Regresión discontinua local: rectas separadas a cada lado del corte dentro de ±${H} puntos, sin ponderar; intervalo del 95 % por remuestreo de municipios (200 réplicas); cortes falsos en ±4 y ±6`]]);
+}
+// gráfico de discontinuidad: medias por tramos y rectas
+function rdPlot(parent,o,H){
+  const W=Math.max(320,parent.clientWidth||440), Hh=220, m={t:14,r:12,b:28,l:46};
+  const pts=o.pts.filter(p=>Math.abs(p.x)<=H), bins=d3.range(-H,H,2).map(a=>{ const s=pts.filter(p=>p.x>=a&&p.x<a+2); return s.length>=5?{x:a+1,y:d3.mean(s,p=>p.y),n:s.length}:null; }).filter(Boolean);
+  if(!bins.length){ parent.textContent="Sin datos suficientes."; return; }
+  const X=d3.scaleLinear().domain([-H,H]).range([m.l,W-m.r]), ys=bins.map(b=>b.y).concat(o.j?[o.j.l.a-o.j.l.b*H,o.j.r.a+o.j.r.b*H]:[]), Yy=d3.scaleLinear().domain([d3.min(ys),d3.max(ys)]).nice(4).range([Hh-m.b,m.t]);
+  const svg=d3.select(parent).append("svg").attr("viewBox",`0 0 ${W} ${Hh}`).attr("role","img").attr("aria-label",o.l);
+  svg.append("g").attr("class","grid").selectAll("line").data(Yy.ticks(4)).join("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Yy).attr("y2",Yy);
+  svg.append("g").attr("class","axis").selectAll("text").data(Yy.ticks(4)).join("text").attr("x",m.l-6).attr("y",v=>Yy(v)+4).attr("text-anchor","end").text(v=>(v>0?"+":"")+nf0.format(v));
+  svg.append("g").attr("class","axis").selectAll("text").data([-H,-5,0,5,H]).join("text").attr("x",X).attr("y",Hh-8).attr("text-anchor","middle").text(v=>(v>0?"+":"")+v);
+  svg.append("line").attr("x1",X(0)).attr("x2",X(0)).attr("y1",m.t).attr("y2",Hh-m.b).attr("stroke",css("--ink")).attr("stroke-dasharray","3 3");
+  svg.append("text").attr("class","lab").attr("x",X(-H)+2).attr("y",Hh-m.b-4).style("fill",css("--muted")).text("← ganó el PP"); svg.append("text").attr("class","lab").attr("x",X(H)-2).attr("y",Hh-m.b-4).attr("text-anchor","end").style("fill",css("--muted")).text("ganó el PSOE →");
+  svg.append("g").selectAll("circle").data(bins).join("circle").attr("cx",b=>X(b.x)).attr("cy",b=>Yy(b.y)).attr("r",b=>Math.min(7,3+Math.sqrt(b.n)/3)).attr("fill",b=>css(b.x<0?"--slate":"--rust")).attr("opacity",.85).append("title").text(b=>`${b.x-1} a ${b.x+1}: ${nf1.format(b.y)} (${b.n} municipios)`);
+  if(o.j){ const l=o.j.l, r=o.j.r; svg.append("line").attr("x1",X(-H)).attr("x2",X(0)).attr("y1",Yy(l.a-l.b*H)).attr("y2",Yy(l.a)).attr("stroke",css("--slate")).attr("stroke-width",2); svg.append("line").attr("x1",X(0)).attr("x2",X(H)).attr("y1",Yy(r.a)).attr("y2",Yy(r.a+r.b*H)).attr("stroke",css("--rust")).attr("stroke-width",2); }
+}
+
+// ---------- AVE: ¿cambia algo cuando llega la alta velocidad? ----------
+async function studyAve(B){
+  await loadTopo(); const CEN=qCen();
+  const ST=EXT.ave.estaciones.filter(e=>e.fecha>="2021-01-01"&&e.fecha<="2023-12-31"&&CEN.has(e.code));
+  const near=(code,d)=>{ const c=CEN.get(code); if(!c) return Infinity; return d3.min(ST,e=>km(c,CEN.get(e.code))); };
+  const PD=SER.padYears, ip=y=>PD.indexOf(y);
+  const base=rowsAll().filter(r=>(r[F.pop]||0)>=500&&CEN.has(r[F.code])&&r[F.pobVar1925]!=null&&r[F.renta19]&&r[F.edad19]&&SBY.get(r[F.code])&&SBY.get(r[F.code])[SF.pad]);
+  const pre=r=>{ const p=SBY.get(r[F.code])[SF.pad]; return pctg(p[ip(2015)],p[ip(2019)]); };
+  base.forEach(r=>{ r._d=near(r[F.code]); r._pre=pre(r); });
+  const T=base.filter(r=>r._d<=25&&r._pre!=null), POOL=base.filter(r=>r._d>=60&&r._pre!=null&&!["51","52"].includes(r[F.prov]));
+  const feat=r=>[Math.log10(r[F.pop]),r[F.renta19],r[F.edad19],r._pre,Math.log10(1+r[F.distCiudad]),CCAA_OF[r[F.prov]]==="Galicia"?1:0];
+  const pairs=matchTwins(T,POOL,feat,{maxD:1.0});
+  const Tm=pairs.map(p=>p.t), Cm=pairs.map(p=>p.c);
+  const OUT=[["pobVar1925","Población, 2019 → 2025",sgn],["paroVar1923","Paro registrado, 2019 → 2023",sgn],["rentaVar1923","Renta por persona, 2019 → 2023",sgn]];
+  const mean_=(rs,k)=>d3.mean(rs.filter(r=>r[F[k]]!=null),r=>r[F[k]]);
+  const did=(ps,k)=>{ const a=ps.filter(p=>p.t[F[k]]!=null&&p.c[F[k]]!=null); return a.length?d3.mean(a,p=>p.t[F[k]]-p.c[F[k]]):null; };
+  const didTrend=ps=>d3.mean(ps,p=>(p.t[F.pobVar1925]-p.t._pre)-(p.c[F.pobVar1925]-p.c._pre));
+  const res=OUT.map(([k,l,f])=>({k,l,f,t:mean_(Tm,k),c:mean_(Cm,k),d:did(pairs,k),ci:bootCI(pairs,s=>did(s,k))}));
+  const dT=didTrend(pairs), ciT=bootCI(pairs,didTrend);
+  // por estación: población 2019–2025 de los municipios a menos de 25 km frente a sus gemelos
+  const byS=ST.map(e=>{ const ps=pairs.filter(p=>km(CEN.get(p.t[F.code]),CEN.get(e.code))<=25); return {e,n:ps.length,d:ps.length?d3.mean(ps,p=>p.t[F.pobVar1925]-p.c[F.pobVar1925]):null}; }).filter(x=>x.n>=3);
+  finding(B,"La pregunta",`<p>Entre 2021 y 2023 la alta velocidad llegó a ${nf0.format(ST.length)} estaciones nuevas o que pasaron a tener servicio de alta velocidad: ${ST.map(e=>e.estacion.replace(/ Alta Velocidad| AV$/,"")).join(", ")}. Es la inversión pública por excelencia contra la «España vaciada». ¿Se nota en la población, el paro o la renta de los municipios de alrededor?</p>`);
+  finding(B,"El método: municipios cercanos a una estación nueva frente a sus gemelos",`<p>Se toman los municipios de 500 habitantes o más a <b>menos de 25 km</b> de una de esas estaciones (${nf0.format(T.length)}). Para cada uno se busca un <b>gemelo</b> a más de 60 km de cualquier estación nueva: parecido en tamaño, renta y edad de 2019, distancia a una ciudad grande y, sobre todo, en cómo evolucionaba su población <i>antes</i> (2015–2019). Se comparan los cambios de 2019 en adelante. Y como el AVE se anuncia con años de antelación, se mira también si los cercanos ya crecían distinto antes.</p>`);
+  const s3=finding(B,"Lo que dicen los datos",`<p>${nf0.format(pairs.length)} parejas. Antes de la llegada (2015–2019) la población cambiaba un ${sgn(d3.mean(Tm,r=>r._pre))} en los cercanos y un ${sgn(d3.mean(Cm,r=>r._pre))} en sus gemelos (se emparejan por esto, así que van casi a la par). Después:</p>`);
+  table(s3,["Qué pasó después","Cerca de una estación nueva","Gemelos","Diferencia"],res.map(o=>[o.l,o.f(o.t),o.f(o.c),`<b>${pts(o.d)} pts</b>${o.ci?` <span class="ci">[${pts(o.ci[0])}; ${pts(o.ci[1])}]</span>`:""}`]),{max:760});
+  add(s3,"p",null,`Descontando además la tendencia previa de cada pareja, la diferencia en población es de ${pts(dT)} puntos${ciT?` [${pts(ciT[0])}; ${pts(ciT[1])}]`:""}.`).style.cssText="max-width:680px;margin-top:8px";
+  if(byS.length){ const fs=fig(s3,{title:"Diferencia de población 2019–2025 frente a los gemelos, estación a estación",source:"Media de las parejas con el municipio a menos de 25 km de cada estación (solo estaciones con 3 o más parejas). Puntos de %."});
+    hbars(fs.body,byS.sort((a,b)=>b.d-a.d).map(x=>({l:`${x.e.estacion.replace(/ Alta Velocidad| AV$/,"")} (${x.n})`,v:x.d})),{fmt:v=>pts(v)+" pts",color:"--rust"}); }
+  const sig=res.filter(o=>o.ci&&(o.ci[0]>0||o.ci[1]<0));
+  finding(B,"Qué se puede concluir y qué no",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">${sig.length?`Los municipios cercanos a una estación nueva ${sig.map(o=>`${o.d>0?"ganaron":"perdieron"} ${nf1.format(Math.abs(o.d))} puntos de ${low(o.l.split(",")[0])} ${o.d>0?"más":"menos"}`).join(" y ")} que sus gemelos. En lo demás, no se distingue nada.`:"A estos pocos años vista, los municipios cercanos a una estación nueva no se distinguen de sus gemelos ni en población, ni en paro, ni en renta: los intervalos incluyen el cero."}</p>
+    <ul class="defs"><li><b>Es pronto.</b> Las estaciones abrieron entre 2021 y 2023 y los datos llegan a 2023–2025. Los efectos del AVE que encuentra la literatura (sobre todo en turismo y en concentrar actividad en las ciudades con estación) tardan más.</li>
+    <li><b>Los gemelos corrigen mucho, no todo:</b> se emparejan por tamaño, renta, edad, lejanía y tendencia previa, pero una estación no cae al azar.</li>
+    <li><b>Se mide el entorno de 25 km, no solo la ciudad con estación.</b> El efecto puede ser positivo en la ciudad y negativo en su entorno (el AVE «aspira» actividad): mirando estación a estación se ve parte de eso.</li>
+    <li>La lista de estaciones y fechas está en el repositorio; Extremadura tiene desde julio de 2022 trenes de altas prestaciones, no AVE puro.</li></ul>`);
+  ficha(B,[["Unidad",`${nf0.format(T.length)} municipios de 500 habitantes o más a menos de 25 km (centro a centro) de una estación con alta velocidad abierta entre 2021 y 2023; ${nf0.format(pairs.length)} con gemelo`],["Gemelos","El municipio más cercano (distancia estandarizada ≤ 1) entre los que están a más de 60 km de cualquier estación nueva, en log del padrón, renta y edad de 2019, cambio del padrón 2015–2019, log de la distancia a una ciudad grande y Galicia sí/no; cada gemelo se usa una vez"],["Resultados","Cambio del padrón 2019–2025; del paro registrado 2019–2023; de la renta por persona 2019–2023"],["Modelo","Diferencia de medias entre parejas; intervalo del 95 % por remuestreo de parejas (200 réplicas). Versión con tendencia: (cambio 2019–2025 − cambio 2015–2019) del cercano menos lo mismo del gemelo"]]);
+}
+
+// ---------- prohibir pisos turísticos: ¿baja el número de pisos turísticos? ----------
+function studyVutBan(B){
+  const P=SER.vtPeriods, per=d=>{ // periodo del INE justo anterior a la fecha
+    const key=d.slice(0,4)+"M"+d.slice(5,7); let i=-1; P.forEach((p,k)=>{ if(p<key) i=k; }); return i; };
+  const R=EXT.vut.municipios.filter(m=>m.fecha>="2023-06-01"&&m.fecha<="2025-06-30"&&m.confianza!=="baja");
+  const byCode=new Map(); R.forEach(m=>{ const i=per(m.fecha); if(i>=2&&i<=P.length-3&&(!byCode.has(m.code)||byCode.get(m.code).i>i)) byCode.set(m.code,{...m,i}); });
+  const T=[...byCode.values()].map(m=>{ const r=BYCODE.get(m.code), s=SBY.get(m.code); if(!r||!s||!s[SF.vtp]||(r[F.pop]||0)<5000) return null; const v=s[SF.vtp]; if(v[m.i]==null||v[m.i-2]==null||v[P.length-1]==null) return null; return {...m,row:r,v,pre:v[m.i]-v[m.i-2],post:v[P.length-1]-v[m.i],lvl:v[m.i],after:P.length-1-m.i}; }).filter(Boolean);
+  const TS=new Set(T.map(t=>t.code));
+  const pool=rowsAll().filter(r=>(r[F.pop]||0)>=5000&&!TS.has(r[F.code])&&SBY.get(r[F.code])&&SBY.get(r[F.code])[SF.vtp]&&SBY.get(r[F.code])[SF.vtp].every(v=>v!=null));
+  // gemelo: misma CCAA, parecido en tamaño, nivel de pisos turísticos y tendencia previa, con las mismas fechas que el tratado
+  const pairs=T.map(t=>{ const c=pool.filter(r=>CCAA_OF[r[F.prov]]===CCAA_OF[t.row[F.prov]]).map(r=>{ const v=SBY.get(r[F.code])[SF.vtp]; return {r,v,lvl:v[t.i],pre:v[t.i]-v[t.i-2],post:v[P.length-1]-v[t.i]}; });
+    const sdL=d3.deviation(c,x=>Math.log10(1+x.lvl))||1, sdP=d3.deviation(c,x=>x.pre)||1, sdN=d3.deviation(c,x=>Math.log10(x.r[F.pop]))||1;
+    let best=null; c.forEach(x=>{ const d=Math.hypot((Math.log10(1+x.lvl)-Math.log10(1+t.lvl))/sdL,(x.pre-t.pre)/sdP,(Math.log10(x.r[F.pop])-Math.log10(t.row[F.pop]))/sdN); if(!best||d<best.d) best={d,...x}; });
+    return best?{t,c:best}:null; }).filter(Boolean);
+  const rel=(x,k)=>x.lvl?x[k]/x.lvl*100:null; // cambio en % del stock
+  const did=ps=>d3.mean(ps,p=>(rel(p.t,"post")-rel(p.t,"pre"))-(rel(p.c,"post")-rel(p.c,"pre")));
+  const didPts=ps=>d3.mean(ps,p=>(p.t.post-p.t.pre)-(p.c.post-p.c.pre));
+  const d=did(pairs), ci=bootCI(pairs,did), dp=didPts(pairs);
+  const mT=d3.mean(pairs,p=>rel(p.t,"post")), mC=d3.mean(pairs,p=>rel(p.c,"post")), pT=d3.mean(pairs,p=>rel(p.t,"pre")), pC=d3.mean(pairs,p=>rel(p.c,"pre"));
+  finding(B,"La pregunta",`<p>Cada vez más ayuntamientos prohíben nuevas viviendas turísticas o suspenden las licencias: Madrid, València, Sevilla, Málaga, Alicante, Badalona… Antes de preguntarse si eso baja el alquiler, hay una pregunta previa: ¿consigue siquiera <b>frenar el número de pisos turísticos</b>? El INE cuenta los pisos turísticos de cada municipio dos veces al año desde 2020, así que se puede mirar.</p>`);
+  finding(B,"El método: antes y después, con un gemelo que no prohibió",`<p>Se toman los municipios con una moratoria o prohibición aprobada entre mediados de 2023 y mediados de 2025 (con fecha confirmada), para tener al menos dos cuentas del INE después. Para cada uno se busca un <b>gemelo</b> de la misma comunidad, parecido en tamaño, en peso de los pisos turísticos y en cómo venían creciendo justo antes, que no haya prohibido nada. Se compara cómo cambió el número de pisos turísticos (en % de los que había) en el año anterior a la medida y desde la medida hasta mayo de 2026, en unos y en otros.</p>`);
+  const s3=finding(B,"Municipio a municipio",`<p>${nf0.format(pairs.length)} municipios con medida y gemelo. Antes de la medida los pisos turísticos crecían un ${sgn(pT)} en ellos y un ${sgn(pC)} en sus gemelos; después, ${sgn(mT)} frente a ${sgn(mC)}.</p>`);
+  table(s3,["Municipio","Medida (fecha)","Antes","Después","Gemelo: antes","Gemelo: después"],pairs.sort((a,b)=>a.t.fecha.localeCompare(b.t.fecha)).map(p=>[`<b>${esc(dispName(p.t.row[F.name]))}</b>`,`${p.t.alcance==="total"?"Total":"Parcial"} (${fechaES(p.t.fecha).replace(/^\d+ de /,"")})`,sgn(rel(p.t,"pre")),`<b>${sgn(rel(p.t,"post"))}</b>`,sgn(rel(p.c,"pre"))+` <small class="muted">${esc(dispName(p.c.r[F.name]))}</small>`,sgn(rel(p.c,"post"))]),{max:900});
+  finding(B,"El resultado",`<p class="big" style="font-size:19px;font-weight:600;max-width:760px">Donde se prohibió, los pisos turísticos ${d<0?"crecieron":"crecieron"} <mark>${nf0.format(Math.abs(d))} puntos ${d<0?"menos":"más"}</mark> que en sus gemelos (en % del stock inicial; intervalo del 95 %: ${ci?`${pts(ci[0])} a ${pts(ci[1])}`:"—"}). ${ci&&ci[1]<0?"Las prohibiciones se notan en el número de pisos turísticos.":ci&&ci[0]>0?"Donde se prohibió, los pisos turísticos siguieron creciendo más que en los gemelos: las medidas llegan donde ya se disparaban, y por ahora no lo han frenado.":"Con tan pocos municipios y tan poco tiempo, los datos no distinguen un efecto de ninguno."}</p>
+    <ul class="defs"><li><b>El INE cuenta anuncios activos en plataformas,</b> no licencias. Una prohibición de licencias nuevas tarda en verse si los anuncios sin licencia siguen activos; y el registro único obligatorio desde julio de 2025 ha retirado anuncios en toda España, también en los gemelos.</li>
+    <li><b>Las medidas no caen al azar:</b> se aprueban donde los pisos turísticos se disparan. El gemelo con la misma tendencia previa corrige parte de eso, no todo.</li>
+    <li><b>Muchas medidas son parciales</b> (unos barrios, un tipo de edificio) y el dato es de todo el municipio.</li>
+    <li>La lista de medidas y fechas, con su fuente y grado de confianza, está en el repositorio. Faltan las que no tienen fecha confirmada.</li></ul>`);
+  ficha(B,[["Unidad",`${nf0.format(T.length)} municipios con moratoria o prohibición de nuevas viviendas turísticas fechada entre junio de 2023 y junio de 2025 (confianza alta o media), ${nf0.format(pairs.length)} con gemelo`],["Gemelos","Municipio de 5.000 habitantes o más de la misma comunidad sin medida, más cercano en log del tamaño, log del % de pisos turísticos en el periodo anterior a la medida y cambio de ese % en el año previo; un mismo gemelo puede servir a varios municipios"],["Resultado","Cambio del % de viviendas turísticas (INE), en % del nivel del periodo anterior a la medida: «antes» = año previo a la medida; «después» = desde la medida hasta mayo de 2026"],["Modelo",FICHA_DID+" Intervalo por remuestreo de parejas (200 réplicas). En puntos de % de viviendas la diferencia es de "+pts(dp)+"."]]);
+}
+
 // =====================================================================
 // QUIÉN SOY, SERVICIOS Y CONTACTO
 // =====================================================================
@@ -3012,7 +3406,7 @@ function qList(){
   const L=[];
   const ed=qQuint("edad","var0525");
   L.push({id:"campo",k:"Población",q:"¿Se vacía el campo por la distancia <em>o por la edad?</em>",
-    a:`<b>Más por la edad.</b> Los pueblos más jóvenes han ${qSigned(ed.lo)} de vecinos desde 2005; los más envejecidos, ${qSigned(ed.hi)}. Entre pueblos de la misma edad, estar lejos de una ciudad apenas cuenta.`,
+    a:`<b>Más por la edad.</b> Los pueblos más jóvenes han ${qSigned(ed.lo)} de vecinos desde 2005; los más envejecidos, ${qSigned(ed.hi)}. Entre pueblos de la misma provincia, tamaño, edad y renta, estar lejos de una ciudad cuenta poco.`,
     href:"/preguntas/cerca-ciudad/", art:"swarm", hero:true, spot:r=>`${r[F.var0525]>=0?"ha ganado":"ha perdido"} un ${nf0.format(Math.abs(r[F.var0525]))}${NB}% de vecinos desde 2005 · edad media ${nf1.format(r[F.edad])} años`,
     cap:"Cada punto es un municipio, colocado según cuánta gente ha ganado o perdido desde 2005; su tamaño es la población. En granate, los más jóvenes; en gris, los más envejecidos. Casi todos los grises están a la izquierda."});
   const vt=partialR("vtCambio","alqVar20",[],true);
@@ -3031,13 +3425,13 @@ function qList(){
   L.push({id:"paro-sur",k:"Trabajo",q:"¿De verdad hay más paro en el sur?",
     a:`<b>Sí.</b> En Andalucía y Extremadura el paro registrado es ${ps/pn>1.4&&ps/pn<1.6?"la mitad más alto":`un ${nf0.format((ps/pn-1)*100)}${NB}% más alto`} que en el norte peninsular.`,
     href:"/temas/trabajo/", art:"bars", hero:true, cap:"Una barra por provincia, ordenadas de norte a sur; más alta y oscura, más paro registrado."});
-  const pa=qMed(qRows(r=>r[F.part]!=null&&(r[F.pop]||0)<1000),"part"), pb=qMed(qRows(r=>r[F.part]!=null&&(r[F.pop]||0)>100000),"part");
+  const pa=qMed(qRows(r=>r[F.part]!=null&&(r[F.pop]||0)<500),"part"), pb=qMed(qRows(r=>r[F.part]!=null&&(r[F.pop]||0)>50000),"part");
   L.push({id:"votar",k:"Voto",q:"¿Se vota más en los pueblos?",
-    a:`<b>Sí.</b> En los de menos de 1.000 habitantes votó el ${nf0.format(pa)}${NB}%; en las ciudades de más de 100.000, el ${nf0.format(pb)}${NB}%. Parte se explica porque allí la población es mayor.`,
+    a:`<b>Sí.</b> En los de menos de 500 habitantes votó el ${nf0.format(pa)}${NB}%; en las ciudades de más de 50.000, el ${nf0.format(pb)}${NB}%. Parte se explica porque allí la población es mayor; el resto, por el tamaño en sí.`,
     href:"/preguntas/votar-pueblos/", art:"turnout", cap:"Un punto por municipio: más oscuro, más participación en las últimas generales."});
   const mc=qMed(qRows(r=>r[F.var0525]!=null&&r[F.distCosta]!=null&&r[F.distCosta]<5),"var0525"), mi=qMed(qRows(r=>r[F.var0525]!=null&&r[F.distCosta]!=null&&r[F.distCosta]>100),"var0525");
   L.push({id:"mar",k:"Población",q:"¿Qué hace que un pueblo gane vecinos?",
-    a:`<b>${mc>mi?"La juventud y la costa, sobre todo":"La juventud, sobre todo"}.</b> Los municipios de costa han ${qSigned(mc)} de vecinos desde 2005; los que están a más de 100 km del mar, ${qSigned(mi)}.`,
+    a:`<b>La juventud, sobre todo, y los estudios.</b> Los municipios de costa han ${qSigned(mc)} de vecinos desde 2005 y los que están a más de 100 km del mar, ${qSigned(mi)}; pero entre pueblos iguales en edad y renta, la costa no añade nada.`,
     href:"/preguntas/crecer/", art:"ridge", hero:true, cap:"España en franjas de norte a sur: cada pico es gente. Las grandes ciudades y la costa sobresalen; el interior queda casi plano."});
   return L;
 }

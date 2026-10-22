@@ -9,7 +9,7 @@ export const SITE={
   url:"https://indicio.es",
   tagline:"Preguntas reales, respuestas con datos públicos",
   description:"Indicio: preguntas reales sobre cómo vivimos, respondidas con datos públicos de los 8.139 municipios de España. Y un laboratorio para que compruebes tú si es causa o casualidad.",
-  dataUpdated:"2026-10-22",
+  dataUpdated:"2026-10-23",
   author:{name:"Borja Burriel",url:"https://indicio.es/quien-soy/",
     bio:"Analista de datos. Trabajo con datos de producto y analítica en una empresa de apps, y en mi tiempo libre hago Indicio: un proyecto personal e independiente, sin publicidad, sin partido y sin otra agenda que entender mejor cómo vivimos. Los datos públicos son de todos, pero casi nadie tiene tiempo de leerlos.",
     linkedin:"", web:"", foto:""},
@@ -18,21 +18,29 @@ export const SITE={
 
 export const STUDIES=[
   {id:"cerca-ciudad",t:"¿Se vacía el campo por la distancia o por la edad?",d:"Con el teletrabajo y la vivienda cara, mucha gente se ha mudado fuera de las ciudades. ¿Hasta qué distancia llega ese efecto? ¿Y es por la distancia o por otras cosas?",m:"Gradiente y comparar entre iguales",tema:"poblacion",pub:"2026-10-22",
-    a:"Más por la edad. Los pueblos más jóvenes han ganado vecinos desde 2005 y los más envejecidos los han perdido. Entre pueblos de la misma edad, estar lejos de una ciudad apenas cuenta."},
+    upd:"2026-10-23",a:"Más por la edad. Entre pueblos de la misma provincia, tamaño, edad y renta, estar lejos de una ciudad cuenta poco. Y quien llega cerca de las ciudades viene, en buena parte, del extranjero."},
   {id:"pisos-turisticos",t:"¿Los pisos turísticos encarecen el alquiler?",d:"Donde más pisos turísticos hay, el alquiler sube algo más. Pero ¿es por los pisos turísticos o por otras cosas que van con ellos?",m:"Cambios y controles",tema:"vivienda",pub:"2026-10-22",
-    a:"Menos de lo que se dice. Donde más han crecido los pisos turísticos no es, en general, donde más ha subido el alquiler. Si hay efecto, está en barrios concretos."},
+    upd:"2026-10-23",a:"Menos de lo que se dice. Donde más han crecido los pisos turísticos no es, en general, donde más ha subido el alquiler, empiece la cuenta en 2020, 2021 o 2022. Si hay efecto, está en barrios concretos."},
   {id:"convergencia",t:"¿Los lugares pobres alcanzan a los ricos?",d:"Entre 2015 y 2024 la renta subió en casi todas partes. ¿Subió más donde partía de abajo, y se ha estrechado la distancia?",m:"Convergencia",tema:"riqueza",pub:"2026-10-22",
-    a:"Sí, poco a poco. La distancia entre los municipios más ricos y los más pobres se ha estrechado desde 2015."},
+    upd:"2026-10-23",a:"Sí, poco a poco. La distancia entre los municipios más ricos y los más pobres se ha estrechado desde 2015, también midiéndolo de forma que el punto de partida no engañe."},
   {id:"votar-pueblos",t:"¿Se vota más en los pueblos?",d:"Los pueblos pequeños tienen una participación mucho más alta. ¿Es por ser pequeños, o porque su población es mayor y los mayores votan más?",m:"Separar dos explicaciones",tema:"voto",pub:"2026-10-22",
-    a:"Sí. En los municipios de menos de 1.000 habitantes vota bastante más gente que en las ciudades grandes. Parte se explica porque allí la población es mayor."},
+    upd:"2026-10-23",a:"Sí. En los municipios de menos de 500 habitantes vota bastante más gente que en las ciudades de más de 50.000. Parte se explica porque allí la población es mayor; el resto, por el tamaño en sí."},
   {id:"crecer",t:"¿Qué hace que un pueblo gane vecinos?",d:"Desde 2020 unos pueblos crecen y otros se vacían. Ponemos a competir los sospechosos habituales —renta, edad, estudios, paro, turismo— comparando entre iguales.",m:"Varios factores a la vez",tema:"poblacion",pub:"2026-10-22",
-    a:"La juventud y la costa, sobre todo. Los municipios de costa han ganado vecinos desde 2005; los que están a más de 100 km del mar, los han perdido."},
+    upd:"2026-10-23",a:"La juventud, sobre todo, y los estudios. La costa crece, pero porque sus pueblos son más jóvenes y más ricos: entre pueblos iguales, estar en la costa no añade nada."},
   {id:"tope-cataluna",t:"¿Frenó el tope de Cataluña el precio del alquiler?",d:"En marzo de 2024 Cataluña empezó a limitar el alquiler en las zonas tensionadas. Comparamos lo que pasó allí con lo que pasó en el resto de España.",m:"Diferencias en diferencias",tema:"vivienda",pub:"2026-10-22",
-    a:"Si hay efecto, es pequeño en estos datos: alrededor de un punto menos de subida en un año. Habrá que repetirlo con los datos de 2025."},
+    upd:"2026-10-23",a:"Si hay efecto, es pequeño en estos datos: entre medio punto y un punto menos de subida en 2024 en los municipios tensionados, según con quién se comparen. Habrá que repetirlo con los datos de 2025."},
   {id:"pensiones",t:"¿Son sostenibles las pensiones?",d:"El gasto en pensiones no para de crecer y se jubilan las generaciones más numerosas. Separamos por qué crece y probamos escenarios.",m:"Descomposición y escenarios",tema:"gasto",pub:"2026-10-22",
-    a:"Depende de tres cosas: cuántos se jubilan, cuánto cobran y cuánto crece la economía. Separamos el gasto en sus partes y probamos escenarios."},
+    upd:"2026-10-23",a:"Depende de tres cosas: cuántos se jubilan, cuánto cobran y cuánto crece la economía. Sin ningún cambio el gasto se dispararía; con las reformas aprobadas, las previsiones lo dejan en torno al 16–17 % del PIB en 2050."},
   {id:"pandemia-turismo",t:"¿Golpeó más la pandemia a las zonas turísticas?",d:"En 2020 el turismo se paró de golpe. Comparamos cómo cambiaron el paro y la renta en las provincias más turísticas y en el resto, antes y después.",m:"Antes y después, con grupo de comparación",tema:"trabajo",pub:"2026-10-22",
-    a:"Sí: en 2020 el paro subió más y la renta bajó más en las provincias más turísticas que en el resto, y después recuperaron."}
+    upd:"2026-10-23",a:"Sí: en 2020 el paro subió más y la renta bajó más en las provincias más turísticas que en el resto, también dentro de cada provincia, y después recuperaron."},
+  {id:"renta-fuentes",t:"¿Quién ha subido la renta de los pueblos pobres?",d:"Los municipios pobres han crecido en renta más que los ricos. ¿Ha sido el trabajo, o las pensiones y las prestaciones que suben por ley? Descomponemos la renta por fuentes y buscamos tres medidas con fecha.",m:"Descomposición y placebos en el tiempo",tema:"riqueza",pub:"2026-10-23",
+    a:"Las dos cosas. Pensiones y prestaciones ponen una parte grande del crecimiento en los municipios pobres, pero los salarios también suben más allí. La subida del salario mínimo de 2019 y las prestaciones de 2020 dejan huella; la revalorización de las pensiones de 2023, no."},
+  {id:"quien-gobierna",t:"¿Importa quién gobierna tu ayuntamiento?",d:"Comparar municipios del PP y del PSOE no sirve: ya eran distintos antes de votar. Usamos las elecciones decididas por un puñado de votos como si fueran un experimento.",m:"Discontinuidad",tema:"voto",pub:"2026-10-23",
+    a:"En población, paro y renta, no se distingue: donde ganó el PP por poco y donde ganó el PSOE por poco pasó lo mismo. Un ayuntamiento manda poco sobre esas cosas, o cuatro años son pocos para verlo."},
+  {id:"ave",t:"¿Cambia algo cuando llega el AVE?",d:"Entre 2021 y 2023 la alta velocidad llegó a Galicia, Extremadura, Burgos, Murcia, Elche y Asturias. Comparamos los municipios cercanos a las estaciones nuevas con sus gemelos.",m:"Gemelos con tendencia previa",tema:"poblacion",pub:"2026-10-23",
+    a:"Poco, por ahora. A dos o cuatro años vista, los municipios cercanos a una estación nueva no se distinguen de sus gemelos en población ni en renta; el paro bajó algo más cerca de las estaciones."},
+  {id:"prohibir-pisos-turisticos",t:"¿Sirve prohibir los pisos turísticos?",d:"Madrid, València, Sevilla, Málaga, Alicante… cada vez más ayuntamientos prohíben nuevas viviendas turísticas. Antes de preguntar por el alquiler: ¿frena siquiera el número de pisos turísticos?",m:"Antes y después, con gemelo",tema:"vivienda",pub:"2026-10-23",
+    a:"Quizá algo, pero poco y pronto para decirlo. Donde se prohibió, los pisos turísticos cayeron unos 5 puntos más que en sus gemelos, pero con 17 municipios y dos años el intervalo incluye el cero. El INE cuenta anuncios, no licencias."}
 ];
 
 // Preguntas que se responden en el laboratorio o en un tema, no en un estudio paso a paso

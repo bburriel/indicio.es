@@ -1,0 +1,43 @@
+{
+  "fuente": [
+    "https://es.wikipedia.org/wiki/Alta_velocidad_ferroviaria_en_Espa%C3%B1a",
+    "https://es.wikipedia.org/wiki/Estaci%C3%B3n_de_Elche_Alta_Velocidad",
+    "https://www.eldiario.es/economia/noventa-pasajeros-primer-servicio-nuevo-ave-madrid-elche-orihuela_1_7183190.html",
+    "https://en.wikipedia.org/wiki/Sanabria_AV_railway_station",
+    "https://en.wikipedia.org/wiki/Madrid%E2%80%93Galicia_high-speed_rail_line",
+    "https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/transportes/Paginas/2020/261020-alta-velocidad.aspx",
+    "https://www.que.es/2021/12/19/ave-conectara-madrid-galicia-anos-obras/",
+    "https://www.moncloa.com/2021/12/22/gobierno-ave-incompleto-provincia-galicia-1155325/",
+    "https://en.wikipedia.org/wiki/Madrid%E2%80%93Extremadura_high-speed_rail_line",
+    "https://www.hosteltur.com/152175_ya-hay-fecha-de-estreno-para-el-tren-de-altas-prestaciones-de-extremadura.html",
+    "https://www.trackopedia.com/en/news/all-countries/electrification-of-the-hsr-line-in-extremadura-completed",
+    "https://en.wikipedia.org/wiki/Venta_de_Ba%C3%B1os%E2%80%93Burgos%E2%80%93Vitoria_high-speed_rail_line",
+    "https://vivirediciones.es/?p=159798",
+    "https://www.lamoncloa.gob.es/lang/en/presidente/news/Paginas/2022/20221219_hspeed-railway-line.aspx",
+    "https://www.merca2.es/2022/12/20/ave-murcia-retraso-1179017/",
+    "https://m.murciatoday.com/new-antequera-ave-station-opens-to-rail-passengers-after-8-years-in-the-pipeline_1988225-a.html",
+    "https://theolivepress.es/spain-news/2023/01/27/ave-and-avant-trains-to-connect-new-railway-station-in-antequera-city-centre-to-22-different-destinations-across-spain-on-daily-basis/",
+    "https://www.trackopedia.com/en/news/all-countries/antequera-hsr-station-starts-operation",
+    "https://en.wikipedia.org/wiki/Madrid%E2%80%93Asturias_high-speed_rail_line",
+    "https://www.railvolution.net/news/variante-de-pajares-inaugurated-1",
+    "https://blog.telecable.es/ave-asturias/"
+  ],
+  "estaciones": [
+    {"estacion": "Elche Alta Velocidad", "code": "03065", "municipio": "Elx/Elche", "fecha": "2021-02-01", "linea": "LAV Madrid-Levante (ramal Murcia), tramo Monforte del Cid-Elche-Orihuela", "nota": "Estación nueva (partida de Matola). Primer AVE comercial Madrid-Elche-Orihuela el 1 de febrero de 2021."},
+    {"estacion": "Orihuela-Miguel Hernández", "code": "03099", "municipio": "Orihuela", "fecha": "2021-02-01", "linea": "LAV Madrid-Levante (ramal Murcia), tramo Monforte del Cid-Elche-Orihuela", "nota": "Estación de la ciudad remodelada; recibe AVE desde el 1 de febrero de 2021 (inaugurada ese día por el presidente del Gobierno). Terminal provisional hasta la llegada a Murcia en dic. 2022."},
+    {"estacion": "Sanabria AV", "code": "49143", "municipio": "Palacios de Sanabria", "fecha": "2021-07-22", "linea": "LAV Madrid-Galicia (Olmedo-Zamora-Pedralba-Ourense)", "nota": "Estación nueva en Otero de Sanabria (municipio de Palacios de Sanabria). El tramo Zamora-Pedralba entró en servicio el 27-10-2020 sin estaciones intermedias; Sanabria AV abrió el 22-07-2021 (Wikipedia EN)."},
+    {"estacion": "A Gudiña-Porta de Galicia", "code": "32034", "municipio": "Gudiña, A", "fecha": "2021-12-21", "linea": "LAV Madrid-Galicia, tramo Pedralba de la Pradería-Ourense", "nota": "Estación nueva (3,6 M EUR) en la LAV. Viaje inaugural 20-12-2021, servicio comercial 21-12-2021. Sustituye funcionalmente a la antigua estación convencional de A Gudiña."},
+    {"estacion": "Ourense", "code": "32054", "municipio": "Ourense", "fecha": "2021-12-21", "linea": "LAV Madrid-Galicia, tramo Pedralba de la Pradería-Ourense", "nota": "Estación existente con servicio convencional y Alvia previo (Ourense-Santiago AV desde 2011/2015). Desde el 21-12-2021 recibe AVE directos desde Madrid por la LAV completa; tiempo a Madrid 2h15."},
+    {"estacion": "Plasencia", "code": "10148", "municipio": "Plasencia", "fecha": "2022-07-19", "linea": "LAV Madrid-Extremadura, tramo Plasencia-Badajoz", "nota": "Estación existente con servicio convencional. Tramo abierto el 19-07-2022 (inauguración institucional 18-07-2022) en ancho ibérico, sin electrificar, máx. 200 km/h, con Alvia S-730 e Intercity. Electrificación completada el 10-09-2024."},
+    {"estacion": "Cáceres", "code": "10037", "municipio": "Cáceres", "fecha": "2022-07-19", "linea": "LAV Madrid-Extremadura, tramo Plasencia-Badajoz", "nota": "Estación existente con servicio convencional; pasa a tener servicio por la nueva plataforma AV (ancho ibérico, 200 km/h) desde el 19-07-2022."},
+    {"estacion": "Mérida", "code": "06083", "municipio": "Mérida", "fecha": "2022-07-19", "linea": "LAV Madrid-Extremadura, tramo Plasencia-Badajoz", "nota": "Estación existente con servicio convencional; pasa a tener servicio por la nueva plataforma AV (ancho ibérico, 200 km/h) desde el 19-07-2022."},
+    {"estacion": "Badajoz", "code": "06015", "municipio": "Badajoz", "fecha": "2022-07-19", "linea": "LAV Madrid-Extremadura, tramo Plasencia-Badajoz", "nota": "Estación existente con servicio convencional; pasa a tener servicio por la nueva plataforma AV (ancho ibérico, 200 km/h) desde el 19-07-2022."},
+    {"estacion": "Burgos-Rosa Manzano", "code": "09059", "municipio": "Burgos", "fecha": "2022-07-22", "linea": "LAV Venta de Baños-Burgos-Vitoria, tramo Venta de Baños-Burgos", "nota": "Estación existente (abierta 12-12-2008, con servicio convencional). Inauguración del tramo 21-07-2022; primer AVE comercial Burgos-Madrid 22-07-2022."},
+    {"estacion": "Murcia del Carmen", "code": "30030", "municipio": "Murcia", "fecha": "2022-12-20", "linea": "LAV Madrid-Levante (ramal Murcia), tramo Orihuela/Beniel-Murcia", "nota": "Estación existente con servicio convencional. Inauguración con el Rey 19-12-2022; primer AVE comercial Murcia-Madrid el 20-12-2022 (con paradas en Orihuela y Elche). Ese día también arrancan Avant Murcia-Alicante."},
+    {"estacion": "Antequera AV", "code": "29015", "municipio": "Antequera", "fecha": "2023-01-25", "linea": "LAV Antequera-Granada (variante de Antequera)", "nota": "Estación nueva en el casco urbano (no confundir con Antequera-Santa Ana, 2007). Murcia Today: primeros viajeros el miércoles 25-01-2023; The Olive Press habla de inauguración el jueves 26-01-2023. DUDA entre 25 y 26 de enero de 2023. No es un tramo nuevo de línea."},
+    {"estacion": "Pola de Lena", "code": "33033", "municipio": "Lena", "fecha": "2023-11-30", "linea": "LAV León-Asturias (Variante de Pajares)", "nota": "Estación existente con servicio convencional; es el final de la LAV. Inauguración 29-11-2023, servicio comercial Alvia Madrid-Gijón desde 30-11-2023. Paran muchos pero no todos los servicios."},
+    {"estacion": "Oviedo", "code": "33044", "municipio": "Oviedo", "fecha": "2023-11-30", "linea": "LAV León-Asturias (Variante de Pajares) + conexión convencional", "nota": "Estación existente con servicio convencional y Alvia previo (por la rampa de Pajares). Alta velocidad por la Variante desde 30-11-2023; AVE Avril desde 21-05-2024."},
+    {"estacion": "Gijón", "code": "33024", "municipio": "Gijón", "fecha": "2023-11-30", "linea": "LAV León-Asturias (Variante de Pajares) + conexión convencional", "nota": "Estación existente (Gijón-Sanz Crespo) con servicio convencional y Alvia previo. Alta velocidad por la Variante desde 30-11-2023; AVE Avril desde 21-05-2024."},
+    {"estacion": "Mieres-Puente", "code": "33037", "municipio": "Mieres", "fecha": "2023-11-30", "linea": "LAV León-Asturias (Variante de Pajares) + conexión convencional", "nota": "Estación existente con servicio convencional; parada de muchos (no todos) los Alvia/AVE desde 30-11-2023. DUDA: no estaba en la lista pedida; incluida por completitud."}
+  ]
+}
