@@ -38,7 +38,7 @@ for fuente in fuentes:
         nuevos.append((fuente, k, n))
 # temas del selector del laboratorio (pestañas): reparte los indicadores, incluidos los originales, en grupos de tamaño manejable
 TEMAS = {
- "Riqueza": "rentaMediana rentaAlta rentaBaja p80p20 ingSalario ingDesempleo ingPrestaciones ingOtros renta rentaHog rentaVar rentaVar20 pobreza gini pensiones irpfBruta irpfDisp irpfCarga irpfTrabajo irpfActiv irpfCapital irpfExenta irpfDecl",
+ "Riqueza": "rentaMediana p80p20 ingSalario ingDesempleo ingPrestaciones ingOtros renta rentaHog rentaVar rentaVar20 pobreza gini pensiones irpfBruta irpfDisp irpfCarga irpfTrabajo irpfActiv irpfCapital irpfExenta irpfDecl",
  "Trabajo": "paro paroReg paroRegVar paroReg15 paroCensal paroMujeres paroJovenes paroMayores45 paroSinEmpleo contrTemp pensionistas paroExtranjeros brechaParoExtr empleo empleoMujeres brechaEmpleo empleoVar temporales autonomos afilHab afilAutonomos afilAgrario afilHogar afilVar afilVar19",
  "Sectores": "agri industria construccion comercio avanzados publico directivos elementales",
  "Población": "varPob var0525 pobVar20 edad menores18 mayores65 extr migExt migInt arraigo llegados inmigReciente",

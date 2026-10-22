@@ -1,4 +1,4 @@
-"""Atlas de distribución de renta de los hogares (INE), nivel municipal, último año (2024): mediana de la renta, rentas muy altas y muy bajas,
+"""Atlas de distribución de renta de los hogares (INE), nivel municipal, último año (2024): mediana de la renta, 
 fuentes de ingreso, desigualdad P80/P20 y tamaño del hogar. INEbase publica una tabla por provincia; se leen en streaming sin guardarlas.
 Uso: python3 ine_atlas.py → cache/out/atlas.json"""
 import json, os, re, subprocess, concurrent.futures as cf, urllib.request
@@ -6,7 +6,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); os.makedirs(f"{HERE}/cache/ou
 ANYO = "2024"
 def ids_de(nombre):
     ts = json.load(urllib.request.urlopen("https://servicios.ine.es/wstempus/js/ES/TABLAS_OPERACION/353", timeout=60))
-    return [t["Id"] for t in ts if t["Nombre"].startswith(nombre)]
+    return [t["Id"] for t in ts if t["Nombre"] == nombre]   # == y no startswith: hay tablas con el mismo comienzo y otras dimensiones
 def num(v):
     try: return float(v.replace(".", "").replace(",", "."))
     except ValueError: return None
@@ -30,15 +30,12 @@ TABLAS = [
  ("Indicadores de renta media y mediana", {"Mediana de la renta por unidad de consumo": "rentaMediana"}),
  ("Distribución por fuente de ingresos", {"Fuente de ingreso: salario": "ingSalario", "Fuente de ingreso: prestaciones por desempleo": "ingDesempleo",
                                          "Fuente de ingreso: otras prestaciones": "ingPrestaciones", "Fuente de ingreso: otros ingresos": "ingOtros"}),
- ("Porcentaje de población con ingresos por unidad de consumo por debajo/encima de determinados umbrales relativos por sexo",
-  {"Población con ingresos por unidad de consumo por debajo 40% de la mediana": "rentaBaja", "Población con ingresos por unidad de consumo por encima 200% de la mediana": "rentaAlta"}),
  ("Índice de Gini y Distribución de la renta P80/P20", {"Distribución de la renta P80/P20": "p80p20"}),
  ("Indicadores demográficos", {"Tamaño medio del hogar": "hogarMedio"}),
 ]
 datos = {}
 for nombre, quiero in TABLAS:
     ids = ids_de(nombre)
-    # la tabla del P80/P20 y la de renta por umbrales traen otras categorías: se descarta lo que no se pide
     with cf.ThreadPoolExecutor(4) as ex:
         for r in ex.map(lambda t: leer(t, quiero), ids):
             for code, d in r.items(): datos.setdefault(code, {}).update(d)
@@ -49,8 +46,6 @@ for d in datos.values():
 SRC = f"INE, Atlas de distribución de renta de los hogares, {ANYO}"
 INDICADORES = [
  ("rentaMediana", "Mediana de la renta por unidad de consumo", "Riqueza", "eur", SRC + " (la renta del hogar «típico», menos sensible a unos pocos ricos que la media)"),
- ("rentaAlta", "Población con ingresos muy altos", "Riqueza", "pct", SRC + " (% con ingresos por unidad de consumo por encima del 200 % de la mediana nacional)"),
- ("rentaBaja", "Población con ingresos muy bajos", "Riqueza", "pct", SRC + " (% con ingresos por unidad de consumo por debajo del 40 % de la mediana nacional)"),
  ("p80p20", "Desigualdad de renta (P80/P20)", "Riqueza", "num1", SRC + " (cuántas veces más gana el 20 % más rico que el 20 % más pobre)"),
  ("ingSalario", "Ingresos que vienen de salarios", "Riqueza", "pct", SRC + " (% de la renta de los hogares)"),
  ("ingDesempleo", "Ingresos que vienen de prestaciones por desempleo", "Riqueza", "pct", SRC + " (% de la renta de los hogares)"),
@@ -60,3 +55,6 @@ INDICADORES = [
 ]
 json.dump({"indicadores": INDICADORES, "datos": datos}, open(f"{HERE}/cache/out/atlas.json", "w"), ensure_ascii=False)
 print(len(datos), "municipios")
+# Pendiente: % de población con ingresos por encima del 200 % y por debajo del 40 % de la mediana (tabla «…umbrales relativos por sexo»).
+# Las tablas de las provincias grandes pesan más de 1 GB (tienen una fila por sección censal y año): hay que descargarlas con curl -m 3000 o más,
+# y comparar el nombre de la tabla con == (con startswith también entran las de edad y nacionalidad, y se mezclan subgrupos).
