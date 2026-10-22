@@ -53,6 +53,12 @@ python3 scripts/datos/series_estudios.py
 
 `data/ext.json` se monta a mano a partir de `scripts/datos/externos/` (listas con fuente y fecha: municipios tensionados del BOE, ERTE por provincia de abril de 2020, estaciones de alta velocidad abiertas 2021–2023 y restricciones municipales a las viviendas turísticas, con grado de confianza). Si añades o corriges una entrada, vuelve a montar `ext.json`.
 
+## Estructura de los estudios
+
+Cada estudio se presenta como un artículo de investigación: un **resumen** arriba (contexto, intervención, análisis, resultados, conclusiones), secciones numeradas (`sec(B,"ctx"|"int"|"ana"|"con",…)`), resultados numerados como 4.1, 4.2… (`res(B,título,html)`) y un apéndice de **métodos** al final (`methods(B,[[clave,valor],…])`). El resumen se crea vacío al empezar (`const AB=abstract(B)`) y se rellena al final con los números (`AB.fill({…})`).
+
+Herramientas estadísticas disponibles en `src/app.js`: `regFn` (pendiente y correlación parcial con efectos fijos de provincia, ponderación e intervalos), `adMatch` + `esCompute` + `esCharts` (estudio de eventos con gemelos), `esPlacebo` (placebos en el espacio), `synthControl` + `synthCharts` (control sintético con placebos), `bootCI` y `placeboRank`.
+
 ## Publicar una pregunta nueva
 
 1. Añade la entrada en `STUDIES` de `src/content.mjs` (id = URL, título, entradilla, método, tema, fecha `pub`, respuesta corta `a`). El título es único: el mismo en portada, índice y página.
