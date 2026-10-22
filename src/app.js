@@ -1139,6 +1139,19 @@ const DPHRASE={renta:["más renta por persona","menos renta por persona"],rentaH
   edad:["más edad media","menos edad media"],mayores65:["más mayores de 65 años","menos mayores de 65 años"],menores18:["más menores de edad","menos menores de edad"],extr:["más población extranjera","menos población extranjera"],
   solos:["más hogares de una persona","menos hogares de una persona"],migExt:["más llegadas del extranjero","menos llegadas del extranjero"],migInt:["más llegadas desde otros municipios","más salidas hacia otros municipios"],
   part:["más participación electoral","menos participación electoral"],paroRegVar:["más subida del paro en el último año","más bajada del paro en el último año"]};
+// frases de los indicadores añadidos desde otras fuentes (censo anual del INE, IRPF de la Agencia Tributaria…)
+Object.assign(DPHRASE,{
+  empleo:["más gente con empleo","menos gente con empleo"],empleoMujeres:["más mujeres con empleo","menos mujeres con empleo"],brechaEmpleo:["más brecha de empleo entre hombres y mujeres","menos brecha de empleo entre hombres y mujeres"],
+  empleoVar:["más subida del empleo desde 2021","menos subida del empleo desde 2021"],paroCensal:["más paro (según el censo)","menos paro (según el censo)"],temporales:["más contratos temporales","menos contratos temporales"],
+  autonomos:["más autónomos","menos autónomos"],directivos:["más directivos y profesionales","menos directivos y profesionales"],elementales:["más ocupaciones elementales","menos ocupaciones elementales"],
+  agri:["más gente trabajando en el campo","menos gente trabajando en el campo"],industria:["más empleo industrial","menos empleo industrial"],construccion:["más empleo en la construcción","menos empleo en la construcción"],
+  comercio:["más empleo en comercio, transporte y hostelería","menos empleo en comercio, transporte y hostelería"],avanzados:["más empleo en servicios avanzados","menos empleo en servicios avanzados"],publico:["más empleo en administración, educación y sanidad","menos empleo en administración, educación y sanidad"],
+  estudiosBasicos:["más gente con solo estudios básicos","menos gente con solo estudios básicos"],superiores2539:["más jóvenes titulados","menos jóvenes titulados"],brechaSuperiores:["más ventaja de las mujeres en titulación superior","menos ventaja de las mujeres en titulación superior"],
+  casados:["más personas casadas","menos personas casadas"],divorciados:["más divorcios y separaciones","menos divorcios y separaciones"],solteros3554:["más solteros de 35 a 54 años","menos solteros de 35 a 54 años"],
+  arraigo:["más gente que siempre ha vivido allí","menos gente que siempre ha vivido allí"],llegados:["más gente llegada de otros municipios","menos gente llegada de otros municipios"],inmigReciente:["más inmigración reciente","menos inmigración reciente"],
+  irpfBruta:["más renta bruta por declarante","menos renta bruta por declarante"],irpfDisp:["más renta disponible por declarante","menos renta disponible por declarante"],irpfCarga:["más impuestos y cotizaciones sobre la renta","menos impuestos y cotizaciones sobre la renta"],
+  irpfTrabajo:["más renta de trabajo y pensiones","menos renta de trabajo y pensiones"],irpfActiv:["más renta de actividades económicas","menos renta de actividades económicas"],irpfCapital:["más renta del capital","menos renta del capital"],
+  irpfExenta:["más renta exenta","menos renta exenta"],irpfDecl:["más declarantes por habitante","menos declarantes por habitante"]});
 const SORTED={};
 function rankOf(k,v,pool){ const key=k+"|"+pool; if(!SORTED[key]){ const mp=pool==="big"?1000:0; SORTED[key]=rowsAll().filter(r=>r[F[k]]!=null&&(r[F.pop]||0)>=mp).map(r=>r[F[k]]).sort((a,b)=>a-b); } const a=SORTED[key]; return a.length?d3.bisectLeft(a,v)/a.length:null; }
 function destaca(box,r){
@@ -1550,7 +1563,7 @@ const CCAA_OF={"01":"País Vasco","20":"País Vasco","48":"País Vasco","02":"Ca
   "26":"La Rioja","28":"Madrid","30":"Murcia","31":"Navarra","33":"Asturias","35":"Canarias","38":"Canarias","39":"Cantabria","51":"Ceuta","52":"Melilla"};
 const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si podría ser causa"],["evolucion","Evolución","Cuánto ha crecido cada dato desde un año"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Reparto","Cómo se reparte un dato entre la población"]];
 const EXSIZES=[["","Todos los tamaños",0,Infinity],["s1","Menos de 1.000 hab.",0,1000],["s2","1.000 a 10.000 hab.",1000,10000],["s3","10.000 a 50.000 hab.",10000,50000],["s4","Más de 50.000 hab.",50000,Infinity],["g1","1.000 hab. o más",1000,Infinity],["g10","10.000 hab. o más",10000,Infinity]];
-const EXQ=[["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Suben los sueldos como los precios?","evolucion",{e:["salMed","alq","ipc"]}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}]];
+const EXQ=[["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Suben los sueldos como los precios?","evolucion",{e:["salMed","alq","ipc"]}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}],["¿Dónde pesa más la brecha de empleo entre hombres y mujeres?","mapa",{d:["brechaEmpleo","empleoMujeres"]}],["¿Más estudios, menos contratos temporales?","cruce",{d:["superiores2539","temporales"],t:"g1"}],["¿Quién vive de qué? Renta de trabajo frente a renta del capital","cruce",{d:["irpfTrabajo","irpfBruta"],t:"g1"}]];
 let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0};
 
 function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=...&b=2015&r=1
@@ -2331,9 +2344,9 @@ function lbTitle(){
 function relHeadline(x,y){
   const c=wcorr(pairPts(x,y,{weighted:!!EX.w,logX:!!EX.lx})); if(!c) return null; const a=Math.abs(c.r);
   if(a<0.1) return `${labK(x)} y ${low(labK(y))} apenas van juntos`;
-  const px=DPHRASE[x], py=DPHRASE[y]; if(!px||!py) return `A más ${low(labK(x))}, ${a<0.3?"algo ":""}${c.r>0?"más":"menos"} ${low(labK(y))}`;
+  const px=DPHRASE[x], py=DPHRASE[y]; if(!px||!py) return `A más ${low(labK(x))}, ${a<0.3?"tiende a haber ":""}${c.r>0?"más":"menos"} ${low(labK(y))}`;
   const yp=py[c.r>0?0:1];
-  return `Donde hay ${px[0]}, ${a<0.3?"hay algo "+yp:a<0.5?"suele haber "+yp:"casi siempre hay "+yp}`;
+  return `Donde hay ${px[0]}, ${a<0.3?"tiende a haber "+yp:a<0.5?"suele haber "+yp:"casi siempre hay "+yp}`;
 }
 function lbSay(){
   const k=EX.d[0], f=k?fmtK(k):null, rows=k?exRows(k):[], wm=rs=>{ const w=d3.sum(rs,r=>r[F.pop]||0); return w?d3.sum(rs,r=>r[F[k]]*(r[F.pop]||0))/w:null; };
