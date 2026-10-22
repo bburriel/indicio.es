@@ -219,7 +219,7 @@ const SRC={
   padron:"INE: padrón municipal 1996–2025", censo:"INE: Censo de Población y Viviendas 2021", mig:"INE: Estadística de Migraciones y Cambios de Residencia 2021–2024",
   ipva:"INE: Índice de Precios de Vivienda en Alquiler (alquileres declarados a Hacienda), por municipio y, por antigüedad del contrato, por provincia", vt:"INE: medición de viviendas turísticas (agosto de 2020 a mayo de 2026)",
   salarios:"INE: Encuesta de Estructura Salarial", ipc:"INE: IPC", sepe:"SEPE: paro registrado por municipio, 2015–septiembre de 2026", interior:"Ministerio del Interior: generales de 2019 y 2023, municipales de 2019 y 2023 y europeas de 2024",
-  idealista:"idealista: precio medio de los anuncios de alquiler", eurostat:"Eurostat: cuentas públicas, pensiones y proyecciones de población",
+  idealista:"idealista: precio medio de los anuncios de alquiler", eurostat:"Eurostat: cuentas públicas, pensiones y proyecciones de población", hicp:"Eurostat: índice de precios de consumo armonizado mensual por grupos de alimentos (prc_hicp_midx), 2021–2025, España, Portugal, Francia, Italia y Alemania",
   tensionadas:"BOE: resoluciones de 14 de marzo y 8 de octubre de 2024 con los municipios catalanes declarados zona de mercado residencial tensionado", erte:"Seguridad Social: trabajadores en ERTE por provincia a 30 de abril de 2020 (nota de afiliación de abril de 2020)",
   ave:"Adif, Renfe y prensa: estaciones con servicio de alta velocidad abierto entre 2021 y 2023 (lista en el repositorio)", vut:"Boletines oficiales y prensa: municipios con moratoria o prohibición de nuevas viviendas turísticas, con fecha (lista en el repositorio)",
   geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN"
@@ -539,6 +539,7 @@ async function renderRiqueza(cityCode){
   // 6. relaciones
   const s6=finding(B,"Qué va con la renta",
     `<p>La renta de un municipio se parece mucho a su nivel de estudios y, en sentido contrario, a su riesgo de pobreza. En <a href="#relaciones-superiores-renta">Relaciones</a> puedes comprobarlo y cruzar la renta con cualquier otro dato: <a href="#relaciones-renta-pobreza">pobreza</a>, <a href="#relaciones-renta-part">participación electoral</a>, <a href="#relaciones-renta-pensiones">peso de las pensiones</a>.</p>`);
+  panoExtra("riqueza",B);
 }
 
 function drawHist(parent,R,mode){
@@ -723,6 +724,7 @@ async function renderVivienda(){
   const s6=finding(B,`${cap(deCadaDiez(ce.secondary))} viviendas no son residencia habitual de nadie`,
     `<p>Según el censo de 2021, el ${pc(ce.secondary)} de las viviendas son segundas residencias o están vacías, y el ${pc(ce.rented)} de los hogares vive de alquiler. Las viviendas sin uso habitual abundan sobre todo en los pueblos que pierden población, lejos de donde más falta hace vivienda.</p>`);
   scatter(s6,{x:"var0525",y:"noPrincipal",minPop:1000,weighted:false,title:"Crecimiento de la población desde 2005 y viviendas vacías o secundarias",source:"Municipios de 1.000 habitantes o más; cada municipio cuenta igual. Fuente: INE, padrón y Censo de 2021."});
+  panoExtra("vivienda",B);
 }
 
 // =====================================================================
@@ -773,6 +775,7 @@ async function renderPoblacion(){
   const s4=finding(B,"Y los que se vacían son también los más envejecidos",
     `<p>La edad media de España ha pasado de ${nf1.format(age0)} a ${nf1.format(age)} años entre 2015 y 2023. En los pueblos que pierden habitantes supera con frecuencia los 50.</p>`);
   scatter(s4,{x:"edad",y:"varPob",minPop:1000,title:"Edad media y crecimiento desde 2015",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Atlas de Renta (2023) y padrón."});
+  panoExtra("poblacion",B);
 }
 
 // =====================================================================
@@ -811,6 +814,7 @@ async function renderTrabajo(){
   const g3=add(s3,"div","cols2");
   const sc3=add(g3,"div"); scatter(sc3,{x:"edad",y:"pensiones",minPop:1000,height:340,title:"Edad media y peso de las pensiones",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Atlas de Renta 2023."});
   topList(g3,"pensiones",{title:"Donde más pesan las pensiones",minPop:5000,link:"vive"});
+  panoExtra("trabajo",B);
 }
 // =====================================================================
 // FICHA DE MUNICIPIO: una sola página con saltos a cada apartado
@@ -1618,7 +1622,7 @@ const CCAA_OF={"01":"País Vasco","20":"País Vasco","48":"País Vasco","02":"Ca
 const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si la relación aguanta entre iguales"],["evolucion","Evolución","Cuánto ha crecido cada dato desde un año"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Reparto","Cómo se reparte un dato entre la población"],["burbujas","Años","Provincias en movimiento: dos datos año a año"],["antes","Antes y después","Qué pasó tras una ley o un suceso, frente a municipios gemelos"]];
 const EXSIZES=[["","Todos los tamaños",0,Infinity],["s1","Menos de 1.000 hab.",0,1000],["s2","1.000 a 10.000 hab.",1000,10000],["s3","10.000 a 50.000 hab.",10000,50000],["s4","Más de 50.000 hab.",50000,Infinity],["g1","1.000 hab. o más",1000,Infinity],["g10","10.000 hab. o más",10000,Infinity]];
 const EXQ=[["¿Frenó el tope el alquiler? Antes y después","antes",{ad:{ev:"tensionadas",y:"ipva"}}],["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Suben los sueldos como los precios?","evolucion",{e:["salMed","alq","ipc"]}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}],["¿Dónde pesa más la brecha de empleo entre hombres y mujeres?","mapa",{d:["brechaEmpleo","empleoMujeres"]}],["¿Más estudios, menos contratos temporales?","cruce",{d:["superiores2539","temporales"],t:"g1"}],["¿Quién vive de qué? Renta de trabajo frente a renta del capital","cruce",{d:["irpfTrabajo","irpfBruta"],t:"g1"}]];
-let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0,bv:0};
+let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0,bv:0,u:""};
 
 function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=...&b=2015&r=1
   const m=h.match(/^explorar(?:\/([a-z]+))?(?:\?(.*))?$/); if(!m) return;
@@ -1626,7 +1630,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   const q=new URLSearchParams(m[2]||"");
   if(q.has("d")) EX.d=q.get("d").split(",").filter(k=>CATK[k]).slice(0,6);
   if(q.has("p")) EX.p=q.get("p"); if(q.has("t")) EX.t=q.get("t"); if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
-  if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx");
+  if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa"].includes(q.get("u"))?q.get("u"):"";
   if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0;
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=q.get("lv");
@@ -1637,7 +1641,7 @@ function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParam
   if(S.d&&S.d.length) q.set("d",S.d.join(",")); if(S.p) q.set("p",S.p); if(S.t) q.set("t",S.t); if(S.m) q.set("m",S.m); if(S.c&&S.c.length) q.set("c",S.c.join(","));
   if(S.v==="grupos") q.set("gb",S.gb); if(S.o) q.set("o",S.o); if(!S.w) q.set("w","0"); if(S.lx) q.set("lx","1");
   if(S.v==="mapa"&&S.bv) q.set("bv","1");
-  if(S.v==="cruce"){ if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
+  if(S.v==="cruce"){ if(S.u) q.set("u",S.u); if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es") q.set("lv",ES_.lev); }
   if(S.v==="antes"){ ["d","p","t","c","m","o"].forEach(k=>q.delete(k)); const A={...AD,...(S.ad||{})}; q.set("ev",A.ev); q.set("oy",A.y); if(ADEV[A.ev].free) q.set("yr",A.yr); if(A.ev==="ccaa"&&A.cc) q.set("cc",A.cc); if(A.ev==="prov"&&A.pv) q.set("pv",A.pv); if(A.ev==="lista"&&A.ms.length) q.set("ms",A.ms.join(",")); if(A.mc) q.set("mc","1"); if(A.mp!==ADEV[A.ev].mp) q.set("mp",A.mp); if(A.mt==="sint") q.set("mt","sint"); }
   return "/laboratorio/"+S.v+"/"+(q.toString()?"?"+q.toString().replace(/%2C/g,","):""); }
@@ -2033,7 +2037,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","padron","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo"],"cerca-ciudad":["padron","atlas","mig","geo"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"]};
+  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -2081,10 +2085,10 @@ function renderEstudios(id){
   document.title=S.t+" · Indicio";
   view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(TOPICL(S.tema))} › ${S.m}</nav>`+pageHead(S.t,S.d,"",`<p class="byline">${byline(S)}</p>${(window.__INDICIO&&window.__INDICIO.illus||{})[S.id]||""}`)+`<div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"cerca-ciudad":studyCerca,"votar-pueblos":studyVotar,
-    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan})[S.id];
+    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA})[S.id];
   const B=document.getElementById("sbody");
   // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
-  const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos"].includes(S.id);
+  const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos","iva-alimentos"].includes(S.id);
   const run=()=>Promise.resolve(fn(B)).catch(e=>{ console.error(e); B.insertAdjacentHTML("beforeend",'<p class="loading">No se pudo calcular una parte de este estudio.</p>'); });
   if(needSeries){ B.innerHTML='<p class="loading">Cargando los datos del estudio…</p>'; loadSeries().then(()=>{ B.innerHTML=""; return run(); }).catch(e=>{ console.error(e); B.innerHTML='<p class="loading">No se pudieron cargar los datos del estudio.</p>'; }); }
   else run();
@@ -2302,6 +2306,7 @@ async function renderGasto(){
   const t=add(s4,"div","extable"); t.innerHTML=`<table class="glance"><thead><tr><th>País</th>${items.map(([c,l])=>`<th class="r">${l}</th>`).join("")}</tr></thead><tbody>${ctry.map(([g,n])=>`<tr${g==="ES"?' class="me"':""}><td>${g==="ES"?"<b>"+n+"</b>":n}</td>${items.map(([c])=>{ const v=g==="ES"?es(c):(EU[g]&&EU[g][c]?EU[g][c][cy]:null); return `<td class="r num">${v==null?"—":pc(v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table>`;
   add(s4,"figcaption",null,`% del PIB, ${cy}. Fuente: Eurostat, COFOG. Los países gastan distinto también porque se organizan distinto: en algunos, parte de la sanidad o de las pensiones es privada y no aparece aquí.`);
   const s5=finding(B,"¿Son sostenibles las pensiones?",`<p>En el laboratorio hay un estudio que separa por qué ha crecido el gasto en pensiones y qué pasará cuando se jubilen las generaciones más numerosas, con una calculadora para probar escenarios.</p><p>${exLink("evolucion",{e:["govTot","govJub","govSan","govEdu","govInt","pib"]},"Compara la evolución del gasto con el PIB en el explorador")} · <a class="exlink" href="/preguntas/pensiones/">Leer el estudio →</a></p>`);
+  panoExtra("gasto",B);
 }
 function govNote(){ return `<footer class="method"><p><b>De dónde salen los datos.</b> Eurostat: gasto de las administraciones públicas por funciones (clasificación COFOG, 1995–${GOV.years[GOV.years.length-1]}), cuentas públicas, deuda pública, PIB, gasto y beneficiarios de pensiones, población y proyecciones de población (EUROPOP2023). Las administraciones públicas incluyen Estado, comunidades autónomas, ayuntamientos y Seguridad Social, sin contar dos veces lo que se transfieren entre ellas.</p><p><b>Cómo leerlos.</b> «Jubilación» es la función de vejez de COFOG: sobre todo pensiones de jubilación, también servicios para mayores. El gasto total en pensiones (con viudedad, incapacidad y otras) es mayor: en el estudio de pensiones se usa esa cifra.</p></footer>`; }
 
@@ -2443,6 +2448,55 @@ const VG=()=>VREFS.elections.filter(k=>k.startsWith("02")).pop();
 // =====================================================================
 // INICIO
 // =====================================================================
+// =====================================================================
+// PANORAMAS: bloques comunes al final de cada tema (más contexto y los análisis del tema)
+// =====================================================================
+const BANDS=()=>Object.keys(REFS.band).sort((a,b)=>+a-+b).map((k,i)=>({k,l:REFS.bandLabels[i].replace(" hab.","").replace("menos de ","< ").replace("más de ","> "),s:REFS.band[k]}));
+function themeStudies(B,tema){
+  const L=STUDIES.filter(S=>S.tema===tema&&!S.href); if(!L.length) return;
+  const s=finding(B,"Para ir más allá: los análisis de este tema",`<p>Cada uno responde a una pregunta concreta con datos y con el método a la vista: qué se compara, con quién, y cuánto aguanta el resultado.</p>`);
+  const g=add(s,"div","tstud");
+  L.forEach(S=>{ const a=add(g,"a"); a.href=`/preguntas/${S.id}/`; const ic=illCard(S.id); if(ic) a.appendChild(ic); a.insertAdjacentHTML("beforeend",`<b>${esc(S.t)}</b><span>${esc(S.a)}</span><em>Leer el análisis →</em>`); });
+}
+function panoExtra(id,B){
+  try{
+    const es=REFS.es, BS=BANDS(), lastY=a=>{ const [v,y]=last(a); return {v,y}; }, firstY=a=>{ const [v,y]=first(a); return {v,y}; };
+    if(id==="riqueza"){
+      const u=lastY(es.pov_u18), u0=firstY(es.pov_u18), o=lastY(es.pov_o65), o0=firstY(es.pov_o65), a=lastY(es.pov_1864);
+      const s=finding(B,`La pobreza tiene cara de niño: ${deCadaDiez(u.v)} menores viven en hogares pobres`,`<p>El riesgo de pobreza (vivir en un hogar con menos del 60${NB}% de la renta mediana) no se reparte igual por edades. En ${u.y} afectaba al ${pc(u.v)} de los menores de 18 años, al ${pc(a.v)} de los adultos de 18 a 64 y al ${pc(o.v)} de los mayores de 65. La pobreza infantil ha bajado desde ${u0.y} (${pc(u0.v)}), pero la de los mayores ha subido (${pc(o0.v)} entonces): el umbral de pobreza sube con la renta mediana, y muchas pensiones bajas se han quedado por debajo de él.</p><p>Por eso las políticas que más pueden mover la pobreza son las que llegan a los hogares con niños: prestaciones por hijo, el Ingreso Mínimo Vital y, sobre todo, el empleo de los padres.</p>`);
+      lineChart(s,{title:"Riesgo de pobreza por edad",sub:"% de personas en hogares con menos del 60 % de la renta mediana",source:"Fuente: INE, Atlas de Distribución de Renta de los Hogares.",series:[{n:"Menores de 18",v:es.pov_u18,c:"--rust",main:true},{n:"18 a 64",v:es.pov_1864,c:"--slate"},{n:"65 y más",v:es.pov_o65,c:"--mustard"}],years:YEARS,xticks:[2015,2019,2023],fmt:pc,tickFmt:v=>nf0.format(v)+" %",height:260});
+      const s2=finding(B,"En los municipios grandes hay más renta, y también más desigualdad",`<p>Renta por persona e índice de Gini (0 = todos igual; 100 = uno lo tiene todo) según el tamaño del municipio. Las ciudades concentran a la vez a los hogares más ricos y a muchos de los más pobres; en los pueblos la renta es más baja, pero más pareja.</p>`);
+      const g=add(s2,"div","cols2"), fa=fig(g,{title:"Renta neta por persona",source:"Último año. Fuente: INE, Atlas de Renta."}), fb=fig(g,{title:"Desigualdad (Gini)",source:"Último año. Fuente: INE, Atlas de Renta."});
+      hbars(fa.body,BS.map(b=>({l:b.l,v:last(b.s.net_income_pc)[0]})),{fmt:eur,color:"--slate",min:0}); hbars(fb.body,BS.map(b=>({l:b.l,v:last(b.s.gini)[0]})),{fmt:v=>nf1.format(v),color:"--rust",min:20});
+    }
+    if(id==="vivienda"){
+      const vt=es.vt, P=REFS.vtPeriods, per=P.map(p=>p.replace(/^(\d{4})M(\d\d)$/,(m,y,mm)=>MES[+mm].slice(0,3)+". "+y.slice(2))), iMax=vt.indexOf(d3.max(vt)), lst=vt[vt.length-1];
+      const s=finding(B,`Los pisos turísticos tocaron techo en ${MES[+P[iMax].slice(5)]} de ${P[iMax].slice(0,4)} y desde entonces bajan`,`<p>El INE cuenta dos veces al año los anuncios de viviendas turísticas en las grandes plataformas. Tras el parón de la pandemia crecieron sin pausa hasta ${per[iMax]} (${nf0.format(vt[iMax])}); desde entonces han bajado un ${pc0((1-lst/vt[iMax])*100)}. Coinciden varias cosas: las prohibiciones municipales, el registro único estatal obligatorio desde julio de 2025, que obliga a cada anuncio a tener un número de registro, y la retirada de anuncios ilegales por parte de las plataformas.</p>`);
+      lineChart(s,{title:"Viviendas turísticas anunciadas en España",source:"Agosto y febrero (o noviembre y mayo) de cada año. Fuente: INE, medición experimental de viviendas turísticas.",series:[{n:"Viviendas turísticas",v:vt,c:"--rust",main:true}],years:per,xticks:[per[0],per[iMax],per[per.length-1]],fmt:v=>nf0.format(v),tickFmt:v=>nf0.format(v/1000)+" mil",height:240});
+      const s2=finding(B,`${cap(deCadaDiez(REFS.census.es.rented))} hogares viven de alquiler, muchos más en las islas y en la costa`,`<p>Según el censo de 2021. El alquiler pesa mucho más en Cataluña, las islas y Ceuta y Melilla, y muy poco en el interior rural, donde casi todo el mundo es propietario. Es una de las razones por las que la subida del alquiler se nota tan distinto según dónde se viva.</p>`);
+      const fa=fig(s2,{title:"Hogares que viven de alquiler, por provincia",source:"% de hogares, 2021. Fuente: INE, Censo de Población y Viviendas."}); hbars(fa.body,provRows("alquiler").sort((a,b)=>b.v-a.v),{fmt:pc,scroll:true,color:"--rust",min:0,ref:REFS.census.es.rented,refLabel:"España"});
+    }
+    if(id==="poblacion"){
+      const o=lastY(es.pct_over65), o0=firstY(es.pct_over65), u=lastY(es.pct_under18), u0=firstY(es.pct_under18);
+      const s=finding(B,`Uno de cada ${nf0.format(100/o.v)} vecinos tiene más de 65 años, y en los pueblos pequeños, uno de cada ${nf0.format(100/last(BS[0].s.pct_over65)[0])}`,`<p>Los mayores de 65 han pasado del ${pc(o0.v)} al ${pc(o.v)} de la población entre ${o0.y} y ${o.y}, y los menores de 18, del ${pc(u0.v)} al ${pc(u.v)}. El envejecimiento es mucho más intenso en los municipios pequeños: en los de menos de 1.000 habitantes, los mayores son el ${pc(last(BS[0].s.pct_over65)[0])}; en las ciudades de más de 100.000, el ${pc(last(BS[BS.length-1].s.pct_over65)[0])}. Es la otra cara de la despoblación: los pueblos no solo pierden gente, pierden a los que tendrían hijos.</p>`);
+      const g=add(s,"div","cols2");
+      lineChart(g,{title:"Mayores de 65 y menores de 18",sub:"% de la población",source:"Fuente: INE, Atlas de Renta (indicadores demográficos).",series:[{n:"Mayores de 65",v:es.pct_over65,c:"--mustard",main:true},{n:"Menores de 18",v:es.pct_under18,c:"--slate"}],years:YEARS,xticks:[2015,2019,2023],fmt:pc,tickFmt:v=>nf0.format(v)+" %",height:240});
+      const fb=fig(g,{title:"Mayores de 65 según el tamaño del municipio",source:"% de la población, último año. Fuente: INE, Atlas de Renta."}); hbars(fb.body,BS.map(b=>({l:b.l,v:last(b.s.pct_over65)[0]})),{fmt:pc,color:"--mustard",min:0});
+    }
+    if(id==="trabajo"){
+      const cats=[{k:"wage",l:"Salarios",c:"--slate"},{k:"pension",l:"Pensiones",c:"--mustard"},{k:"unemp_benefit",l:"Paro",c:"--rust"},{k:"other_benefits",l:"Otras prestaciones",c:"--plum"},{k:"other_income",l:"Otros ingresos",c:"--stone"}];
+      const rows=BS.map(b=>({l:b.l,v:Object.fromEntries(cats.map(c=>[c.k,last(b.s[c.k])[0]]))})).concat([{l:"España",me:true,v:Object.fromEntries(cats.map(c=>[c.k,last(es[c.k])[0]]))}]);
+      const b0=rows[0].v, bN=rows[BS.length-1].v;
+      const s=finding(B,`En los pueblos más pequeños, ${nf0.format(b0.pension)} de cada 100 euros son pensiones`,`<p>De dónde sale la renta de los hogares según el tamaño del municipio. En las ciudades de más de 100.000 habitantes, ${nf0.format(bN.wage)} de cada 100 euros son salarios y ${nf0.format(bN.pension)}, pensiones; en los municipios de menos de 1.000, los salarios bajan a ${nf0.format(b0.wage)} y las pensiones suben a ${nf0.format(b0.pension)}. Eso hace a los pueblos más estables cuando llega una crisis (las pensiones no caen) pero también más dependientes de cómo se revaloricen cada año.</p>`);
+      stackBars(s,{rows,cats,note:"% de la renta bruta declarada, último año disponible. Fuente: INE, Atlas de Renta."});
+      const PR=REFS.paro.prov, PY=REFS.paroYears, i19=PY.indexOf(2019), i25=PY.indexOf(2025);
+      if(PR&&i19>=0&&i25>=0){ const rw=Object.entries(PR).map(([p,v])=>v.paro&&v.paro[i19]?{l:provShort(PROVS[p]),v:(v.paro[i25]/v.paro[i19]-1)*100}:null).filter(Boolean).sort((a,b)=>a.v-b.v), esv=(REFS.paro.es.paro[i25]/REFS.paro.es.paro[i19]-1)*100;
+        const s2=finding(B,`Desde 2019 el paro registrado ha bajado un ${pc0(-esv)}, pero mucho más en unas provincias que en otras`,`<p>Cambio del paro registrado entre la media de 2019, antes de la pandemia, y la de 2025. Bajó en todas partes, pero el ritmo varía mucho: han caído más las provincias que partían de más paro (en Extremadura, Castilla-La Mancha o Andalucía) y Baleares; mucho menos las del País Vasco, Navarra y Barcelona, que ya tenían poco.</p>`);
+        const f=fig(s2,{source:"Media anual del paro registrado. Fuente: SEPE."}); hbars(f.body,rw,{fmt:sgn,scroll:true,color:"--slate",ref:esv,refLabel:"España",max:0}); }
+    }
+    themeStudies(B,id);
+  }catch(e){ console.error(e); }
+}
 async function renderInicioV1(){
   document.title="Indicio · Cómo vive España, municipio a municipio";
   const G=subidas(), lose=loseShare(), n=rowsAll().length;
@@ -2697,6 +2751,7 @@ async function renderVoto(){
   if(eu&&F.salf24!=null){ const ccaa=d3.rollups(rows.filter(r=>r[F.salf24]!=null&&r[F.pop]),v=>d3.sum(v,r=>r[F.salf24]*r[F.pop])/d3.sum(v,r=>r[F.pop]),r=>CCAA_OF[r[F.prov]]).filter(([c])=>c&&!/Ceuta|Melilla/.test(c)).sort((a,b)=>b[1]-a[1]);
     const s5=finding(B,`Se Acabó La Fiesta, la sorpresa de las europeas: un ${pc(VREFS.es[eu].share.SALF||0)} de los votos`,`<p>La candidatura nueva de las europeas de 2024 por comunidades. Fue más fuerte en ${esc(ccaa[0][0])} y ${esc(ccaa[1][0])}.</p>`);
     const f5=fig(s5,{title:"Voto a Se Acabó La Fiesta, europeas de 2024",source:"% sobre voto válido, media ponderada por población. Fuente: Ministerio del Interior."}); hbars(f5.body,ccaa.map(([l,v])=>({l,v})),{fmt:pc,color:"--plum",min:0,ref:VREFS.es[eu].share.SALF,refLabel:"España"}); }
+  panoExtra("voto",B);
 }
 // =====================================================================
 // LABORATORIO: un lienzo con pasos (gráfico, datos, municipios, comprobar)
@@ -2863,6 +2918,7 @@ function lbSay(){
   if(EX.v==="burbujas") return `<b>Qué estás viendo:</b> cada provincia año a año, con ${low(labK(EX.d[0]))} en horizontal y ${low(labK(EX.d[1]))} en vertical. Si las burbujas suben o se desplazan juntas, los dos datos cambian a la vez; si unas se quedan atrás, hay provincias que no siguen la tendencia.`;
   if(EX.v==="tabla"){ const o=EX.o&&EX.o!=="pop"&&EX.d.includes(EX.o)?EX.o:k, rs=exRows(o).sort((a,b)=>b[F[o]]-a[F[o]]); if(!rs.length) return ""; const fo=fmtK(o);
     return `<b>Qué estás viendo:</b> ${nf0.format(rs.length)} municipios ordenados por ${low(labK(o))}. Encabeza ${esc(dispName(rs[0][F.name]))} con ${fo(rs[0][F[o]])}; la media de la selección es ${fo(d3.sum(rs,r=>r[F[o]]*(r[F.pop]||0))/d3.sum(rs,r=>r[F.pop]||0))}. Pulsa una columna para ordenar por otro dato.`; }
+  if(EX.v==="cruce"&&EX.u) return "";
   if(EX.v==="cruce"){ if(EX.d.length<2) return "Pon un segundo dato en el hueco vertical."; const [x,y]=EX.d, c=wcorr(pairPts(x,y,{weighted:!!EX.w,logX:!!EX.lx})); if(!c) return "No hay datos suficientes para medir la relación.";
     return `<b>Qué estás viendo:</b> cada círculo es un municipio, más grande cuanta más gente. La relación es <b>${strength(Math.abs(c.r))}</b> (r = ${rFmt(c.r)}). ${Math.abs(c.r)>=0.1?`Las diferencias de ${low(labK(x))} explican el ${nf0.format(c.r*c.r*100)}${NB}% de las de ${low(labK(y))}; el resto depende de otras cosas.`:""}`; }
   if(EX.v==="antes") return `<b>Qué estás viendo:</b> ${low(ADY[AD.y].l)} de los municipios afectados y de sus gemelos (los más parecidos que no lo vivieron), con el año anterior a la medida = 100. Si antes iban juntos y después se separan, esa separación es la mejor pista de un efecto.`;
@@ -2937,11 +2993,52 @@ function ctrlRisk(x,y,c){
   return RISK[key]=out;
 }
 
+// ---------- escala: comparar municipios, provincias o comunidades ----------
+const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"]];
+function scaleBar(){ return `<div class="lbscale" role="group" aria-label="Escala de la comparación"><span class="lbscale-l">Comparar</span><div class="seg">${SCALES.map(([u,l])=>`<button type="button" data-u="${u}" aria-pressed="${(EX.u||"")===u}">${l}</button>`).join("")}</div><span class="lbscale-h">${EX.u?"Cada punto es la media de sus municipios, ponderada por población.":"Cada punto es un municipio."}</span></div>`; }
+function scaleWire(out){ out.querySelectorAll(".lbscale button[data-u]").forEach(b=>b.addEventListener("click",()=>{ EX.u=b.dataset.u; navTo(exHash()); })); }
+// agrega los municipios (con el filtro de provincia y tamaño del laboratorio) en provincias o comunidades
+function aggPts(x,y,u){
+  const key=u==="prov"?r=>r[F.prov]:r=>CCAA_OF[r[F.prov]], name=u==="prov"?k=>provShort(PROVS[k]):k=>k;
+  const rs=rowsAll().filter(r=>r[F[x]]!=null&&r[F[y]]!=null&&r[F.pop]&&exOK(r)&&key(r));
+  return d3.groups(rs,key).map(([k,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return {k,l:name(k),n:v.length,pop:w,x:d3.sum(v,r=>r[F[x]]*r[F.pop])/w,y:d3.sum(v,r=>r[F[y]]*r[F.pop])/w}; }).filter(p=>isFinite(p.x)&&isFinite(p.y));
+}
+function exCruceAgg(out,x,y){
+  const u=EX.u, P=aggPts(x,y,u), wt=!!EX.w;
+  const cAt=uu=>{ if(!uu){ const c=wcorr(pairPts(x,y,{weighted:wt})); return c?{r:c.r,n:pairPts(x,y,{weighted:wt}).length}:null; } const A=aggPts(x,y,uu), c=wcorr(A.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1}))); return c?{r:c.r,n:A.length}:null; };
+  const C={"":cAt(""),prov:cAt("prov"),ccaa:cAt("ccaa")};
+  out.insertAdjacentHTML("beforeend",`<div id="aggplot"></div>`);
+  if(P.length<4){ document.getElementById("aggplot").innerHTML='<p class="loading">Hay muy pocos grupos con estos filtros. Quita el filtro de provincia para comparar comunidades o provincias.</p>'; return; }
+  const box=document.getElementById("aggplot"), W=Math.max(320,box.clientWidth||720), H=Math.min(520,Math.max(340,W*0.62)), m={t:16,r:96,b:46,l:58};
+  const fx=fmtK(x), fy=fmtK(y);
+  const X=d3.scaleLinear().domain(d3.extent(P,p=>p.x)).nice().range([m.l,W-m.r]), Y=d3.scaleLinear().domain(d3.extent(P,p=>p.y)).nice().range([H-m.b,m.t]), Rr=d3.scaleSqrt().domain([0,d3.max(P,p=>p.pop)]).range([3,u==="ccaa"?26:18]);
+  const sv=d3.select(box).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`${labK(x)} y ${low(labK(y))} por ${u==="prov"?"provincias":"comunidades"}`);
+  sv.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(X).ticks(6).tickFormat(fx)).call(g=>g.select(".domain").attr("stroke","var(--rule-2)")).selectAll("text").attr("fill","var(--muted)");
+  sv.append("g").attr("transform",`translate(${m.l},0)`).call(d3.axisLeft(Y).ticks(6).tickFormat(fy)).call(g=>g.select(".domain").attr("stroke","var(--rule-2)")).selectAll("text").attr("fill","var(--muted)");
+  sv.append("text").attr("x",W-m.r).attr("y",H-8).attr("text-anchor","end").attr("font-size",12).attr("fill","var(--ink-2)").text(labK(x)+" →");
+  sv.append("text").attr("x",m.l).attr("y",m.t-4).attr("font-size",12).attr("fill","var(--ink-2)").text("↑ "+labK(y));
+  const c=wcorr(P.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1})));
+  if(c){ const [a,b]=X.domain(); const mx=c.mx??d3.mean(P,p=>p.x), my=c.my??d3.mean(P,p=>p.y); sv.append("line").attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(my+c.b*(a-mx))).attr("y2",Y(my+c.b*(b-mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
+  const g=sv.append("g").selectAll("g").data(P.slice().sort((a,b)=>b.pop-a.pop)).join("g");
+  g.append("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>Rr(p.pop)).attr("fill","var(--rust)").attr("fill-opacity",.55).attr("stroke","var(--rust)").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)} (${nf0.format(p.n)} municipios)`);
+  const lab=u==="ccaa"?P:P.filter(p=>{ const zx=Math.abs(p.x-d3.mean(P,q=>q.x))/(d3.deviation(P,q=>q.x)||1), zy=Math.abs(p.y-d3.mean(P,q=>q.y))/(d3.deviation(P,q=>q.y)||1); return zx+zy>1.6||p.pop>3e6; });
+  sv.append("g").selectAll("text").data(lab).join("text").attr("x",p=>X(p.x)+Rr(p.pop)+3).attr("y",p=>Y(p.y)+4).attr("font-size",11).attr("fill","var(--ink-2)").text(p=>p.l);
+  add(box,"figcaption",null,`${nf0.format(P.length)} ${u==="prov"?"provincias":"comunidades y ciudades autónomas"}; el tamaño del punto es la población. Medias de los municipios con dato, ponderadas por población${EX.p||EX.t?", con el filtro de arriba":""}.`);
+  // la escala cambia la respuesta
+  const rF=o=>o?`r = ${rFmt(o.r)}`:"—", bar=o=>o?`<span class="scb"><i style="width:${Math.abs(o.r)*100}%;background:var(${o.r<0?"--slate":"--rust"})"></i></span>`:"";
+  const tst=document.getElementById("lbtest");
+  if(tst) tst.innerHTML=`<section class="scale-cmp" aria-label="La escala cambia la respuesta"><div><h3>La escala cambia la respuesta</h3>
+    <table class="tbl scale-t"><thead><tr><th>Comparando…</th><th>Puntos</th><th>Fuerza de la relación</th><th></th></tr></thead><tbody>${SCALES.map(([uu,l])=>`<tr${uu===(u||"")?' class="me"':""}><td>${l}</td><td class="r num">${C[uu]?nf0.format(C[uu].n):"—"}</td><td class="r num"><b>${rF(C[uu])}</b></td><td>${bar(C[uu])}</td></tr>`).join("")}</tbody></table>
+    <p>${C[""]&&C[u]?(Math.abs(C[u].r)>Math.abs(C[""].r)+0.15?`Entre ${u==="prov"?"provincias":"comunidades"} la relación parece <b>mucho más fuerte</b> (${rFmt(C[u].r)}) que entre municipios (${rFmt(C[""].r)}). Es lo habitual: al promediar se borran las diferencias dentro de cada territorio y queda solo lo que separa a unos territorios de otros, que suele ir todo junto (renta, estudios, edad, paro).`:Math.abs(C[u].r)<Math.abs(C[""].r)-0.15?`Entre ${u==="prov"?"provincias":"comunidades"} la relación es <b>más débil</b> (${rFmt(C[u].r)}) que entre municipios (${rFmt(C[""].r)}): lo que se ve entre municipios pasa sobre todo dentro de cada territorio.`:`La relación se parece a todas las escalas (${rFmt(C[""].r)} entre municipios, ${rFmt(C[u].r)} entre ${u==="prov"?"provincias":"comunidades"}): es un patrón que no depende de cómo se agrupe.`):""}</p>
+    <p class="muted">Cuidado con la <b>falacia ecológica</b>: que dos cosas vayan juntas entre comunidades no dice que vayan juntas entre municipios, ni mucho menos entre personas. Con ${C[u]?nf0.format(C[u].n):"pocos"} puntos, además, una sola comunidad puede mover mucho el resultado. Las pruebas de «¿aguanta la relación?» (comparar entre parecidos, gemelos, dentro de cada provincia) solo tienen sentido con municipios: <button type="button" class="lnk" data-u="">vuelve a municipios</button> para usarlas.</p></div></section>`;
+  tst&&tst.querySelectorAll("button[data-u]").forEach(b=>b.addEventListener("click",()=>{ EX.u=""; navTo(exHash()); }));
+}
 function exCruce(out){
   if(EX.d.length<2){ out.innerHTML='<p class="loading">Pon un segundo dato en el hueco «Vertical» para cruzarlo con el primero.</p>'; return; }
   const [x,y]=EX.d; XS={...XS,x,y,minPop:0,prov:"",weighted:!!EX.w,logX:!!EX.lx,sz:EX.sz,col:EX.col,quad:EX.q};
+  if(EX.u){ out.innerHTML=scaleBar(); scaleWire(out); exCruceAgg(out,x,y); return; }
   LBPOS=null;
-  out.innerHTML=`<div id="ctlnote"></div><div id="cplot"></div>`;
+  out.innerHTML=scaleBar()+`<div id="ctlnote"></div><div id="cplot"></div>`; scaleWire(out);
   const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" aria-label="¿Aguanta la relación?"><div class="czc-l" id="czl"></div><div class="czc-r"><p class="czc-q" id="cztags"></p><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><p class="czc-m"><button type="button" class="lnk" id="czmore" aria-expanded="false" aria-controls="lbcausal">Entender esta relación a fondo ↓</button> <span class="muted">las pruebas una a una, municipios gemelos y provincia a provincia</span> · <a href="/laboratorio/metodo/">Guía: de la relación a la causa →</a></p></div></section>`;
   const cb=document.getElementById("lbcausal"); if(cb) cb.hidden=true;
   document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.textContent=o?"Ocultar el detalle ↑":"Entender esta relación a fondo ↓"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
@@ -3744,6 +3841,72 @@ function rdPlot(parent,o,H){
 }
 
 // ---------- AVE: ¿cambia algo cuando llega la alta velocidad? ----------
+// =====================================================================
+// IVA DE LOS ALIMENTOS: triple diferencia (alimentos con rebaja − sin rebaja; España − otros países; mes de la medida − mismo mes de otros años)
+// =====================================================================
+function studyIVA(B){
+  const AB=abstract(B), H=EXT.hicp, P=H.periods, S=H.series, O=["PT","FR","IT","DE"], ON={PT:"Portugal",FR:"Francia",IT:"Italia",DE:"Alemania"};
+  const TR=[["CP0111","Pan y cereales"],["CP0114","Leche, queso y huevos"],["CP0116","Frutas"],["CP0117","Legumbres y hortalizas"]], CT=[["CP0112","Carne"],["CP0113","Pescado"]];
+  const ix=(y,m)=>P.indexOf(`${y}-${String(m).padStart(2,"0")}`);
+  // variación mensual en puntos logarítmicos (≈ %)
+  const dm=(g,k,y,m)=>{ const b=ix(y,m), a=m===1?ix(y-1,12):ix(y,m-1); if(a<0||b<0) return null; const s=S[g][k]; return 100*Math.log(s[b]/s[a]); };
+  const YRS=[2021,2022,2023,2024,2025];
+  // efecto de un mes: (España − media de otros años en ese mes) − lo mismo en los otros países
+  const sea=(g,k,y,m)=>{ const v=YRS.filter(yy=>yy!==y).map(yy=>dm(g,k,yy,m)).filter(x=>x!=null), d=dm(g,k,y,m); return d==null||!v.length?null:d-d3.mean(v); };
+  const eff=(k,y,m)=>{ const e=sea("ES",k,y,m), o=O.map(g=>sea(g,k,y,m)).filter(x=>x!=null); return e==null||!o.length?null:e-d3.mean(o); };
+  const effT=(y,m)=>{ const v=TR.map(([k])=>eff(k,y,m)); return v.some(x=>x==null)?null:d3.mean(v); };
+  const effC=(y,m)=>{ const v=CT.map(([k])=>eff(k,y,m)); return v.some(x=>x==null)?null:d3.mean(v); };
+  const EV=[{y:2023,m:1,l:"Enero de 2023",t:"del 4 al 0 %",mech:100*Math.log(1/1.04)},{y:2024,m:10,l:"Octubre de 2024",t:"del 0 al 2 %",mech:100*Math.log(1.02)},{y:2025,m:1,l:"Enero de 2025",t:"del 2 al 4 %",mech:100*Math.log(1.04/1.02)}];
+  EV.forEach(e=>{ e.items=TR.map(([k,l])=>({k,l,v:eff(k,e.y,e.m)})); e.ctrl=CT.map(([k,l])=>({k,l,v:eff(k,e.y,e.m)})); e.avg=effT(e.y,e.m); e.cavg=effC(e.y,e.m); e.pt=e.avg/e.mech*100; });
+  const isEv=(y,m)=>EV.some(e=>e.y===y&&e.m===m);
+  // calendario: el mismo cálculo para cada mes de 2022 a 2025 (los meses sin medida son placebos)
+  const CAL=[]; for(let y=2022;y<=2025;y++) for(let m=1;m<=12;m++){ if(ix(y,m)<0) continue; const v=effT(y,m); if(v!=null) CAL.push({y,m,v,ev:isEv(y,m)}); }
+  const PL=CAL.filter(c=>!c.ev).map(c=>c.v), e0=EV[0], e2=EV[2];
+  const fr=e0.items[2], frPt=fr.v/e0.mech*100, fr2=e2.items[2], below=PL.filter(v=>v<=e0.avg).length, above=PL.filter(v=>v>=e2.avg).length;
+  const f1=v=>v==null?"—":(v<0?"−":v>0?"+":"")+nf1.format(Math.abs(v)), MESC=["","ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+
+  sec(B,"ctx",`<p>En 2022 la cesta de la compra se disparó: los alimentos llegaron a subir más de un 15${NB}% en un año, el mayor encarecimiento en casi tres décadas. Para aliviarlo, el Gobierno eliminó el IVA de los alimentos más básicos desde el 1 de enero de 2023. Era una medida cara, unos 700 millones de euros al año, y desde el primer día se repitió la misma pregunta: <b>¿llegaría la rebaja al ticket, o se la quedarían por el camino los supermercados y los productores?</b></p>
+    <p>La pregunta tiene una dificultad evidente. Los precios de los alimentos se movían mucho por otras razones: la sequía, la guerra de Ucrania, el precio de la energía, la temporada de cada fruta. Ver que el pan subió en 2023 no dice nada sobre si la rebaja funcionó; lo que importa es si subió <i>menos de lo que habría subido sin ella</i>. Y como la medida se fue retirando en dos pasos, en octubre de 2024 y en enero de 2025, se puede mirar también lo contrario: si al volver el IVA los precios subieron.</p>`);
+  sec(B,"int",`<p>El 1 de enero de 2023 el IVA de los alimentos de primera necesidad (pan, harinas, leche, quesos, huevos, frutas, verduras, legumbres, tubérculos y cereales) bajó del 4 al <b>0${NB}%</b>, y el de los aceites y la pasta, del 10 al 5${NB}%. La rebaja se prorrogó durante 2024 y se retiró en dos escalones: el <b>1 de octubre de 2024</b> subió al 2${NB}% y el <b>1 de enero de 2025</b> volvió al 4${NB}%. La carne y el pescado nunca tuvieron rebaja: sirven de comparación.</p>`,{title:"La medida"});
+  sec(B,"ana",`<p>Se usan los índices de precios armonizados de Eurostat, mes a mes, de 2021 a 2025, para cuatro grupos de alimentos con rebaja (pan y cereales; leche, queso y huevos; frutas; legumbres y hortalizas) y dos sin ella (carne y pescado), en España y en cuatro países vecinos que no tocaron el IVA en esas fechas: Portugal, Francia, Italia y Alemania.</p>
+    <p>El efecto de cada medida es una <b>triple diferencia</b>. Primero, cuánto cambió el precio de un alimento en España el mes de la medida, descontando lo que suele cambiar ese mismo mes en otros años (la fruta de enero no se comporta como la de julio). Segundo, se resta lo mismo calculado en los otros países, lo que quita lo que movió los precios en toda Europa a la vez. Tercero, se compara con la carne y el pescado, que no tuvieron rebaja. Si la rebaja llegó entera al consumidor, el precio debería caer un 3,8${NB}% (lo que pesa un IVA del 4${NB}%). El resultado se compara con ese número para saber <b>qué parte de la rebaja se trasladó</b>.</p>`);
+
+  const s1=res(B,`En enero de 2023 los alimentos con rebaja se abarataron un ${nf1.format(Math.abs(e0.avg))}${NB}% respecto a lo esperable`,`<p>Cada barra es el mismo cálculo para un mes distinto: cuánto se separaron los alimentos con rebaja en España de lo que sería normal ese mes, descontando a los otros países. En los meses sin ninguna medida (gris) esperaríamos ruido alrededor de cero. En granate, los meses en que cambió el IVA.</p>`);
+  { const fg=fig(s1,{title:"Efecto estimado, mes a mes",sub:"Puntos porcentuales; media de los cuatro grupos con rebaja",source:"Fuente: Eurostat, IPCA mensual (prc_hicp_midx). Cálculo de Indicio."});
+    const W=Math.max(320,fg.body.clientWidth||680), Hh=260, m={t:16,r:10,b:30,l:40};
+    const X=d3.scaleBand().domain(CAL.map((c,i)=>i)).range([m.l,W-m.r]).padding(0.18), ext=d3.extent(CAL,c=>c.v), Y=d3.scaleLinear().domain([Math.min(-2.5,ext[0]),Math.max(2.5,ext[1])]).nice().range([Hh-m.b,m.t]);
+    const sv=d3.select(fg.body).append("svg").attr("viewBox",`0 0 ${W} ${Hh}`).attr("role","img").attr("aria-label","Efecto estimado mes a mes");
+    sv.append("g").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",d=>Y(d)).attr("y2",d=>Y(d)).attr("stroke","var(--rule)");
+    sv.append("g").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",d=>Y(d)+4).attr("text-anchor","end").attr("font-size",11).attr("fill","var(--muted)").text(d=>f1(d));
+    sv.append("g").selectAll("rect").data(CAL).join("rect").attr("x",(c,i)=>X(i)).attr("width",X.bandwidth()).attr("y",c=>Y(Math.max(0,c.v))).attr("height",c=>Math.abs(Y(c.v)-Y(0))).attr("fill",c=>c.ev?"var(--brand)":"var(--rule-2)").append("title").text(c=>`${MESC[c.m]} ${c.y}: ${f1(c.v)} puntos`);
+    sv.append("g").selectAll("text").data(CAL.map((c,i)=>({c,i})).filter(o=>o.c.m===1)).join("text").attr("x",o=>X(o.i)).attr("y",Hh-10).attr("font-size",11).attr("fill","var(--muted)").text(o=>o.c.y);
+    EV.forEach(e=>{ const i=CAL.findIndex(c=>c.y===e.y&&c.m===e.m); if(i<0) return; sv.append("text").attr("x",X(i)+X.bandwidth()/2).attr("y",e.avg<0?Y(e.avg)+14:Y(e.avg)-6).attr("text-anchor","middle").attr("font-size",11).attr("font-weight",700).attr("fill","var(--brand)").text(`${MESC[e.m]} ${String(e.y).slice(2)}`); });
+  }
+  lect(s1,`<p>La barra de enero de 2023 cae hasta ${f1(e0.avg)} puntos, ${below===0?`más que cualquiera de los ${PL.length} meses sin medida`:`más que ${PL.length-below} de los ${PL.length} meses sin medida`}. Es la señal de que la rebaja sí se notó en el precio, y no fue un movimiento normal de enero: los otros eneros, y los otros países ese mismo enero, sirven para descontarlo.</p><p>La caída media no llega al 3,8${NB}% que habría supuesto trasladar todo el IVA, pero esa comparación engaña: los grupos de pan y de lácteos incluyen muchos productos que no tuvieron rebaja (bollería, galletas, yogures, nata). En la fruta, el único grupo en el que todo bajó de IVA, el precio cayó ${nf1.format(Math.abs(fr.v))} puntos: <b>en torno al ${nf0.format(frPt)}${NB}% de la rebaja</b>. Es una cifra cercana al 90${NB}% que estimó el Banco de España con datos producto a producto.</p>`);
+
+  const s2=res(B,`Donde todo el grupo tenía rebaja, llegó casi entera; y al volver el IVA, los precios subieron`,`<p>Efecto estimado en cada grupo de alimentos, en el mes de cada cambio de IVA, frente a lo que habría supuesto trasladarlo entero. La carne y el pescado, sin cambio de IVA, deberían salir cerca de cero: son la prueba de que el método no se inventa efectos.</p>`);
+  table(s2,["Grupo",...EV.map(e=>`${e.l}<br><small>IVA ${e.t}</small>`)],[
+    ...TR.map(([k,l],j)=>[l,...EV.map(e=>`${f1(e.items[j].v)}`)]),
+    ["<b>Media con rebaja</b>",...EV.map(e=>`<b>${f1(e.avg)}</b>`)],
+    ["<i>Si se trasladara entero</i>",...EV.map(e=>`<i>${f1(e.mech)}</i>`)],
+    ["<b>Parte trasladada</b>",...EV.map(e=>`<b>${e.pt<0?"ninguna":nf0.format(e.pt)+NB+"%"}</b>`)],
+    ...CT.map(([k,l],j)=>[`${l} <small>(sin cambio de IVA)</small>`,...EV.map(e=>f1(e.ctrl[j].v))])],{max:820});
+  lect(s2,`<p>La fila de «parte trasladada» hay que leerla con cuidado: es la media de cuatro grupos que mezclan productos con y sin rebaja, así que es un mínimo. La fila de la fruta es la más limpia, porque toda ella bajó de IVA, y ahí la rebaja llegó casi entera (${nf0.format(frPt)}${NB}%). En el pan y los lácteos el efecto es menor, como cabe esperar si solo una parte de lo que se mide tenía rebaja.</p><p>La retirada cuenta la misma historia al revés. En enero de 2025, cuando el IVA volvió al 4${NB}%, los alimentos con rebaja se encarecieron ${nf1.format(Math.abs(e2.avg))} puntos frente a lo esperable, más o menos lo que pesa el impuesto (${nf0.format(e2.pt)}${NB}%). El escalón intermedio de octubre de 2024 no se distingue del ruido, sobre todo por la fruta, cuyo precio cambia mucho entre septiembre y octubre. La carne y el pescado ${Math.abs(e0.cavg)<0.8&&Math.abs(e2.cavg)<1?"apenas se mueven en esos meses, como debe ser":"se mueven algo, lo que pide cautela"}.</p>`);
+
+  const s3=res(B,below===0&&above===0?"Ningún otro mes se parece a los meses de la medida":"Los meses de la medida destacan, pero el ruido es grande",`<p>La prueba del calendario: si el cálculo se repite en cada uno de los ${PL.length} meses de 2022 a 2025 en los que no cambió el IVA, ¿cuántos dan una caída como la de enero de 2023 o una subida como la de enero de 2025?</p>`);
+  add(s3,"p",null,`Caídas iguales o mayores que la de enero de 2023: <b>${below} de ${PL.length}</b>. Subidas iguales o mayores que la de enero de 2025: <b>${above} de ${PL.length}</b>. El mes sin medida más extremo da ${f1(d3.min(PL))} y ${f1(d3.max(PL))} puntos.`);
+  lect(s3,`<p>Es la forma más sencilla de saber si un resultado podría ser casualidad: si muchos meses normales dieran cifras así, no habría por qué creer que la de enero de 2023 se debe al IVA. ${below===0?"Aquí no pasa: enero de 2023 está solo en su extremo.":"Aquí hay algún mes normal con cifras parecidas, así que el resultado hay que tomarlo con cautela."} Ojo con un detalle: Portugal tuvo su propio «IVA cero» entre abril de 2023 y enero de 2024, lo que ensucia algo su comparación en esos meses. Repetir el cálculo sin Portugal da un resultado muy parecido (−1,8 puntos en enero de 2023 y, en la fruta, −3,6).</p>`);
+
+  sec(B,"con",`<p><b>La rebaja del IVA de los alimentos sí llegó al ticket, y en buena parte.</b> En la fruta, el grupo en el que todos los productos bajaron de IVA, llegó en torno al ${nf0.format(frPt)}${NB}% de lo que se dejaba de cobrar, una cifra en línea con la del Banco de España. Y cuando el impuesto volvió, en enero de 2025, los precios subieron en la misma medida: la prueba al revés confirma que el IVA de estos productos se nota en el precio.</p>
+    <p>Para el debate político, eso desmonta la idea de que la rebaja «se la quedaron los supermercados», al menos en el primer mes. Pero no responde a otra pregunta igual de importante: si era la mejor forma de gastar ese dinero. La rebaja del IVA llega a todos los hogares por igual, también a los que no la necesitan, y cuanto más se gasta en comida, más se ahorra; una ayuda directa a los hogares con menos renta habría concentrado el mismo dinero donde más falta hacía.</p>
+    <ul class="defs"><li><b>Cada grupo mezcla productos con y sin rebaja.</b> El pan de molde o la bollería no bajaron de IVA; el yogur tampoco. Eso hace que el «si se trasladara entero» de la tabla sea un máximo y que la parte trasladada real sea algo mayor de lo que aquí se mide, sobre todo en pan y lácteos.</li>
+    <li><b>Es el primer mes.</b> Una parte de la rebaja pudo trasladarse más tarde, o deshacerse con los meses. Con datos mensuales tan volátiles no se puede seguir con precisión.</li>
+    <li><b>Cuatro países de comparación.</b> Si en enero de 2023 algo movió los precios de los alimentos de forma especial solo en España, se confundiría con la rebaja; la comparación con la carne y el pescado reduce ese riesgo.</li>
+    <li>El Banco de España, con los precios del INE producto a producto, estimó un traslado de en torno al 90${NB}% en enero y febrero de 2023. Este análisis, con grupos agregados de Eurostat, da una cota prudente que es coherente con esa cifra donde el grupo es homogéneo.</li></ul>`);
+  methods(B,[["En pocas palabras","Se compara cuánto cambió el precio de los alimentos con rebaja de IVA en España el mes de cada cambio, frente al mismo mes de otros años, frente a la carne y el pescado y frente a cuatro países vecinos, y se mide qué parte del impuesto llegó al precio."],["Datos","Eurostat, índice de precios de consumo armonizado mensual (prc_hicp_midx, 2015 = 100), enero de 2021 a septiembre de 2025: España, Portugal, Francia, Italia y Alemania; grupos COICOP 01.1.1, 01.1.2, 01.1.3, 01.1.4, 01.1.6 y 01.1.7."],["Efecto de un mes","Variación logarítmica mensual en España menos su media en ese mismo mes de los demás años 2021–2025, menos la misma cantidad en la media de los cuatro países. Para los grupos con rebaja se promedia entre los cuatro."],["Traslado","Efecto medio dividido entre el cambio mecánico del IVA en logaritmos (−3,9 puntos de 4 a 0 %; +2,0 de 0 a 2 % y de 2 a 4 %). Los grupos mezclan productos sin rebaja, así que es una cota inferior."],["Falsificación","La carne y el pescado, sin cambio de IVA, deben salir cerca de cero. Calendario de placebos: el mismo cálculo en los meses sin medida de 2022–2025."],["Limitaciones","Un mes; grupos agregados; Portugal con su propia rebaja de abril a diciembre de 2023; los aceites y la pasta (del 10 al 5 %) no se analizan por falta de comparación europea en estos datos."]]);
+  AB.fill({ctx:"En 2022 los alimentos subieron más de un 15 % y el Gobierno quitó el IVA a los básicos para aliviar la compra.",intT:"La medida",int:"IVA de los alimentos básicos del 4 al 0 % en enero de 2023; vuelta al 2 % en octubre de 2024 y al 4 % en enero de 2025.",ana:"Triple diferencia mensual con Eurostat: España frente a cuatro países vecinos, alimentos con rebaja frente a carne y pescado, y el mes de la medida frente al mismo mes de otros años; calendario de placebos.",res:`Enero de 2023: ${f1(e0.avg)} puntos de media en los grupos con rebaja; en la fruta, toda ella rebajada, ${f1(fr.v)} (en torno al ${nf0.format(frPt)} % de la rebaja). Enero de 2025: ${f1(e2.avg)}. ${below} de ${PL.length} meses sin medida dan una caída igual o mayor.`,con:"La rebaja llegó al precio en buena parte, y su retirada se notó igual; queda abierto si era la forma más eficaz de ayudar a quien más lo necesitaba."});
+}
+
 async function studyAve(B){
   const AB=abstract(B);
   await loadTopo(); const CEN=qCen();

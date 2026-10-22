@@ -178,3 +178,17 @@ export const TILL={
 
 // Encuadre de cada escena en las tarjetas (ventana de 720 px de ancho sobre 1200)
 export const FOCUS={"cerca-ciudad":330,"pisos-turisticos":240,"convergencia":240,"votar-pueblos":360,"crecer":380,"tope-cataluna":300,"pensiones":340,"pandemia-turismo":330,"renta-fuentes":480,"quien-gobierna":350,"ave":360,"prohibir-pisos-turisticos":240,"estudiar":300,"paro-sur":300};
+
+ILLUS["iva-alimentos"]=svg("iva-alimentos","Una cesta de la compra con pan, leche y fruta junto a un ticket",
+  R(0,300,1200,60,"k9")+R(0,292,1200,10,"kr")+
+  G("translate(420 0)",
+    R(40,150,30,110,"kc",` rx="6"`)+R(40,150,30,110,"sk",` rx="6" fill="none" stroke-width="2"`)+R(40,182,30,30,"k4")+
+    E(150,170,70,26,"k3")+P("M88 168 q20 -14 40 0 q20 -14 40 0 q20 -14 40 0","sk",` fill="none" stroke-width="2" opacity=".5"`)+
+    C(240,190,22,"k2")+C(270,180,20,"k5")+C(290,200,18,"k3")+R(268,152,4,14,"k5")+
+    P("M0 196 L340 196 L310 300 L30 300 Z","k1")+[60,120,180,240,290].map(x=>L(x,206,x-6+(x>170?10:0),290,"sl",` stroke-width="3" opacity=".5"`)).join("")+
+    P("M40 196 Q170 90 300 196","sk",` fill="none" stroke-width="6"`))+
+  G("translate(860 70) rotate(4)",R(0,0,150,220,"kc")+P("M0 220 l12 10 l13 -10 l12 10 l13 -10 l12 10 l13 -10 l12 10 l13 -10 l12 10 l13 -10 l12 10 l13 -10 L150 220 Z","kc")+
+    [30,52,74,96,118].map((y,i)=>R(16,y,[80,64,90,56,72][i],7,"kr")+R(112,y,22,7,"kr")).join("")+L(16,148,134,148,"sk",` stroke-width="2" stroke-dasharray="4 4"`)+R(16,162,50,10,"ki")+R(96,162,38,10,"ki")+
+    G("translate(60 186)",C(0,0,26,"sb",` fill="none" stroke-width="5"`)+P("M-10 10 L10 -10","sb",` fill="none" stroke-width="5" stroke-linecap="round"`)+C(-8,-8,4,"k1")+C(8,8,4,"k1")))+
+  C(140,80,28,"k3")+tree(220,300,1.3)+tree(1120,300,1));
+FOCUS["iva-alimentos"]=330;
