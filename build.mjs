@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
-import {SITE,STUDIES,QUICK,TOPICS,PAGES} from "./src/content.mjs";
+import {SITE,STUDIES,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
 const OUT=path.join(ROOT,"dist");
@@ -36,7 +36,7 @@ const CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
 fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js);
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS,arts:ARTS});
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 
@@ -79,10 +79,10 @@ const urls=[]; const addUrl=(loc,pri,mod)=>urls.push({loc:SITE.url+loc,pri,mod:m
 // ---------- portada ----------
 {
   const lead=STUDIES[0];
-  const cards=STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · ${esc(S.m)}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta →</div></a>`).join("");
+  const cards=STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · ${esc(S.m)}${S.ev?` <span class="ev ev-${S.ev}">${esc(EVIDENCE[S.ev].l)}</span>`:""}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta →</div></a>`).join("");
   const main=snapshot("/")||`<section class="qh"><div class="kk2">Preguntas reales. Respuestas con datos públicos.</div><h1 class="qh-q">${esc(lead.t)}</h1><p class="qh-a"><b>${esc(lead.a.split(". ")[0])}.</b> ${esc(lead.a.split(". ").slice(1).join(". "))} <a href="/preguntas/${lead.id}/">Ver la respuesta →</a></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que de verdad dicen los datos</h2><div class="qg">${cards}</div><p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
-  <section class="ed-sec"><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rows.length)} municipios. Te ayudamos a saber si es causa o casualidad.</p><p><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></section>
+  <section class="ed-sec"><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rows.length)} municipios, si la relación aguanta entre municipios parecidos y qué pasó antes y después de una ley.</p><p><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPICS.map(T=>`<a href="/temas/${T.id}/">${T.l}</a>`).join("")}</div></section>${sources}`;
   page({route:"/",title:PAGES["/"].t,desc:PAGES["/"].d,ogTitle:SITE.name+" · "+SITE.tagline,main,
     jsonld:{"@context":"https://schema.org","@type":"WebSite",name:SITE.name,url:SITE.url,description:SITE.description,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},potentialAction:{"@type":"SearchAction",target:SITE.url+"/municipio/?q={search_term_string}","query-input":"required name=search_term_string"}}});
@@ -92,7 +92,7 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
 
 // ---------- preguntas ----------
 {
-  const cards=[...STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · <span class="k-m">${esc(S.m)}</span></div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta → <time datetime="${S.pub}">${fechaES(S.pub)}</time></div></a>`),
+  const cards=[...STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · <span class="k-m">${esc(S.m)}</span>${S.ev?` <span class="ev ev-${S.ev}">${esc(EVIDENCE[S.ev].l)}</span>`:""}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta → <time datetime="${S.pub}">${fechaES(S.pub)}</time></div></a>`),
     ...QUICK.map(Q=>`<a href="${Q.href}"><div class="k">${esc(topicName(Q.tema))}</div><div class="q">${esc(Q.t)}</div><div class="a">${esc(Q.a)}</div><div class="go">Ver la respuesta →</div></a>`)].join("");
   const main=snapshot("/preguntas/")||`<header class="phead"><h1>Análisis</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
   page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Análisis",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
@@ -131,7 +131,7 @@ for(const route of ["/laboratorio/","/laboratorio/metodo/","/municipio/","/quien
   page({route,title:P.t,desc:P.d,main,robots:route==="/comparar/"?"noindex,follow":""});
   if(route!=="/comparar/") addUrl(route,route==="/laboratorio/"?0.9:0.6);
 }
-for(const v of ["mapa","ranking","cruce","evolucion","grupos","reparto","tabla"]){
+for(const v of ["mapa","ranking","cruce","evolucion","grupos","reparto","tabla","antes"]){
   const P=PAGES["/laboratorio/"], route="/laboratorio/"+v+"/";
   page({route,title:"Laboratorio · "+v[0].toUpperCase()+v.slice(1)+" · Indicio",desc:P.d,main:`<header class="phead"><h1>Laboratorio</h1><p class="dek">${esc(P.d)}</p></header><p class="loading">Cargando datos…</p>`,robots:"noindex,follow"});
 }

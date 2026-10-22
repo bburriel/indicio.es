@@ -1064,3 +1064,23 @@ svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg 
 .ab-n{font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--brand)}
 .ab-why{max-width:700px; padding:6px 0 26px} .ab-why h2{font-size:26px; margin-bottom:10px} .ab-why p{font-size:17px; line-height:1.6; color:var(--ink-2); margin:0 0 14px} .ab-why a{color:var(--brand)}
 @media (max-width:860px){ .ab-story{grid-template-columns:minmax(0,1fr)} }
+
+/* ---------- niveles de evidencia, avisos de controles y «Antes y después» ---------- */
+.ev{display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.02em; text-transform:none; padding:1px 7px; border-radius:999px; border:1px solid currentColor; vertical-align:1px; margin-left:4px; text-decoration:none; white-space:nowrap; line-height:1.5}
+.ev-desc{color:var(--muted)} .ev-igual{color:var(--mustard)} .ev-natural{color:var(--ok)}
+a.ev:hover{background:color-mix(in srgb, currentColor 10%, transparent)}
+.defs li > .ev:first-child{margin:0 6px 0 0}
+.czk.risk{color:var(--ink-2)} .czk .rk{color:var(--ko); font-weight:700}
+.czwarn{display:block; margin-top:8px; padding:8px 10px; border-left:3px solid var(--mustard); background:color-mix(in srgb, var(--mustard) 9%, var(--card)); font-size:14px; line-height:1.45}
+.czcause{display:block; margin-top:8px; font-size:13.5px; color:var(--muted)}
+.mustbe{margin-top:14px; padding:12px 14px; border:1px solid var(--rule-2); border-radius:8px; background:var(--card)}
+.mustbe h4{font-size:15px; margin:0 0 6px}
+.mustbe ol{margin:0 0 8px 18px; padding:0; font-size:14px; line-height:1.5} .mustbe li+li{margin-top:4px}
+.mustbe p{font-size:14px; margin:0}
+.ad-ctl label.blk{display:block; font-size:13px; font-weight:600; margin:10px 0 4px; color:var(--ink-2)}
+.ad-ctl .chk{margin-top:8px}
+.ad-list{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px} .ad-list button{font-size:12.5px; border:1px solid var(--rule-2); background:var(--card); border-radius:999px; padding:2px 8px; cursor:pointer}
+.ad-verdict{font-size:19px; font-weight:600; max-width:760px; line-height:1.4; margin:4px 0 10px}
+.ad-verdict small{display:block; font-size:14.5px; font-weight:400; color:var(--ink-2); margin-top:4px}
+.ad-tests{list-style:none; padding:0; margin:8px 0 0; font-size:14.5px; max-width:760px} .ad-tests li{display:flex; gap:8px; padding:6px 0; border-bottom:1px solid var(--rule)}
+.gapc svg .band{fill:color-mix(in srgb, var(--rust) 16%, transparent)}
