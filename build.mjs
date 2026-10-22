@@ -45,6 +45,7 @@ for(const f of ["favicon.svg","apple-touch-icon.png","icon-192.png","icon-512.pn
 copyDir(path.join(ROOT,"vendor"),path.join(OUT,"vendor"));
 if(exists("og")) copyDir(path.join(ROOT,"og"),path.join(OUT,"og"));
 if(exists("art")) copyDir(path.join(ROOT,"art"),path.join(OUT,"art"));
+if(exists("illus")){ fs.mkdirSync(path.join(OUT,"illus"),{recursive:true}); for(const f of fs.readdirSync(path.join(ROOT,"illus")).filter(f=>f.endsWith(".svg"))) fs.copyFileSync(path.join(ROOT,"illus",f),path.join(OUT,"illus",f)); }
 copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+CONTENT)).replace("__JS__",JS).replace("__CSS__",CSS));
@@ -93,17 +94,17 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
 {
   const cards=[...STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · <span class="k-m">${esc(S.m)}</span></div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta → <time datetime="${S.pub}">${fechaES(S.pub)}</time></div></a>`),
     ...QUICK.map(Q=>`<a href="${Q.href}"><div class="k">${esc(topicName(Q.tema))}</div><div class="q">${esc(Q.t)}</div><div class="a">${esc(Q.a)}</div><div class="go">Ver la respuesta →</div></a>`)].join("");
-  const main=snapshot("/preguntas/")||`<header class="phead"><h1>Preguntas</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
-  page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Preguntas",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
+  const main=snapshot("/preguntas/")||`<header class="phead"><h1>Análisis</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
+  page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Análisis",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
   addUrl("/preguntas/",0.9);
   for(const S of STUDIES){
     const route="/preguntas/"+S.id+"/";
-    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Preguntas</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p></header>
+    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p></header>
       <section class="finding"><h2>La respuesta corta</h2><div class="txt"><p>${esc(S.a)}</p><p>La respuesta completa, con los gráficos y el método paso a paso, se calcula con los datos al abrir la página. <a href="/laboratorio/">Ponla a prueba en el laboratorio →</a></p></div></section>${sources}`;
     const og=exists("og/"+S.id+".png")?"/og/"+S.id+".png":null;
     page({route,title:S.t+" · Indicio",desc:S.a,ogTitle:S.t,main,type:"article",ogImage:og,
       jsonld:[{"@context":"https://schema.org","@type":"Article",headline:S.t,description:S.d,datePublished:S.pub,dateModified:S.upd||S.pub,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url},mainEntityOfPage:SITE.url+route,image:SITE.url+(og||"/og-image.png"),articleSection:topicName(S.tema)},
-        breadcrumb([["Preguntas","/preguntas/"],[S.t,route]])]});
+        breadcrumb([["Análisis","/preguntas/"],[S.t,route]])]});
     addUrl(route,0.8,S.upd||S.pub);
   }
 }
@@ -115,10 +116,10 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
   addUrl("/temas/",0.7);
   for(const T of TOPICS){
     const route="/temas/"+T.id+"/", qs=STUDIES.filter(S=>S.tema===T.id);
-    const main=snapshot(route)||`<nav class="crumbs"><a href="/temas/">Temas</a> › ${esc(T.l)}</nav><header class="phead"><h1>${esc(T.q)}</h1><p class="dek">${esc(T.d)}</p></header>
+    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(T.l)}</nav><header class="phead"><h1>${esc(T.q)}</h1><p class="dek">${esc(T.d)}</p></header>
       ${qs.length?`<section class="finding"><h2>Preguntas sobre ${esc(T.l.toLowerCase())}</h2><div class="studies">${qs.map(S=>`<a class="study" href="/preguntas/${S.id}/"><span>${esc(S.m)}</span><b>${esc(S.t)}</b><p>${esc(S.a)}</p></a>`).join("")}</div></section>`:""}
       <section class="finding"><h2>Míralo en el laboratorio</h2><div class="txt"><p>Los datos de este tema, municipio a municipio, en mapas, rankings y cruces: <a href="/laboratorio/">abrir el laboratorio →</a></p></div></section>${sources}`;
-    page({route,title:T.q+" · "+T.l+" · Indicio",desc:T.d,ogTitle:T.q,main,jsonld:breadcrumb([["Temas","/temas/"],[T.l,route]])});
+    page({route,title:T.q+" · "+T.l+" · Indicio",desc:T.d,ogTitle:T.q,main,jsonld:breadcrumb([["Análisis","/preguntas/"],[T.l,route]])});
     addUrl(route,0.7);
   }
 }

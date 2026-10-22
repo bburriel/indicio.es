@@ -2,30 +2,19 @@
   <div class="wrap top-in">
     <a class="logo" href="/" aria-label="Indicio, portada"><svg class="lg-m" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true" focusable="false"><defs><clipPath id="lgclip"><circle cx="14" cy="13" r="8.2"/></clipPath></defs><path d="M1 22 L7 18 L11 20 L15 12 L19 15 L24 7 L31 9" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><g clip-path="url(#lgclip)"><path d="M1 22 L7 18 L11 20 L15 12 L19 15 L24 7 L31 9" fill="none" stroke="#8a2232" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g><circle cx="14" cy="13" r="9.4" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20.8 19.8l7.6 7.6" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/></svg>Indicio</a>
     <nav class="nav" aria-label="Secciones">
-      <a href="/preguntas/" id="nav-preguntas">Preguntas</a>
-      <div class="navdd"><button type="button" class="ddb" id="nav-temas" aria-expanded="false" aria-haspopup="true">Temas</button>
-        <div class="ddm" id="ddm-temas" hidden>
-          <a href="/temas/"><b>Todos los temas</b><small>Las preguntas, agrupadas por tema</small></a>
-          <a href="/temas/riqueza/">Riqueza<small>¿Cómo se reparte la riqueza?</small></a>
-          <a href="/temas/vivienda/">Vivienda<small>¿Por qué cuesta tanto encontrar casa?</small></a>
-          <a href="/temas/poblacion/">Población<small>¿Quién llega y quién se va?</small></a>
-          <a href="/temas/trabajo/">Trabajo<small>¿De qué vivimos?</small></a>
-          <a href="/temas/gasto/">Dinero público<small>¿En qué se gasta?</small></a>
-          <a href="/temas/voto/">Voto<small>¿Cómo vota cada España?</small></a>
-        </div></div>
-      <a href="/laboratorio/" id="nav-lab">Laboratorio</a>
-      <a href="/municipio/" id="nav-municipio">Municipios</a>
+      <a href="/preguntas/" id="nav-preguntas" title="Preguntas ya respondidas, temas y tu municipio">Análisis</a>
+      <a href="/laboratorio/" id="nav-lab" title="Cruza datos y comprueba si es causa o casualidad">Laboratorio</a>
       <a href="/quien-soy/" id="nav-sobre" class="navsobre">Quién soy</a>
     </nav>
     <div class="search" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="results">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <input id="q" type="search" placeholder="Busca un municipio" autocomplete="off" aria-label="Buscar un municipio" aria-autocomplete="list" aria-controls="results">
+      <input id="q" type="search" placeholder="Busca tu municipio" autocomplete="off" aria-label="Buscar un municipio" aria-autocomplete="list" aria-controls="results">
       <ul id="results" class="results" role="listbox" hidden></ul>
     </div>
   </div>
 </header>
 
 <main class="wrap" id="view">{{MAIN}}</main>
-<footer class="sitefoot"><div class="wrap"><span><b>Indicio</b> · Preguntas reales, respuestas con datos públicos · <a href="/feed.xml">RSS</a> · datos actualizados {{DATAUPD}}</span><nav aria-label="Pie"><a href="/preguntas/">Preguntas</a><a href="/temas/">Temas</a><a href="/laboratorio/">Laboratorio</a><a href="/quien-soy/">Quién soy</a><a href="/quien-soy/contacto/">Escríbeme</a></nav></div></footer>
+<footer class="sitefoot"><div class="wrap"><span><b>Indicio</b> · Preguntas reales, respuestas con datos públicos · <a href="/feed.xml">RSS</a> · datos actualizados {{DATAUPD}}</span><nav aria-label="Pie"><a href="/preguntas/">Análisis</a><a href="/temas/">Temas</a><a href="/municipio/">Municipios</a><a href="/laboratorio/">Laboratorio</a><a href="/quien-soy/">Quién soy</a><a href="/quien-soy/contacto/">Escríbeme</a></nav></div></footer>
 <form name="contacto" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="bot-field"><input name="nombre"><input name="email"><select name="motivo"><option>x</option></select><textarea name="mensaje"></textarea></form>
 

@@ -54,9 +54,9 @@ export const TOPICS=[
 
 export const PAGES={
   "/":{t:"Indicio · Preguntas reales, respuestas con datos públicos",d:SITE.description},
-  "/preguntas/":{t:"Preguntas · Indicio",d:"Preguntas reales sobre cómo vivimos, respondidas con datos públicos. Cada una lleva su respuesta corta y, dentro, cómo se ha calculado y qué se puede concluir."},
+  "/preguntas/":{t:"Análisis · Indicio",d:"Preguntas reales sobre cómo vivimos, ya respondidas con datos públicos: por tema y para tu municipio. Cada una lleva su respuesta corta y, dentro, cómo se ha calculado y qué se puede concluir."},
   "/temas/":{t:"Temas · Indicio",d:"Riqueza, vivienda, población, trabajo, dinero público y voto: los datos públicos de España, tema a tema."},
-  "/laboratorio/":{t:"Laboratorio · Indicio",d:"Tu lienzo en blanco para los datos de España: cruza dos datos en los 8.139 municipios y comprueba si es causa o casualidad."},
+  "/laboratorio/":{t:"Laboratorio · Indicio",d:"Tu lienzo para los datos de España: elige un gráfico, cruza dos datos en los 8.139 municipios y comprueba en tres pasos si es causa o casualidad."},
   "/laboratorio/metodo/":{t:"Cómo buscar causas con datos públicos · Indicio",d:"Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede."},
   "/municipio/":{t:"Municipios · Indicio",d:"Busca tu municipio y mira cómo sale en renta, población, paro, vivienda y voto, comparado con España."},
   "/quien-soy/":{t:"Quién soy · Indicio",d:"Indicio es un proyecto personal e independiente de Borja Burriel: datos públicos, sin publicidad y con el método a la vista."},
