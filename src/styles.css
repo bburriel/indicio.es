@@ -1084,3 +1084,26 @@ a.ev:hover{background:color-mix(in srgb, currentColor 10%, transparent)}
 .ad-verdict small{display:block; font-size:14.5px; font-weight:400; color:var(--ink-2); margin-top:4px}
 .ad-tests{list-style:none; padding:0; margin:8px 0 0; font-size:14.5px; max-width:760px} .ad-tests li{display:flex; gap:8px; padding:6px 0; border-bottom:1px solid var(--rule)}
 .gapc svg .band{fill:color-mix(in srgb, var(--rust) 16%, transparent)}
+
+/* ---------- estudios como artículo de investigación ---------- */
+.abstract{margin:6px 0 10px; padding:18px 20px 14px; background:var(--card); border:1px solid var(--rule-2); border-left:4px solid var(--brand); border-radius:8px; max-width:820px}
+.abstract .abs-h{font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); margin-bottom:8px}
+.abstract .abs-lede{font-family:var(--serif); font-size:clamp(19px,2.1vw,23px); line-height:1.38; color:var(--ink); margin:0 0 14px; max-width:44ch}
+.abstract dl{font-size:14.5px!important; border-top:1px solid var(--rule); padding-top:12px}
+.abstract dl{display:grid; grid-template-columns:minmax(96px,128px) 1fr; gap:8px 16px; margin:0; font-size:15.5px; line-height:1.5}
+.abstract dt{font-weight:700; color:var(--ink)} .abstract dd{margin:0; color:var(--ink-2)}
+.abstract .abs-m{margin:10px 0 0; font-size:13.5px}
+.psec > h2{font-size:13px!important; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); font-family:inherit; max-width:none}
+.psec-res{padding-bottom:0; border-bottom:0}
+#sbody{counter-reset:res}
+.pres{padding-top:22px; border-bottom:0}
+.pres > h3{font-size:clamp(21px,2.4vw,26px); line-height:1.24; font-weight:700; letter-spacing:-.01em; max-width:30ch; margin:0}
+.pres > h3::before{content:none}
+.psec-res + .pres{padding-top:6px}
+.methods{background:color-mix(in srgb, var(--band) 55%, transparent); border-radius:10px; padding:22px 22px 18px!important; margin-top:24px; border-bottom:0!important}
+.methods h2{font-size:22px}
+.methods dl{display:grid; grid-template-columns:minmax(120px,190px) 1fr; gap:10px 18px; margin:6px 0 0; font-size:14.5px; line-height:1.55}
+.methods dt{font-weight:700; color:var(--ink)} .methods dd{margin:0; color:var(--ink-2)}
+.methods code{font-size:.92em}
+table.reg td.num, table.reg th.r{white-space:nowrap}
+@media (max-width:640px){ .abstract dl,.methods dl{grid-template-columns:1fr; gap:2px 0} .abstract dt,.methods dt{margin-top:8px} }
