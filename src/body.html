@@ -2,11 +2,27 @@
   <div class="wrap top-in">
     <a class="logo" href="/" aria-label="Indicio, portada"><span aria-hidden="true">Indic<span class="lg-i">ı</span>o</span></a>
     <nav class="nav" aria-label="Secciones">
-      <a href="/preguntas/" id="nav-preguntas" title="Preguntas ya respondidas, temas y tu municipio">Análisis</a>
+      <span class="navdd" id="navdd"><a href="/preguntas/" id="nav-preguntas" title="Preguntas ya respondidas, por tema o por municipio">Análisis</a><button type="button" class="ddb" id="nav-an-btn" aria-expanded="false" aria-controls="mega-an" aria-label="Abrir el menú de Análisis"></button></span>
       <a href="/laboratorio/" id="nav-lab" title="Cruza datos y comprueba si es causa o casualidad">Laboratorio</a>
       <a href="/quien-soy/" id="nav-sobre" class="navsobre">Quién soy</a>
     </nav>
   </div>
+  <div class="wrap mega-wrap"><div class="mega" id="mega-an" role="region" aria-label="Menú de Análisis">
+    <div class="mega-col mega-t"><div class="mega-h">Por tema</div><div class="mega-grid">
+          <a href="/preguntas/?tema=riqueza"><b>Riqueza</b><small>¿Cómo se reparte la riqueza?</small></a>
+          <a href="/preguntas/?tema=vivienda"><b>Vivienda</b><small>¿Por qué cuesta tanto encontrar casa?</small></a>
+          <a href="/preguntas/?tema=poblacion"><b>Población</b><small>¿Quién llega y quién se va?</small></a>
+          <a href="/preguntas/?tema=trabajo"><b>Trabajo</b><small>¿De qué vivimos?</small></a>
+          <a href="/preguntas/?tema=gasto"><b>Dinero público</b><small>¿En qué se gasta?</small></a>
+          <a href="/preguntas/?tema=voto"><b>Voto</b><small>¿Cómo vota cada España?</small></a>
+    </div></div>
+    <div class="mega-col"><div class="mega-h">Por municipio</div>
+      <div class="search mega-s" id="mq-s" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="mq" type="search" placeholder="Busca tu municipio" autocomplete="off" aria-label="Buscar un municipio" aria-autocomplete="list" aria-controls="mq-r"><ul id="mq-r" class="results" role="listbox" hidden></ul></div>
+      <a href="/municipio/"><b>Fichas de municipios</b><small>Cómo sale cada uno, en el mapa</small></a>
+      <a href="/comparar/"><b>Comparar dos municipios</b><small>Lado a lado, dato a dato</small></a>
+    </div>
+    <a class="mega-all" href="/preguntas/">Ver todas las preguntas →</a>
+  </div></div>
 </header>
 
 <main class="wrap" id="view">{{MAIN}}</main>
