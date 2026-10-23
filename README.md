@@ -31,7 +31,15 @@ npm run build      # genera dist/ (segundos, sin dependencias)
 npm run serve      # prueba en http://localhost:8787
 ```
 
-Para desplegar: arrastra la carpeta `dist/` a Netlify (o `netlify deploy --prod` si usas el CLI; `netlify.toml` ya apunta a `dist/`).
+Para desplegar (Cloudflare Pages, proyecto `indicio`):
+
+```
+npm run deploy     # build + wrangler pages deploy dist --project-name indicio --branch main
+```
+
+La primera vez `wrangler` pide entrar en la cuenta de Cloudflare. `dist/` lleva `_headers` (caché) y `_redirects`. En Cloudflare Pages las reglas de `_redirects` se aplican aunque exista el fichero, así que solo reescriben rutas que no existen como fichero (apartados de la ficha, `/municipio/<m>/<apartado>/`, y comparaciones, `/comparar/<a>-<b>/`). La redirección de `www.indicio.es` a `indicio.es` es una regla de redirección de Cloudflare, no está en el repo. Para probar en local como en Cloudflare: `npx wrangler pages dev dist`.
+
+Antes estaba en Netlify (proyecto «cifrarios»); `netlify.toml` se queda por si se vuelve.
 
 Cuando cambies textos, datos o gráficos de las páginas editoriales, regenera los snapshots y las imágenes para compartir (necesita Playwright una vez: `npm i -D playwright && npx playwright install chromium`):
 
@@ -75,4 +83,4 @@ La fecha `upd` (revisión) se muestra junto a la de publicación si es distinta;
 - `/municipio/` · `/municipio/<código INE>-<nombre>/` (8.139 páginas) · `/comparar/<a>-<b>/`
 - `/quien-soy/` · `/quien-soy/contacto/`
 
-Los enlaces antiguos con `#` (`/#estudios-x`, `/#m46166`, `/#explorar/cruce?…`) siguen funcionando: la app los convierte a la ruta nueva. `cifrarios.netlify.app` redirige con 301 a `indicio.es` (regla en `_redirects`).
+Los enlaces antiguos con `#` (`/#estudios-x`, `/#m46166`, `/#explorar/cruce?…`) siguen funcionando: la app los convierte a la ruta nueva. `cifrarios.netlify.app` redirige con 301 a `indicio.es` (lo hace el último deploy que quedó en Netlify).
