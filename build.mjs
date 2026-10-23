@@ -9,6 +9,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 import {SITE,STUDIES,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
+import {ILLUS,TILL,FOCUS} from "./src/illus.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
 const OUT=path.join(ROOT,"dist");
@@ -36,7 +37,7 @@ const CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
 fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js);
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE});
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 
@@ -99,7 +100,7 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
   addUrl("/preguntas/",0.9);
   for(const S of STUDIES){
     const route="/preguntas/"+S.id+"/";
-    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p></header>
+    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p>${ILLUS[S.id]||""}</header>
       <section class="finding"><h2>La respuesta corta</h2><div class="txt"><p>${esc(S.a)}</p><p>La respuesta completa, con los gráficos y el método paso a paso, se calcula con los datos al abrir la página. <a href="/laboratorio/">Ponla a prueba en el laboratorio →</a></p></div></section>${sources}`;
     const og=exists("og/"+S.id+".png")?"/og/"+S.id+".png":null;
     page({route,title:S.t+" · Indicio",desc:S.a,ogTitle:S.t,main,type:"article",ogImage:og,
