@@ -36,6 +36,13 @@ PAGINAS = {
     "sanidad_centros": "https://www.sanidad.gob.es/ciudadanos/centrosCA.do",
     "interior_criminalidad": "https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/balances.html",
     "dgt_parque": "https://www.dgt.es/menusecundario/dgt-en-cifras/dgt-en-cifras-resultados/",
+    # Boletín del Ministerio: otras secciones (visados, licencias, vivienda protegida, valor tasado...)
+    **{f"mivau_orden_{o}": f"https://apps.fomento.gob.es/BoletinOnline2/?nivel=2&orden={o}000000" for o in ("30", "31", "32", "33", "34", "35", "36", "38", "40", "41", "42")},
+    "mivau_inicio": "https://apps.fomento.gob.es/BoletinOnline2/",
+    # SEPE: una página mensual de ejemplo para ver cómo se llaman sus ficheros (paro y contratos por municipio)
+    "sepe_2026_septiembre": "https://www.sepe.es/HomeSepe/que-es-el-sepe/estadisticas/datos-estadisticos/municipios/2026/septiembre.html",
+    "sepe_2025_diciembre": "https://www.sepe.es/HomeSepe/que-es-el-sepe/estadisticas/datos-estadisticos/municipios/2025/diciembre.html",
+    "sepe_2019_diciembre": "https://www.sepe.es/HomeSepe/que-es-el-sepe/estadisticas/datos-estadisticos/municipios/2019/diciembre.html",
 }
 
 H = "https://www.hacienda.gob.es/cdi/sist%20financiacion%20y%20deuda/informacioneells/"
@@ -59,6 +66,11 @@ FICHEROS = {
         + [f"https://www.seg-social.es/descargas/STAT/MUNCNAE12{y:02d}.xlsx" for y in range(15, 26)],
     # Afiliados por municipio y régimen (el mismo Excel que usa ss_afiliacion.py): septiembre de cada año
     "ss_muni": [f"https://www.seg-social.es/descarga/es/Muni09{y}" for y in range(2015, 2027)],
+    # Afiliados por municipio y sector: diciembres desde 2011
+    "ss_muncnae_hist": [f"https://www.seg-social.es/descargas/STAT/MUNCNAE12{y:02d}.xlsx" for y in range(11, 15)],
+    # Ministerio de Vivienda (boletín estadístico): compraventas de vivienda por municipio, por residencia y nacionalidad del comprador,
+    # valor de las transacciones; transacciones y precio del suelo urbano por provincia
+    "mivau": ["https://apps.fomento.gob.es/BoletinOnline2/" + u for u in ['sedal/34010110.XLS', 'sedal/34010120.XLS', 'sedal/34010130.XLS', 'sedal/34010140.XLS', 'sedal/34010150.XLS', 'sedal/34010160.XLS', 'sedal/34010170.XLS', 'sedal/34010180.XLS', 'sedal/34010190.XLS', 'sedal/340101a0.XLS', 'sedal/340101b0.XLS', 'sedal/340101c0.XLS', 'sedal/340101d0.XLS', 'sedal/340101e0.XLS', 'sedal/340101f0.XLS', 'sedal/340101g0.XLS', 'sedal/340101h0.XLS', 'sedal/340101i0.XLS', 'sedal/340101j0.XLS', 'sedal/340101k0.XLS', 'sedal/340101l0.XLS', 'sedal/34010210.XLS', 'sedal/34010220.XLS', 'sedal/34010230.XLS', 'sedal/34010240.XLS', 'sedal/34010250.XLS', 'sedal/34020110.XLS', 'sedal/34020120.XLS', 'sedal/34020130.XLS', 'sedal/34020140.XLS', 'sedal/34020150.XLS', 'sedal/34020160.XLS', 'sedal/34020170.XLS', 'sedal/34020180.XLS', 'sedal/36100500.XLS', 'sedal/36101000.XLS', 'sedal/36101500.XLS', 'sedal/36102000.XLS', 'sedal/36102500.XLS', 'sedal/36103000.XLS', 'sedal/36103500.XLS', 'sedal/36104000.XLS', 'sedal/36200500.XLS', 'sedal/36201000.XLS', 'sedal/36201500.XLS', 'sedal/36300500.XLS', 'sedal/36301000.XLS', 'sedal/36301500.XLS', 'sedal/36400500.XLS', 'sedal/36401000.XLS', 'sedal/36401500.XLS', 'sedal/36402000.XLS', 'sedal/36402500.XLS', 'sedal/36403000.XLS']],
 }
 
 
@@ -79,8 +91,72 @@ def explorar():
         print(("ok   " if ok else "FALLO"), code, k)
 
 
+def enlaces(pagina, patron):
+    """Enlaces de una página índice guardada por «explorar» que cumplen el patrón."""
+    import re
+    f = os.path.join(OUT, "paginas", pagina + ".html")
+    if not os.path.exists(f):
+        return []
+    return re.findall(r'href=["\']([^"\']*' + patron + r'[^"\']*)["\']', open(f, errors="ignore").read(), re.I)
+
+
+def dinamicos():
+    """Ficheros que se localizan leyendo páginas: secciones del boletín del Ministerio y un Excel por mes del SEPE."""
+    out = {}
+    mivau = []
+    import glob
+    for f in sorted(glob.glob(os.path.join(OUT, "paginas", "mivau_orden_*.html"))):
+        o = os.path.basename(f)[12:14]
+        if o in ("37", "39"):  # transporte de mercancías: no interesa
+            continue
+        mivau += ["https://apps.fomento.gob.es/BoletinOnline2/" + u for u in enlaces(f"mivau_orden_{o}", r"sedal/")]
+    out["mivau_extra"] = sorted(set(mivau))
+    # SEPE: la página general enlaza una página por mes; cada una enlaza ESTADISTICA_MUNICIPIOS.xls (paro y contratos por municipio)
+    meses = sorted(set(enlaces("sepe_municipios", r"/datos-estadisticos/municipios/20\d\d/")))
+    d = os.path.join(OUT, "paginas", "sepe_meses")
+    os.makedirs(d, exist_ok=True)
+    sepe = []
+    for m in meses:
+        url = m if m.startswith("http") else "https://www.sepe.es" + m
+        anyo_mes = "_".join(url.rstrip("/").split("/")[-2:]).replace(".html", "")
+        dest = os.path.join(d, anyo_mes + ".html")
+        if not os.path.exists(dest):
+            curl(url, dest)
+        if os.path.exists(dest):
+            import re
+            x = re.findall(r'href=["\']([^"\']*ESTADISTICA_MUNICIPIOS[^"\']*\.xls)["\']', open(dest, errors="ignore").read(), re.I)
+            if x:
+                sepe.append((anyo_mes, "https://www.sepe.es" + x[0] if x[0].startswith("/") else x[0]))
+    out["sepe_municipios"] = sepe
+    # Sanidad: catálogos de centros de atención primaria, dispositivos y hospitales en CSV (enlaces «Formato CSV»)
+    import html as _h
+    out["sanidad"] = ["https://www.sanidad.gob.es/ciudadanos/" + _h.unescape(u) for u in enlaces("sanidad_centros", r"6578706f7274=1")]
+    return out
+
+
 def descargar():
     fallos = []
+    din = dinamicos()
+    FICHEROS["mivau_extra"] = din["mivau_extra"]
+    d = os.path.join(OUT, "sanidad")
+    os.makedirs(d, exist_ok=True)
+    for i, url in enumerate(din["sanidad"]):
+        nombre = ["centros_atencion_primaria", "dispositivos", "hospitales"][i] if i < 3 else f"sanidad_{i}"
+        dest = os.path.join(d, nombre + ".csv")
+        if not os.path.exists(dest):
+            ok, code = curl(url, dest)
+            print(("ok   " if ok else "FALLO"), code, "sanidad", nombre)
+    d = os.path.join(OUT, "sepe_municipios")
+    os.makedirs(d, exist_ok=True)
+    print(f"SEPE: {len(din['sepe_municipios'])} meses localizados")
+    for anyo_mes, url in din["sepe_municipios"]:
+        dest = os.path.join(d, f"ESTADISTICA_MUNICIPIOS_{anyo_mes}.xls")
+        if os.path.exists(dest):
+            continue
+        ok, code = curl(url, dest)
+        print(("ok   " if ok else "FALLO"), code, "sepe", anyo_mes)
+        if not ok:
+            fallos.append(url)
     for grupo, urls in FICHEROS.items():
         d = os.path.join(OUT, grupo)
         os.makedirs(d, exist_ok=True)

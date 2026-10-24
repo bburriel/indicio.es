@@ -878,6 +878,9 @@ const ACC=[
   ["todos","Desigualdad y barrios",(s,r,d)=>secTodos(s,r,d),(r,d)=>{ const [p]=last(d.s.poverty),[e]=last(REFS.es.poverty); return p==null?"Barrio a barrio, con la renta de cada sección censal.":`El ${pc(p)} en riesgo de pobreza (España: ${pc(e)}). Y la renta de cada barrio en un mapa.`; },(r,d)=>miniLines(d.s.poverty,REFS.es.poverty,{w:150,h:26,pad:2,index:false}),"mapa y 2 gráficos"],
   ["vivienda","Vivienda",(s,r,d)=>secVivienda(s,r,d),(r,d)=>{ const c=d.census||{}, ce=REFS.census.es; let t=c.rented!=null?`${c.rented<ce.rented-4?"Pocos":c.rented>ce.rented+4?"Muchos":"Bastantes"} hogares de alquiler (${pc0(c.rented)}; España ${pc0(ce.rented)})`:"Alquiler, viviendas vacías y pisos turísticos"; if(r[F.alqVar]!=null) t+=`; el alquiler sube ${r[F.alqVar]>esMean("alqVar")+3?"más":r[F.alqVar]<esMean("alqVar")-3?"menos":"lo mismo"} que en España`; return t+"."; },(r,d)=>{ const c=d.census||{}; return c.owned==null?"":miniStack([[c.owned,"--mustard"],[c.rented,"--rust"],[c.otherTenure,"--stone"]],{w:150}); },"4 gráficos"],
   ["voto","Voto",(s,r,d)=>secVoto(s,r,d),(r,d)=>{ const v=d.vote||{}, k=VG(); if(!v[k]) return "Resultados electorales."; const o=Object.entries(v[k].share).filter(([p])=>p!=="Otros").sort((a,b)=>b[1]-a[1])[0]; const t=v[k].turnout, te=VREFS.es[k].turnout; return `Ganó ${partyArt(r[F.prov],k,o[0])} en ${k.slice(2,6)} (${pc(o[1])}); participación ${t>te+5?"muy alta":t>te+1?"alta":t<te-5?"muy baja":t<te-1?"baja":"como la media"}.`; },(r,d)=>{ const v=d.vote||{}, k=VG(); return v[k]?miniStack(Object.entries(v[k].share).sort((a,b)=>(a[0]==="Otros")-(b[0]==="Otros")||b[1]-a[1]).map(([p,x])=>[x,pColor(p)]),{w:150}):""; },"4 gráficos"],
+  ["mas","Empleo, compraventas y deuda",(s,r,d)=>secMas(s,r,d),(r,d)=>{ const O=REFS.otras, Y=O&&O.years; if(!O||!(d.afil||d.contrT||d.comp)) return "Afiliados, contratos, compraventas de vivienda y deuda del ayuntamiento."; const t=[]; const lo=(a,ys)=>{ if(!a) return null; for(let i=a.length-1;i>=0;i--) if(a[i]!=null) return a[i]; return null; };
+      if(d.afil&&d.afil[0]&&lo(d.afil)!=null) t.push(`Afiliados: ${sgn((lo(d.afil)/d.afil[0]-1)*100)} desde 2011`); if(lo(d.contrT)!=null) t.push(`${pc0(lo(d.contrT))} de contratos temporales`); const dd=lo(d.deuda), p=lastV(d.pad); if(dd!=null&&p) t.push(dd>0?`deuda municipal de ${eur(dd/p)} por habitante`:"ayuntamiento sin deuda"); return cap(t.join("; "))+"."; },
+    (r,d)=>d.afil&&d.afil.some(v=>v)?miniLines(d.afil,null,{w:150,h:26,pad:3}):"","4 gráficos"],
   ["datos","Todos los datos en una tabla",(s,r,d)=>glance(add(s,"div"),r,d),(r,d)=>`Los ${d3.sum(GLANCE,g=>g[1].length)} datos del municipio, con la media de España y su posición.`,()=>`<svg viewBox="0 0 150 26" aria-hidden="true">${[0,1,2].map(i=>`<rect x="0" y="${3+i*8}" width="150" height="3" rx="1.5" style="fill:var(--band)"/><circle cx="${[40,110,75][i]}" cy="${4.5+i*8}" r="3" style="fill:var(--rust)"/>`).join("")}</svg>`,"tabla"],
   ["parecidos","Municipios parecidos",(s,r,d)=>parecidos(s,r),(r,d)=>{ const n=nearest(r,3); return n.length?`Se parece a ${n.map(([x])=>esc(dispName(x[F.name]))).join(", ").replace(/, ([^,]*)$/," y $1")}.`:"Los que más se le parecen."; },()=>`<svg viewBox="0 0 150 26" aria-hidden="true">${[20,48,76,104,132].map((x,i)=>`<circle cx="${x}" cy="13" r="${i===0?8:6}" style="fill:var(${i===0?"--rust":"--rule-2"})"/>`).join("")}</svg>`,"tabla"]];
 function toggleSec(k,force){
@@ -1108,6 +1111,30 @@ function secVivienda(s,r,d){
     const b3=block(s,"Viviendas turísticas"); const g=add(b3,"div","cols2");
     lineChart(g,{title:"Viviendas turísticas, % del total",source:"Fuente: INE, estadística experimental de viviendas turísticas.",series:[{n:r[F.name],v:d.vtp,c:"--s-mun",main:true},{n:"Provincia",v:pr.vtp,c:"--s-prov"},{n:"España",v:es.vtp,c:"--s-es"}],years:per,xticks:[per[0],per[Math.floor(per.length/2)],per[per.length-1]],fmt:pc,tickFmt:v=>nf1.format(v)+"%"});
     lineChart(g,{title:"Número de viviendas turísticas",source:"Fuente: INE.",series:[{n:r[F.name],v:d.vt,c:"--s-mun",main:true}],years:per,xticks:[per[0],per[Math.floor(per.length/2)],per[per.length-1]],fmt:v=>nf0.format(v)}); }
+}
+
+// ---------- empleo, compraventas y deuda (SEPE, Seguridad Social, Ministerio de Vivienda, Hacienda) ----------
+function perHab(v,ys,pad,por){ if(!v||!pad) return null; const PY=REFS.padYears; return v.map((x,i)=>{ const j=PY.indexOf(ys[i]), p=j>=0?pad[j]:null; return x==null||!p?null:x/p*por; }); }
+function secMas(s,r,d){
+  const O=REFS.otras; if(!O){ lead(s,"No hay datos de estas fuentes."); return; }
+  const P=r[F.prov], op=O.prov[P]||{}, oe=O.es, pr=REFS.prov[P], es=REFS.es, Y=O.years, nm=dispName(r[F.name]);
+  const lo=(a,ys)=>{ if(!a) return [null,null]; for(let i=a.length-1;i>=0;i--) if(a[i]!=null) return [a[i],ys[i]]; return [null,null]; };
+  const t=[];
+  const [a25]=lo(d.afil,Y.afil), a11=d.afil?d.afil[0]:null;
+  if(a25!=null&&a11) t.push(`En diciembre de 2025 trabajaban aquí <mark>${nf0.format(a25)}</mark> afiliados a la Seguridad Social, ${(g=>`un ${nf0.format(Math.abs(g))}${NB}% ${g>=0?"más":"menos"}`)((a25/a11-1)*100)} que en 2011 (España: ${sgn((lo(oe.afil,Y.afil)[0]/oe.afil[0]-1)*100)}).`);
+  const [ct,cy]=lo(d.contrT,Y.contrT), i21=Y.contrT.indexOf(2021);
+  if(ct!=null) t.push(`El ${pc(ct)} de los contratos firmados en ${cy} fueron temporales${d.contrT[i21]!=null?`, frente al ${pc(d.contrT[i21])} de 2021, antes de la reforma laboral`:""} (España: ${pc(lo(oe.contrT,Y.contrT)[0])}).`);
+  const [dd,dy]=lo(d.deuda,Y.deuda), pad=lastV(d.pad);
+  if(dd!=null&&pad) t.push(dd>0?`El ayuntamiento debía ${eur(dd/pad)} por habitante a final de ${dy} (media de los ayuntamientos de España: ${eur(lo(oe.deuda,Y.deuda)[0]/lastV(es.pad))}).`:`El ayuntamiento no tenía deuda a final de ${dy}.`);
+  lead(s,t.join(" ")||"No hay datos de estas fuentes para este municipio.");
+  if(d.afil||d.contrT){ const b=block(s,"Empleo y contratos"), g=add(b,"div","cols2");
+    if(d.afil) lineChart(g,{title:"Afiliados a la Seguridad Social",sub:"2011 = 100, en diciembre de cada año",source:"Fuente: Seguridad Social (afiliados según el municipio del centro de trabajo).",series:[{n:nm,v:d.afil,c:"--s-mun",main:true},{n:"Provincia",v:op.afil,c:"--s-prov"},{n:"España",v:oe.afil,c:"--s-es"}],years:Y.afil,index:true,fmt:v=>nf1.format(v),xticks:[2011,2018,2025]});
+    if(d.contrT) lineChart(g,{title:"Contratos iniciales temporales",sub:"% de los contratos firmados cada año",source:"Fuente: SEPE. La reforma laboral se aplica desde 2022.",series:[{n:nm,v:d.contrT,c:"--s-mun",main:true},{n:"Provincia",v:op.contrT,c:"--s-prov"},{n:"España",v:oe.contrT,c:"--s-es"}],years:Y.contrT,fmt:pc,tickFmt:v=>nf0.format(v)+"%",xticks:[2006,2015,2025]}); }
+  if(d.comp||d.vtas){ const b=block(s,"Compraventas de vivienda"), g=add(b,"div","cols2");
+    if(d.comp) lineChart(g,{title:"Compraventas de vivienda por cada 1.000 habitantes",source:"Fuente: Ministerio de Vivienda (datos de los notarios) y padrón.",series:[{n:nm,v:perHab(d.comp,Y.comp,d.pad,1000),c:"--s-mun",main:true},{n:"Provincia",v:perHab(op.comp,Y.comp,pr.pad,1000),c:"--s-prov"},{n:"España",v:perHab(oe.comp,Y.comp,es.pad,1000),c:"--s-es"}],years:Y.comp,fmt:v=>nf1.format(v),xticks:[2004,2014,2025]});
+    if(d.vtas) lineChart(g,{title:"Valor tasado de la vivienda libre",sub:"€ por m², media del año",source:"Fuente: Ministerio de Vivienda.",series:[{n:nm,v:d.vtas,c:"--s-mun",main:true}],years:Y.vtas,fmt:v=>nf0.format(v)+NB+"€",xticks:[2005,2015,2025]}); }
+  if(d.deuda&&d.deuda.some(v=>v)){ const b=block(s,"Deuda del ayuntamiento"), g=add(b,"div","cols2");
+    lineChart(g,{title:"Deuda viva por habitante",sub:"€ a 31 de diciembre; provincia y España, todos sus ayuntamientos (2017 no se publicó)",source:"Fuente: Ministerio de Hacienda y padrón.",series:[{n:nm,v:perHab(d.deuda,Y.deuda,d.pad,1),c:"--s-mun",main:true},{n:"Provincia",v:perHab(op.deuda,Y.deuda,pr.pad,1),c:"--s-prov"},{n:"España",v:perHab(oe.deuda,Y.deuda,es.pad,1),c:"--s-es"}],years:Y.deuda,fmt:v=>nf0.format(v)+NB+"€",xticks:[2015,2020,2025]}); }
 }
 
 // ---------- voto ----------
@@ -1506,6 +1533,8 @@ async function renderComparar(a,b){
 // =====================================================================
 const vtAnnual=(arr)=>{ if(!arr) return null; const P=REFS.vtPeriods, g={}; P.forEach((p,i)=>{ const y=+p.slice(0,4); if(arr[i]!=null) (g[y]=g[y]||[]).push(arr[i]); }); const ys=Object.keys(g).map(Number).sort(); return {years:ys,v:ys.map(y=>d3.mean(g[y]))}; };
 // cada serie: etiqueta, grupo, unidad (eur se puede deflactar), y función que devuelve {years,v,scope} para el ámbito
+// series de otras fuentes (SEPE, Seguridad Social, Ministerio de Vivienda, Hacienda): municipio en data/prov, provincia y España en REFS.otras
+const OT=k=>(A,lev,P)=>{ const o=REFS.otras; if(!o) return {years:[],v:null}; return {years:o.years[k],v:lev==="es"?o.es[k]:lev==="prov"?(o.prov[P]||{})[k]:A[k]}; };
 const EVO=[
   {k:"renta",l:"Renta neta por persona",g:"Ingresos",u:"eur",src:"INE, Atlas de Renta",get:(A)=>({years:YEARS,v:A.s?A.s.net_income_pc:null})},
   {k:"rentaHog",l:"Renta neta por hogar",g:"Ingresos",u:"eur",src:"INE, Atlas de Renta",get:(A)=>({years:YEARS,v:A.s?A.s.net_income_hh:null})},
@@ -1524,10 +1553,17 @@ const EVO=[
   {k:"govInt",l:"Intereses de la deuda",g:"Dinero público",u:"eur",nat:true,src:"Eurostat, COFOG",get:()=>GOV?{years:GOV.years.map(Number),v:GOV.fun.GF0107.meur}:{years:[],v:null}},
   {k:"govIng",l:"Ingresos públicos",g:"Dinero público",u:"eur",nat:true,src:"Eurostat",get:()=>GOV?{years:GOV.years.map(Number),v:GOV.main.TR.meur}:{years:[],v:null}},
   {k:"pob",l:"Habitantes",g:"Población y trabajo",u:"n",src:"INE, padrón municipal",get:(A)=>({years:REFS.padYears,v:A.pad})},
-  {k:"paro",l:"Paro registrado",g:"Población y trabajo",u:"n",src:"SEPE (2026: enero a septiembre)",get:(A,lev,P,code)=>({years:REFS.paroYears,v:lev==="es"?REFS.paro.es.paro:lev==="prov"?(REFS.paro.prov[P]||{}).paro:(A.paro||{}).y})}];
+  {k:"paro",l:"Paro registrado",g:"Población y trabajo",u:"n",src:"SEPE (2026: enero a septiembre)",get:(A,lev,P,code)=>({years:REFS.paroYears,v:lev==="es"?REFS.paro.es.paro:lev==="prov"?(REFS.paro.prov[P]||{}).paro:(A.paro||{}).y})},
+  {k:"paroL",l:"Paro registrado desde 2006",g:"Población y trabajo",u:"n",src:"SEPE, paro registrado por municipio (2026: enero a septiembre)",get:OT("paroL")},
+  {k:"afil",l:"Afiliados a la Seguridad Social (diciembre)",g:"Población y trabajo",u:"n",src:"Seguridad Social, afiliados por municipio del centro de trabajo",get:OT("afil")},
+  {k:"contr",l:"Contratos registrados en el año",g:"Población y trabajo",u:"n",src:"SEPE, contratos por municipio del centro de trabajo",get:OT("contr")},
+  {k:"contrT",l:"Contratos temporales (% de los nuevos)",g:"Población y trabajo",u:"pct",src:"SEPE, contratos iniciales por municipio",get:OT("contrT")},
+  {k:"comp",l:"Compraventas de vivienda",g:"Vivienda",u:"n",src:"Ministerio de Vivienda, transacciones de vivienda (notarios)",get:OT("comp")},
+  {k:"vtas",l:"Valor tasado de la vivienda (€/m²)",g:"Vivienda",u:"eur",src:"Ministerio de Vivienda, valor tasado (municipios de más de 25.000 hab.)",get:(A,lev)=>lev==="mun"&&REFS.otras?{years:REFS.otras.years.vtas,v:A.vtas}:{years:[],v:null}},
+  {k:"deuda",l:"Deuda del ayuntamiento",g:"Dinero público",u:"eur",src:"Ministerio de Hacienda, deuda viva de los ayuntamientos a 31 de diciembre",get:OT("deuda")}];
 const EVOK={}; EVO.forEach(e=>EVOK[e.k]=e);
-const EVOSH={pib:"PIB",govTot:"Gasto público",govJub:"Jubilación",govSan:"Sanidad",govEdu:"Educación",govInt:"Intereses deuda",govIng:"Ingresos públicos",renta:"Renta/persona",rentaHog:"Renta/hogar",rentaMed:"Renta mediana",salMedia:"Salario medio",salMed:"Salario mediano",alq:"Alquiler declarado",alqNuevo:"Alquiler nuevos",vt:"Pisos turísticos",ipc:"Precios (IPC)",pob:"Habitantes",paro:"Paro registrado"};
-const EVOPRESET=[["Gasto público y PIB",["govTot","govJub","govSan","govEdu","pib"]],["Sueldos y alquiler",["salMed","alq","alqNuevo","ipc"]],["Renta y precios",["renta","rentaHog","salMedia","ipc"]],["Población y paro",["pob","paro"]],["Turismo y alquiler",["vt","alq","pob"]]];
+const EVOSH={pib:"PIB",govTot:"Gasto público",govJub:"Jubilación",govSan:"Sanidad",govEdu:"Educación",govInt:"Intereses deuda",govIng:"Ingresos públicos",renta:"Renta/persona",rentaHog:"Renta/hogar",rentaMed:"Renta mediana",salMedia:"Salario medio",salMed:"Salario mediano",alq:"Alquiler declarado",alqNuevo:"Alquiler nuevos",vt:"Pisos turísticos",ipc:"Precios (IPC)",pob:"Habitantes",paro:"Paro registrado",paroL:"Paro registrado",afil:"Afiliados",contr:"Contratos",contrT:"Contratos temporales",comp:"Compraventas",vtas:"Valor tasado",deuda:"Deuda municipal"};
+const EVOPRESET=[["Gasto público y PIB",["govTot","govJub","govSan","govEdu","pib"]],["Sueldos y alquiler",["salMed","alq","alqNuevo","ipc"]],["Renta y precios",["renta","rentaHog","salMedia","ipc"]],["Población y paro",["pob","paro"]],["Turismo y alquiler",["vt","alq","pob"]],["Empleo y contratos",["afil","contr","contrT","paroL"]],["Compraventas y precios",["comp","vtas","alq","ipc"]]];
 const EVOCOL=["--rust","--slate","--mustard","--plum","--olive","--stone"];
 let ES_={sel:["salMed","alq","alqNuevo","ipc"],mun:null,lev:"es",base:null};
 
@@ -1630,7 +1666,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   const q=new URLSearchParams(m[2]||"");
   if(q.has("d")) EX.d=q.get("d").split(",").filter(k=>CATK[k]).slice(0,6);
   if(q.has("p")) EX.p=q.get("p"); if(q.has("t")) EX.t=q.get("t"); if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
-  if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa"].includes(q.get("u"))?q.get("u"):"";
+  if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa","eu"].includes(q.get("u"))?q.get("u"):"";
   if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0;
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=q.get("lv");
@@ -1967,15 +2003,19 @@ function exGrupos(out){
 const BSER=[["renta","net_income_pc"],["pobreza","poverty"],["gini","gini"],["edad","mean_age"],["extr","pct_foreign"],["mayores65","pct_over65"],["menores18","pct_under18"],["solos","pct_single_hh"],["rentaHog","net_income_hh"]];
 let BUB_T=null;
 async function exBurbujas(out){
-  const keys=BSER.map(b=>b[0]).filter(k=>CATK[k]); let bx=keys.includes(EX.d[0])?EX.d[0]:"renta", by=keys.includes(EX.d[1])?EX.d[1]:"pobreza"; if(bx===by) by=keys.find(k=>k!==bx);
+  await loadRegional();
+  // series anuales por provincia: las del Atlas de Renta (media de los municipios) y las oficiales de data/regional.json
+  const keysA=BSER.map(b=>b[0]).filter(k=>CATK[k]), keysR=CAT.filter(c=>c.reg&&c.np>=40).map(c=>c.k), keys=[...keysA,...keysR];
+  let bx=keys.includes(EX.d[0])?EX.d[0]:"renta", by=keys.includes(EX.d[1])?EX.d[1]:"pobreza"; if(bx===by) by=keys.find(k=>k!==bx);
   EX.d=[bx,by];
-  const opt=sel=>keys.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("");
+  const opt=sel=>`<optgroup label="Atlas de Renta (media de los municipios)">${keysA.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("")}</optgroup><optgroup label="Datos oficiales por provincia">${keysR.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("")}</optgroup>`;
   out.innerHTML=`<div class="exrow"><label class="exlab" for="bbx">Horizontal</label><select class="sel" id="bbx">${opt(bx)}</select><label class="exlab" for="bby">Vertical</label><select class="sel" id="bby">${opt(by)}</select></div><div class="bubctl"><button type="button" class="sel" id="bplay" aria-label="Reproducir">▶ Reproducir</button><input type="range" id="byr" min="0" max="${YEARS.length-1}" value="${YEARS.length-1}" aria-label="Año"><b id="byl"></b></div><div id="bubbox"><p class="loading">Cargando las provincias…</p></div>`;
   document.getElementById("bbx").addEventListener("change",e=>{ EX.d=[e.target.value,by]; exUpdate(); });
   document.getElementById("bby").addEventListener("change",e=>{ EX.d=[bx,e.target.value]; exUpdate(); });
-  const sx=BSER.find(b=>b[0]===bx)[1], sy=BSER.find(b=>b[0]===by)[1];
+  const regS=(k,p)=>{ const s=((REG.data.prov[p]||{})[k.slice(2)])||{}; return YEARS.map(y=>s[y]??null); };
   let data; try{ data=await Promise.all(Object.keys(PROVS).map(async p=>{ const t=await loadProv(p), m=Object.values(t); const avg=k=>YEARS.map((_,i)=>{ let a=0,b=0; for(const z of m){ const v=z.s[k]&&z.s[k][i], w=z.s.population[i]; if(v!=null&&w){ a+=v*w; b+=w; } } return b?a/b:null; });
-      return {p,n:provShort(PROVS[p]),pop:YEARS.map((_,i)=>d3.sum(m,z=>z.s.population[i]||0)),x:avg(sx),y:avg(sy)}; })); }catch(e){ document.getElementById("bubbox").innerHTML='<p class="loading">No se pudieron cargar las provincias.</p>'; return; }
+      const ser=k=>isReg(k)?regS(k,p):avg(BSER.find(b=>b[0]===k)[1]);
+      return {p,n:provShort(PROVS[p]),pop:YEARS.map((_,i)=>d3.sum(m,z=>z.s.population[i]||0)),x:ser(bx),y:ser(by)}; })); }catch(e){ document.getElementById("bubbox").innerHTML='<p class="loading">No se pudieron cargar las provincias.</p>'; return; }
   if(!document.getElementById("bubbox")) return;
   data=data.filter(d=>d.x.some(v=>v!=null)&&d.y.some(v=>v!=null)); const last=YEARS.length-1;
   const fill=a=>{ let l=null; return a.map(v=>{ if(v!=null) l=v; return l; }).reduceRight((r,v,i)=>{ r[i]=v==null?r[i+1]:v; return r; },new Array(a.length)); };
@@ -2398,8 +2438,8 @@ function miniStack(parts,{w=160,h=26}={}){
 }
 // barras horizontales pequeñas: rows=[[valor,color]]
 function miniBars(rows,{w=200,h=40,max}={}){
-  const mx=max||d3.max(rows,r=>Math.abs(r[0]))||1, bh=(h-(rows.length-1)*3)/rows.length;
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${rows.map(([v,c],i)=>`<rect x="0" y="${(i*(bh+3)).toFixed(1)}" width="${Math.max(2,Math.abs(v)/mx*w).toFixed(1)}" height="${bh.toFixed(1)}" style="fill:var(${c})"/>`).join("")}</svg>`;
+  const mx=max||d3.max(rows,r=>Math.abs(r[0]))||1, gap=Math.min(3,h/rows.length/3), bh=Math.max(.5,(h-(rows.length-1)*gap)/rows.length);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${rows.map(([v,c],i)=>`<rect x="0" y="${(i*(bh+gap)).toFixed(1)}" width="${Math.max(2,Math.abs(v)/mx*w).toFixed(1)}" height="${bh.toFixed(1)}" style="fill:var(${c})"/>`).join("")}</svg>`;
 }
 // n de cada diez, en cuadraditos
 function miniTen(n,{w=200,h=34}={}){ const s=w/10; return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true">${d3.range(10).map(i=>`<rect x="${(i*s+1).toFixed(1)}" y="${(h-s+2)/2}" width="${(s-3).toFixed(1)}" height="${(s-3).toFixed(1)}" rx="2" style="fill:var(${i<n?"--rust":"--rule-2"})"/>`).join("")}</svg>`; }
@@ -2772,7 +2812,10 @@ let EXTRA_P=null;
 function loadExtra(){ return EXTRA_P||(EXTRA_P=getJSON("/data/extra.json").then(ex=>{ const n=IDX[0].row.length; ex.fields.forEach((f,i)=>{ F[f]=n+i; }); IDX.forEach((o,i)=>{ const e=ex.rows[i]; for(let j=0;j<e.length;j++) o.row.push(e[j]); }); for(const k in ESMEAN) delete ESMEAN[k]; for(const k in PCTL) delete PCTL[k]; }).catch(e=>{ console.error(e); EXTRA_P=null; })); }
 async function renderExplorar(h){
   if(!EXTRA_P&&!document.querySelector(".lb")) view.innerHTML='<p class="loading">Cargando los datos del laboratorio…</p>';
-  await loadExtra();
+  // los datos de provincias, comunidades y Europa solo se esperan si el enlace los pide; si no, se cargan por detrás
+  const needR=/[?&,=]R_|[?&]u=(prov|ccaa)/.test(h)||/[?&,=]R_/.test(h), needE=/[?&,=]E_|[?&]u=eu/.test(h);
+  await Promise.all([loadExtra(),needR?loadRegional():null,needE?loadEuropa():null]);
+  if(!needR) loadRegional(); if(!needE) setTimeout(()=>loadEuropa(),3000);
   if(!/^explorar/.test(pathToKey())) return;   // el lector ya se ha ido a otra página mientras cargaban los datos
   const blank=/^explorar\/?$/.test(h);
   // /laboratorio/ abre directamente el lienzo con una relación de ejemplo; la guía de arriba propone por dónde empezar
@@ -2810,24 +2853,27 @@ function nbDraw(){
 // ---------- panel lateral ----------
 const SLOTS={mapa:{get n(){return EX.bv?2:1},l:["Color del mapa (azul)","Segundo dato (rosa)"]},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
 // ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
-const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Voto","Territorio"], COVER={};
+const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
 function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remove(); document.removeEventListener("keydown",pickKey); } }
 function pickKey(e){ if(e.key==="Escape") closePicker(); }
-function openPicker(btn,{current,excl=[],onPick,extras=null}){
+function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false}){
   closePicker();
-  const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g));
+  // los datos de provincias y comunidades solo en «Relación»; en la escala de Europa, solo los de Europa
+  const okC=c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg));
+  const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g&&okC(c)));
   let tab=extras&&!(CATK[current]||{}).g?"Opciones":(CATK[current]||{}).g||groups[0], q="";
   const EXG="Opciones", tabs=extras?[EXG,...groups]:groups;
   const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p);
-  const avail=c=>!excl.includes(c.k)||c.k===current;
+  const avail=c=>okC(c)&&(!excl.includes(c.k)||c.k===current);
+  const covTxt=c=>c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
   p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
   const draw=()=>{
     const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k).includes(nq);
     document.getElementById("dpt").innerHTML=tabs.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${g===EXG?extras.length:CAT.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
     const ex=extras&&!nq&&tab===EXG?extras.map(([k,l])=>`<li><button type="button" data-k="${k}" class="${k===current?"on":""}"><b>${esc(l)}</b></button></li>`).join(""):"";
     const items=tab===EXG&&!nq?[]:CAT.filter(c=>avail(c)&&(nq?hit(c):c.g===tab));
-    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${nf0.format(cover(c.k))} municipios</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
+    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${covTxt(c)}</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
     p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
     p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); }));
   };
@@ -2847,7 +2893,7 @@ function exBar(){
   let slots="";
   if(S){ const used=Math.min(S.n,EX.d.length), lab=i=>typeof S.l==="function"?S.l(i):S.l[i];
     for(let i=0;i<used;i++) slots+=`<div class="slot full"><span class="nm" style="flex:1"><small>${lab(i)}</small><button type="button" class="pick" data-i="${i}" aria-haspopup="dialog" aria-label="${lab(i)}: ${esc(labK(EX.d[i]))}. Cambiar"><span class="pv">${esc(labK(EX.d[i]))}</span><span class="pg">${esc((CATK[EX.d[i]]||{}).g||"")}</span></button></span>${(S.add&&used>1)||(EX.v==="cruce"&&false)?`<button type="button" data-x="${i}" aria-label="Quitar">×</button>`:""}</div>`;
-    if(EX.v==="cruce"&&used>=2) slots+=["sz","col"].map(kd=>{ const k=EX[kd], on=!!k&&!(kd==="sz"&&k==="1"&&false); return `<div class="slot enc"><span class="nm" style="flex:1"><small>${kd==="sz"?"Tamaño del punto":"Color del punto"} (opcional)</small><button type="button" class="pick${k?"":" add"}" data-enc="${kd}" aria-haspopup="dialog"><span class="pv">${k?esc(encLab(k,kd)):kd==="sz"?"Habitantes":"+ elige un dato"}</span>${k&&CATK[k]?`<span class="pg">${esc(CATK[k].g)}</span>`:""}</button></span>${k&&kd==="col"||k&&kd==="sz"?`<button type="button" data-xenc="${kd}" aria-label="Quitar">×</button>`:""}</div>`; }).join("");
+    if(EX.v==="cruce"&&used>=2&&!EX.u) slots+=["sz","col"].map(kd=>{ const k=EX[kd], on=!!k&&!(kd==="sz"&&k==="1"&&false); return `<div class="slot enc"><span class="nm" style="flex:1"><small>${kd==="sz"?"Tamaño del punto":"Color del punto"} (opcional)</small><button type="button" class="pick${k?"":" add"}" data-enc="${kd}" aria-haspopup="dialog"><span class="pv">${k?esc(encLab(k,kd)):kd==="sz"?"Habitantes":"+ elige un dato"}</span>${k&&CATK[k]?`<span class="pg">${esc(CATK[k].g)}</span>`:""}</button></span>${k&&kd==="col"||k&&kd==="sz"?`<button type="button" data-xenc="${kd}" aria-label="Quitar">×</button>`:""}</div>`; }).join("");
     if(used<S.n&&(S.add||EX.v==="cruce")&&!(EX.v==="cruce"&&used>=2)) slots+=`<div class="slot"><span class="nm" style="flex:1"><small>${S.add?S.add+" (opcional)":lab(used)}</small><button type="button" class="pick add" data-add="1" aria-haspopup="dialog" aria-label="${S.add||lab(used)}"><span class="pv">+ elige un dato</span></button></span></div>`; }
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
@@ -2866,7 +2912,8 @@ function exBar(){
       <p class="hint">Debajo del gráfico: <b>¿aguanta la relación?</b> Marca qué igualar y mira cuánto queda. Para hablar de causa, usa <b>Antes y después</b>.</p>`
       :`<p class="hint" style="margin:0">Para ver si una relación aguanta al comparar entre iguales, pásala a una relación; para medir el efecto de una ley o un suceso, usa <b>Antes y después</b>.</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
-  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",()=>{ const i=+b.dataset.i; openPicker(b,{current:EX.d[i],excl:EX.d,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; exUpdate(); }}); }));
+  const regOK=EX.v==="cruce", euOK=EX.v==="cruce"&&EX.u==="eu";
+  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
   bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",()=>{ openPicker(b,{current:null,excl:EX.d,onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,6); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-x]").forEach(b=>b.addEventListener("click",()=>{ if(EX.d.length<=1) return; EX.d.splice(+b.dataset.x,1); exUpdate(); }));
   bar.querySelectorAll("button[data-q]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.q; if(EX.v==="cruce"||EX.v==="tabla"||EX.v==="grupos"){ const S=SLOTS[EX.v]; if(EX.d.length<S.n&&EX.v!=="cruce") EX.d.push(k); else { const pos=EX.v==="cruce"?1:Math.min(EX.d.length,S.n)-1; EX.d=EX.d.filter(x=>x!==k); EX.d.splice(pos,1,k); } } else { EX.d=[k,...EX.d.filter(x=>x!==k)]; } EX.d=EX.d.slice(0,6); exUpdate(); }));
@@ -2882,7 +2929,7 @@ function exBar(){
   const lx=document.getElementById("exlx"); if(lx) lx.addEventListener("change",e=>{ EX.lx=e.target.checked?1:0; exUpdate(); });
   const sw=document.getElementById("exswap"); if(sw) sw.addEventListener("click",()=>{ EX.d=[EX.d[1],EX.d[0],...EX.d.slice(2)]; exUpdate(); });
   const gg=document.getElementById("exgo"); if(gg) gg.addEventListener("click",()=>{ EX.v="cruce"; if(EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); });
-  const ct=document.getElementById("excount"); if(ct&&EX.d[0]){ const n=exRows(EX.d[0]).length; ct.textContent=`${nf0.format(n)} municipios con datos de ${low(labK(EX.d[0]))}.`; }
+  const ct=document.getElementById("excount"); if(ct&&EX.d[0]){ if(EX.v==="cruce"&&EX.u==="eu") ct.textContent="En la escala de Europa no se filtran municipios."; else if(EX.v==="cruce"&&EX.d.slice(0,2).some(isReg)) ct.textContent="El filtro solo afecta a los datos municipales; los oficiales son de toda la provincia o comunidad."; else { const n=exRows(EX.d[0]).length; ct.textContent=`${nf0.format(n)} municipios con datos de ${low(labK(EX.d[0]))}.`; } }
 }
 function exUpdate(){ exSync(); exSetHash(); exBar(); exDraw(); }
 
@@ -2930,6 +2977,7 @@ function lbSay(){
 }
 function exDraw(){
   const out=document.getElementById("exout"); if(!out) return; out.innerHTML="";
+  { const h0=exHash(); fixScale(); if(exHash()!==h0){ exSetHash(); exBar(); } }
   ["lbtest","lbcausal","lbmore"].forEach(i=>{ const e=document.getElementById(i); if(e) e.innerHTML=""; });
   const t=document.getElementById("lbtitle"); if(t) t.textContent=lbTitle();
   const sb=document.getElementById("lbsub"); if(sb) sb.textContent=EX.v==="antes"?`${ADY[AD.y].l} · afectados frente a gemelos`:EX.v==="evolucion"?"Series en el tiempo":(EX.v==="cruce"&&EX.d.length>1?labK(EX.d[0])+" ↔ "+low(labK(EX.d[1]))+" · ":"")+lbWhere()+([EX.m,MUN2].filter(c=>c&&BYCODE.has(c)).length?" · Destacado"+(myOk(MUN2)?"s":"")+": "+[EX.m,MUN2].filter(c=>c&&BYCODE.has(c)).map(c=>dispName(BYCODE.get(c)[F.name])).join(" y "):"");
@@ -2942,6 +2990,9 @@ function exDraw(){
   const say=document.getElementById("lbsay"); if(say){ try{ say.innerHTML=lbSay(); }catch(e){ say.innerHTML=""; } say.parentElement.hidden=!say.innerHTML; }
 }
 function exCSV(){
+  if(EX.v==="cruce"&&EX.u&&AGGLAST&&AGGLAST.u===EX.u){ const A=AGGLAST, f=v=>v==null?"":String(+v.toFixed(4)).replace(".",",");
+    const lines=[[A.u==="eu"?"region":A.u==="prov"?"provincia":"comunidad",labK(A.x),labK(A.y),A.year?"año":""].join(";")].concat(A.P.map(p=>['"'+p.l+'"',f(p.x),f(p.y),A.year||""].join(";")));
+    const blob=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="indicio-"+A.u+".csv"; document.body.appendChild(a); a.click(); a.remove(); return; }
   const ks=EX.d, rows=exRows().filter(r=>ks.some(k=>r[F[k]]!=null));
   const lines=[["codigo_ine","municipio","provincia","habitantes",...ks.map(labK)].join(";")].concat(rows.map(r=>[r[F.code],'"'+r[F.name]+'"','"'+provShort(PROVS[r[F.prov]])+'"',r[F.pop],...ks.map(k=>r[F[k]]==null?"":String(r[F[k]]).replace(".",","))].join(";")));
   const blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="cifrario.csv"; document.body.appendChild(a); a.click(); a.remove();
@@ -2993,20 +3044,58 @@ function ctrlRisk(x,y,c){
   return RISK[key]=out;
 }
 
-// ---------- escala: comparar municipios, provincias o comunidades ----------
-const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"]];
-function scaleBar(){ return `<div class="lbscale" role="group" aria-label="Escala de la comparación"><span class="lbscale-l">Comparar</span><div class="seg">${SCALES.map(([u,l])=>`<button type="button" data-u="${u}" aria-pressed="${(EX.u||"")===u}">${l}</button>`).join("")}</div><span class="lbscale-h">${EX.u?"Cada punto es la media de sus municipios, ponderada por población.":"Cada punto es un municipio."}</span></div>`; }
-function scaleWire(out){ out.querySelectorAll(".lbscale button[data-u]").forEach(b=>b.addEventListener("click",()=>{ EX.u=b.dataset.u; navTo(exHash()); })); }
-// agrega los municipios (con el filtro de provincia y tamaño del laboratorio) en provincias o comunidades
-function aggPts(x,y,u){
-  const key=u==="prov"?r=>r[F.prov]:r=>CCAA_OF[r[F.prov]], name=u==="prov"?k=>provShort(PROVS[k]):k=>k;
-  const rs=rowsAll().filter(r=>r[F[x]]!=null&&r[F[y]]!=null&&r[F.pop]&&exOK(r)&&key(r));
-  return d3.groups(rs,key).map(([k,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return {k,l:name(k),n:v.length,pop:w,x:d3.sum(v,r=>r[F[x]]*r[F.pop])/w,y:d3.sum(v,r=>r[F[y]]*r[F.pop])/w}; }).filter(p=>isFinite(p.x)&&isFinite(p.y));
+// ---------- escala: comparar municipios, provincias, comunidades o regiones de Europa ----------
+// datos oficiales que solo existen por provincia o comunidad (data/regional.json) y regiones de Europa (data/europa.json):
+// se cargan aparte y se añaden al catálogo con claves R_… y E_…; solo se pueden usar en «Relación» (escalas de provincia, comunidad o Europa) y en «Años»
+let REG=null, REG_P=null, EUR=null, EUR_P=null, AGGY=null; const REGCC={}, REGCCN={};
+const regF=u=>/^%/.test(u)?"pct":/^€/.test(u)?"eur":/^años$/.test(u)?"years":/PPC|puestos|viviendas$/.test(u)?"int":"num1";
+const regSrc=v=>`${typeof v.tabla==="number"?"INE (tabla "+v.tabla+")":v.tabla}${v.nota?" · "+v.nota:""} · ${v.u}`;
+function loadRegional(){ return REG_P||(REG_P=getJSON("/data/regional.json").then(g=>{ REG=g;
+  Object.entries(g.provCcaa).forEach(([p,c])=>{ REGCC[c]=CCAA_OF[p]; REGCCN[CCAA_OF[p]]=c; });
+  Object.entries(g.vars).forEach(([k,v])=>{ const np=Object.keys(g.data.prov).filter(p=>g.data.prov[p][k]).length, nc=Object.keys(g.data.ccaa).filter(c=>g.data.ccaa[c][k]).length;
+    if(CATK["R_"+k]) return; const c={k:"R_"+k,l:v.l,g:"Provincias y comunidades",f:regF(v.u),src:regSrc(v),reg:true,np,nc}; CAT.push(c); CATK[c.k]=c; }); }).catch(e=>{ console.error(e); REG_P=null; })); }
+function loadEuropa(){ return EUR_P||(EUR_P=getJSON("/data/europa.json").then(g=>{ EUR=g;
+  Object.entries(g.vars).forEach(([k,v])=>{ if(CATK["E_"+k]) return; const c={k:"E_"+k,l:v.l,g:"Europa",f:regF(v.u),src:v.fuente+" · "+v.u,eu:true}; CAT.push(c); CATK[c.k]=c; }); }).catch(e=>{ console.error(e); EUR_P=null; })); }
+const isReg=k=>!!(CATK[k]||{}).reg, isEU=k=>!!(CATK[k]||{}).eu;
+// en qué escalas se puede dibujar el par elegido
+function scaleOK(u,ks){ ks=ks||EX.d.slice(0,2); const R=ks.map(k=>CATK[k]||{});
+  if(u==="eu") return true; if(R.some(c=>c.eu)) return false;
+  if(u==="") return !R.some(c=>c.reg); if(u==="prov") return !R.some(c=>c.reg&&c.np<40); if(u==="ccaa") return !R.some(c=>c.reg&&c.nc<15); return true; }
+// ajusta la escala y los datos para que sean compatibles (al cargar un enlace, al cambiar de vista o al elegir un dato)
+function fixScale(){
+  if(EX.v!=="cruce"&&EX.v!=="burbujas"){ const d=EX.d.filter(k=>CATK[k]&&!isReg(k)&&!isEU(k)); if(d.length!==EX.d.length){ EX.d=d.length?d:["renta","paroReg"]; } return; }
+  if(EX.v==="burbujas") return;
+  if(EX.u==="eu"){ if(!EUR) return; const d=EX.d.slice(0,2).filter(isEU); const def=["E_pib_pps","E_paro"].filter(k=>!d.includes(k)); while(d.length<2) d.push(def.shift()); EX.d=[...d,...EX.d.slice(2).filter(isEU)]; EX.c=[]; return; }
+  if(EX.d.some(isEU)){ EX.d=EX.d.filter(k=>!isEU(k)); const def=["renta","paroReg"].filter(k=>!EX.d.includes(k)); while(EX.d.length<2) EX.d.push(def.shift()); }
+  if(EX.d.slice(0,2).some(isReg)){ if(!scaleOK(EX.u)) EX.u=scaleOK("prov")?"prov":"ccaa"; EX.c=[]; }
 }
+const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"],["eu","Europa"]];
+function scaleBar(){ const anyR=EX.d.slice(0,2).some(isReg);
+  const h=EX.u==="eu"?"Cada punto es una región europea (NUTS 2); en granate, las españolas. Datos de Eurostat.":EX.u?(anyR?`Datos oficiales de cada ${EX.u==="prov"?"provincia":"comunidad"}${EX.d.slice(0,2).every(isReg)?"":"; los datos municipales, media de sus municipios ponderada por población"}.`:"Cada punto es la media de sus municipios, ponderada por población."):"Cada punto es un municipio.";
+  return `<div class="lbscale" role="group" aria-label="Escala de la comparación"><span class="lbscale-l">Comparar</span><div class="seg">${SCALES.map(([u,l])=>{ const ok=scaleOK(u)||u==="eu"; return `<button type="button" data-u="${u}" aria-pressed="${(EX.u||"")===u}"${ok?"":` disabled title="Uno de los datos elegidos no existe a esta escala"`}>${l}</button>`; }).join("")}</div><span class="lbscale-h">${h}</span></div>`; }
+function scaleWire(out){ out.querySelectorAll(".lbscale button[data-u]").forEach(b=>b.addEventListener("click",async()=>{ const u=b.dataset.u; if(u==="eu") await loadEuropa(); if(u&&u!=="eu") await loadRegional();
+  if(EX.u==="eu"&&u!=="eu") EX.d=EX.d.filter(k=>!isEU(k)); EX.u=u; fixScale(); navTo(exHash()); })); }
+// último año con dato para (casi) todas las provincias o comunidades en todos los datos oficiales elegidos
+function regYear(ks,u){ if(!ks.length||!REG) return null; const D=REG.data[u]||{}, cnt={};
+  Object.values(D).forEach(o=>{ const ys=ks.map(k=>Object.keys(o[k.slice(2)]||{})); ys.reduce((a,b)=>a.filter(y=>b.includes(y))).forEach(y=>cnt[y]=(cnt[y]||0)+1); });
+  const need=u==="prov"?40:14, ok=Object.keys(cnt).filter(y=>cnt[y]>=need).sort(); return ok.length?ok[ok.length-1]:(Object.keys(cnt).sort().pop()||null); }
+// agrega los municipios (con el filtro de provincia y tamaño del laboratorio) en provincias o comunidades; los datos oficiales se toman tal cual
+function aggPts(x,y,u){
+  const key=u==="prov"?r=>r[F.prov]:r=>CCAA_OF[r[F.prov]], name=u==="prov"?k=>provShort(PROVS[k]):k=>k, rx=isReg(x), ry=isReg(y);
+  if(!rx&&!ry){ AGGY=null; const rs=rowsAll().filter(r=>r[F[x]]!=null&&r[F[y]]!=null&&r[F.pop]&&exOK(r)&&key(r));
+    return d3.groups(rs,key).map(([k,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return {k,l:name(k),n:v.length,pop:w,x:d3.sum(v,r=>r[F[x]]*r[F.pop])/w,y:d3.sum(v,r=>r[F[y]]*r[F.pop])/w}; }).filter(p=>isFinite(p.x)&&isFinite(p.y)); }
+  AGGY=regYear([rx&&x,ry&&y].filter(Boolean),u);
+  const all=rowsAll().filter(r=>key(r)), pop=d3.rollup(all,v=>d3.sum(v,r=>r[F.pop]||0),key), nm=d3.rollup(all,v=>v.length,key), M={};
+  [[x,rx],[y,ry]].forEach(([k,isR])=>{ if(!isR){ const rs=all.filter(r=>r[F[k]]!=null&&r[F.pop]&&exOK(r)); M[k]=new Map(d3.groups(rs,key).map(([g,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return [g,d3.sum(v,r=>r[F[k]]*r[F.pop])/w]; })); } });
+  const val=(k,isR,g)=>{ if(!isR) return M[k].get(g); const c=u==="prov"?g:REGCCN[g], s=(((REG.data[u]||{})[c])||{})[k.slice(2)]; return s?s[AGGY]:null; };
+  return [...pop.keys()].map(g=>({k:g,l:name(g),n:nm.get(g),pop:pop.get(g),x:val(x,rx,g),y:val(y,ry,g)})).filter(p=>p.x!=null&&p.y!=null&&isFinite(p.x)&&isFinite(p.y));
+}
+let AGGLAST=null;   // puntos del último gráfico agregado (para el CSV)
 function exCruceAgg(out,x,y){
-  const u=EX.u, P=aggPts(x,y,u), wt=!!EX.w;
-  const cAt=uu=>{ if(!uu){ const c=wcorr(pairPts(x,y,{weighted:wt})); return c?{r:c.r,n:pairPts(x,y,{weighted:wt}).length}:null; } const A=aggPts(x,y,uu), c=wcorr(A.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1}))); return c?{r:c.r,n:A.length}:null; };
+  const u=EX.u, wt=!!EX.w, anyR=isReg(x)||isReg(y);
+  const cAt=uu=>{ if(!scaleOK(uu,[x,y])) return null; if(!uu){ const c=wcorr(pairPts(x,y,{weighted:wt})); return c?{r:c.r,n:pairPts(x,y,{weighted:wt}).length}:null; } const A=aggPts(x,y,uu), c=wcorr(A.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1}))); return c?{r:c.r,n:A.length,y:AGGY}:null; };
   const C={"":cAt(""),prov:cAt("prov"),ccaa:cAt("ccaa")};
+  const P=aggPts(x,y,u); AGGLAST={u,x,y,P,year:AGGY};
   out.insertAdjacentHTML("beforeend",`<div id="aggplot"></div>`);
   if(P.length<4){ document.getElementById("aggplot").innerHTML='<p class="loading">Hay muy pocos grupos con estos filtros. Quita el filtro de provincia para comparar comunidades o provincias.</p>'; return; }
   const box=document.getElementById("aggplot"), W=Math.max(320,box.clientWidth||720), H=Math.min(520,Math.max(340,W*0.62)), m={t:16,r:96,b:46,l:58};
@@ -3018,24 +3107,60 @@ function exCruceAgg(out,x,y){
   sv.append("text").attr("x",W-m.r).attr("y",H-8).attr("text-anchor","end").attr("font-size",12).attr("fill","var(--ink-2)").text(labK(x)+" →");
   sv.append("text").attr("x",m.l).attr("y",m.t-4).attr("font-size",12).attr("fill","var(--ink-2)").text("↑ "+labK(y));
   const c=wcorr(P.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1})));
-  if(c){ const [a,b]=X.domain(); const mx=c.mx??d3.mean(P,p=>p.x), my=c.my??d3.mean(P,p=>p.y); sv.append("line").attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(my+c.b*(a-mx))).attr("y2",Y(my+c.b*(b-mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
+  const cid="agclip"+Math.random().toString(36).slice(2,7); sv.append("clipPath").attr("id",cid).append("rect").attr("x",m.l).attr("y",m.t).attr("width",W-m.r-m.l).attr("height",H-m.b-m.t);
+  if(c){ const [a,b]=X.domain(); const mx=c.mx??d3.mean(P,p=>p.x), my=c.my??d3.mean(P,p=>p.y); sv.append("line").attr("clip-path",`url(#${cid})`).attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(my+c.b*(a-mx))).attr("y2",Y(my+c.b*(b-mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
   const g=sv.append("g").selectAll("g").data(P.slice().sort((a,b)=>b.pop-a.pop)).join("g");
   g.append("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>Rr(p.pop)).attr("fill","var(--rust)").attr("fill-opacity",.55).attr("stroke","var(--rust)").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)} (${nf0.format(p.n)} municipios)`);
   const lab=u==="ccaa"?P:P.filter(p=>{ const zx=Math.abs(p.x-d3.mean(P,q=>q.x))/(d3.deviation(P,q=>q.x)||1), zy=Math.abs(p.y-d3.mean(P,q=>q.y))/(d3.deviation(P,q=>q.y)||1); return zx+zy>1.6||p.pop>3e6; });
   sv.append("g").selectAll("text").data(lab).join("text").attr("x",p=>X(p.x)+Rr(p.pop)+3).attr("y",p=>Y(p.y)+4).attr("font-size",11).attr("fill","var(--ink-2)").text(p=>p.l);
-  add(box,"figcaption",null,`${nf0.format(P.length)} ${u==="prov"?"provincias":"comunidades y ciudades autónomas"}; el tamaño del punto es la población. Medias de los municipios con dato, ponderadas por población${EX.p||EX.t?", con el filtro de arriba":""}.`);
+  add(box,"figcaption",null,`${nf0.format(P.length)} ${u==="prov"?"provincias":"comunidades y ciudades autónomas"}; el tamaño del punto es la población. ${anyR?`Datos oficiales de ${AGGY}${isReg(x)&&isReg(y)?"":"; el otro dato, media de los municipios con dato ponderada por población"}. Fuente: ${[x,y].filter(isReg).map(k=>CATK[k].src).join("; ")}.`:`Medias de los municipios con dato, ponderadas por población${EX.p||EX.t?", con el filtro de arriba":""}.`}`);
   // la escala cambia la respuesta
   const rF=o=>o?`r = ${rFmt(o.r)}`:"—", bar=o=>o?`<span class="scb"><i style="width:${Math.abs(o.r)*100}%;background:var(${o.r<0?"--slate":"--rust"})"></i></span>`:"";
   const tst=document.getElementById("lbtest");
   if(tst) tst.innerHTML=`<section class="scale-cmp" aria-label="La escala cambia la respuesta"><div><h3>La escala cambia la respuesta</h3>
-    <table class="tbl scale-t"><thead><tr><th>Comparando…</th><th>Puntos</th><th>Fuerza de la relación</th><th></th></tr></thead><tbody>${SCALES.map(([uu,l])=>`<tr${uu===(u||"")?' class="me"':""}><td>${l}</td><td class="r num">${C[uu]?nf0.format(C[uu].n):"—"}</td><td class="r num"><b>${rF(C[uu])}</b></td><td>${bar(C[uu])}</td></tr>`).join("")}</tbody></table>
+    <table class="tbl scale-t"><thead><tr><th>Comparando…</th><th>Puntos</th><th>Fuerza de la relación</th><th></th></tr></thead><tbody>${SCALES.filter(([uu])=>uu!=="eu").map(([uu,l])=>`<tr${uu===(u||"")?' class="me"':""}><td>${l}</td><td class="r num">${C[uu]?nf0.format(C[uu].n):"—"}</td><td class="r num"><b>${rF(C[uu])}</b></td><td>${bar(C[uu])}</td></tr>`).join("")}</tbody></table>${anyR?`<p class="muted">${isReg(x)&&isReg(y)?"Estos datos":"Uno de los datos"} solo existe${isReg(x)&&isReg(y)?"n":""} por provincia o comunidad: no se puede comparar entre municipios.</p>`:""}
     <p>${C[""]&&C[u]?(Math.abs(C[u].r)>Math.abs(C[""].r)+0.15?`Entre ${u==="prov"?"provincias":"comunidades"} la relación parece <b>mucho más fuerte</b> (${rFmt(C[u].r)}) que entre municipios (${rFmt(C[""].r)}). Es lo habitual: al promediar se borran las diferencias dentro de cada territorio y queda solo lo que separa a unos territorios de otros, que suele ir todo junto (renta, estudios, edad, paro).`:Math.abs(C[u].r)<Math.abs(C[""].r)-0.15?`Entre ${u==="prov"?"provincias":"comunidades"} la relación es <b>más débil</b> (${rFmt(C[u].r)}) que entre municipios (${rFmt(C[""].r)}): lo que se ve entre municipios pasa sobre todo dentro de cada territorio.`:`La relación se parece a todas las escalas (${rFmt(C[""].r)} entre municipios, ${rFmt(C[u].r)} entre ${u==="prov"?"provincias":"comunidades"}): es un patrón que no depende de cómo se agrupe.`):""}</p>
-    <p class="muted">Cuidado con la <b>falacia ecológica</b>: que dos cosas vayan juntas entre comunidades no dice que vayan juntas entre municipios, ni mucho menos entre personas. Con ${C[u]?nf0.format(C[u].n):"pocos"} puntos, además, una sola comunidad puede mover mucho el resultado. Las pruebas de «¿aguanta la relación?» (comparar entre parecidos, gemelos, dentro de cada provincia) solo tienen sentido con municipios: <button type="button" class="lnk" data-u="">vuelve a municipios</button> para usarlas.</p></div></section>`;
+    <p class="muted">Cuidado con la <b>falacia ecológica</b>: que dos cosas vayan juntas entre comunidades no dice que vayan juntas entre municipios, ni mucho menos entre personas. Con ${C[u]?nf0.format(C[u].n):"pocos"} puntos, además, una sola comunidad puede mover mucho el resultado. Las pruebas de «¿aguanta la relación?» (comparar entre parecidos, gemelos, dentro de cada provincia) solo tienen sentido con municipios${anyR?".":`: <button type="button" class="lnk" data-u="">vuelve a municipios</button> para usarlas.`}</p></div></section>`;
   tst&&tst.querySelectorAll("button[data-u]").forEach(b=>b.addEventListener("click",()=>{ EX.u=""; navTo(exHash()); }));
+}
+// regiones de Europa (NUTS 2) con datos de Eurostat; España resaltada
+function exCruceEU(out,x,y){
+  const D=EUR&&EUR.data; if(!D){ out.insertAdjacentHTML("beforeend",'<p class="loading">Cargando los datos de Europa…</p>'); loadEuropa().then(()=>exDraw()); return; }
+  const kx=x.slice(2), ky=y.slice(2), regs=Object.keys(D).filter(g=>g.length===4&&!g.startsWith("EU")&&!/ZZ$/.test(g));
+  const cnt={}; regs.forEach(g=>{ const a=(D[g][kx])||{}, b=(D[g][ky])||{}; Object.keys(a).filter(y=>b[y]!=null).forEach(y=>cnt[y]=(cnt[y]||0)+1); });
+  const yrs=Object.keys(cnt).sort(), mx=d3.max(Object.values(cnt))||0, yr=yrs.filter(y=>cnt[y]>=mx*0.85).pop();
+  const P=regs.map(g=>({k:g,l:EUR.nombres[g]||g,es:g.startsWith("ES"),x:((D[g][kx])||{})[yr],y:((D[g][ky])||{})[yr]})).filter(p=>p.x!=null&&p.y!=null);
+  AGGLAST={u:"eu",x,y,P,year:yr};
+  out.insertAdjacentHTML("beforeend",`<div id="aggplot"></div>`);
+  const box=document.getElementById("aggplot"); if(P.length<10){ box.innerHTML='<p class="loading">No hay datos suficientes de estos dos indicadores para el mismo año.</p>'; return; }
+  const W=Math.max(320,box.clientWidth||720), H=Math.min(520,Math.max(340,W*0.62)), m={t:16,r:110,b:46,l:58}, fx=fmtK(x), fy=fmtK(y);
+  const q=(a,p)=>d3.quantile(a.slice().sort(d3.ascending),p), xs=P.map(p=>p.x), ys=P.map(p=>p.y);
+  const X=d3.scaleLinear().domain([q(xs,0),q(xs,1)]).nice().range([m.l,W-m.r]), Y=d3.scaleLinear().domain([q(ys,0),q(ys,1)]).nice().range([H-m.b,m.t]);
+  const sv=d3.select(box).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`${labK(x)} y ${low(labK(y))} en las regiones de Europa`);
+  sv.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(X).ticks(6).tickFormat(fx)).call(g=>g.select(".domain").attr("stroke","var(--rule-2)")).selectAll("text").attr("fill","var(--muted)");
+  sv.append("g").attr("transform",`translate(${m.l},0)`).call(d3.axisLeft(Y).ticks(6).tickFormat(fy)).call(g=>g.select(".domain").attr("stroke","var(--rule-2)")).selectAll("text").attr("fill","var(--muted)");
+  sv.append("text").attr("x",W-m.r).attr("y",H-8).attr("text-anchor","end").attr("font-size",12).attr("fill","var(--ink-2)").text(labK(x)+" →");
+  sv.append("text").attr("x",m.l).attr("y",m.t-4).attr("font-size",12).attr("fill","var(--ink-2)").text("↑ "+labK(y));
+  const c=wcorr(P.map(p=>({x:p.x,y:p.y,w:1}))), ce=wcorr(P.filter(p=>p.es).map(p=>({x:p.x,y:p.y,w:1})));
+  const cid="euclip"+Math.random().toString(36).slice(2,7); sv.append("clipPath").attr("id",cid).append("rect").attr("x",m.l).attr("y",m.t).attr("width",W-m.r-m.l).attr("height",H-m.b-m.t);
+  if(c){ const [a,b]=X.domain(); sv.append("line").attr("clip-path",`url(#${cid})`).attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(c.my+c.b*(a-c.mx))).attr("y2",Y(c.my+c.b*(b-c.mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
+  const dots=P.slice().sort((a,b)=>a.es-b.es);
+  sv.append("g").selectAll("circle").data(dots).join("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>p.es?5.5:3.5).attr("fill",p=>p.es?"var(--rust)":"var(--slate)").attr("fill-opacity",p=>p.es?.85:.35).attr("stroke",p=>p.es?"var(--rust)":"none").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)}`);
+  sv.append("g").selectAll("text").data(P.filter(p=>p.es)).join("text").attr("x",p=>X(p.x)+7).attr("y",p=>Y(p.y)+4).attr("font-size",10.5).attr("fill","var(--ink-2)").text(p=>p.l.replace(/^Comunidad (de |Foral de )?|^Región de |^Principado de |^Comunitat |^Illes /,""));
+  const ES=D.ES||{}, EU=D.EU27_2020||{}, v=(o,k)=>((o[k]||{})[yr]);
+  add(box,"figcaption",null,`${nf0.format(P.length)} regiones europeas (NUTS 2) en ${yr}; en granate, las ${nf0.format(P.filter(p=>p.es).length)} españolas. Fuente: ${CATK[x].src.split(" · ")[0]}${CATK[y].src.split(" · ")[0]!==CATK[x].src.split(" · ")[0]?" y "+CATK[y].src.split(" · ")[0]:""}.`);
+  const tst=document.getElementById("lbtest");
+  if(tst) tst.innerHTML=`<section class="scale-cmp" aria-label="España en Europa"><div><h3>España en Europa</h3>
+    <table class="tbl scale-t"><thead><tr><th></th><th class="r">${esc(labK(x))}</th><th class="r">${esc(labK(y))}</th></tr></thead><tbody>
+    <tr class="me"><td>España</td><td class="r num">${v(ES,kx)!=null?fx(v(ES,kx)):"—"}</td><td class="r num">${v(ES,ky)!=null?fy(v(ES,ky)):"—"}</td></tr>
+    <tr><td>Unión Europea</td><td class="r num">${v(EU,kx)!=null?fx(v(EU,kx)):"—"}</td><td class="r num">${v(EU,ky)!=null?fy(v(EU,ky)):"—"}</td></tr></tbody></table>
+    <p>${c?`Entre todas las regiones europeas la relación es de r = <b>${rFmt(c.r)}</b>${ce?`; solo entre las españolas, r = <b>${rFmt(ce.r)}</b>`:""}. ${ce&&Math.abs(ce.r-c.r)>0.3?"El patrón de España no es el de Europa: dentro de España las regiones se ordenan de otra manera.":"España sigue un patrón parecido al del resto de Europa."}`:""}</p>
+    <p class="muted">Cada país mide igual estos indicadores (encuestas armonizadas de Eurostat), así que sí se pueden comparar. Pero entre países pesan cosas que aquí no se ven: leyes, instituciones, historia. Cuidado con leerlo como causa.</p></div></section>`;
 }
 function exCruce(out){
   if(EX.d.length<2){ out.innerHTML='<p class="loading">Pon un segundo dato en el hueco «Vertical» para cruzarlo con el primero.</p>'; return; }
   const [x,y]=EX.d; XS={...XS,x,y,minPop:0,prov:"",weighted:!!EX.w,logX:!!EX.lx,sz:EX.sz,col:EX.col,quad:EX.q};
+  if(EX.u==="eu"){ out.innerHTML=scaleBar(); scaleWire(out); exCruceEU(out,x,y); return; }
   if(EX.u){ out.innerHTML=scaleBar(); scaleWire(out); exCruceAgg(out,x,y); return; }
   LBPOS=null;
   out.innerHTML=scaleBar()+`<div id="ctlnote"></div><div id="cplot"></div>`; scaleWire(out);

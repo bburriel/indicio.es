@@ -57,6 +57,9 @@ def ccaa_code(name):
 
 
 def load(tid):
+    if not os.path.exists(os.path.join(SRC, f"{tid}.json.gz")):
+        print(f"  falta la tabla {tid}")
+        return {"dims": [], "periodos": [], "series": []}
     with gzip.open(os.path.join(SRC, f"{tid}.json.gz"), "rt", encoding="utf-8") as f:
         return json.load(f)
 
@@ -141,6 +144,9 @@ DATA = {"prov": {}, "ccaa": {}, "es": {}}
 
 
 def put(key, label, unidad, tabla, res, nota=""):
+    if not any(res.values()):
+        print(f"{key}: sin datos (falta la tabla o el fichero); se conserva lo anterior si lo hay")
+        return
     VARS[key] = {"l": label, "u": unidad, "tabla": tabla, "nota": nota,
                  "escalas": sorted({lvl for (lvl, _) in res})}
     for (lvl, code), serie in res.items():
@@ -217,6 +223,78 @@ def main():
         pick(9993, {"Dificultad para llegar a fin de mes": ["Con dificultad", "Con mucha dificultad"]}, combine="sum"))
     put("vacantes", "Vacantes de empleo", "puestos", 6064, pick(6064, {}))
 
+    # --- otras fuentes (regional_otras.py) ---
+    import regional_otras as O
+    S = lambda f: json.load(open(os.path.join(ROOT, "scripts", "datos", "cache", f))) if os.path.exists(os.path.join(ROOT, "scripts", "datos", "cache", f)) else None
+    mv = S("out_series_mivau.json")
+    if mv:
+        Y = mv["years"]; full = [y for y in Y if y <= 2025]
+        comp = O.agg_mun(mv["series"], Y, "compraventas", PROV_CCAA, full)
+        put("compraventas", "Compraventas de vivienda por cada 1.000 habitantes", "por 1.000 hab. y año", "MIVAU", per_hab(comp),
+            "Ministerio de Vivienda, transacciones inmobiliarias (notarios), suma de los municipios")
+        put("comp_nueva", "Compraventas de vivienda nueva", "% de las compraventas", "MIVAU", O.ratio(O.agg_mun(mv["series"], Y, "compNueva", PROV_CCAA, full), comp))
+        put("comp_protegida", "Compraventas de vivienda protegida", "% de las compraventas", "MIVAU", O.ratio(O.agg_mun(mv["series"], Y, "compProtegida", PROV_CCAA, full), comp))
+    EXT = os.path.isdir(os.path.join(ROOT, "scripts", "datos", "cache", "externos"))
+    if EXT:
+      put("comp_extranjeros", "Compraventas de vivienda hechas por extranjeros", "% de las compraventas", "MIVAU", O.extranjeros(ccaa_code),
+          "Ministerio de Vivienda: extranjeros residentes en España más no residentes")
+      put("suelo", "Precio medio del suelo urbano", "€/m²", "MIVAU", O.suelo(ccaa_code), "Ministerio de Vivienda, media de los cuatro trimestres")
+      put("viv_iniciadas", "Viviendas libres iniciadas por cada 1.000 habitantes", "por 1.000 hab. y año", "MIVAU",
+          per_hab({k: v for k, v in O.tabla_anual(os.path.join(ROOT, "scripts", "datos", "cache", "externos", "mivau_extra", "32200500.XLS"), ccaa_code).items()}),
+          "Ministerio de Vivienda, visados de dirección de obra nueva de los colegios de aparejadores")
+      put("viv_protegidas", "Viviendas protegidas terminadas (calificación definitiva) por cada 10.000 habitantes", "por 10.000 hab. y año", "MIVAU",
+          per_hab(O.tabla_anual(os.path.join(ROOT, "scripts", "datos", "cache", "externos", "mivau_extra", "31306000.XLS"), ccaa_code), 10000),
+          "Ministerio de Vivienda, planes estatales y autonómicos")
+    se = S("out_series_sepe.json")
+    if se:
+        Y = [y for y in se["years"] if se["meses"][str(y)] == 12]
+        ind = {k: O.agg_mun(se["series"], se["years"], k, PROV_CCAA, Y) for k in ("contrIndefH", "contrIndefM", "contrTempH", "contrTempM")}
+        add2 = lambda a, b: {k: {y: a[k][y] + b.get(k, {}).get(y, 0) for y in a[k]} for k in a}
+        indef, temp = add2(ind["contrIndefH"], ind["contrIndefM"]), add2(ind["contrTempH"], ind["contrTempM"])
+        put("contratos_temporales", "Contratos iniciales que son temporales", "% de los contratos iniciales", "SEPE",
+            O.ratio(temp, add2(indef, temp)), "SEPE, contratos registrados por municipio del centro de trabajo, suma del año")
+        put("contratos_hab", "Contratos registrados por habitante", "contratos por hab. y año", "SEPE",
+            per_hab(O.agg_mun(se["series"], se["years"], "contr", PROV_CCAA, Y), 1))
+    ss = S("out_series_ss.json")
+    if ss:
+        Y = [int(p[:4]) for p in ss["periodos"]]; dic = [int(p[:4]) for p in ss["periodos"] if p.endswith("12")]
+        tot = O.agg_mun(ss["series"], Y, "total", PROV_CCAA, dic)
+        put("afiliados", "Afiliados a la Seguridad Social por cada 100 habitantes (diciembre)", "por 100 hab.", "Seguridad Social", per_hab(tot, 100),
+            "Seguridad Social: afiliados por municipio de la cuenta de cotización (donde se trabaja)")
+        for k, lab in [("autonomos", "Autónomos"), ("industria", "Industria"), ("hosteleria", "Hostelería"), ("publico", "Administración, educación y sanidad"),
+                       ("construccion", "Construcción"), ("agri", "Agricultura")]:
+            put("afil_" + k, f"Afiliados: {lab}", "% de los afiliados", "Seguridad Social", O.ratio(O.agg_mun(ss["series"], Y, k, PROV_CCAA, dic), tot))
+    de = S("out_series_deuda.json")
+    if de:
+        put("deuda_municipal", "Deuda viva de los ayuntamientos por habitante", "€ por hab.", "Hacienda",
+            per_hab(O.agg_mun(de["series"], de["years"], "x", PROV_CCAA) if False else O.agg_mun({c: {"x": v} for c, v in de["series"].items()}, de["years"], "x", PROV_CCAA), 1),
+            "Ministerio de Hacienda, deuda viva a 31 de diciembre, suma de los ayuntamientos")
+    cam = O.camas(ccaa_code) if EXT else {}
+    if cam: put("camas_hosp", "Camas hospitalarias por cada 1.000 habitantes", "por 1.000 hab.", "Sanidad",
+        per_hab({k: {"2025": v} for k, v in cam.items()} | {("ccaa", c): {"2025": sum(v for (l, p), v in cam.items() if PROV_CCAA.get(p) == c)} for c in CCAA}
+                | {("es", "ES"): {"2025": sum(cam.values())}}), "Ministerio de Sanidad, Catálogo Nacional de Hospitales (camas instaladas)")
+    put("esperanza_vida", "Esperanza de vida al nacer", "años", 1485,
+        {**pick(1485, {"Sexo": amb}), **pick(1448, {"Sexo": amb})})
+    put("ipv", "Precio de la vivienda (IPV, índice 2025 = 100)", "índice", 80271, pick(80271, {"Índices y Tasas": "Media anual", "General, vivienda nueva y de segunda mano": "General"}))
+    put("ipv_var", "Subida del precio de la vivienda (IPV)", "% anual", 80271, pick(80271, {"Índices y Tasas": "Variación anual", "General, vivienda nueva y de segunda mano": "General"}))
+    try:
+        put("teletrabajo", "Asalariados que trabajan desde casa (alguna vez o más de la mitad de los días)", "% de asalariados", 65789,
+            O.ratio(pick(65789, {"Sexo": amb, "Días trabajados en el domicilio particular": ["Más de la mitad de los días que trabajó", "Ocasionalmente"]}, combine="sum"),
+                    pick(65789, {"Sexo": amb, "Días trabajados en el domicilio particular": "Total"})))
+    except Exception as e: print("teletrabajo:", e)
+    if os.path.isdir(O.EU):
+        put("pib_pps", "PIB por habitante en paridad de poder de compra (UE = 100)", "UE = 100", "Eurostat", O.eu_prov_pib(), "Eurostat, nama_10r_3gdp y nama_10r_2gdp")
+        put("abandono", "Abandono temprano de la educación (18–24 años)", "%", "Eurostat", O.eu_ccaa("edat_lfse_16", {"sex": "T", "unit": "PC", "age": "Y18-24"}))
+        put("superiores", "Población de 25 a 64 años con estudios superiores", "%", "Eurostat",
+            O.eu_ccaa("edat_lfse_04", {"sex": "T", "isced11": "ED5-8", "age": "Y25-64", "unit": "PC"}))
+        put("paro_larga", "Parados de larga duración (% de la población activa)", "%", "Eurostat",
+            O.eu_ccaa("lfst_r_lfu2ltu", {"isced11": "TOTAL", "sex": "T", "age": "Y15-74", "unit": "PC_ACT"}))
+        put("renta_pps", "Renta disponible de los hogares por habitante (PPC)", "PPC", "Eurostat",
+            O.eu_ccaa("nama_10r_2hhinc", {"unit": "PPS_EU27_2020_HAB", "direct": "BAL", "na_item": "B6N"}, 0))
+        eu = O.europa()
+        with open(os.path.join(ROOT, "data", "europa.json"), "w") as f: json.dump(eu, f, ensure_ascii=False, separators=(",", ":"))
+        print("→ data/europa.json", os.path.getsize(os.path.join(ROOT, "data", "europa.json")) // 1024, "KB")
+
     # Comunidades de una sola provincia: el dato de la comunidad vale para la provincia y al revés
     uni = {"03": "33", "04": "07", "06": "39", "13": "28", "14": "30", "15": "31", "17": "26", "18": "51", "19": "52"}
     for cc, pp in uni.items():
@@ -226,7 +304,17 @@ def main():
                 b[k] = a[k]
             if k not in a and k in b:
                 a[k] = b[k]
-    out = {"fuente": "INE (API JSON). Ver scripts/datos/ine_api.py y regional.py", "provs": PROVS, "ccaa": CCAA, "provCcaa": PROV_CCAA,
+    # en la tarea mensual de GitHub no están los ficheros de otras fuentes: se conservan las variables que ya había
+    if os.path.exists(OUT):
+        prev = json.load(open(OUT))
+        for k, v in prev.get("vars", {}).items():
+            if k in VARS: continue
+            VARS[k] = v
+            for lvl in DATA:
+                for code, d in prev["data"].get(lvl, {}).items():
+                    if k in d: DATA[lvl].setdefault(code, {})[k] = d[k]
+            print(f"{k}: se conserva de la versión anterior")
+    out = {"fuente": "INE (API JSON), Ministerio de Vivienda, SEPE, Seguridad Social, Hacienda, Sanidad y Eurostat. Ver scripts/datos/regional.py y regional_otras.py", "provs": PROVS, "ccaa": CCAA, "provCcaa": PROV_CCAA,
            "vars": VARS, "data": DATA}
     with open(OUT, "w") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
