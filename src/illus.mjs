@@ -192,3 +192,13 @@ ILLUS["iva-alimentos"]=svg("iva-alimentos","Una cesta de la compra con pan, lech
     G("translate(60 186)",C(0,0,26,"sb",` fill="none" stroke-width="5"`)+P("M-10 10 L10 -10","sb",` fill="none" stroke-width="5" stroke-linecap="round"`)+C(-8,-8,4,"k1")+C(8,8,4,"k1")))+
   C(140,80,28,"k3")+tree(220,300,1.3)+tree(1120,300,1));
 FOCUS["iva-alimentos"]=330;
+
+ILLUS["vivienda-protegida"]=svg("vivienda-protegida","Un bloque de vivienda protegida con un escudo, una grúa parada y edificios altos al fondo",
+  hills(250,"k8",24,1.3)+R(0,300,1200,60,"k9")+
+  [[760,230,"k4"],[840,280,"k2"],[930,210,"k1"],[1010,260,"k4"],[1090,190,"k2"]].map(([x,h,c],i)=>bldg(x,300,70,h,c,"k7",2,[i*2%5])).join("")+
+  G("translate(560 0)",R(0,70,10,230,"k2")+R(-120,70,250,10,"k2")+R(110,80,8,14,"ki")+L(-90,80,-90,170,"sk",` stroke-width="2"`)+R(-102,170,24,16,"k3")+
+    P("M-120 70 L5 40 L130 70","sk",` fill="none" stroke-width="2"`)+R(-10,290,30,10,"ki"))+
+  bldg(190,300,190,150,"kc","k7",4,[2,5],"k3")+R(190,140,190,10,"k1")+
+  G("translate(285 182)",P("M0 -26 L22 -18 L22 2 C22 16 10 24 0 28 C-10 24 -22 16 -22 2 L-22 -18 Z","kr")+P("M-9 1 L-2 9 L11 -8","sc",` fill="none" stroke-width="4" stroke-linecap="round"`))+
+  tree(110,300,1.2)+tree(430,300,0.9)+person(470,300,"k5",1)+C(140,70,26,"k3"));
+FOCUS["vivienda-protegida"]=240;
