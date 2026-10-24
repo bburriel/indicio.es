@@ -26,3 +26,19 @@ Orden: descargar → script de la fuente → `python3 construir.py` → `npm run
 - **INE · empresas y turismo con móviles por municipio**: tasas trimestrales muy ruidosas o tablas sin descarga completa.
 - **Centros educativos y sanitarios**: no hay archivo municipal público claro.
 - **Atlas de renta · ingresos muy altos y muy bajos** (% con más del 200 % o menos del 40 % de la mediana): las tablas de las provincias grandes pesan más de 1 GB (una fila por sección censal y año); queda pendiente bajarlas con un tiempo de espera mayor (ver el final de `ine_atlas.py`).
+
+## Series del INE por provincia y comunidad (`data/regional.json`)
+
+Tres pasos, todos con la API JSON del INE (`servicios.ine.es/wstempus`):
+
+1. `python3 scripts/datos/ine_api.py catalogo`: lista de operaciones y de sus tablas (`cache/ine_operaciones.json`, `cache/ine_tablas.json`).
+2. `python3 scripts/datos/ine_api.py descargar`: unas 60 tablas elegidas a mano (EPA, hipotecas, migraciones, PIB, empresas, turismo, IPC, condiciones de vida, salarios, censo, indicadores urbanos…) y todas las tablas de varias operaciones elegidas por nombre (precio de vivienda, compraventas, ejecuciones hipotecarias, índice de referencia del alquiler, construcción, indicadores demográficos, proyecciones, sociedades, presupuestos familiares, movilidad, matrimonios). Unos 2,3 GB en `cache/ine/`. `faltan` baja solo lo que no esté ya.
+3. `python3 scripts/datos/ine_compactar.py`: lo reduce a ~30 MB (`cache/ine_compacto/<id>.json.gz`) y escribe `cache/ine_resumen.json` con las variables y periodos de cada tabla.
+
+Después, `python3 scripts/datos/regional.py` construye `data/regional.json`: indicadores anuales (años completos) con el código INE de provincia y de comunidad. Las tasas por habitante usan el padrón de `data/refs.json`. En las comunidades de una sola provincia, el dato de una vale para la otra.
+
+La tarea de GitHub `.github/workflows/datos-ine.yml` repite los cuatro pasos el día 3 de cada mes y hace commit de `data/regional.json` si cambia.
+
+## Otras fuentes (`scripts/datos/externos.py`)
+
+`descargar` baja la deuda viva de cada ayuntamiento (Hacienda, 2015–2025) y la afiliación a la Seguridad Social por municipio, sector y régimen (cada diciembre y el último mes). `explorar` guarda las páginas índice de SEPE, Ministerio de Vivienda, Hacienda, Notariado, Registradores, Catastro, AEAT, DataInvex, Educación, Sanidad, Interior y DGT para localizar los ficheros exactos de la siguiente tanda.

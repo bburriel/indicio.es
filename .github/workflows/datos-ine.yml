@@ -1,0 +1,36 @@
+# Actualiza cada mes los datos del INE por provincia y comunidad (data/regional.json) y abre un commit si cambian.
+# También se puede lanzar a mano desde la pestaña Actions de GitHub.
+name: Datos INE
+
+on:
+  schedule:
+    - cron: "17 5 3 * *"   # día 3 de cada mes, 05:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Catálogo y descarga de tablas del INE
+        run: |
+          python3 scripts/datos/ine_api.py catalogo
+          python3 scripts/datos/ine_api.py descargar
+      - name: Compactar y construir data/regional.json
+        run: |
+          python3 scripts/datos/ine_compactar.py
+          python3 scripts/datos/regional.py
+      - name: Commit si hay cambios
+        run: |
+          git config user.name "indicio-datos"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/regional.json
+          git diff --cached --quiet || git commit -m "Datos INE: actualización mensual de data/regional.json"
+          git push
