@@ -39,31 +39,26 @@ for s in t["series"]:
         c = ccaa_code(r.get("Comunidades y Ciudades Autónomas") or "")
         if c: sal["ccaa"][c] = s["v"]
 out["salario"] = sal
-# subclases de alimentos (si se han descargado)
+# subclases de alimentos y bebidas no alcohólicas (si se han descargado): las del grupo 01, en el orden del INE,
+# hasta la primera de bebidas alcohólicas
+def subs(t):
+    res = {}
+    for s in t["series"]:
+        r = row(t, s); n = r.get("Subclases ECOICOP")
+        if n and r.get("Índices y Tasas") in ("Índice", "Ponderación"):
+            n = n.strip()
+            if n.startswith("Bebidas espirituosas"): break
+            res[n] = s["v"]
+    return res
 t = load(76128)
 if t:
-    sub = {"periodos": t["periodos"], "s": {}}
-    for s in t["series"]:
-        r = row(t, s)
-        if r.get("Tipo de dato", r.get("Índices y Tasas")) not in ("Índice", None) and "Índice" not in json.dumps(r, ensure_ascii=False): continue
-        name = next((v for k, v in r.items() if v and re.match(r"^01\d{2,}", str(v))), None)
-        if not name: continue
-        if "Índice" not in [v for v in r.values()]: continue
-        sub["s"][name] = [None if x is None else round(x, 3) for x in s["v"]]
+    sub = {"periodos": t["periodos"], "s": {n: [None if x is None else round(x, 3) for x in v] for n, v in subs(t).items()}}
     w = load(76159)
-    if w:
-        sub["pesos"] = {}
-        for s in w["series"]:
-            r = row(w, s); name = next((v for k, v in r.items() if v and re.match(r"^01\d{2,}", str(v))), None)
-            if name: sub["pesos"][name] = {p: x for p, x in zip(w["periodos"], s["v"]) if x is not None}
+    if w: sub["pesos"] = {n: v[-1] for n, v in subs(w).items()}; sub["pesosAño"] = w["periodos"][-1]
     tc = load(76132)
-    if tc:
-        sub["impConst"] = {}
-        for s in tc["series"]:
-            r = row(tc, s); name = next((v for k, v in r.items() if v and re.match(r"^01\d{2,}", str(v))), None)
-            if name and "Índice" in r.values(): sub["impConst"][name] = {"periodos": tc["periodos"], "v": [None if x is None else round(x, 3) for x in s["v"]]}
+    if tc: sub["impConst"] = {"periodos": tc["periodos"], "s": {n: [None if x is None else round(x, 3) for x in v] for n, v in subs(tc).items()}}
     out["subclases"] = sub
-    print("subclases:", len(sub["s"]), list(sub["s"])[:8])
+    print("subclases:", len(sub["s"]), list(sub["s"])[:3], list(sub["s"])[-2:])
 json.dump(out, open(f"{HERE}/../../data/alimentos.json", "w"), ensure_ascii=False, separators=(",", ":"))
 print(P[0], P[-1], list(ipc["es"]), len(ipc["ccaa"]), sal["periodos"][-1], len(sal["ccaa"]), os.path.getsize(f"{HERE}/../../data/alimentos.json") // 1024, "KB")
 print("alimentos ES:", ipc["es"]["alimentos"][P.index("2021M01")], ipc["es"]["alimentos"][-1], "general", ipc["es"]["general"][P.index("2021M01")], ipc["es"]["general"][-1])

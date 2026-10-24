@@ -4038,7 +4038,7 @@ function studyIVA(B){
 // ---------- tres análisis causales con los datos de SEPE, Seguridad Social y Ministerio de Vivienda (data/causales.json) ----------
 let CAUS_P=null; const loadCausales=()=>CAUS_P||(CAUS_P=getJSON("/data/causales.json"));
 const mesLab=p=>{ const [y,m]=p.split("-"); return MES[+m].slice(0,3)+". "+y; };
-const listY=a=>a.join(", ").replace(/, ([^,]*)$/," y $1");
+const listY=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+" y "+a[a.length-1];
 
 // Reforma laboral de 2022: ¿cayó la temporalidad, y perdieron empleo los municipios que más dependían del contrato temporal?
 async function studyReforma(B){
@@ -4289,10 +4289,19 @@ async function studyAlimentos(B){
   lect(s3,`<p>${CC.filter(x=>x.b>=0).length?`Solo en ${listY(CC.filter(x=>x.b>=0).map(x=>x.n))} el sueldo medio ha subido al menos como la comida.`:"En todas las comunidades la comida ha subido más que el sueldo medio."} Donde peor ha ido, ${listY(CC.slice(0,2).map(x=>x.n))}, con el sueldo de ${LY} se compra en torno a un ${f0(Math.abs(CC[0].b))}${NB}% menos de comida que en ${B0}. Las diferencias vienen más de los sueldos que de los precios: la comida sube parecido en todas partes; los sueldos, no.</p>`);
 
   if(SUB&&SUB.s&&Object.keys(SUB.s).length){
-    const sp=SUB.periodos, rows=Object.entries(SUB.s).map(([n,v])=>{ const a=yav(v,sp,B0), b=yav(v,sp,LY); return a&&b?{n:n.replace(/^[\d.]+\s*/,""),g:(b/a-1)*100}:null; }).filter(Boolean).sort((a,b)=>b.g-a.g);
-    const s4=res(B,`Lo que más ha subido: ${listY(rows.slice(0,3).map(r=>low(r.n)))}`,`<p>Subida de precio de cada tipo de alimento entre ${B0} y ${LY} (IPC por subclases).</p>`);
+    const sp=SUB.periodos, W=SUB.pesos||{}, rows=Object.entries(SUB.s).map(([n,v])=>{ const a=yav(v,sp,B0), b=yav(v,sp,LY); return a&&b?{n,g:(b/a-1)*100,w:W[n]||0}:null; }).filter(Boolean).sort((a,b)=>b.g-a.g);
+    const SHORT={"Carne, fresca, refrigerada o congelada":"carne fresca","Carne, seca, salada, en salmuera o ahumada":"embutidos y carne curada","Pan y productos de panadería":"pan y bollería","Pescado,  fresco, refrigerado o congelado":"pescado fresco","Chocolate, cacao y productos alimenticios a base de cacao":"chocolate y cacao","Zumos de frutas y hortalizas":"zumos","Aceites vegetales":"aceite","Café y sucedáneos de café":"café","Hortalizas, tubérculos y legumbres, molidos y en otras preparaciones":"conservas y preparados de hortalizas","Frutas y frutos secos procesados (en conserva, tostados, molidos, etc.)":"fruta en conserva y frutos secos procesados","Otros productos a base de cereales y de grano molidos":"otros productos de cereales","Frutos secos naturales, con o sin cáscara":"frutos secos"};
+    const sh=n=>SHORT[n]||low(n.split(",")[0].split(" (")[0]);
+    const CAUSA={"Huevos":"la gripe aviar en los huevos","Zumos de frutas y hortalizas":"las malas cosechas de naranja en los zumos","Chocolate, cacao y productos alimenticios a base de cacao":"el precio mundial del cacao en el chocolate","Aceites vegetales":"la sequía en el aceite de oliva","Azúcar de caña y azúcar de remolacha":"el precio mundial del azúcar"};
+    const top=rows.slice(0,6), cs=top.filter(r=>CAUSA[r.n]);
+    const s4=res(B,`Lo que más ha subido: ${listY(rows.slice(0,3).map(r=>sh(r.n)))}`,`<p>Subida de precio de cada tipo de alimento y bebida no alcohólica entre ${B0} y ${LY} (IPC por subclases, ${rows.length} tipos).</p>`);
     hbars(s4,rows.map(r=>({l:r.n,v:r.g})),{fmt:v=>sg(v),ref:gF,refLabel:"Alimentos",scroll:true});
-    lect(s4,`<p>La media esconde mucha variedad. ${listY(rows.slice(0,3).map(r=>`${low(r.n)} (${sg(r.g)})`))} encabezan la lista; en el otro extremo, ${listY(rows.slice(-3).map(r=>`${low(r.n)} (${sg(r.g)})`))}. Detrás de los primeros hay causas concretas: la sequía en el aceite de oliva, la gripe aviar en los huevos, la energía en los productos más elaborados.</p>`);
+    lect(s4,`<p>La media esconde mucha variedad. ${cap(listY(top.slice(0,3).map(r=>`${sh(r.n)} (${sg(r.g)})`)))} encabezan la lista; en el otro extremo, ${listY(rows.slice(-3).map(r=>`${sh(r.n)} (${sg(r.g)})`))}. ${cs.length?`Detrás de los que más suben hay causas concretas: ${listY(cs.map(r=>CAUSA[r.n]))}.`:""}</p>`);
+    // contribución: peso en la cesta × subida
+    const tw=d3.sum(rows,r=>r.w), con=rows.map(r=>({...r,c:r.w*r.g})).sort((a,b)=>b.c-a.c), tc=d3.sum(con,r=>r.c);
+    if(tw>0){ const s5=res(B,`Lo que más ha encarecido la cesta: ${listY(con.slice(0,3).map(r=>sh(r.n)))}`,`<p>No es lo mismo que suba mucho algo que se compra poco que algo que se compra cada semana. Cuánto ha aportado cada tipo de alimento a la subida total, según lo que pesa en el gasto de los hogares (ponderaciones del IPC de ${SUB.pesosAño||"2026"}).</p>`);
+      table(s5,["Tipo de alimento","Peso en la cesta de alimentos","Subida","Parte de la subida total"],con.slice(0,10).map(r=>[r.n,pc(r.w/tw*100),sg(r.g),pc(r.c/tc*100)]),{max:820});
+      lect(s5,`<p>${cap(listY(con.slice(0,3).map(r=>sh(r.n))))} explican juntos un ${f0(d3.sum(con.slice(0,3),r=>r.c)/tc*100)}${NB}% de lo que ha subido la cesta de alimentos: no son los que más se han encarecido en porcentaje, pero son los que más se compran. ${top.filter(r=>r.w/tw<0.02).length?`En cambio, ${listY(top.filter(r=>r.w/tw<0.02).slice(0,2).map(r=>sh(r.n)))}, que encabezan la lista de subidas, pesan poco en el gasto.`:""}</p>`); }
   }
 
   sec(B,"con",`<p><b>La comida es hoy bastante más cara en proporción al sueldo que antes de la pandemia.</b> Entre ${B0} y ${LY} los alimentos subieron un ${f0(gF)}${NB}% y el sueldo medio un ${f0(gW)}${NB}%: con el mismo sueldo se compra un ${f0(Math.abs(buy))}${NB}% ${buy<0?"menos":"más"} de comida. Para el resto de la cesta, en cambio, los sueldos han seguido a los precios.</p>
