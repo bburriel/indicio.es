@@ -8,7 +8,8 @@
     "build": "node build.mjs",
     "serve": "node serve.mjs",
     "snapshot": "node snapshot.mjs",
-    "release": "npm run build && npm run snapshot && npm run build"
+    "release": "npm run build && npm run snapshot && npm run build",
+    "deploy": "npm run build && npx wrangler@4 pages deploy dist --project-name indicio --branch main"
   },
   "devDependencies": {
     "playwright": "^1.50.0"
