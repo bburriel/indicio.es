@@ -27,6 +27,11 @@ BUSCAR = [
 
 # Tablas que se descargan en el paso 2 (elegidas a partir de cache/ine_tablas.json)
 TABLAS = {
+    # IPC con detalle de alimentos (análisis del precio de los alimentos)
+    24077: "IPC: índice general nacional desde 1961", 24080: "IPC: grupos ECOICOP nacionales desde 1993",
+    76128: "IPC: índices nacionales de subclases", 76129: "IPC: índices nacionales de rúbricas", 76159: "IPC: ponderaciones de subclases",
+    76132: "IPC: índices nacionales a impuestos constantes de subclases", 76137: "IPC: subgrupos por comunidad", 76138: "IPC: rúbricas por comunidad",
+    76126: "IPC: subgrupos nacionales", 76127: "IPC: clases nacionales",
     # Mercado de trabajo (EPA, trimestral)
     65349: "EPA: tasas de actividad, paro y empleo por provincia y sexo",
     65351: "EPA: activos por grupo de edad y provincia",

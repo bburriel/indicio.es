@@ -84,5 +84,8 @@ for c, v in mt["series"].items():
     ser[c] = {"t": v["t"], "u": v["u"], "p": POP[c], "r": RENTA18.get(c), "g": 1 if c in T else 2 if c in A else 0}
 out["tension"] = {"periodos": mt["periodos"], "series": ser}
 print("tension:", len(ser), sum(1 for v in ser.values() if v["g"] == 1), sum(1 for v in ser.values() if v["g"] == 2))
+# --- deuda de los ayuntamientos (para el análisis de quién gobierna), en miles de euros ---
+de = L("out_series_deuda.json")
+out["deuda"] = {"years": de["years"], "s": {c: [None if x is None else round(x / 1000) for x in v] for c, v in de["series"].items() if c in POP}}
 json.dump(out, open(f"{DATA}/causales.json", "w"), separators=(",", ":"))
 print(os.path.getsize(f"{DATA}/causales.json") // 1024, "KB")

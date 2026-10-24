@@ -60,3 +60,5 @@ Todo se puede repetir con `bash scripts/datos/todo.sh limpiar` (sin volver a des
 `regional.py` conserva las variables de la versión anterior de `data/regional.json` que no puede recalcular (por ejemplo, en la tarea mensual de GitHub, que solo tiene el INE).
 
 `causales.py` prepara `data/causales.json` para los análisis de la reforma laboral, del salario mínimo y el empleo de hogar y de las compraventas con el tope del alquiler (necesita además `mivau_trim.py`, compraventas por municipio y trimestre).
+
+`alimentos.py` prepara `data/alimentos.json` (IPC general y de alimentos por comunidad desde 2002, coste salarial por trabajador y, si se han descargado las tablas 76128, 76159 y 76132 del INE, el IPC por subclases) para el análisis del precio de los alimentos.
