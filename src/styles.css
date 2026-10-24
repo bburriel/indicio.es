@@ -1149,3 +1149,4 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .tstud span{font-size:14.5px; color:var(--ink-2); line-height:1.45}
 .tstud em{font-style:normal; font-size:14px; font-weight:700; color:var(--brand-2)}
 .tstud a:hover b{color:var(--brand-2)}
+.lbscale button[disabled]{opacity:.42;cursor:not-allowed}

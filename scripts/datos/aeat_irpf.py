@@ -58,5 +58,7 @@ INDICADORES = [
  ("irpfExenta", "Renta exenta de impuestos", "Riqueza", "pct", SRC + " (% de la renta bruta)"),
  ("irpfDecl", "Declaraciones de IRPF por cada 100 habitantes", "Riqueza", "pct", SRC),
 ]
+if not datos:   # sin los Excel de la AEAT no se pisa el resultado anterior (construir.py borraría los indicadores)
+    raise SystemExit("No hay datos de IRPF: faltan los Excel en cache/aeat/. No se toca cache/out/irpf.json.")
 json.dump({"indicadores": INDICADORES, "datos": datos}, open(f"{HERE}/cache/out/irpf.json", "w"), ensure_ascii=False)
 print(len(datos), "municipios con indicadores de IRPF")

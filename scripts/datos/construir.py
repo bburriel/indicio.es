@@ -10,12 +10,13 @@ ix = json.load(open(os.path.join(DATA, "index.json"), encoding="utf-8")); cat = 
 # los indicadores añadidos viven en data/extra.json (columnas alineadas fila a fila con index.json) para no engordar el índice que carga toda la web;
 # aquí se vuelve a unir todo en una tabla y al final se separa de nuevo
 EXTRA = os.path.join(DATA, "extra.json")
+os.makedirs(os.path.join(HERE, "cache"), exist_ok=True)
+if not os.path.exists(os.path.join(HERE, "cache", "index_original.json")):   # las claves de origen son las de data/index.json (lo añadido vive en extra.json)
+    json.dump({"fields": ix["fields"], "cat": [c["k"] for c in cat]}, open(os.path.join(HERE, "cache", "index_original.json"), "w"))
 if os.path.exists(EXTRA):
     ex = json.load(open(EXTRA, encoding="utf-8")); assert len(ex["rows"]) == len(ix["rows"])
     ix["fields"] += ex["fields"]
     for r, e in zip(ix["rows"], ex["rows"]): r += e
-if not os.path.exists(os.path.join(HERE, "cache", "index_original.json")):   # copia del estado inicial, para saber qué claves son de origen
-    json.dump({"fields": ix["fields"], "cat": [c["k"] for c in cat]}, open(os.path.join(HERE, "cache", "index_original.json"), "w"))
 orig = json.load(open(os.path.join(HERE, "cache", "index_original.json")))
 bloqueadas = set(orig["fields"])
 fuentes = sys.argv[1:] or sorted(os.path.basename(f)[:-5] for f in glob.glob(os.path.join(HERE, "cache", "out", "*.json")) if not f.endswith("_raw.json"))
@@ -39,12 +40,13 @@ for fuente in fuentes:
 # temas del selector del laboratorio (pestañas): reparte los indicadores, incluidos los originales, en grupos de tamaño manejable
 TEMAS = {
  "Riqueza": "rentaMediana p80p20 ingSalario ingDesempleo ingPrestaciones ingOtros renta rentaHog rentaVar rentaVar20 pobreza gini pensiones irpfBruta irpfDisp irpfCarga irpfTrabajo irpfActiv irpfCapital irpfExenta irpfDecl",
- "Trabajo": "paro paroReg paroRegVar paroReg15 paroCensal paroMujeres paroJovenes paroMayores45 paroSinEmpleo contrTemp pensionistas paroExtranjeros brechaParoExtr empleo empleoMujeres brechaEmpleo empleoVar temporales autonomos afilHab afilAutonomos afilAgrario afilHogar afilVar afilVar19",
- "Sectores": "agri industria construccion comercio avanzados publico directivos elementales",
+ "Trabajo": "paro paroReg paroRegVar paroReg15 paroCensal paroMujeres paroJovenes paroMayores45 paroSinEmpleo contrTemp pensionistas paroExtranjeros brechaParoExtr empleo empleoMujeres brechaEmpleo empleoVar temporales autonomos afilHab afilAutonomos afilAgrario afilHogar afilVar afilVar19 contrTemp25 contrTempVar paroVar07 afilMujeres afilVar11",
+ "Sectores": "agri industria construccion comercio avanzados publico directivos elementales afilIndustria afilConstruccion afilComercio afilHosteleria afilProfesional afilPublico",
  "Población": "varPob var0525 pobVar20 edad menores18 mayores65 extr migExt migInt arraigo llegados inmigReciente",
  "Hogares": "hogarMedio solos casados divorciados solteros3554",
  "Educación": "superiores estudiantes estudiosBasicos superiores2539 brechaSuperiores",
- "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio",
+ "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio compHab compNueva compProtegida compVar valorTasado valorTasadoVar",
+ "Ayuntamiento": "deudaHab",
  "Voto": "pp psoe vox sumar part part24 salf24",
  "Territorio": "pop densidad superficie distCiudad distCosta",
 }

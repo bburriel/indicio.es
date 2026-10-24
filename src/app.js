@@ -222,7 +222,10 @@ const SRC={
   idealista:"idealista: precio medio de los anuncios de alquiler", eurostat:"Eurostat: cuentas públicas, pensiones y proyecciones de población", hicp:"Eurostat: índice de precios de consumo armonizado mensual por grupos de alimentos (prc_hicp_midx), 2021–2025, España, Portugal, Francia, Italia y Alemania",
   tensionadas:"BOE: resoluciones de 14 de marzo y 8 de octubre de 2024 con los municipios catalanes declarados zona de mercado residencial tensionado", erte:"Seguridad Social: trabajadores en ERTE por provincia a 30 de abril de 2020 (nota de afiliación de abril de 2020)",
   ave:"Adif, Renfe y prensa: estaciones con servicio de alta velocidad abierto entre 2021 y 2023 (lista en el repositorio)", vut:"Boletines oficiales y prensa: municipios con moratoria o prohibición de nuevas viviendas turísticas, con fecha (lista en el repositorio)",
-  geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN"
+  geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN",
+  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
+  deuda:"Ministerio de Hacienda: deuda viva de cada ayuntamiento a 31 de diciembre, 2015–2025 (sin 2017)", contratos:"SEPE: contratos iniciales indefinidos y temporales por municipio y mes (2005–2026) y paro registrado por municipio", afil:"Seguridad Social: afiliados por municipio, régimen y actividad, diciembre de 2011 a 2025", compr:"Ministerio de Vivienda: compraventas de vivienda por municipio y trimestre (notarios), 2004–2026",
+  mivau:"Ministerio de Vivienda: viviendas protegidas con calificación definitiva (planes estatales y autonómicos, 1991–2025), viviendas libres iniciadas (1991–2025) y transacciones de vivienda de los notarios (2004–2025)"
 };
 function methodNote(keys){
   const ks=keys||Object.keys(SRC).filter(k=>!["tensionadas","erte","ave","vut","eurostat"].includes(k));
@@ -878,6 +881,9 @@ const ACC=[
   ["todos","Desigualdad y barrios",(s,r,d)=>secTodos(s,r,d),(r,d)=>{ const [p]=last(d.s.poverty),[e]=last(REFS.es.poverty); return p==null?"Barrio a barrio, con la renta de cada sección censal.":`El ${pc(p)} en riesgo de pobreza (España: ${pc(e)}). Y la renta de cada barrio en un mapa.`; },(r,d)=>miniLines(d.s.poverty,REFS.es.poverty,{w:150,h:26,pad:2,index:false}),"mapa y 2 gráficos"],
   ["vivienda","Vivienda",(s,r,d)=>secVivienda(s,r,d),(r,d)=>{ const c=d.census||{}, ce=REFS.census.es; let t=c.rented!=null?`${c.rented<ce.rented-4?"Pocos":c.rented>ce.rented+4?"Muchos":"Bastantes"} hogares de alquiler (${pc0(c.rented)}; España ${pc0(ce.rented)})`:"Alquiler, viviendas vacías y pisos turísticos"; if(r[F.alqVar]!=null) t+=`; el alquiler sube ${r[F.alqVar]>esMean("alqVar")+3?"más":r[F.alqVar]<esMean("alqVar")-3?"menos":"lo mismo"} que en España`; return t+"."; },(r,d)=>{ const c=d.census||{}; return c.owned==null?"":miniStack([[c.owned,"--mustard"],[c.rented,"--rust"],[c.otherTenure,"--stone"]],{w:150}); },"4 gráficos"],
   ["voto","Voto",(s,r,d)=>secVoto(s,r,d),(r,d)=>{ const v=d.vote||{}, k=VG(); if(!v[k]) return "Resultados electorales."; const o=Object.entries(v[k].share).filter(([p])=>p!=="Otros").sort((a,b)=>b[1]-a[1])[0]; const t=v[k].turnout, te=VREFS.es[k].turnout; return `Ganó ${partyArt(r[F.prov],k,o[0])} en ${k.slice(2,6)} (${pc(o[1])}); participación ${t>te+5?"muy alta":t>te+1?"alta":t<te-5?"muy baja":t<te-1?"baja":"como la media"}.`; },(r,d)=>{ const v=d.vote||{}, k=VG(); return v[k]?miniStack(Object.entries(v[k].share).sort((a,b)=>(a[0]==="Otros")-(b[0]==="Otros")||b[1]-a[1]).map(([p,x])=>[x,pColor(p)]),{w:150}):""; },"4 gráficos"],
+  ["mas","Empleo, compraventas y deuda",(s,r,d)=>secMas(s,r,d),(r,d)=>{ const O=REFS.otras, Y=O&&O.years; if(!O||!(d.afil||d.contrT||d.comp)) return "Afiliados, contratos, compraventas de vivienda y deuda del ayuntamiento."; const t=[]; const lo=(a,ys)=>{ if(!a) return null; for(let i=a.length-1;i>=0;i--) if(a[i]!=null) return a[i]; return null; };
+      if(d.afil&&d.afil[0]&&lo(d.afil)!=null) t.push(`Afiliados: ${sgn((lo(d.afil)/d.afil[0]-1)*100)} desde 2011`); if(lo(d.contrT)!=null) t.push(`${pc0(lo(d.contrT))} de contratos temporales`); const dd=lo(d.deuda), p=lastV(d.pad); if(dd!=null&&p) t.push(dd>0?`deuda municipal de ${eur(dd/p)} por habitante`:"ayuntamiento sin deuda"); return cap(t.join("; "))+"."; },
+    (r,d)=>d.afil&&d.afil.some(v=>v)?miniLines(d.afil,null,{w:150,h:26,pad:3}):"","4 gráficos"],
   ["datos","Todos los datos en una tabla",(s,r,d)=>glance(add(s,"div"),r,d),(r,d)=>`Los ${d3.sum(GLANCE,g=>g[1].length)} datos del municipio, con la media de España y su posición.`,()=>`<svg viewBox="0 0 150 26" aria-hidden="true">${[0,1,2].map(i=>`<rect x="0" y="${3+i*8}" width="150" height="3" rx="1.5" style="fill:var(--band)"/><circle cx="${[40,110,75][i]}" cy="${4.5+i*8}" r="3" style="fill:var(--rust)"/>`).join("")}</svg>`,"tabla"],
   ["parecidos","Municipios parecidos",(s,r,d)=>parecidos(s,r),(r,d)=>{ const n=nearest(r,3); return n.length?`Se parece a ${n.map(([x])=>esc(dispName(x[F.name]))).join(", ").replace(/, ([^,]*)$/," y $1")}.`:"Los que más se le parecen."; },()=>`<svg viewBox="0 0 150 26" aria-hidden="true">${[20,48,76,104,132].map((x,i)=>`<circle cx="${x}" cy="13" r="${i===0?8:6}" style="fill:var(${i===0?"--rust":"--rule-2"})"/>`).join("")}</svg>`,"tabla"]];
 function toggleSec(k,force){
@@ -1108,6 +1114,30 @@ function secVivienda(s,r,d){
     const b3=block(s,"Viviendas turísticas"); const g=add(b3,"div","cols2");
     lineChart(g,{title:"Viviendas turísticas, % del total",source:"Fuente: INE, estadística experimental de viviendas turísticas.",series:[{n:r[F.name],v:d.vtp,c:"--s-mun",main:true},{n:"Provincia",v:pr.vtp,c:"--s-prov"},{n:"España",v:es.vtp,c:"--s-es"}],years:per,xticks:[per[0],per[Math.floor(per.length/2)],per[per.length-1]],fmt:pc,tickFmt:v=>nf1.format(v)+"%"});
     lineChart(g,{title:"Número de viviendas turísticas",source:"Fuente: INE.",series:[{n:r[F.name],v:d.vt,c:"--s-mun",main:true}],years:per,xticks:[per[0],per[Math.floor(per.length/2)],per[per.length-1]],fmt:v=>nf0.format(v)}); }
+}
+
+// ---------- empleo, compraventas y deuda (SEPE, Seguridad Social, Ministerio de Vivienda, Hacienda) ----------
+function perHab(v,ys,pad,por){ if(!v||!pad) return null; const PY=REFS.padYears; return v.map((x,i)=>{ const j=PY.indexOf(ys[i]), p=j>=0?pad[j]:null; return x==null||!p?null:x/p*por; }); }
+function secMas(s,r,d){
+  const O=REFS.otras; if(!O){ lead(s,"No hay datos de estas fuentes."); return; }
+  const P=r[F.prov], op=O.prov[P]||{}, oe=O.es, pr=REFS.prov[P], es=REFS.es, Y=O.years, nm=dispName(r[F.name]);
+  const lo=(a,ys)=>{ if(!a) return [null,null]; for(let i=a.length-1;i>=0;i--) if(a[i]!=null) return [a[i],ys[i]]; return [null,null]; };
+  const t=[];
+  const [a25]=lo(d.afil,Y.afil), a11=d.afil?d.afil[0]:null;
+  if(a25!=null&&a11) t.push(`En diciembre de 2025 trabajaban aquí <mark>${nf0.format(a25)}</mark> afiliados a la Seguridad Social, ${(g=>`un ${nf0.format(Math.abs(g))}${NB}% ${g>=0?"más":"menos"}`)((a25/a11-1)*100)} que en 2011 (España: ${sgn((lo(oe.afil,Y.afil)[0]/oe.afil[0]-1)*100)}).`);
+  const [ct,cy]=lo(d.contrT,Y.contrT), i21=Y.contrT.indexOf(2021);
+  if(ct!=null) t.push(`El ${pc(ct)} de los contratos firmados en ${cy} fueron temporales${d.contrT[i21]!=null?`, frente al ${pc(d.contrT[i21])} de 2021, antes de la reforma laboral`:""} (España: ${pc(lo(oe.contrT,Y.contrT)[0])}).`);
+  const [dd,dy]=lo(d.deuda,Y.deuda), pad=lastV(d.pad);
+  if(dd!=null&&pad) t.push(dd>0?`El ayuntamiento debía ${eur(dd/pad)} por habitante a final de ${dy} (media de los ayuntamientos de España: ${eur(lo(oe.deuda,Y.deuda)[0]/lastV(es.pad))}).`:`El ayuntamiento no tenía deuda a final de ${dy}.`);
+  lead(s,t.join(" ")||"No hay datos de estas fuentes para este municipio.");
+  if(d.afil||d.contrT){ const b=block(s,"Empleo y contratos"), g=add(b,"div","cols2");
+    if(d.afil) lineChart(g,{title:"Afiliados a la Seguridad Social",sub:"2011 = 100, en diciembre de cada año",source:"Fuente: Seguridad Social (afiliados según el municipio del centro de trabajo).",series:[{n:nm,v:d.afil,c:"--s-mun",main:true},{n:"Provincia",v:op.afil,c:"--s-prov"},{n:"España",v:oe.afil,c:"--s-es"}],years:Y.afil,index:true,fmt:v=>nf1.format(v),xticks:[2011,2018,2025]});
+    if(d.contrT) lineChart(g,{title:"Contratos iniciales temporales",sub:"% de los contratos firmados cada año",source:"Fuente: SEPE. La reforma laboral se aplica desde 2022.",series:[{n:nm,v:d.contrT,c:"--s-mun",main:true},{n:"Provincia",v:op.contrT,c:"--s-prov"},{n:"España",v:oe.contrT,c:"--s-es"}],years:Y.contrT,fmt:pc,tickFmt:v=>nf0.format(v)+"%",xticks:[2006,2015,2025]}); }
+  if(d.comp||d.vtas){ const b=block(s,"Compraventas de vivienda"), g=add(b,"div","cols2");
+    if(d.comp) lineChart(g,{title:"Compraventas de vivienda por cada 1.000 habitantes",source:"Fuente: Ministerio de Vivienda (datos de los notarios) y padrón.",series:[{n:nm,v:perHab(d.comp,Y.comp,d.pad,1000),c:"--s-mun",main:true},{n:"Provincia",v:perHab(op.comp,Y.comp,pr.pad,1000),c:"--s-prov"},{n:"España",v:perHab(oe.comp,Y.comp,es.pad,1000),c:"--s-es"}],years:Y.comp,fmt:v=>nf1.format(v),xticks:[2004,2014,2025]});
+    if(d.vtas) lineChart(g,{title:"Valor tasado de la vivienda libre",sub:"€ por m², media del año",source:"Fuente: Ministerio de Vivienda.",series:[{n:nm,v:d.vtas,c:"--s-mun",main:true}],years:Y.vtas,fmt:v=>nf0.format(v)+NB+"€",xticks:[2005,2015,2025]}); }
+  if(d.deuda&&d.deuda.some(v=>v)){ const b=block(s,"Deuda del ayuntamiento"), g=add(b,"div","cols2");
+    lineChart(g,{title:"Deuda viva por habitante",sub:"€ a 31 de diciembre; provincia y España, todos sus ayuntamientos (2017 no se publicó)",source:"Fuente: Ministerio de Hacienda y padrón.",series:[{n:nm,v:perHab(d.deuda,Y.deuda,d.pad,1),c:"--s-mun",main:true},{n:"Provincia",v:perHab(op.deuda,Y.deuda,pr.pad,1),c:"--s-prov"},{n:"España",v:perHab(oe.deuda,Y.deuda,es.pad,1),c:"--s-es"}],years:Y.deuda,fmt:v=>nf0.format(v)+NB+"€",xticks:[2015,2020,2025]}); }
 }
 
 // ---------- voto ----------
@@ -1506,6 +1536,8 @@ async function renderComparar(a,b){
 // =====================================================================
 const vtAnnual=(arr)=>{ if(!arr) return null; const P=REFS.vtPeriods, g={}; P.forEach((p,i)=>{ const y=+p.slice(0,4); if(arr[i]!=null) (g[y]=g[y]||[]).push(arr[i]); }); const ys=Object.keys(g).map(Number).sort(); return {years:ys,v:ys.map(y=>d3.mean(g[y]))}; };
 // cada serie: etiqueta, grupo, unidad (eur se puede deflactar), y función que devuelve {years,v,scope} para el ámbito
+// series de otras fuentes (SEPE, Seguridad Social, Ministerio de Vivienda, Hacienda): municipio en data/prov, provincia y España en REFS.otras
+const OT=k=>(A,lev,P)=>{ const o=REFS.otras; if(!o) return {years:[],v:null}; return {years:o.years[k],v:lev==="es"?o.es[k]:lev==="prov"?(o.prov[P]||{})[k]:A[k]}; };
 const EVO=[
   {k:"renta",l:"Renta neta por persona",g:"Ingresos",u:"eur",src:"INE, Atlas de Renta",get:(A)=>({years:YEARS,v:A.s?A.s.net_income_pc:null})},
   {k:"rentaHog",l:"Renta neta por hogar",g:"Ingresos",u:"eur",src:"INE, Atlas de Renta",get:(A)=>({years:YEARS,v:A.s?A.s.net_income_hh:null})},
@@ -1524,10 +1556,17 @@ const EVO=[
   {k:"govInt",l:"Intereses de la deuda",g:"Dinero público",u:"eur",nat:true,src:"Eurostat, COFOG",get:()=>GOV?{years:GOV.years.map(Number),v:GOV.fun.GF0107.meur}:{years:[],v:null}},
   {k:"govIng",l:"Ingresos públicos",g:"Dinero público",u:"eur",nat:true,src:"Eurostat",get:()=>GOV?{years:GOV.years.map(Number),v:GOV.main.TR.meur}:{years:[],v:null}},
   {k:"pob",l:"Habitantes",g:"Población y trabajo",u:"n",src:"INE, padrón municipal",get:(A)=>({years:REFS.padYears,v:A.pad})},
-  {k:"paro",l:"Paro registrado",g:"Población y trabajo",u:"n",src:"SEPE (2026: enero a septiembre)",get:(A,lev,P,code)=>({years:REFS.paroYears,v:lev==="es"?REFS.paro.es.paro:lev==="prov"?(REFS.paro.prov[P]||{}).paro:(A.paro||{}).y})}];
+  {k:"paro",l:"Paro registrado",g:"Población y trabajo",u:"n",src:"SEPE (2026: enero a septiembre)",get:(A,lev,P,code)=>({years:REFS.paroYears,v:lev==="es"?REFS.paro.es.paro:lev==="prov"?(REFS.paro.prov[P]||{}).paro:(A.paro||{}).y})},
+  {k:"paroL",l:"Paro registrado desde 2006",g:"Población y trabajo",u:"n",src:"SEPE, paro registrado por municipio (2026: enero a septiembre)",get:OT("paroL")},
+  {k:"afil",l:"Afiliados a la Seguridad Social (diciembre)",g:"Población y trabajo",u:"n",src:"Seguridad Social, afiliados por municipio del centro de trabajo",get:OT("afil")},
+  {k:"contr",l:"Contratos registrados en el año",g:"Población y trabajo",u:"n",src:"SEPE, contratos por municipio del centro de trabajo",get:OT("contr")},
+  {k:"contrT",l:"Contratos temporales (% de los nuevos)",g:"Población y trabajo",u:"pct",src:"SEPE, contratos iniciales por municipio",get:OT("contrT")},
+  {k:"comp",l:"Compraventas de vivienda",g:"Vivienda",u:"n",src:"Ministerio de Vivienda, transacciones de vivienda (notarios)",get:OT("comp")},
+  {k:"vtas",l:"Valor tasado de la vivienda (€/m²)",g:"Vivienda",u:"eur",src:"Ministerio de Vivienda, valor tasado (municipios de más de 25.000 hab.)",get:(A,lev)=>lev==="mun"&&REFS.otras?{years:REFS.otras.years.vtas,v:A.vtas}:{years:[],v:null}},
+  {k:"deuda",l:"Deuda del ayuntamiento",g:"Dinero público",u:"eur",src:"Ministerio de Hacienda, deuda viva de los ayuntamientos a 31 de diciembre",get:OT("deuda")}];
 const EVOK={}; EVO.forEach(e=>EVOK[e.k]=e);
-const EVOSH={pib:"PIB",govTot:"Gasto público",govJub:"Jubilación",govSan:"Sanidad",govEdu:"Educación",govInt:"Intereses deuda",govIng:"Ingresos públicos",renta:"Renta/persona",rentaHog:"Renta/hogar",rentaMed:"Renta mediana",salMedia:"Salario medio",salMed:"Salario mediano",alq:"Alquiler declarado",alqNuevo:"Alquiler nuevos",vt:"Pisos turísticos",ipc:"Precios (IPC)",pob:"Habitantes",paro:"Paro registrado"};
-const EVOPRESET=[["Gasto público y PIB",["govTot","govJub","govSan","govEdu","pib"]],["Sueldos y alquiler",["salMed","alq","alqNuevo","ipc"]],["Renta y precios",["renta","rentaHog","salMedia","ipc"]],["Población y paro",["pob","paro"]],["Turismo y alquiler",["vt","alq","pob"]]];
+const EVOSH={pib:"PIB",govTot:"Gasto público",govJub:"Jubilación",govSan:"Sanidad",govEdu:"Educación",govInt:"Intereses deuda",govIng:"Ingresos públicos",renta:"Renta/persona",rentaHog:"Renta/hogar",rentaMed:"Renta mediana",salMedia:"Salario medio",salMed:"Salario mediano",alq:"Alquiler declarado",alqNuevo:"Alquiler nuevos",vt:"Pisos turísticos",ipc:"Precios (IPC)",pob:"Habitantes",paro:"Paro registrado",paroL:"Paro registrado",afil:"Afiliados",contr:"Contratos",contrT:"Contratos temporales",comp:"Compraventas",vtas:"Valor tasado",deuda:"Deuda municipal"};
+const EVOPRESET=[["Gasto público y PIB",["govTot","govJub","govSan","govEdu","pib"]],["Sueldos y alquiler",["salMed","alq","alqNuevo","ipc"]],["Renta y precios",["renta","rentaHog","salMedia","ipc"]],["Población y paro",["pob","paro"]],["Turismo y alquiler",["vt","alq","pob"]],["Empleo y contratos",["afil","contr","contrT","paroL"]],["Compraventas y precios",["comp","vtas","alq","ipc"]]];
 const EVOCOL=["--rust","--slate","--mustard","--plum","--olive","--stone"];
 let ES_={sel:["salMed","alq","alqNuevo","ipc"],mun:null,lev:"es",base:null};
 
@@ -1630,7 +1669,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   const q=new URLSearchParams(m[2]||"");
   if(q.has("d")) EX.d=q.get("d").split(",").filter(k=>CATK[k]).slice(0,6);
   if(q.has("p")) EX.p=q.get("p"); if(q.has("t")) EX.t=q.get("t"); if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
-  if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa"].includes(q.get("u"))?q.get("u"):"";
+  if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=q.get("gb"); if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa","eu"].includes(q.get("u"))?q.get("u"):"";
   if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0;
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=q.get("lv");
@@ -1967,15 +2006,19 @@ function exGrupos(out){
 const BSER=[["renta","net_income_pc"],["pobreza","poverty"],["gini","gini"],["edad","mean_age"],["extr","pct_foreign"],["mayores65","pct_over65"],["menores18","pct_under18"],["solos","pct_single_hh"],["rentaHog","net_income_hh"]];
 let BUB_T=null;
 async function exBurbujas(out){
-  const keys=BSER.map(b=>b[0]).filter(k=>CATK[k]); let bx=keys.includes(EX.d[0])?EX.d[0]:"renta", by=keys.includes(EX.d[1])?EX.d[1]:"pobreza"; if(bx===by) by=keys.find(k=>k!==bx);
+  await loadRegional();
+  // series anuales por provincia: las del Atlas de Renta (media de los municipios) y las oficiales de data/regional.json
+  const keysA=BSER.map(b=>b[0]).filter(k=>CATK[k]), keysR=CAT.filter(c=>c.reg&&c.np>=40).map(c=>c.k), keys=[...keysA,...keysR];
+  let bx=keys.includes(EX.d[0])?EX.d[0]:"renta", by=keys.includes(EX.d[1])?EX.d[1]:"pobreza"; if(bx===by) by=keys.find(k=>k!==bx);
   EX.d=[bx,by];
-  const opt=sel=>keys.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("");
+  const opt=sel=>`<optgroup label="Atlas de Renta (media de los municipios)">${keysA.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("")}</optgroup><optgroup label="Datos oficiales por provincia">${keysR.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("")}</optgroup>`;
   out.innerHTML=`<div class="exrow"><label class="exlab" for="bbx">Horizontal</label><select class="sel" id="bbx">${opt(bx)}</select><label class="exlab" for="bby">Vertical</label><select class="sel" id="bby">${opt(by)}</select></div><div class="bubctl"><button type="button" class="sel" id="bplay" aria-label="Reproducir">▶ Reproducir</button><input type="range" id="byr" min="0" max="${YEARS.length-1}" value="${YEARS.length-1}" aria-label="Año"><b id="byl"></b></div><div id="bubbox"><p class="loading">Cargando las provincias…</p></div>`;
   document.getElementById("bbx").addEventListener("change",e=>{ EX.d=[e.target.value,by]; exUpdate(); });
   document.getElementById("bby").addEventListener("change",e=>{ EX.d=[bx,e.target.value]; exUpdate(); });
-  const sx=BSER.find(b=>b[0]===bx)[1], sy=BSER.find(b=>b[0]===by)[1];
+  const regS=(k,p)=>{ const s=((REG.data.prov[p]||{})[k.slice(2)])||{}; return YEARS.map(y=>s[y]??null); };
   let data; try{ data=await Promise.all(Object.keys(PROVS).map(async p=>{ const t=await loadProv(p), m=Object.values(t); const avg=k=>YEARS.map((_,i)=>{ let a=0,b=0; for(const z of m){ const v=z.s[k]&&z.s[k][i], w=z.s.population[i]; if(v!=null&&w){ a+=v*w; b+=w; } } return b?a/b:null; });
-      return {p,n:provShort(PROVS[p]),pop:YEARS.map((_,i)=>d3.sum(m,z=>z.s.population[i]||0)),x:avg(sx),y:avg(sy)}; })); }catch(e){ document.getElementById("bubbox").innerHTML='<p class="loading">No se pudieron cargar las provincias.</p>'; return; }
+      const ser=k=>isReg(k)?regS(k,p):avg(BSER.find(b=>b[0]===k)[1]);
+      return {p,n:provShort(PROVS[p]),pop:YEARS.map((_,i)=>d3.sum(m,z=>z.s.population[i]||0)),x:ser(bx),y:ser(by)}; })); }catch(e){ document.getElementById("bubbox").innerHTML='<p class="loading">No se pudieron cargar las provincias.</p>'; return; }
   if(!document.getElementById("bubbox")) return;
   data=data.filter(d=>d.x.some(v=>v!=null)&&d.y.some(v=>v!=null)); const last=YEARS.length-1;
   const fill=a=>{ let l=null; return a.map(v=>{ if(v!=null) l=v; return l; }).reduceRight((r,v,i)=>{ r[i]=v==null?r[i+1]:v; return r; },new Array(a.length)); };
@@ -2037,7 +2080,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","padron","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo"],"cerca-ciudad":["padron","atlas","mig","geo"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"]};
+  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","etcl"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -2085,10 +2128,10 @@ function renderEstudios(id){
   document.title=S.t+" · Indicio";
   view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(TOPICL(S.tema))} › ${S.m}</nav>`+pageHead(S.t,S.d,"",`<p class="byline">${byline(S)}</p>${(window.__INDICIO&&window.__INDICIO.illus||{})[S.id]||""}`)+`<div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"cerca-ciudad":studyCerca,"votar-pueblos":studyVotar,
-    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA})[S.id];
+    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"tope-compraventas":studyTopeComp,"deuda-quien-gobierna":studyDeudaGob,"precio-alimentos":studyAlimentos})[S.id];
   const B=document.getElementById("sbody");
   // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
-  const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos","iva-alimentos"].includes(S.id);
+  const needSeries=["deuda-quien-gobierna","tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos","iva-alimentos"].includes(S.id);
   const run=()=>Promise.resolve(fn(B)).catch(e=>{ console.error(e); B.insertAdjacentHTML("beforeend",'<p class="loading">No se pudo calcular una parte de este estudio.</p>'); });
   if(needSeries){ B.innerHTML='<p class="loading">Cargando los datos del estudio…</p>'; loadSeries().then(()=>{ B.innerHTML=""; return run(); }).catch(e=>{ console.error(e); B.innerHTML='<p class="loading">No se pudieron cargar los datos del estudio.</p>'; }); }
   else run();
@@ -2398,8 +2441,8 @@ function miniStack(parts,{w=160,h=26}={}){
 }
 // barras horizontales pequeñas: rows=[[valor,color]]
 function miniBars(rows,{w=200,h=40,max}={}){
-  const mx=max||d3.max(rows,r=>Math.abs(r[0]))||1, bh=(h-(rows.length-1)*3)/rows.length;
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${rows.map(([v,c],i)=>`<rect x="0" y="${(i*(bh+3)).toFixed(1)}" width="${Math.max(2,Math.abs(v)/mx*w).toFixed(1)}" height="${bh.toFixed(1)}" style="fill:var(${c})"/>`).join("")}</svg>`;
+  const mx=max||d3.max(rows,r=>Math.abs(r[0]))||1, gap=Math.min(3,h/rows.length/3), bh=Math.max(.5,(h-(rows.length-1)*gap)/rows.length);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${rows.map(([v,c],i)=>`<rect x="0" y="${(i*(bh+gap)).toFixed(1)}" width="${Math.max(2,Math.abs(v)/mx*w).toFixed(1)}" height="${bh.toFixed(1)}" style="fill:var(${c})"/>`).join("")}</svg>`;
 }
 // n de cada diez, en cuadraditos
 function miniTen(n,{w=200,h=34}={}){ const s=w/10; return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true">${d3.range(10).map(i=>`<rect x="${(i*s+1).toFixed(1)}" y="${(h-s+2)/2}" width="${(s-3).toFixed(1)}" height="${(s-3).toFixed(1)}" rx="2" style="fill:var(${i<n?"--rust":"--rule-2"})"/>`).join("")}</svg>`; }
@@ -2772,7 +2815,10 @@ let EXTRA_P=null;
 function loadExtra(){ return EXTRA_P||(EXTRA_P=getJSON("/data/extra.json").then(ex=>{ const n=IDX[0].row.length; ex.fields.forEach((f,i)=>{ F[f]=n+i; }); IDX.forEach((o,i)=>{ const e=ex.rows[i]; for(let j=0;j<e.length;j++) o.row.push(e[j]); }); for(const k in ESMEAN) delete ESMEAN[k]; for(const k in PCTL) delete PCTL[k]; }).catch(e=>{ console.error(e); EXTRA_P=null; })); }
 async function renderExplorar(h){
   if(!EXTRA_P&&!document.querySelector(".lb")) view.innerHTML='<p class="loading">Cargando los datos del laboratorio…</p>';
-  await loadExtra();
+  // los datos de provincias, comunidades y Europa solo se esperan si el enlace los pide; si no, se cargan por detrás
+  const needR=/[?&,=]R_|[?&]u=(prov|ccaa)/.test(h)||/[?&,=]R_/.test(h), needE=/[?&,=]E_|[?&]u=eu/.test(h);
+  await Promise.all([loadExtra(),needR?loadRegional():null,needE?loadEuropa():null]);
+  if(!needR) loadRegional(); if(!needE) setTimeout(()=>loadEuropa(),3000);
   if(!/^explorar/.test(pathToKey())) return;   // el lector ya se ha ido a otra página mientras cargaban los datos
   const blank=/^explorar\/?$/.test(h);
   // /laboratorio/ abre directamente el lienzo con una relación de ejemplo; la guía de arriba propone por dónde empezar
@@ -2810,24 +2856,27 @@ function nbDraw(){
 // ---------- panel lateral ----------
 const SLOTS={mapa:{get n(){return EX.bv?2:1},l:["Color del mapa (azul)","Segundo dato (rosa)"]},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
 // ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
-const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Voto","Territorio"], COVER={};
+const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
 function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remove(); document.removeEventListener("keydown",pickKey); } }
 function pickKey(e){ if(e.key==="Escape") closePicker(); }
-function openPicker(btn,{current,excl=[],onPick,extras=null}){
+function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false}){
   closePicker();
-  const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g));
+  // los datos de provincias y comunidades solo en «Relación»; en la escala de Europa, solo los de Europa
+  const okC=c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg));
+  const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g&&okC(c)));
   let tab=extras&&!(CATK[current]||{}).g?"Opciones":(CATK[current]||{}).g||groups[0], q="";
   const EXG="Opciones", tabs=extras?[EXG,...groups]:groups;
   const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p);
-  const avail=c=>!excl.includes(c.k)||c.k===current;
+  const avail=c=>okC(c)&&(!excl.includes(c.k)||c.k===current);
+  const covTxt=c=>c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
   p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
   const draw=()=>{
     const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k).includes(nq);
     document.getElementById("dpt").innerHTML=tabs.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${g===EXG?extras.length:CAT.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
     const ex=extras&&!nq&&tab===EXG?extras.map(([k,l])=>`<li><button type="button" data-k="${k}" class="${k===current?"on":""}"><b>${esc(l)}</b></button></li>`).join(""):"";
     const items=tab===EXG&&!nq?[]:CAT.filter(c=>avail(c)&&(nq?hit(c):c.g===tab));
-    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${nf0.format(cover(c.k))} municipios</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
+    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${covTxt(c)}</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
     p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
     p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); }));
   };
@@ -2847,7 +2896,7 @@ function exBar(){
   let slots="";
   if(S){ const used=Math.min(S.n,EX.d.length), lab=i=>typeof S.l==="function"?S.l(i):S.l[i];
     for(let i=0;i<used;i++) slots+=`<div class="slot full"><span class="nm" style="flex:1"><small>${lab(i)}</small><button type="button" class="pick" data-i="${i}" aria-haspopup="dialog" aria-label="${lab(i)}: ${esc(labK(EX.d[i]))}. Cambiar"><span class="pv">${esc(labK(EX.d[i]))}</span><span class="pg">${esc((CATK[EX.d[i]]||{}).g||"")}</span></button></span>${(S.add&&used>1)||(EX.v==="cruce"&&false)?`<button type="button" data-x="${i}" aria-label="Quitar">×</button>`:""}</div>`;
-    if(EX.v==="cruce"&&used>=2) slots+=["sz","col"].map(kd=>{ const k=EX[kd], on=!!k&&!(kd==="sz"&&k==="1"&&false); return `<div class="slot enc"><span class="nm" style="flex:1"><small>${kd==="sz"?"Tamaño del punto":"Color del punto"} (opcional)</small><button type="button" class="pick${k?"":" add"}" data-enc="${kd}" aria-haspopup="dialog"><span class="pv">${k?esc(encLab(k,kd)):kd==="sz"?"Habitantes":"+ elige un dato"}</span>${k&&CATK[k]?`<span class="pg">${esc(CATK[k].g)}</span>`:""}</button></span>${k&&kd==="col"||k&&kd==="sz"?`<button type="button" data-xenc="${kd}" aria-label="Quitar">×</button>`:""}</div>`; }).join("");
+    if(EX.v==="cruce"&&used>=2&&!EX.u) slots+=["sz","col"].map(kd=>{ const k=EX[kd], on=!!k&&!(kd==="sz"&&k==="1"&&false); return `<div class="slot enc"><span class="nm" style="flex:1"><small>${kd==="sz"?"Tamaño del punto":"Color del punto"} (opcional)</small><button type="button" class="pick${k?"":" add"}" data-enc="${kd}" aria-haspopup="dialog"><span class="pv">${k?esc(encLab(k,kd)):kd==="sz"?"Habitantes":"+ elige un dato"}</span>${k&&CATK[k]?`<span class="pg">${esc(CATK[k].g)}</span>`:""}</button></span>${k&&kd==="col"||k&&kd==="sz"?`<button type="button" data-xenc="${kd}" aria-label="Quitar">×</button>`:""}</div>`; }).join("");
     if(used<S.n&&(S.add||EX.v==="cruce")&&!(EX.v==="cruce"&&used>=2)) slots+=`<div class="slot"><span class="nm" style="flex:1"><small>${S.add?S.add+" (opcional)":lab(used)}</small><button type="button" class="pick add" data-add="1" aria-haspopup="dialog" aria-label="${S.add||lab(used)}"><span class="pv">+ elige un dato</span></button></span></div>`; }
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
@@ -2866,7 +2915,8 @@ function exBar(){
       <p class="hint">Debajo del gráfico: <b>¿aguanta la relación?</b> Marca qué igualar y mira cuánto queda. Para hablar de causa, usa <b>Antes y después</b>.</p>`
       :`<p class="hint" style="margin:0">Para ver si una relación aguanta al comparar entre iguales, pásala a una relación; para medir el efecto de una ley o un suceso, usa <b>Antes y después</b>.</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
-  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",()=>{ const i=+b.dataset.i; openPicker(b,{current:EX.d[i],excl:EX.d,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; exUpdate(); }}); }));
+  const regOK=EX.v==="cruce", euOK=EX.v==="cruce"&&EX.u==="eu";
+  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
   bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",()=>{ openPicker(b,{current:null,excl:EX.d,onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,6); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-x]").forEach(b=>b.addEventListener("click",()=>{ if(EX.d.length<=1) return; EX.d.splice(+b.dataset.x,1); exUpdate(); }));
   bar.querySelectorAll("button[data-q]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.q; if(EX.v==="cruce"||EX.v==="tabla"||EX.v==="grupos"){ const S=SLOTS[EX.v]; if(EX.d.length<S.n&&EX.v!=="cruce") EX.d.push(k); else { const pos=EX.v==="cruce"?1:Math.min(EX.d.length,S.n)-1; EX.d=EX.d.filter(x=>x!==k); EX.d.splice(pos,1,k); } } else { EX.d=[k,...EX.d.filter(x=>x!==k)]; } EX.d=EX.d.slice(0,6); exUpdate(); }));
@@ -2882,7 +2932,7 @@ function exBar(){
   const lx=document.getElementById("exlx"); if(lx) lx.addEventListener("change",e=>{ EX.lx=e.target.checked?1:0; exUpdate(); });
   const sw=document.getElementById("exswap"); if(sw) sw.addEventListener("click",()=>{ EX.d=[EX.d[1],EX.d[0],...EX.d.slice(2)]; exUpdate(); });
   const gg=document.getElementById("exgo"); if(gg) gg.addEventListener("click",()=>{ EX.v="cruce"; if(EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); });
-  const ct=document.getElementById("excount"); if(ct&&EX.d[0]){ const n=exRows(EX.d[0]).length; ct.textContent=`${nf0.format(n)} municipios con datos de ${low(labK(EX.d[0]))}.`; }
+  const ct=document.getElementById("excount"); if(ct&&EX.d[0]){ if(EX.v==="cruce"&&EX.u==="eu") ct.textContent="En la escala de Europa no se filtran municipios."; else if(EX.v==="cruce"&&EX.d.slice(0,2).some(isReg)) ct.textContent="El filtro solo afecta a los datos municipales; los oficiales son de toda la provincia o comunidad."; else { const n=exRows(EX.d[0]).length; ct.textContent=`${nf0.format(n)} municipios con datos de ${low(labK(EX.d[0]))}.`; } }
 }
 function exUpdate(){ exSync(); exSetHash(); exBar(); exDraw(); }
 
@@ -2930,6 +2980,7 @@ function lbSay(){
 }
 function exDraw(){
   const out=document.getElementById("exout"); if(!out) return; out.innerHTML="";
+  { const h0=exHash(); fixScale(); if(exHash()!==h0){ exSetHash(); exBar(); } }
   ["lbtest","lbcausal","lbmore"].forEach(i=>{ const e=document.getElementById(i); if(e) e.innerHTML=""; });
   const t=document.getElementById("lbtitle"); if(t) t.textContent=lbTitle();
   const sb=document.getElementById("lbsub"); if(sb) sb.textContent=EX.v==="antes"?`${ADY[AD.y].l} · afectados frente a gemelos`:EX.v==="evolucion"?"Series en el tiempo":(EX.v==="cruce"&&EX.d.length>1?labK(EX.d[0])+" ↔ "+low(labK(EX.d[1]))+" · ":"")+lbWhere()+([EX.m,MUN2].filter(c=>c&&BYCODE.has(c)).length?" · Destacado"+(myOk(MUN2)?"s":"")+": "+[EX.m,MUN2].filter(c=>c&&BYCODE.has(c)).map(c=>dispName(BYCODE.get(c)[F.name])).join(" y "):"");
@@ -2942,6 +2993,9 @@ function exDraw(){
   const say=document.getElementById("lbsay"); if(say){ try{ say.innerHTML=lbSay(); }catch(e){ say.innerHTML=""; } say.parentElement.hidden=!say.innerHTML; }
 }
 function exCSV(){
+  if(EX.v==="cruce"&&EX.u&&AGGLAST&&AGGLAST.u===EX.u){ const A=AGGLAST, f=v=>v==null?"":String(+v.toFixed(4)).replace(".",",");
+    const lines=[[A.u==="eu"?"region":A.u==="prov"?"provincia":"comunidad",labK(A.x),labK(A.y),A.year?"año":""].join(";")].concat(A.P.map(p=>['"'+p.l+'"',f(p.x),f(p.y),A.year||""].join(";")));
+    const blob=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="indicio-"+A.u+".csv"; document.body.appendChild(a); a.click(); a.remove(); return; }
   const ks=EX.d, rows=exRows().filter(r=>ks.some(k=>r[F[k]]!=null));
   const lines=[["codigo_ine","municipio","provincia","habitantes",...ks.map(labK)].join(";")].concat(rows.map(r=>[r[F.code],'"'+r[F.name]+'"','"'+provShort(PROVS[r[F.prov]])+'"',r[F.pop],...ks.map(k=>r[F[k]]==null?"":String(r[F[k]]).replace(".",","))].join(";")));
   const blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="cifrario.csv"; document.body.appendChild(a); a.click(); a.remove();
@@ -2993,20 +3047,58 @@ function ctrlRisk(x,y,c){
   return RISK[key]=out;
 }
 
-// ---------- escala: comparar municipios, provincias o comunidades ----------
-const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"]];
-function scaleBar(){ return `<div class="lbscale" role="group" aria-label="Escala de la comparación"><span class="lbscale-l">Comparar</span><div class="seg">${SCALES.map(([u,l])=>`<button type="button" data-u="${u}" aria-pressed="${(EX.u||"")===u}">${l}</button>`).join("")}</div><span class="lbscale-h">${EX.u?"Cada punto es la media de sus municipios, ponderada por población.":"Cada punto es un municipio."}</span></div>`; }
-function scaleWire(out){ out.querySelectorAll(".lbscale button[data-u]").forEach(b=>b.addEventListener("click",()=>{ EX.u=b.dataset.u; navTo(exHash()); })); }
-// agrega los municipios (con el filtro de provincia y tamaño del laboratorio) en provincias o comunidades
-function aggPts(x,y,u){
-  const key=u==="prov"?r=>r[F.prov]:r=>CCAA_OF[r[F.prov]], name=u==="prov"?k=>provShort(PROVS[k]):k=>k;
-  const rs=rowsAll().filter(r=>r[F[x]]!=null&&r[F[y]]!=null&&r[F.pop]&&exOK(r)&&key(r));
-  return d3.groups(rs,key).map(([k,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return {k,l:name(k),n:v.length,pop:w,x:d3.sum(v,r=>r[F[x]]*r[F.pop])/w,y:d3.sum(v,r=>r[F[y]]*r[F.pop])/w}; }).filter(p=>isFinite(p.x)&&isFinite(p.y));
+// ---------- escala: comparar municipios, provincias, comunidades o regiones de Europa ----------
+// datos oficiales que solo existen por provincia o comunidad (data/regional.json) y regiones de Europa (data/europa.json):
+// se cargan aparte y se añaden al catálogo con claves R_… y E_…; solo se pueden usar en «Relación» (escalas de provincia, comunidad o Europa) y en «Años»
+let REG=null, REG_P=null, EUR=null, EUR_P=null, AGGY=null; const REGCC={}, REGCCN={};
+const regF=u=>/^%/.test(u)?"pct":/^€/.test(u)?"eur":/^años$/.test(u)?"years":/PPC|puestos|viviendas$/.test(u)?"int":"num1";
+const regSrc=v=>`${typeof v.tabla==="number"?"INE (tabla "+v.tabla+")":v.tabla}${v.nota?" · "+v.nota:""} · ${v.u}`;
+function loadRegional(){ return REG_P||(REG_P=getJSON("/data/regional.json").then(g=>{ REG=g;
+  Object.entries(g.provCcaa).forEach(([p,c])=>{ REGCC[c]=CCAA_OF[p]; REGCCN[CCAA_OF[p]]=c; });
+  Object.entries(g.vars).forEach(([k,v])=>{ const np=Object.keys(g.data.prov).filter(p=>g.data.prov[p][k]).length, nc=Object.keys(g.data.ccaa).filter(c=>g.data.ccaa[c][k]).length;
+    if(CATK["R_"+k]) return; const c={k:"R_"+k,l:v.l,g:"Provincias y comunidades",f:regF(v.u),src:regSrc(v),reg:true,np,nc}; CAT.push(c); CATK[c.k]=c; }); }).catch(e=>{ console.error(e); REG_P=null; })); }
+function loadEuropa(){ return EUR_P||(EUR_P=getJSON("/data/europa.json").then(g=>{ EUR=g;
+  Object.entries(g.vars).forEach(([k,v])=>{ if(CATK["E_"+k]) return; const c={k:"E_"+k,l:v.l,g:"Europa",f:regF(v.u),src:v.fuente+" · "+v.u,eu:true}; CAT.push(c); CATK[c.k]=c; }); }).catch(e=>{ console.error(e); EUR_P=null; })); }
+const isReg=k=>!!(CATK[k]||{}).reg, isEU=k=>!!(CATK[k]||{}).eu;
+// en qué escalas se puede dibujar el par elegido
+function scaleOK(u,ks){ ks=ks||EX.d.slice(0,2); const R=ks.map(k=>CATK[k]||{});
+  if(u==="eu") return true; if(R.some(c=>c.eu)) return false;
+  if(u==="") return !R.some(c=>c.reg); if(u==="prov") return !R.some(c=>c.reg&&c.np<40); if(u==="ccaa") return !R.some(c=>c.reg&&c.nc<15); return true; }
+// ajusta la escala y los datos para que sean compatibles (al cargar un enlace, al cambiar de vista o al elegir un dato)
+function fixScale(){
+  if(EX.v!=="cruce"&&EX.v!=="burbujas"){ const d=EX.d.filter(k=>CATK[k]&&!isReg(k)&&!isEU(k)); if(d.length!==EX.d.length){ EX.d=d.length?d:["renta","paroReg"]; } return; }
+  if(EX.v==="burbujas") return;
+  if(EX.u==="eu"){ if(!EUR) return; const d=EX.d.slice(0,2).filter(isEU); const def=["E_pib_pps","E_paro"].filter(k=>!d.includes(k)); while(d.length<2) d.push(def.shift()); EX.d=[...d,...EX.d.slice(2).filter(isEU)]; EX.c=[]; return; }
+  if(EX.d.some(isEU)){ EX.d=EX.d.filter(k=>!isEU(k)); const def=["renta","paroReg"].filter(k=>!EX.d.includes(k)); while(EX.d.length<2) EX.d.push(def.shift()); }
+  if(EX.d.slice(0,2).some(isReg)){ if(!scaleOK(EX.u)) EX.u=scaleOK("prov")?"prov":"ccaa"; EX.c=[]; }
 }
+const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"],["eu","Europa"]];
+function scaleBar(){ const anyR=EX.d.slice(0,2).some(isReg);
+  const h=EX.u==="eu"?"Cada punto es una región europea (NUTS 2); en granate, las españolas. Datos de Eurostat.":EX.u?(anyR?`Datos oficiales de cada ${EX.u==="prov"?"provincia":"comunidad"}${EX.d.slice(0,2).every(isReg)?"":"; los datos municipales, media de sus municipios ponderada por población"}.`:"Cada punto es la media de sus municipios, ponderada por población."):"Cada punto es un municipio.";
+  return `<div class="lbscale" role="group" aria-label="Escala de la comparación"><span class="lbscale-l">Comparar</span><div class="seg">${SCALES.map(([u,l])=>{ const ok=scaleOK(u)||u==="eu"; return `<button type="button" data-u="${u}" aria-pressed="${(EX.u||"")===u}"${ok?"":` disabled title="Uno de los datos elegidos no existe a esta escala"`}>${l}</button>`; }).join("")}</div><span class="lbscale-h">${h}</span></div>`; }
+function scaleWire(out){ out.querySelectorAll(".lbscale button[data-u]").forEach(b=>b.addEventListener("click",async()=>{ const u=b.dataset.u; if(u==="eu") await loadEuropa(); if(u&&u!=="eu") await loadRegional();
+  if(EX.u==="eu"&&u!=="eu") EX.d=EX.d.filter(k=>!isEU(k)); EX.u=u; fixScale(); navTo(exHash()); })); }
+// último año con dato para (casi) todas las provincias o comunidades en todos los datos oficiales elegidos
+function regYear(ks,u){ if(!ks.length||!REG) return null; const D=REG.data[u]||{}, cnt={};
+  Object.values(D).forEach(o=>{ const ys=ks.map(k=>Object.keys(o[k.slice(2)]||{})); ys.reduce((a,b)=>a.filter(y=>b.includes(y))).forEach(y=>cnt[y]=(cnt[y]||0)+1); });
+  const need=u==="prov"?40:14, ok=Object.keys(cnt).filter(y=>cnt[y]>=need).sort(); return ok.length?ok[ok.length-1]:(Object.keys(cnt).sort().pop()||null); }
+// agrega los municipios (con el filtro de provincia y tamaño del laboratorio) en provincias o comunidades; los datos oficiales se toman tal cual
+function aggPts(x,y,u){
+  const key=u==="prov"?r=>r[F.prov]:r=>CCAA_OF[r[F.prov]], name=u==="prov"?k=>provShort(PROVS[k]):k=>k, rx=isReg(x), ry=isReg(y);
+  if(!rx&&!ry){ AGGY=null; const rs=rowsAll().filter(r=>r[F[x]]!=null&&r[F[y]]!=null&&r[F.pop]&&exOK(r)&&key(r));
+    return d3.groups(rs,key).map(([k,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return {k,l:name(k),n:v.length,pop:w,x:d3.sum(v,r=>r[F[x]]*r[F.pop])/w,y:d3.sum(v,r=>r[F[y]]*r[F.pop])/w}; }).filter(p=>isFinite(p.x)&&isFinite(p.y)); }
+  AGGY=regYear([rx&&x,ry&&y].filter(Boolean),u);
+  const all=rowsAll().filter(r=>key(r)), pop=d3.rollup(all,v=>d3.sum(v,r=>r[F.pop]||0),key), nm=d3.rollup(all,v=>v.length,key), M={};
+  [[x,rx],[y,ry]].forEach(([k,isR])=>{ if(!isR){ const rs=all.filter(r=>r[F[k]]!=null&&r[F.pop]&&exOK(r)); M[k]=new Map(d3.groups(rs,key).map(([g,v])=>{ const w=d3.sum(v,r=>r[F.pop]); return [g,d3.sum(v,r=>r[F[k]]*r[F.pop])/w]; })); } });
+  const val=(k,isR,g)=>{ if(!isR) return M[k].get(g); const c=u==="prov"?g:REGCCN[g], s=(((REG.data[u]||{})[c])||{})[k.slice(2)]; return s?s[AGGY]:null; };
+  return [...pop.keys()].map(g=>({k:g,l:name(g),n:nm.get(g),pop:pop.get(g),x:val(x,rx,g),y:val(y,ry,g)})).filter(p=>p.x!=null&&p.y!=null&&isFinite(p.x)&&isFinite(p.y));
+}
+let AGGLAST=null;   // puntos del último gráfico agregado (para el CSV)
 function exCruceAgg(out,x,y){
-  const u=EX.u, P=aggPts(x,y,u), wt=!!EX.w;
-  const cAt=uu=>{ if(!uu){ const c=wcorr(pairPts(x,y,{weighted:wt})); return c?{r:c.r,n:pairPts(x,y,{weighted:wt}).length}:null; } const A=aggPts(x,y,uu), c=wcorr(A.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1}))); return c?{r:c.r,n:A.length}:null; };
+  const u=EX.u, wt=!!EX.w, anyR=isReg(x)||isReg(y);
+  const cAt=uu=>{ if(!scaleOK(uu,[x,y])) return null; if(!uu){ const c=wcorr(pairPts(x,y,{weighted:wt})); return c?{r:c.r,n:pairPts(x,y,{weighted:wt}).length}:null; } const A=aggPts(x,y,uu), c=wcorr(A.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1}))); return c?{r:c.r,n:A.length,y:AGGY}:null; };
   const C={"":cAt(""),prov:cAt("prov"),ccaa:cAt("ccaa")};
+  const P=aggPts(x,y,u); AGGLAST={u,x,y,P,year:AGGY};
   out.insertAdjacentHTML("beforeend",`<div id="aggplot"></div>`);
   if(P.length<4){ document.getElementById("aggplot").innerHTML='<p class="loading">Hay muy pocos grupos con estos filtros. Quita el filtro de provincia para comparar comunidades o provincias.</p>'; return; }
   const box=document.getElementById("aggplot"), W=Math.max(320,box.clientWidth||720), H=Math.min(520,Math.max(340,W*0.62)), m={t:16,r:96,b:46,l:58};
@@ -3018,24 +3110,60 @@ function exCruceAgg(out,x,y){
   sv.append("text").attr("x",W-m.r).attr("y",H-8).attr("text-anchor","end").attr("font-size",12).attr("fill","var(--ink-2)").text(labK(x)+" →");
   sv.append("text").attr("x",m.l).attr("y",m.t-4).attr("font-size",12).attr("fill","var(--ink-2)").text("↑ "+labK(y));
   const c=wcorr(P.map(p=>({x:p.x,y:p.y,w:wt?p.pop:1})));
-  if(c){ const [a,b]=X.domain(); const mx=c.mx??d3.mean(P,p=>p.x), my=c.my??d3.mean(P,p=>p.y); sv.append("line").attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(my+c.b*(a-mx))).attr("y2",Y(my+c.b*(b-mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
+  const cid="agclip"+Math.random().toString(36).slice(2,7); sv.append("clipPath").attr("id",cid).append("rect").attr("x",m.l).attr("y",m.t).attr("width",W-m.r-m.l).attr("height",H-m.b-m.t);
+  if(c){ const [a,b]=X.domain(); const mx=c.mx??d3.mean(P,p=>p.x), my=c.my??d3.mean(P,p=>p.y); sv.append("line").attr("clip-path",`url(#${cid})`).attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(my+c.b*(a-mx))).attr("y2",Y(my+c.b*(b-mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
   const g=sv.append("g").selectAll("g").data(P.slice().sort((a,b)=>b.pop-a.pop)).join("g");
   g.append("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>Rr(p.pop)).attr("fill","var(--rust)").attr("fill-opacity",.55).attr("stroke","var(--rust)").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)} (${nf0.format(p.n)} municipios)`);
   const lab=u==="ccaa"?P:P.filter(p=>{ const zx=Math.abs(p.x-d3.mean(P,q=>q.x))/(d3.deviation(P,q=>q.x)||1), zy=Math.abs(p.y-d3.mean(P,q=>q.y))/(d3.deviation(P,q=>q.y)||1); return zx+zy>1.6||p.pop>3e6; });
   sv.append("g").selectAll("text").data(lab).join("text").attr("x",p=>X(p.x)+Rr(p.pop)+3).attr("y",p=>Y(p.y)+4).attr("font-size",11).attr("fill","var(--ink-2)").text(p=>p.l);
-  add(box,"figcaption",null,`${nf0.format(P.length)} ${u==="prov"?"provincias":"comunidades y ciudades autónomas"}; el tamaño del punto es la población. Medias de los municipios con dato, ponderadas por población${EX.p||EX.t?", con el filtro de arriba":""}.`);
+  add(box,"figcaption",null,`${nf0.format(P.length)} ${u==="prov"?"provincias":"comunidades y ciudades autónomas"}; el tamaño del punto es la población. ${anyR?`Datos oficiales de ${AGGY}${isReg(x)&&isReg(y)?"":"; el otro dato, media de los municipios con dato ponderada por población"}. Fuente: ${[x,y].filter(isReg).map(k=>CATK[k].src).join("; ")}.`:`Medias de los municipios con dato, ponderadas por población${EX.p||EX.t?", con el filtro de arriba":""}.`}`);
   // la escala cambia la respuesta
   const rF=o=>o?`r = ${rFmt(o.r)}`:"—", bar=o=>o?`<span class="scb"><i style="width:${Math.abs(o.r)*100}%;background:var(${o.r<0?"--slate":"--rust"})"></i></span>`:"";
   const tst=document.getElementById("lbtest");
   if(tst) tst.innerHTML=`<section class="scale-cmp" aria-label="La escala cambia la respuesta"><div><h3>La escala cambia la respuesta</h3>
-    <table class="tbl scale-t"><thead><tr><th>Comparando…</th><th>Puntos</th><th>Fuerza de la relación</th><th></th></tr></thead><tbody>${SCALES.map(([uu,l])=>`<tr${uu===(u||"")?' class="me"':""}><td>${l}</td><td class="r num">${C[uu]?nf0.format(C[uu].n):"—"}</td><td class="r num"><b>${rF(C[uu])}</b></td><td>${bar(C[uu])}</td></tr>`).join("")}</tbody></table>
+    <table class="tbl scale-t"><thead><tr><th>Comparando…</th><th>Puntos</th><th>Fuerza de la relación</th><th></th></tr></thead><tbody>${SCALES.filter(([uu])=>uu!=="eu").map(([uu,l])=>`<tr${uu===(u||"")?' class="me"':""}><td>${l}</td><td class="r num">${C[uu]?nf0.format(C[uu].n):"—"}</td><td class="r num"><b>${rF(C[uu])}</b></td><td>${bar(C[uu])}</td></tr>`).join("")}</tbody></table>${anyR?`<p class="muted">${isReg(x)&&isReg(y)?"Estos datos":"Uno de los datos"} solo existe${isReg(x)&&isReg(y)?"n":""} por provincia o comunidad: no se puede comparar entre municipios.</p>`:""}
     <p>${C[""]&&C[u]?(Math.abs(C[u].r)>Math.abs(C[""].r)+0.15?`Entre ${u==="prov"?"provincias":"comunidades"} la relación parece <b>mucho más fuerte</b> (${rFmt(C[u].r)}) que entre municipios (${rFmt(C[""].r)}). Es lo habitual: al promediar se borran las diferencias dentro de cada territorio y queda solo lo que separa a unos territorios de otros, que suele ir todo junto (renta, estudios, edad, paro).`:Math.abs(C[u].r)<Math.abs(C[""].r)-0.15?`Entre ${u==="prov"?"provincias":"comunidades"} la relación es <b>más débil</b> (${rFmt(C[u].r)}) que entre municipios (${rFmt(C[""].r)}): lo que se ve entre municipios pasa sobre todo dentro de cada territorio.`:`La relación se parece a todas las escalas (${rFmt(C[""].r)} entre municipios, ${rFmt(C[u].r)} entre ${u==="prov"?"provincias":"comunidades"}): es un patrón que no depende de cómo se agrupe.`):""}</p>
-    <p class="muted">Cuidado con la <b>falacia ecológica</b>: que dos cosas vayan juntas entre comunidades no dice que vayan juntas entre municipios, ni mucho menos entre personas. Con ${C[u]?nf0.format(C[u].n):"pocos"} puntos, además, una sola comunidad puede mover mucho el resultado. Las pruebas de «¿aguanta la relación?» (comparar entre parecidos, gemelos, dentro de cada provincia) solo tienen sentido con municipios: <button type="button" class="lnk" data-u="">vuelve a municipios</button> para usarlas.</p></div></section>`;
+    <p class="muted">Cuidado con la <b>falacia ecológica</b>: que dos cosas vayan juntas entre comunidades no dice que vayan juntas entre municipios, ni mucho menos entre personas. Con ${C[u]?nf0.format(C[u].n):"pocos"} puntos, además, una sola comunidad puede mover mucho el resultado. Las pruebas de «¿aguanta la relación?» (comparar entre parecidos, gemelos, dentro de cada provincia) solo tienen sentido con municipios${anyR?".":`: <button type="button" class="lnk" data-u="">vuelve a municipios</button> para usarlas.`}</p></div></section>`;
   tst&&tst.querySelectorAll("button[data-u]").forEach(b=>b.addEventListener("click",()=>{ EX.u=""; navTo(exHash()); }));
+}
+// regiones de Europa (NUTS 2) con datos de Eurostat; España resaltada
+function exCruceEU(out,x,y){
+  const D=EUR&&EUR.data; if(!D){ out.insertAdjacentHTML("beforeend",'<p class="loading">Cargando los datos de Europa…</p>'); loadEuropa().then(()=>exDraw()); return; }
+  const kx=x.slice(2), ky=y.slice(2), regs=Object.keys(D).filter(g=>g.length===4&&!g.startsWith("EU")&&!/ZZ$/.test(g));
+  const cnt={}; regs.forEach(g=>{ const a=(D[g][kx])||{}, b=(D[g][ky])||{}; Object.keys(a).filter(y=>b[y]!=null).forEach(y=>cnt[y]=(cnt[y]||0)+1); });
+  const yrs=Object.keys(cnt).sort(), mx=d3.max(Object.values(cnt))||0, yr=yrs.filter(y=>cnt[y]>=mx*0.85).pop();
+  const P=regs.map(g=>({k:g,l:EUR.nombres[g]||g,es:g.startsWith("ES"),x:((D[g][kx])||{})[yr],y:((D[g][ky])||{})[yr]})).filter(p=>p.x!=null&&p.y!=null);
+  AGGLAST={u:"eu",x,y,P,year:yr};
+  out.insertAdjacentHTML("beforeend",`<div id="aggplot"></div>`);
+  const box=document.getElementById("aggplot"); if(P.length<10){ box.innerHTML='<p class="loading">No hay datos suficientes de estos dos indicadores para el mismo año.</p>'; return; }
+  const W=Math.max(320,box.clientWidth||720), H=Math.min(520,Math.max(340,W*0.62)), m={t:16,r:110,b:46,l:58}, fx=fmtK(x), fy=fmtK(y);
+  const q=(a,p)=>d3.quantile(a.slice().sort(d3.ascending),p), xs=P.map(p=>p.x), ys=P.map(p=>p.y);
+  const X=d3.scaleLinear().domain([q(xs,0),q(xs,1)]).nice().range([m.l,W-m.r]), Y=d3.scaleLinear().domain([q(ys,0),q(ys,1)]).nice().range([H-m.b,m.t]);
+  const sv=d3.select(box).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`${labK(x)} y ${low(labK(y))} en las regiones de Europa`);
+  sv.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(X).ticks(6).tickFormat(fx)).call(g=>g.select(".domain").attr("stroke","var(--rule-2)")).selectAll("text").attr("fill","var(--muted)");
+  sv.append("g").attr("transform",`translate(${m.l},0)`).call(d3.axisLeft(Y).ticks(6).tickFormat(fy)).call(g=>g.select(".domain").attr("stroke","var(--rule-2)")).selectAll("text").attr("fill","var(--muted)");
+  sv.append("text").attr("x",W-m.r).attr("y",H-8).attr("text-anchor","end").attr("font-size",12).attr("fill","var(--ink-2)").text(labK(x)+" →");
+  sv.append("text").attr("x",m.l).attr("y",m.t-4).attr("font-size",12).attr("fill","var(--ink-2)").text("↑ "+labK(y));
+  const c=wcorr(P.map(p=>({x:p.x,y:p.y,w:1}))), ce=wcorr(P.filter(p=>p.es).map(p=>({x:p.x,y:p.y,w:1})));
+  const cid="euclip"+Math.random().toString(36).slice(2,7); sv.append("clipPath").attr("id",cid).append("rect").attr("x",m.l).attr("y",m.t).attr("width",W-m.r-m.l).attr("height",H-m.b-m.t);
+  if(c){ const [a,b]=X.domain(); sv.append("line").attr("clip-path",`url(#${cid})`).attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(c.my+c.b*(a-c.mx))).attr("y2",Y(c.my+c.b*(b-c.mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
+  const dots=P.slice().sort((a,b)=>a.es-b.es);
+  sv.append("g").selectAll("circle").data(dots).join("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>p.es?5.5:3.5).attr("fill",p=>p.es?"var(--rust)":"var(--slate)").attr("fill-opacity",p=>p.es?.85:.35).attr("stroke",p=>p.es?"var(--rust)":"none").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)}`);
+  sv.append("g").selectAll("text").data(P.filter(p=>p.es)).join("text").attr("x",p=>X(p.x)+7).attr("y",p=>Y(p.y)+4).attr("font-size",10.5).attr("fill","var(--ink-2)").text(p=>p.l.replace(/^Comunidad (de |Foral de )?|^Región de |^Principado de |^Comunitat |^Illes /,""));
+  const ES=D.ES||{}, EU=D.EU27_2020||{}, v=(o,k)=>((o[k]||{})[yr]);
+  add(box,"figcaption",null,`${nf0.format(P.length)} regiones europeas (NUTS 2) en ${yr}; en granate, las ${nf0.format(P.filter(p=>p.es).length)} españolas. Fuente: ${CATK[x].src.split(" · ")[0]}${CATK[y].src.split(" · ")[0]!==CATK[x].src.split(" · ")[0]?" y "+CATK[y].src.split(" · ")[0]:""}.`);
+  const tst=document.getElementById("lbtest");
+  if(tst) tst.innerHTML=`<section class="scale-cmp" aria-label="España en Europa"><div><h3>España en Europa</h3>
+    <table class="tbl scale-t"><thead><tr><th></th><th class="r">${esc(labK(x))}</th><th class="r">${esc(labK(y))}</th></tr></thead><tbody>
+    <tr class="me"><td>España</td><td class="r num">${v(ES,kx)!=null?fx(v(ES,kx)):"—"}</td><td class="r num">${v(ES,ky)!=null?fy(v(ES,ky)):"—"}</td></tr>
+    <tr><td>Unión Europea</td><td class="r num">${v(EU,kx)!=null?fx(v(EU,kx)):"—"}</td><td class="r num">${v(EU,ky)!=null?fy(v(EU,ky)):"—"}</td></tr></tbody></table>
+    <p>${c?`Entre todas las regiones europeas la relación es de r = <b>${rFmt(c.r)}</b>${ce?`; solo entre las españolas, r = <b>${rFmt(ce.r)}</b>`:""}. ${ce&&Math.abs(ce.r-c.r)>0.3?"El patrón de España no es el de Europa: dentro de España las regiones se ordenan de otra manera.":"España sigue un patrón parecido al del resto de Europa."}`:""}</p>
+    <p class="muted">Cada país mide igual estos indicadores (encuestas armonizadas de Eurostat), así que sí se pueden comparar. Pero entre países pesan cosas que aquí no se ven: leyes, instituciones, historia. Cuidado con leerlo como causa.</p></div></section>`;
 }
 function exCruce(out){
   if(EX.d.length<2){ out.innerHTML='<p class="loading">Pon un segundo dato en el hueco «Vertical» para cruzarlo con el primero.</p>'; return; }
   const [x,y]=EX.d; XS={...XS,x,y,minPop:0,prov:"",weighted:!!EX.w,logX:!!EX.lx,sz:EX.sz,col:EX.col,quad:EX.q};
+  if(EX.u==="eu"){ out.innerHTML=scaleBar(); scaleWire(out); exCruceEU(out,x,y); return; }
   if(EX.u){ out.innerHTML=scaleBar(); scaleWire(out); exCruceAgg(out,x,y); return; }
   LBPOS=null;
   out.innerHTML=scaleBar()+`<div id="ctlnote"></div><div id="cplot"></div>`; scaleWire(out);
@@ -3905,6 +4033,318 @@ function studyIVA(B){
     <li>El Banco de España, con los precios del INE producto a producto, estimó un traslado de en torno al 90${NB}% en enero y febrero de 2023. Este análisis, con grupos agregados de Eurostat, da una cota prudente que es coherente con esa cifra donde el grupo es homogéneo.</li></ul>`);
   methods(B,[["En pocas palabras","Se compara cuánto cambió el precio de los alimentos con rebaja de IVA en España el mes de cada cambio, frente al mismo mes de otros años, frente a la carne y el pescado y frente a cuatro países vecinos, y se mide qué parte del impuesto llegó al precio."],["Datos","Eurostat, índice de precios de consumo armonizado mensual (prc_hicp_midx, 2015 = 100), enero de 2021 a septiembre de 2025: España, Portugal, Francia, Italia y Alemania; grupos COICOP 01.1.1, 01.1.2, 01.1.3, 01.1.4, 01.1.6 y 01.1.7."],["Efecto de un mes","Variación logarítmica mensual en España menos su media en ese mismo mes de los demás años 2021–2025, menos la misma cantidad en la media de los cuatro países. Para los grupos con rebaja se promedia entre los cuatro."],["Traslado","Efecto medio dividido entre el cambio mecánico del IVA en logaritmos (−3,9 puntos de 4 a 0 %; +2,0 de 0 a 2 % y de 2 a 4 %). Los grupos mezclan productos sin rebaja, así que es una cota inferior."],["Falsificación","La carne y el pescado, sin cambio de IVA, deben salir cerca de cero. Calendario de placebos: el mismo cálculo en los meses sin medida de 2022–2025."],["Limitaciones","Un mes; grupos agregados; Portugal con su propia rebaja de abril a diciembre de 2023; los aceites y la pasta (del 10 al 5 %) no se analizan por falta de comparación europea en estos datos."]]);
   AB.fill({ctx:"En 2022 los alimentos subieron más de un 15 % y el Gobierno quitó el IVA a los básicos para aliviar la compra.",intT:"La medida",int:"IVA de los alimentos básicos del 4 al 0 % en enero de 2023; vuelta al 2 % en octubre de 2024 y al 4 % en enero de 2025.",ana:"Triple diferencia mensual con Eurostat: España frente a cuatro países vecinos, alimentos con rebaja frente a carne y pescado, y el mes de la medida frente al mismo mes de otros años; calendario de placebos.",res:`Enero de 2023: ${f1(e0.avg)} puntos de media en los grupos con rebaja; en la fruta, toda ella rebajada, ${f1(fr.v)} (en torno al ${nf0.format(frPt)} % de la rebaja). Enero de 2025: ${f1(e2.avg)}. ${below} de ${PL.length} meses sin medida dan una caída igual o mayor.`,con:"La rebaja llegó al precio en buena parte, y su retirada se notó igual; queda abierto si era la forma más eficaz de ayudar a quien más lo necesitaba."});
+}
+
+// ---------- tres análisis causales con los datos de SEPE, Seguridad Social y Ministerio de Vivienda (data/causales.json) ----------
+let CAUS_P=null; const loadCausales=()=>CAUS_P||(CAUS_P=getJSON("/data/causales.json"));
+const mesLab=p=>{ const [y,m]=p.split("-"); return MES[+m].slice(0,3)+". "+y; };
+const listY=a=>a.join(", ").replace(/, ([^,]*)$/," y $1");
+
+// Reforma laboral de 2022: ¿cayó la temporalidad, y perdieron empleo los municipios que más dependían del contrato temporal?
+async function studyReforma(B){
+  const AB=abstract(B), R=(await loadCausales()).reforma, per=R.periodos, G=R.grupos, n=G.length;
+  const GN=["Menos temporalidad","Algo menos","Algo más","Más temporalidad"], GC=["--slate","--s-prov","--mustard","--rust"];
+  const sh=(g,ps)=>{ let i=0,t=0; per.forEach((p,k)=>{ if(ps(p)){ i+=g.mes[k][0]; t+=g.mes[k][1]; } }); return i+t?t/(i+t)*100:null; };
+  const shY=(g,y)=>sh(g,p=>p.startsWith(String(y))), YS=[2019,2020,2021,2022,2023,2024,2025,2026];
+  const SH=G.map(g=>YS.map(y=>shY(g,y))), drop=G.map((g,j)=>d3.mean([2023,2024,2025].map(y=>shY(g,y)))-shY(g,2019));
+  const tot=(g,y)=>d3.sum(per.map((p,k)=>p.startsWith(String(y))?g.mes[k][0]+g.mes[k][1]:0)), ind=(g,y)=>d3.sum(per.map((p,k)=>p.startsWith(String(y))?g.mes[k][0]:0));
+  const all={mes:per.map((p,k)=>[d3.sum(G,g=>g.mes[k][0]),d3.sum(G,g=>g.mes[k][1])])}, shAll19=shY(all,2019), shAll25=shY(all,2025);
+  // monthly share (12-month rolling to quitar estacionalidad)
+  const roll=g=>per.map((p,k)=>{ if(k<11) return null; let i=0,t=0; for(let j=k-11;j<=k;j++){ i+=g.mes[j][0]; t+=g.mes[j][1]; } return t/(i+t)*100; });
+  // empleo: afiliados en diciembre, frente a la tendencia de 2016–2019
+  const AY=d3.range(2016,2026), af=g=>AY.map(y=>g.afil[y]), pr=g=>AY.map(y=>g.paro[y]);
+  const trendDev=(g,k,yr)=>{ const a=g[k]; const pre=Math.log(a[2019]/a[2016])/3, act=Math.log(a[yr]/a[2019]); return (act-pre*(yr-2019))*100; };
+  const EMP=G.map(g=>({pre:(Math.pow(g.afil[2019]/g.afil[2016],1/3)-1)*100,act:(g.afil[2025]/g.afil[2019]-1)*100,dev:trendDev(g,"afil",2025),dev21:trendDev(g,"afil",2021),paroDev:trendDev(g,"paro",2025)}));
+  const gap=EMP[n-1].dev-EMP[0].dev, gapP=EMP[n-1].paroDev-EMP[0].paroDev;
+  // placebo: el mismo cálculo con una «reforma» falsa en 2018 (tendencia 2016–2017, efecto a 2019)
+  const fake=g=>{ const a=g.afil; return (Math.log(a[2019]/a[2017])-Math.log(a[2017]/a[2016])*2)*100; }, fakeGap=fake(G[n-1])-fake(G[0]);
+  const f1=v=>nf1.format(v), f0=v=>nf0.format(v), pts=v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" puntos";
+
+  sec(B,"ctx",`<p>España fue durante décadas el país de la Unión Europea con más contratos temporales. En 2019, <b>${f0(shAll19)} de cada 100 contratos</b> que se firmaban eran temporales: por obra, por días, por semanas. La reforma laboral pactada en diciembre de 2021 entre el Gobierno, los sindicatos y la patronal quiso acabar con eso.</p>
+    <p>Dos preguntas se discutieron desde el primer día: si de verdad bajaría la temporalidad, o si se disfrazaría con otros contratos; y si al encarecer o complicar la contratación temporal se perdería empleo, sobre todo en los lugares y sectores que más dependían de ella (el campo, la hostelería, el turismo).</p>`);
+  sec(B,"int",`<p>Desde el 31 de marzo de 2022 desaparece el contrato «por obra o servicio» y los temporales quedan limitados a causas concretas (picos de producción, sustituciones). Se potencia el <b>fijo discontinuo</b>, un contrato indefinido para trabajos de temporada, que cuenta como indefinido.</p>`,{title:"La medida"});
+  sec(B,"ana",`<p>La reforma afectó a todo el país a la vez, así que no hay un grupo sin reforma con el que comparar. Lo que sí hay es <b>distinta exposición</b>: en unos municipios casi todos los contratos eran temporales y en otros bastante menos. Si la reforma destruyó empleo, debería notarse más donde más dependían del contrato temporal.</p>
+    <p>Se toman los ${f0(R.nmun)} municipios con al menos 100 contratos iniciales en 2019, se reparten en cuatro grupos iguales según el % de contratos temporales de 2019 (de ${f1(G[0].lo)} a ${f1(G[n-1].hi)}${NB}%), y se sigue en cada grupo, mes a mes, el tipo de contrato (SEPE), y año a año el empleo (afiliados a la Seguridad Social en diciembre) y el paro registrado. El empleo se compara con la tendencia que traía cada grupo en 2016–2019.</p>`);
+
+  const s1=res(B,`Los contratos temporales bajaron unos ${f0(Math.abs(d3.mean(drop)))} puntos en todas partes`,`<p>Porcentaje de los contratos iniciales que son temporales, en los últimos doce meses, para cada grupo de municipios.</p>`);
+  const PL=per.map(mesLab);
+  lineChart(s1,{title:"Contratos iniciales temporales, % (media de 12 meses)",sub:"Grupos de municipios según la temporalidad de 2019",source:"Fuente: SEPE, contratos por municipio y mes. Cálculo de Indicio.",series:G.map((g,j)=>({n:GN[j],v:roll(g),c:GC[j],main:j===n-1})),years:PL,xticks:[PL[11],PL[per.indexOf("2022-03")],PL[PL.length-1]],fmt:v=>pc(v),tickFmt:v=>f0(v)+"%"});
+  table(s1,["Grupo (temporales en 2019)","2019","2021","2023–2025","Cambio"],G.map((g,j)=>[`${GN[j]} <small>(${f1(g.lo)}–${f1(g.hi)}${NB}%)</small>`,pc(SH[j][0]),pc(SH[j][2]),pc(SH[j][0]+drop[j]),pts(drop[j])]),{max:720});
+  lect(s1,`<p>La caída es enorme y casi simultánea en los cuatro grupos: en 2022 la temporalidad baja de golpe y en 2023 ya está en su nuevo nivel. En el conjunto de estos municipios pasa del ${pc(shAll19)} en 2019 al ${pc(shAll25)} en 2025. Todos bajan unos 30–35 puntos: los municipios más temporales siguen teniendo más contratos temporales que el resto, pero la distancia apenas cambia. La temporalidad bajó en todas partes, no solo donde era más alta.</p><p>Una parte de lo que antes eran temporales son ahora <b>fijos discontinuos</b>, que el SEPE cuenta como indefinidos aunque trabajen solo una parte del año. Por eso los contratos indefinidos se multiplican por ${f0(ind(G[n-1],2025)/ind(G[n-1],2019))} en el grupo más temporal, y el número total de contratos cae (un ${f0((1-tot(G[n-1],2025)/tot(G[n-1],2019))*100)}${NB}% allí, un ${f0((1-tot(G[0],2025)/tot(G[0],2019))*100)}${NB}% en el menos temporal): se firman menos contratos porque ya no se encadenan tantos cortos.</p>`);
+
+  const s2=res(B,Math.abs(gap)<2?"Donde más dependían del contrato temporal no se perdió más empleo":gap<0?`Donde más dependían del contrato temporal el empleo creció ${f1(Math.abs(gap))} puntos menos de lo esperable`:`Donde más dependían del contrato temporal el empleo creció algo más`,`<p>Afiliados a la Seguridad Social en diciembre, 2019 = 100. Cada grupo crecía a un ritmo distinto antes de la reforma, así que lo que importa es cuánto se separa cada uno de su propia tendencia.</p>`);
+  lineChart(s2,{title:"Afiliados a la Seguridad Social, 2019 = 100",sub:"Diciembre de cada año",source:"Fuente: Seguridad Social (afiliados por municipio del centro de trabajo). Cálculo de Indicio.",series:G.map((g,j)=>({n:GN[j],v:af(g).map(v=>v/g.afil[2019]*100),c:GC[j],main:j===n-1})),years:AY,fmt:v=>f1(v),xticks:[2016,2019,2022,2025]});
+  table(s2,["Grupo","Crecimiento anual 2016–2019","Afiliados 2019 → 2025","Frente a su tendencia, 2025","Paro registrado frente a su tendencia, 2025"],G.map((g,j)=>[GN[j],sgn(EMP[j].pre),sgn(EMP[j].act),pts(EMP[j].dev),pts(EMP[j].paroDev)]),{max:820});
+  lect(s2,`<p>Los municipios más temporales (sobre todo agrícolas y turísticos: el campo y la hostelería eran el ${f0(G[n-1].hostAgri[2019])}${NB}% de sus afiliados en 2019, frente al ${f0(G[0].hostAgri[2019])}${NB}% en el grupo menos temporal) ya crecían menos antes de la reforma. Descontando esa tendencia, en 2025 el empleo del grupo más temporal queda ${pts(gap)} respecto al menos temporal${Math.abs(gap)<2?": una diferencia pequeña, del tamaño del ruido":""}. El paro registrado cuenta lo mismo: frente a su tendencia, el grupo más temporal queda ${pts(gapP)} respecto al menos temporal${gapP<0?" (menos paro, no más)":""}.</p><p>Todos los grupos quedan por debajo de su tendencia de 2016–2019, pero eso es sobre todo la pandemia: en 2021 ya estaban por debajo (entre ${pts(d3.min(EMP,e=>e.dev21))} y ${pts(d3.max(EMP,e=>e.dev21))}), antes de que la reforma entrara en vigor.</p>`);
+
+  const s3=res(B,"La prueba con una reforma falsa",`<p>Si el método se inventara diferencias, también las encontraría donde no hubo reforma. Se repite el cálculo como si hubiera habido una reforma en 2018: tendencia de 2016–2017 y efecto en 2019.</p>`);
+  add(s3,"p",null,`Diferencia entre el grupo más temporal y el menos temporal con la reforma falsa de 2018: <b>${pts(fakeGap)}</b> en solo dos años. Con la reforma real, en seis años: <b>${pts(gap)}</b>.`);
+  lect(s3,`<p>${Math.abs(fakeGap)>=Math.abs(gap)?"La reforma falsa da una diferencia tan grande como la real: lo que se ve tras 2022 no se distingue de las oscilaciones normales entre estos grupos.":"La diferencia real es mayor que la de la reforma falsa, pero no mucho: hay que leerla con cautela."} Con cuatro grupos y un solo país, la conclusión segura es la negativa: <b>no hay rastro de una destrucción de empleo concentrada donde más se usaba el contrato temporal</b>.</p>`);
+
+  sec(B,"con",`<p><b>La reforma laboral cambió el tipo de contrato en toda España y no se ve que costara empleo donde más se usaba el temporal.</b> La temporalidad de los contratos nuevos bajó unos 30 puntos casi de un mes para otro, en todos los grupos de municipios; y los que más dependían del contrato temporal no perdieron más empleo que los demás, una vez descontada la tendencia que ya traían.</p>
+    <ul class="defs"><li><b>No mide el efecto total.</b> Como la reforma llegó a la vez a todo el país, este diseño solo ve diferencias entre municipios más y menos expuestos. Si la reforma hubiera subido o bajado el empleo en todas partes por igual, no se vería aquí.</li>
+    <li><b>Fijos discontinuos.</b> Parte de la caída de la temporalidad es un cambio de etiqueta: trabajos de temporada que antes eran temporales ahora son fijos discontinuos. Con los datos del SEPE por municipio no se pueden separar.</li>
+    <li><b>La pandemia en medio.</b> 2020 y 2021 movieron el empleo mucho más que cualquier reforma, y más en los municipios turísticos. Por eso se mide frente a la tendencia de antes de 2020 y se mira también 2021.</li>
+    <li><b>Lugar de trabajo.</b> Los contratos y los afiliados se cuentan donde está el centro de trabajo, no donde vive la persona.</li></ul>`);
+  methods(B,[["En pocas palabras","Se comparan los municipios según cuánto dependían del contrato temporal en 2019: cómo cambió su temporalidad y si su empleo se separó de la tendencia que traía."],["Datos","SEPE: contratos iniciales indefinidos y temporales por municipio y mes (enero de 2019 a septiembre de 2026) y paro registrado medio anual; Seguridad Social: afiliados por municipio y actividad en diciembre (2016–2025)."],["Grupos","Municipios con al menos 100 contratos iniciales en 2019, en cuartiles del % de temporales de 2019 (cada grupo, el mismo número de municipios). Se suman los municipios de cada grupo."],["Frente a la tendencia",`Diferencia entre el crecimiento logarítmico 2019–2025 y el que habría dado la tasa media anual de 2016–2019, en puntos. Lo mismo para el paro.`],["Placebo","Mismo cálculo con una reforma falsa en 2018: tendencia de 2016–2017 y crecimiento hasta 2019."]]);
+  AB.fill({ctx:`En 2019, ${f0(shAll19)} de cada 100 contratos firmados eran temporales.`,intT:"La medida",int:"La reforma laboral de 2022 limitó los contratos temporales y potenció los fijos discontinuos.",ana:"Municipios en cuatro grupos según su temporalidad de 2019; tipo de contrato mes a mes y empleo frente a su tendencia previa.",res:`Temporalidad −${f0(Math.abs(d3.mean(drop)))} puntos en todos los grupos; empleo del grupo más temporal frente al menos temporal, ${pts(gap)} descontando la tendencia (placebo: ${pts(fakeGap)}).`,con:"La temporalidad bajó en todas partes y no se ve pérdida de empleo concentrada donde más se usaba el contrato temporal."});
+}
+
+// Salario mínimo de 2019 y empleo de hogar
+async function studyHogar(B){
+  const AB=abstract(B), H=(await loadCausales()).hogar, G=H.grupos, n=G.length, Y=d3.range(2013,2021);
+  const GN=["Renta más baja","Baja","Media","Alta","Renta más alta"], GC=["--slate","--s-prov","--stone","--mustard","--rust"];
+  const sum=k=>Object.fromEntries(Y.map(y=>[y,d3.sum(G,g=>g[k][y])]));
+  const hog=sum("hogar"), tot=sum("total");
+  const ch=(o,y)=>(o[y]/o[y-1]-1)*100;
+  // aceleración: cambio del año menos la media de los tres anteriores
+  const acc=(o,y)=>ch(o,y)-d3.mean([y-3,y-2,y-1].map(x=>ch(o,x)));
+  const AC=d3.range(2017,2021).map(y=>({y,v:acc(hog,y),t:acc(tot,y)}));
+  const a19=AC.find(a=>a.y===2019), others=AC.filter(a=>a.y!==2019&&a.y!==2020);
+  const gChg=(g,y0,y1)=>(g.hogar[y1]/g.hogar[y0]-1)*100, gPre=g=>(Math.pow(g.hogar[2018]/g.hogar[2015],1/3)-1)*100;
+  const GT=G.map(g=>({pre:gPre(g),c19:gChg(g,2018,2019),dev:gChg(g,2018,2019)-gPre(g)}));
+  const grad=GT[0].dev-GT[n-1].dev;
+  const f1=v=>nf1.format(v), f0=v=>nf0.format(v), pts=v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" puntos";
+
+  sec(B,"ctx",`<p>En enero de 2019 el salario mínimo subió un 22${NB}%, de 736 a 900 euros al mes en catorce pagas: la mayor subida en cuarenta años. Uno de los empleos más expuestos era el <b>servicio doméstico</b>: limpiar o cuidar en casas particulares, un trabajo casi siempre femenino, a menudo por horas y con salarios muy cerca del mínimo. Para las empleadas de hogar por horas, el mínimo pasó de 5,76 a 7,04 euros la hora.</p>
+    <p>Se dijo que muchas familias darían de baja a sus empleadas o las pasarían a la economía sumergida. ¿Se ve en los datos?</p>`);
+  sec(B,"int",`<p>Subida del salario mínimo interprofesional del 22,3${NB}% desde el 1 de enero de 2019 (Real Decreto 1462/2018), que también fija el mínimo por hora de las empleadas de hogar. En 2020 subió otro 5,6${NB}%.</p>`,{title:"La medida"});
+  sec(B,"ana",`<p>Se sigue el número de afiliadas al <b>sistema especial de empleados de hogar</b> de la Seguridad Social en diciembre de cada año, de 2013 a 2020, de dos formas. Primero, en toda España: si la subida tuvo efecto, la caída de 2019 debería ser más fuerte que la de los años anteriores. Segundo, por grupos de municipios según su renta de 2018 (cinco grupos con la misma población): donde las familias tienen menos renta, pagar el nuevo mínimo cuesta más, y la caída debería ser mayor.</p>
+    <p>El análisis se para en 2020: en diciembre de 2021 la Seguridad Social cambió la forma de asignar a estas afiliadas a un municipio, y la serie municipal da un salto que no es real.</p>`);
+
+  const s1=res(B,Math.abs(a19.v)<1.5||others.some(a=>a.v<=a19.v)?"En 2019 el empleo de hogar siguió cayendo, pero al mismo ritmo que ya traía":`En 2019 el empleo de hogar cayó ${f1(Math.abs(a19.v))} puntos más de lo que venía cayendo`,`<p>Afiliadas al sistema especial de empleados de hogar en diciembre, 2018 = 100, frente al total de afiliados.</p>`);
+  lineChart(s1,{title:"Afiliados en diciembre, 2018 = 100",sub:"Municipios con dato de renta (casi toda España)",source:"Fuente: Seguridad Social. Cálculo de Indicio.",series:[{n:"Empleo de hogar",v:Y.map(y=>hog[y]/hog[2018]*100),c:"--rust",main:true},{n:"Todos los afiliados",v:Y.map(y=>tot[y]/tot[2018]*100),c:"--slate"}],years:Y,fmt:v=>f1(v),xticks:[2013,2016,2018,2020]});
+  table(s1,["Año","Cambio del empleo de hogar","Cambio de los años anteriores (media)","Aceleración"],AC.map(a=>[`${a.y}${a.y===2019?" <b>(subida del SMI)</b>":a.y===2020?" <small>(pandemia)</small>":""}`,sgn(ch(hog,a.y)),sgn(d3.mean([a.y-3,a.y-2,a.y-1].map(x=>ch(hog,x)))),pts(a.v)]),{max:720});
+  lect(s1,`<p>El empleo de hogar ya caía antes de la subida: desde 2016 perdía afiliadas cada año, mientras el empleo total crecía. En 2019 cayó un ${f1(Math.abs(ch(hog,2019)))}${NB}%, algo más que en 2018 (${f1(Math.abs(ch(hog,2018)))}${NB}%). Pero la «aceleración» de 2019 (${pts(a19.v)}) ${others.some(a=>a.v<=a19.v)?`no es mayor que la de años sin subida del salario mínimo, como ${others.filter(a=>a.v<=a19.v).map(a=>a.y).join(" o ")}`:"es la mayor de la serie, aunque la diferencia con otros años es pequeña"}. En 2020 la caída siguió, ya con la pandemia.</p>`);
+
+  const s2=res(B,Math.abs(grad)<1.5?"Y no cayó más donde las familias tienen menos renta":grad<0?`Cayó ${f1(Math.abs(grad))} puntos más en los municipios de renta más baja`:"Cayó más, si acaso, en los municipios de renta alta",`<p>Cambio del empleo de hogar en 2019 en cada grupo de municipios según su renta de 2018, frente a su propia tendencia de 2015–2018.</p>`);
+  lineChart(s2,{title:"Empleo de hogar por renta del municipio, 2018 = 100",source:"Fuente: Seguridad Social e INE (Atlas de Renta). Cálculo de Indicio.",series:G.map((g,j)=>({n:GN[j],v:Y.map(y=>g.hogar[y]/g.hogar[2018]*100),c:GC[j],main:j===0})),years:Y,fmt:v=>f1(v),xticks:[2013,2016,2018,2020]});
+  table(s2,["Grupo","Renta por persona, 2018","Afiliadas de hogar, 2018","Tendencia 2015–2018","Cambio 2019","Frente a la tendencia"],G.map((g,j)=>[GN[j],`${eur(g.lo)}–${eur(g.hi)}`,nf0.format(g.hogar[2018]),sgn(GT[j].pre),sgn(GT[j].c19),pts(GT[j].dev)]),{max:860});
+  lect(s2,`<p>Si la subida hubiera echado a empleadas de hogar porque las familias no podían pagarla, debería notarse más donde las familias ganan menos. No se ve un patrón así: la diferencia entre el grupo de renta más baja y el de renta más alta es de ${pts(grad)} respecto a sus tendencias. Llama la atención otra cosa: casi la mitad del empleo de hogar registrado está en los municipios de más renta (${f0(G[n-1].hogar[2018]/d3.sum(G,g=>g.hogar[2018])*100)}${NB}% en el grupo más rico, frente a ${f0(G[0].hogar[2018]/d3.sum(G,g=>g.hogar[2018])*100)}${NB}% en el más pobre, con la misma población).</p>`);
+
+  sec(B,"con",`<p><b>No se ve que la subida del salario mínimo de 2019 hundiera el empleo de hogar registrado.</b> Siguió cayendo, como venía haciendo desde 2016, y no cayó más donde las familias tenían menos renta para pagar el nuevo mínimo.</p>
+    <ul class="defs"><li><b>Lo que no se ve.</b> Si algunas familias pasaron a sus empleadas a la economía sumergida, o les redujeron horas manteniendo el alta, no aparece en estos datos. Es justo lo que más preocupaba.</li>
+    <li><b>Caída de fondo.</b> El empleo de hogar registrado baja desde 2016 por razones que no tienen que ver con el salario mínimo (envejecimiento de las empleadas, cambios en los cuidados). Separar un efecto pequeño de esa tendencia con datos anuales es difícil.</li>
+    <li><b>Hasta 2020.</b> El cambio de 2021 en la asignación de municipios impide seguir la serie municipal más allá.</li>
+    <li>Otros trabajos han encontrado efectos negativos pequeños de la subida de 2019 en el empleo de los trabajadores con salarios más bajos (Banco de España) y ninguno claro en el agregado (AIReF, Ministerio de Trabajo). Este análisis, con datos más gruesos, encaja con un efecto pequeño o nulo en este colectivo.</li></ul>`);
+  methods(B,[["En pocas palabras","Se mira si el empleo de hogar cayó más de lo normal en 2019, el año de la subida del 22 % del salario mínimo, y si cayó más donde las familias tienen menos renta."],["Datos","Seguridad Social: afiliados por municipio y régimen en diciembre (sistema especial de empleados de hogar y total), 2013–2020; INE, Atlas de Distribución de Renta de los Hogares, renta neta por persona de 2018."],["Aceleración","Cambio porcentual del año menos la media de los cambios de los tres años anteriores."],["Grupos de renta","Municipios ordenados por renta por persona de 2018 y repartidos en cinco grupos con la misma población."],["Frente a la tendencia","Cambio de 2018 a 2019 menos la tasa media anual de 2015 a 2018."]]);
+  AB.fill({ctx:"En 2019 el salario mínimo subió un 22 %; el servicio doméstico era uno de los empleos más expuestos.",intT:"La medida",int:"Salario mínimo de 736 a 900 euros al mes (de 5,76 a 7,04 euros la hora en el empleo de hogar) desde enero de 2019.",ana:"Afiliadas al régimen de hogar en diciembre, 2013–2020: España frente a su tendencia, y municipios por renta.",res:`Caída del ${f1(Math.abs(ch(hog,2019)))} % en 2019 (aceleración ${pts(a19.v)}), parecida a otros años; sin más caída donde la renta es menor (${pts(grad)}).`,con:"No se ve que la subida hundiera el empleo de hogar registrado; los datos no dicen nada de la economía sumergida."});
+}
+
+// Zonas tensionadas de Cataluña: ¿se vendieron más pisos al llegar el tope al alquiler?
+async function studyTopeComp(B){
+  const AB=abstract(B), T=(await loadCausales()).tension, per=T.periodos, S=T.series, ix=p=>per.indexOf(p);
+  const cat=c=>["08","17","25","43"].includes(c.slice(0,2));
+  const ent=Object.entries(S);
+  const TR=ent.filter(([c,v])=>v.g===1), AM=ent.filter(([c,v])=>v.g===2), CO=ent.filter(([c,v])=>!cat(c));
+  const rng_=(a,b)=>per.filter(p=>p>=a&&p<=b);
+  const PRE=rng_("2022T2","2024T1"), POST=rng_("2024T2","2026T2");
+  const avg=(L,ps,k="t")=>d3.mean(ps,p=>d3.sum(L,([c,v])=>v[k][ix(p)]||0));
+  const did=(L,C,pre,post,k="t")=>((avg(L,post,k)/avg(L,pre,k))/(avg(C,post,k)/avg(C,pre,k))-1)*100;
+  const D=did(TR,CO,PRE,POST), Du=did(TR,CO,PRE,POST,"u");
+  const DA=did(AM,CO,rng_("2023T1","2024T3"),rng_("2025T1","2026T2"));
+  // placebo en el tiempo: «tope» en 2022T2 (antes: 2020T3–2022T1; después: 2022T2–2023T4) y en 2019T1
+  const PL=[["2019T1",rng_("2017T1","2018T4"),rng_("2019T1","2019T4")],["2022T2",rng_("2020T3","2022T1"),rng_("2022T2","2023T4")]].map(([l,a,b])=>({l,v:did(TR,CO,a,b)}));
+  // sin Barcelona ciudad
+  const DnoB=did(TR.filter(([c])=>c!=="08019"),CO,PRE,POST);
+  // gemelos: cada municipio con tope frente al más parecido fuera de Cataluña (tamaño, renta, evolución 2019–2023)
+  const lg=(v,ps)=>Math.log(1+d3.sum(ps,p=>v.t[ix(p)]||0));
+  const gro=v=>lg(v,rng_("2023T1","2023T4"))-lg(v,rng_("2019T1","2019T4"));
+  const feat=([c,v])=>[Math.log10(v.p),v.r||12000,gro(v)];
+  const okT=TR.filter(([c,v])=>v.p>=10000&&v.r), okC=CO.filter(([c,v])=>v.r);
+  const pairs=matchTwins(okT,okC,feat,{maxD:1.0});
+  const pd=pr=>(lg(pr.t[1],POST)-lg(pr.t[1],PRE))-(lg(pr.c[1],POST)-lg(pr.c[1],PRE));
+  const pdStat=ps=>ps.length?(Math.exp(d3.mean(ps,pd))-1)*100:null, Dtw=pdStat(pairs), ciTw=bootCI(pairs,pdStat);
+  const idx=L=>{ const b=avg(L,PRE); return per.map(p=>d3.sum(L,([c,v])=>v.t[ix(p)]||0)/b*100); };
+  const QS=rng_("2019T1",per[per.length-1]), qi=QS.map(ix), QL=QS.map(p=>p.replace(/(\d{4})T(\d)/,"T$2 $1"));
+  const f1=v=>nf1.format(v), f0=v=>nf0.format(v), pts=v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+NB+"%";
+
+  sec(B,"ctx",`<p>En marzo de 2024 Cataluña fue la primera comunidad en aplicar el tope al precio del alquiler de la ley de vivienda, en ${f0(TR.length)} municipios declarados zona tensionada; en octubre se amplió a otros ${f0(AM.length)}. El <a href="/preguntas/tope-cataluna/">análisis del tope</a> mide si frenó el alquiler. Aquí la pregunta es otra, la que más se repitió en contra: <b>¿empujó el tope a los propietarios a vender sus pisos en vez de alquilarlos?</b></p>
+    <p>Si fuera así, debería verse un aumento de las compraventas de vivienda, sobre todo de segunda mano, en los municipios con tope respecto a los que no lo tienen.</p>`);
+  sec(B,"int",`<p>Desde el 16 de marzo de 2024, los contratos nuevos de alquiler en ${f0(TR.length)} municipios catalanes (Barcelona y su área, las capitales y buena parte de la costa) no pueden superar el precio del contrato anterior ni el índice de referencia. Desde el 8 de octubre de 2024, también en otros ${f0(AM.length)} municipios.</p>`,{title:"La medida"});
+  sec(B,"ana",`<p>Se usan las compraventas de vivienda por municipio y trimestre que publica el Ministerio de Vivienda con los datos de los notarios. Se compara el cambio de las compraventas entre los dos años anteriores al tope (del segundo trimestre de 2022 al primero de 2024) y los dos años posteriores, en los municipios con tope y en los ${f0(CO.length)} municipios de 20.000 habitantes o más del resto de España, que no tuvieron tope (<b>diferencias en diferencias</b>). Se repite con un municipio gemelo para cada uno, con placebos en fechas falsas y sin Barcelona.</p>`);
+
+  const s1=res(B,`Las compraventas subieron un ${f1(Math.abs(D))}${NB}% ${D>=0?"más":"menos"} en los municipios con tope`,`<p>Compraventas de vivienda por trimestre, índice: media de los dos años antes del tope = 100.</p>`);
+  const iT=idx(TR), iC=idx(CO);
+  lineChart(s1,{title:"Compraventas de vivienda (antes del tope = 100)",sub:"Municipios con tope desde marzo de 2024 y municipios de 20.000 hab. o más del resto de España",source:"Fuente: Ministerio de Vivienda (notarios). Cálculo de Indicio.",series:[{n:"Con tope (Cataluña)",v:qi.map(i=>iT[i]),c:"--rust",main:true},{n:"Resto de España",v:qi.map(i=>iC[i]),c:"--slate"}],years:QL,xticks:[QL[0],QL[QS.indexOf("2024T1")],QL[QL.length-1]],fmt:v=>f1(v)});
+  table(s1,["",`Antes (${PRE[0].replace("T"," T")}–${PRE[PRE.length-1].replace("T"," T")})`,`Después (${POST[0].replace("T"," T")}–${POST[POST.length-1].replace("T"," T")})`,"Cambio"],[["Con tope",f0(avg(TR,PRE)),f0(avg(TR,POST)),sgn((avg(TR,POST)/avg(TR,PRE)-1)*100)],["Resto de España (20.000 hab. o más)",f0(avg(CO,PRE)),f0(avg(CO,POST)),sgn((avg(CO,POST)/avg(CO,PRE)-1)*100)],["<b>Diferencia en diferencias</b>","","",`<b>${pts(D)}</b>`]],{max:760});
+  lect(s1,`<p>Las compraventas subieron en toda España en 2024 y 2025, con la bajada de los tipos de interés. En los municipios con tope subieron más: ${pts(D)} respecto al resto. ${Du>D?"En la vivienda de segunda mano, que es la que se alquilaba, la diferencia es algo mayor":"En la vivienda de segunda mano, que es la que se alquilaba, la diferencia es parecida"} (${pts(Du)}). Las dos líneas iban muy juntas antes del tope y se separan a partir de 2024.</p>`);
+
+  const s2=res(B,"Las pruebas",`<p>El mismo cálculo con otras comparaciones y con fechas en las que no pasó nada.</p>`);
+  table(s2,["Prueba","Resultado"],[
+    ["Diferencia en diferencias (principal)",`<b>${pts(D)}</b>`],
+    ["Solo vivienda de segunda mano",pts(Du)],
+    ["Sin Barcelona ciudad",pts(DnoB)],
+    [`Gemelos: ${f0(pairs.length)} municipios con tope de 10.000 hab. o más, cada uno con el más parecido de fuera de Cataluña`,Dtw==null?"—":`${pts(Dtw)}${ciTw?` <small>[${sgn(ciTw[0])}; ${sgn(ciTw[1])}]</small>`:""}`],
+    [`Ampliación de octubre de 2024 (${f0(AM.length)} municipios más)`,pts(DA)],
+    ...PL.map(p=>[`Placebo: tope falso en ${p.l.replace("T"," T")}`,pts(p.v)])],{max:820});
+  const plMax=d3.max(PL,p=>Math.abs(p.v));
+  lect(s2,`<p>${plMax<Math.abs(D)/2?"Los placebos, con fechas en las que no hubo tope, dan diferencias mucho menores: la separación de 2024 no es algo que pase cualquier año.":"Algún placebo da una diferencia del mismo tamaño, así que la separación de 2024 podría ser ruido."} ${Dtw!=null&&ciTw?(ciTw[0]>0?"Con gemelos el resultado se mantiene y el intervalo no incluye el cero.":ciTw[1]<0?"Con gemelos el signo se invierte: el resultado depende de con quién se compare.":"Con gemelos el resultado apunta en la misma dirección, pero el intervalo incluye el cero: la estimación es imprecisa."):""} ${Math.abs(DnoB-D)<3?"Quitar Barcelona apenas lo cambia.":"Quitar Barcelona lo cambia bastante: pesa mucho en el resultado."} ${DA>0?"La ampliación de octubre, con otros municipios y otra fecha, va en la misma dirección.":"La ampliación de octubre, en cambio, no muestra lo mismo."}</p>`);
+
+  sec(B,"con",`<p><b>${D>3&&(!ciTw||ciTw[0]>0)?"Tras el tope, en los municipios con tope se vendieron más viviendas que en el resto de España: es compatible con que algunos propietarios vendieran en vez de alquilar.":D>0?"Hay una pista de que tras el tope se vendieron más viviendas en los municipios con tope, pero no es concluyente.":"No se ve que el tope empujara a vender más viviendas."}</b> ${D>0?`La diferencia, ${pts(D)}, equivale a unas ${f0((avg(TR,POST)-avg(TR,POST)/(1+D/100))*4)} compraventas más al año en los municipios con tope.`:""}</p>
+    <p>Que se vendan más pisos no es malo en sí: un piso que se vende sigue existiendo, y a menudo lo compra alguien para vivir en él. Lo que preocupa es que salga del alquiler, y eso estos datos no lo dicen: no sabemos si lo que se vendió estaba alquilado ni quién lo compró.</p>
+    <ul class="defs"><li><b>Cataluña no es el resto de España.</b> Si en 2024 algo movió el mercado de compraventa solo en Cataluña, se confundiría con el tope. Los gemelos y la ampliación de octubre reducen ese riesgo, pero no lo eliminan.</li>
+    <li><b>Poco tiempo.</b> Dos años y un trimestre después del tope.</li>
+    <li><b>Compraventas, no oferta de alquiler.</b> El número de contratos de alquiler y el de pisos que pasan a venta se miden en el <a href="/preguntas/tope-cataluna/">análisis del tope</a> con otros datos.</li></ul>`);
+  methods(B,[["En pocas palabras","Se compara cuánto cambiaron las compraventas de vivienda en los municipios con tope al alquiler antes y después de marzo de 2024, frente a municipios grandes del resto de España sin tope."],["Datos","Ministerio de Vivienda: transacciones inmobiliarias de vivienda por municipio y trimestre (total y segunda mano), datos de los notarios, 2017–2026; BOE: municipios declarados zona tensionada en Cataluña; INE: padrón y Atlas de Renta (2018)."],["Diferencia en diferencias","(compraventas medias por trimestre después / antes en los municipios con tope) / (lo mismo en el grupo de comparación) − 1. Antes: 2022T2–2024T1; después: 2024T2–2026T2."],["Gemelos","Para cada municipio con tope de 10.000 habitantes o más, el municipio de 20.000 o más de fuera de Cataluña más parecido en tamaño (logaritmo), renta por persona de 2018 y evolución de las compraventas de 2019 a 2023 (distancia sobre variables estandarizadas, umbral 1). Efecto: media de las diferencias de cambio logarítmico; intervalo por remuestreo de parejas."],["Placebos","El mismo cálculo con topes falsos en el primer trimestre de 2019 y en el segundo de 2022."]]);
+  AB.fill({ctx:"Cataluña aplicó el tope al alquiler en marzo de 2024; se temía que los propietarios vendieran en vez de alquilar.",intT:"La medida",int:`Tope al precio de los contratos nuevos en ${f0(TR.length)} municipios (marzo de 2024) y ${f0(AM.length)} más (octubre de 2024).`,ana:"Compraventas por municipio y trimestre (notarios): municipios con tope frente a municipios grandes del resto de España, gemelos y placebos.",res:`Compraventas ${pts(D)} respecto al resto de España (segunda mano ${pts(Du)}; gemelos ${Dtw==null?"—":pts(Dtw)}); placebos ${PL.map(p=>pts(p.v)).join(" y ")}.`,con:"Se vendieron más viviendas donde hay tope; los datos no dicen si salieron del alquiler."});
+}
+
+// ---------- deuda de los ayuntamientos según quién gobierna (regresión discontinua con las municipales de 2019 y 2023) ----------
+async function studyDeudaGob(B){
+  const AB=abstract(B), DE=(await loadCausales()).deuda, DY=DE.years, PD=SER.padYears;
+  const dHab=(code,y,s)=>{ const v=DE.s[code], i=DY.indexOf(y), p=s[SF.pad]&&s[SF.pad][PD.indexOf(y)]; return v&&i>=0&&v[i]!=null&&p?v[i]*1000/p:null; };
+  const FAM=l=>l&&l.length?l[0][0]:null;
+  const rows=SER.rows.map(r=>({code:r[0],s:r,x:BYCODE.get(r[0])})).filter(o=>o.x&&(o.x[F.pop]||0)>=250);
+  // descriptivo: deuda por habitante según la lista más votada en 2019
+  const fams=["PP","PSOE"], famOf=o=>{ const f=FAM(o.s[SF.mun]&&o.s[SF.mun][0]); return !f?null:fams.includes(f)?f:"Otras listas"; };
+  const DESC=["PP","PSOE","Otras listas"].map(f=>{ const g=rows.filter(o=>famOf(o)===f), a=g.map(o=>({v19:dHab(o.code,2019,o.s),v23:dHab(o.code,2023,o.s),p:o.x[F.pop]})).filter(o=>o.v19!=null&&o.v23!=null);
+    const w=k=>d3.sum(a,o=>o[k]*o.p)/d3.sum(a,o=>o.p); return {f,n:a.length,med19:d3.median(a,o=>o.v19),med23:d3.median(a,o=>o.v23),w19:w("v19"),w23:w("v23"),zero:a.filter(o=>o.v23===0).length/a.length*100}; });
+  // regresión discontinua (como en «¿Importa quién gobierna?»)
+  const H=10;
+  const fitW=pts=>{ const W=d3.sum(pts,p=>p.w); if(!W) return null; const mx=d3.sum(pts,p=>p.w*p.x)/W, my=d3.sum(pts,p=>p.w*p.y)/W; let sxy=0,sxx=0; pts.forEach(p=>{ sxy+=p.w*(p.x-mx)*(p.y-my); sxx+=p.w*(p.x-mx)**2; }); const b=sxx?sxy/sxx:0; return {a:my-b*mx,b,n:pts.length}; };
+  const jumpAt=(pts,c,h=H)=>{ const k=p=>({...p,w:Math.max(0,1-Math.abs(p.x-c)/h)}); const L=pts.filter(p=>p.x<c&&p.x>=c-h).map(k), R=pts.filter(p=>p.x>=c&&p.x<=c+h).map(k); if(L.length<25||R.length<25) return null; const l=fitW(L), r=fitW(R); return {j:(r.a+r.b*c)-(l.a+l.b*c),l,r,nL:L.length,nR:R.length}; };
+  const rd=(pts,c=0,h=H,B_=200)=>{ const j=jumpAt(pts,c,h); if(!j) return null; const ci=bootCI(pts.filter(p=>Math.abs(p.x-c)<=h),s=>{ const q=jumpAt(s,c,h); return q?q.j:null; },{B:B_}); return {...j,ci}; };
+  const elec=e=>rows.map(o=>{ const m=o.s[SF.mun]&&o.s[SF.mun][e]; if(!m) return null; const fam=m.map(l=>l[0]); if(!(fam.includes("PP")&&fam.includes("PSOE"))) return null; return {...o,m:m.find(l=>l[0]==="PSOE")[1]-m.find(l=>l[0]==="PP")[1]}; }).filter(Boolean);
+  const M19=elec(0), M23=elec(1);
+  const clip=(a,lo,hi)=>a.map(p=>({...p,y:Math.max(lo,Math.min(hi,p.y))}));
+  const ptsOf=(M,f)=>M.map(d=>({x:d.m,y:f(d)})).filter(p=>p.y!=null&&isFinite(p.y));
+  const ch=(y0,y1)=>d=>{ const a=dHab(d.code,y0,d.s), b=dHab(d.code,y1,d.s); return a!=null&&b!=null?b-a:null; };
+  const OUT=[["Deuda por habitante, cambio 2019 → 2023 (€)",M19,ch(2019,2023),[-1500,1500]],["Deuda por habitante en 2023 (€)",M19,d=>dHab(d.code,2023,d.s),[0,3000]],["Ayuntamientos con deuda en 2023 (%)",M19,d=>{ const v=dHab(d.code,2023,d.s); return v==null?null:v>0?100:0; },[0,100]],["Mandato 2023: cambio 2023 → 2025 (€)",M23,ch(2023,2025),[-1500,1500]]];
+  const est=OUT.map(([l,M,f,[lo,hi]])=>{ const pts=clip(ptsOf(M,f),lo,hi), j=rd(pts); const A=M.filter(d=>d.m>0).map(f).filter(v=>v!=null), Bq=M.filter(d=>d.m<0).map(f).filter(v=>v!=null);
+    return {l,pts,j,ci:j&&j.ci,naive:d3.mean(A.map(v=>Math.max(lo,Math.min(hi,v))))-d3.mean(Bq.map(v=>Math.max(lo,Math.min(hi,v)))),bw:[5,7.5,15,20].map(h=>({h,r:rd(pts,0,h,120)})),plc:[-6,-4,4,6].map(c=>({c,r:rd(pts,c,H,100)}))}; });
+  const bal=[["Deuda por habitante en 2019 (€)",d=>dHab(d.code,2019,d.s),[0,3000]],["Cambio 2015 → 2019 (€)",ch(2015,2019),[-1500,1500]]].map(([l,f,[lo,hi]])=>({l,r:rd(clip(ptsOf(M19,f),lo,hi),0,H,150)}));
+  const sig=est.filter(o=>sigCI(o.ci)), balBad=bal.filter(b=>b.r&&sigCI(b.r.ci));
+  const nBw=d3.sum(est,o=>o.bw.filter(b=>b.r&&b.r.ci&&sigCI(b.r.ci)).length), nPl=d3.sum(est,o=>o.plc.filter(p=>p.r&&p.r.ci&&sigCI(p.r.ci)).length);
+  const e0=est[0], W_=M19.filter(d=>Math.abs(d.m)<=H).length;
+  const f0=v=>nf0.format(v), E=v=>v==null?"—":(v<0?"−":v>0?"+":"")+nf0.format(Math.abs(v))+NB+"€", Ep=v=>v==null?"—":(v<0?"−":v>0?"+":"")+nf1.format(Math.abs(v));
+
+  sec(B,"ctx",`<p>La deuda es una de las pocas cosas que un alcalde controla de verdad: decide cuánto pide prestado, cuánto devuelve y cuánto gasta. Por eso es un terreno clásico del debate político: unos acusan a otros de endeudar los ayuntamientos y otros presumen de haberlos saneado.</p>
+    <p>Desde 2012, la ley de estabilidad presupuestaria obliga a los ayuntamientos a equilibrar sus cuentas y a dedicar el superávit a pagar deuda. En España la deuda municipal ha bajado mucho: de unos 29.000 millones de euros en 2015 a unos 16.000 en 2025. <b>¿Depende de quién gobierne el ayuntamiento?</b></p>`);
+  sec(B,"int",`<p>Quedar como lista más votada en las municipales de mayo de 2019 o de mayo de 2023, PP frente a PSOE, en los municipios de 250 habitantes o más donde esas fueron las dos listas más votadas. Lo que se mide: la deuda viva del ayuntamiento por habitante a 31 de diciembre, de Hacienda.</p>`,{title:"Qué se compara"});
+  sec(B,"ana",`<p>Primero, la comparación directa: deuda por habitante de los ayuntamientos según qué lista ganó. Esa comparación engaña, porque cada partido gana en municipios distintos (más grandes, más ricos, de otras comunidades). Después, la <b>regresión discontinua</b> de «<a href="/preguntas/quien-gobierna/">¿Importa quién gobierna tu ayuntamiento?</a>»: solo en las elecciones ajustadas, donde ganar fue casi cuestión de suerte, se mira si la deuda cambia de forma distinta según quién quedó primero. Para que unos pocos municipios muy endeudados no dominen el resultado, los cambios se recortan a ±1.500${NB}€ por habitante.</p>`);
+
+  const dP=DESC[0], dS=DESC[1];
+  const s1=res(B,Math.abs(dS.w23-dP.w23)<40?"Los ayuntamientos del PP y del PSOE deben parecido":`Por vecino, los ayuntamientos del ${dS.w23>dP.w23?"PSOE":"PP"} deben más; el típico, casi nada`,`<p>Deuda viva por habitante según la lista más votada en las municipales de 2019. La mediana es el ayuntamiento del medio; la media ponderada, lo que debe en promedio cada vecino.</p>`);
+  table(s1,["Lista más votada en 2019","Municipios","Mediana 2019","Mediana 2023","Media por vecino 2019","Media por vecino 2023","Sin deuda en 2023"],DESC.map(d=>[d.f,f0(d.n),eur(d.med19),eur(d.med23),eur(d.w19),eur(d.w23),pc0(d.zero)]),{max:900});
+  lect(s1,`<p>La mayoría de los ayuntamientos pequeños no deben nada, gobierne quien gobierne: por eso la mediana es tan baja. La deuda se concentra en ciudades grandes y en algunos municipios con problemas antiguos (Jaén, Los Barrios, Parla…). La media por vecino depende sobre todo de qué ciudades grandes gobernó cada partido, no de cómo gobiernan: por eso esta comparación no sirve para saber si un partido endeuda más.</p>`);
+
+  const s2=res(B,sig.length?`En las elecciones ajustadas, ${sig.map(o=>low(o.l.split(" (")[0])).join(" y ")}: hay diferencia según quién ganó`:"En las elecciones ajustadas, quién gana no cambia la deuda",`<p>${f0(W_)} municipios decididos por menos de ${H} puntos en 2019. En horizontal, la ventaja del PSOE sobre el PP; en vertical, la deuda. Medias por tramos de 2 puntos y una recta a cada lado del empate.</p>`);
+  const grid=add(s2,"div","cols2");
+  est.forEach(o=>{ const fg=fig(grid,{title:o.l,source:`Salto en el empate: <b>${o.j?Ep(o.j.j):"—"}</b>${o.ci?` [${Ep(o.ci[0])}; ${Ep(o.ci[1])}]`:""}. Comparación directa PSOE − PP: ${Ep(o.naive)}.`}); rdPlot(fg.body,o,H); });
+  lect(s2,`<p>Lo que hay que mirar es el centro de cada gráfico: si el partido del alcalde importara para la deuda, las dos rectas no se encontrarían en el cero. ${sig.length?`Hay escalón en ${sig.map(o=>low(o.l)).join(" y ")}.`:"En los cuatro gráficos el salto es pequeño y su intervalo incluye el cero."} El primero es el principal: cuánto cambió la deuda por habitante durante el mandato 2019–2023 (${e0.j?`salto de ${E(e0.j.j)} por habitante`:"sin datos suficientes"}). El último repite la prueba con las elecciones de 2023 y los dos primeros años de mandato.</p>`);
+
+  const s3=res(B,"Las comprobaciones",`<p>Si el diseño funciona, la deuda de antes de la elección no debería saltar en el empate, y el resultado no debería depender de la ventana ni aparecer en cortes falsos.</p>`);
+  table(s3,["Prueba","Resultado"],[...bal.map(b=>[`Antes de la elección: ${low(b.l)}`,b.r?`${Ep(b.r.j)}${b.r.ci?` [${Ep(b.r.ci[0])}; ${Ep(b.r.ci[1])}]`:""}`:"—"]),
+    ...est.slice(0,1).flatMap(o=>[...o.bw.map(b=>[`Ventana ±${nf1.format(b.h)} puntos`,b.r?`${Ep(b.r.j)}${b.r.ci&&sigCI(b.r.ci)?"*":""}`:"—"]),...o.plc.map(p=>[`Corte falso en ${p.c>0?"+":"−"}${Math.abs(p.c)} puntos`,p.r?`${Ep(p.r.j)}${p.r.ci&&sigCI(p.r.ci)?"*":""}`:"—"])])],{max:760});
+  add(s3,"p","muted","Cambio de la deuda por habitante 2019 → 2023, en euros. * El intervalo del 95 % excluye el cero.").style.cssText="font-size:13.5px;margin-top:6px";
+  lect(s3,`<p>${balBad.length?"Ojo: la deuda de antes de la elección ya salta en el empate, así que los dos lados no eran del todo comparables.":"Antes de votar, la deuda de los dos lados del empate era parecida: el diseño compara municipios comparables."} ${nBw||nPl?`Con alguna ventana o algún corte falso aparece un salto aislado (${nBw+nPl} en total, contando los cuatro resultados): es la medida del ruido de estos datos.`:"Ni otras ventanas ni los cortes falsos producen saltos: el resultado es estable."}</p>`);
+
+  sec(B,"con",`<p>${sig.length?`<b>Hay alguna diferencia según quién ganó</b> (${sig.map(o=>low(o.l)).join("; ")}), pero hay que leerla con las comprobaciones de arriba.`:"<b>En los municipios donde la elección fue ajustada, que ganara el PP o el PSOE no cambió la deuda del ayuntamiento.</b>"} Las diferencias que se ven al comparar todos los municipios son de dónde gobierna cada partido, no de cómo gobierna.</p>
+    <p>Encaja con lo que pasó en la década: la ley de estabilidad y la regla de gasto obligaron a casi todos los ayuntamientos a reducir deuda, gobernara quien gobernara, y dejaron poco margen al color político.</p>
+    <ul class="defs"><li><b>Municipios pequeños y medianos.</b> En las elecciones ajustadas casi no hay ciudades grandes, que son las que acumulan más deuda. El resultado no dice nada de Madrid, Barcelona o Jaén.</li>
+    <li><b>Lista más votada no siempre es alcalde.</b> Los pactos pueden dar la alcaldía al segundo.</li>
+    <li><b>Deuda no es todo.</b> Un ayuntamiento puede tener poca deuda y facturas sin pagar, o mucha deuda por inversiones útiles. Aquí solo se mide la deuda viva con bancos y otras administraciones.</li>
+    <li><b>Sin 2017.</b> Hacienda no publicó ese año en el mismo formato; no afecta a los periodos medidos.</li></ul>`);
+  methods(B,[["En pocas palabras","Se compara la deuda de los ayuntamientos según quién ganó por poco las municipales de 2019 y 2023, PP o PSOE, para separar el efecto del partido del de dónde gobierna."],["Datos","Ministerio de Hacienda: deuda viva de cada ayuntamiento a 31 de diciembre (2015–2025, sin 2017); Ministerio del Interior: municipales de 2019 y 2023; INE: padrón."],["Diseño","Regresión discontinua en el margen PSOE − PP entre las dos listas más votadas: recta a cada lado del empate con núcleo triangular y ventana de ±10 puntos; intervalos por remuestreo (200 veces)."],["Recortes","Cambios de la deuda por habitante recortados a ±1.500 €; niveles, a 0–3.000 €."],["Comprobaciones","Deuda anterior a la elección (2019 y cambio 2015–2019), ventanas de 5 a 20 puntos y cortes falsos en ±4 y ±6 puntos."]]);
+  AB.fill({ctx:"La deuda es una de las pocas cosas que controla un alcalde; la de los ayuntamientos bajó de 29.000 a 16.000 millones entre 2015 y 2025.",intT:"Qué se compara",int:"Ganar por poco las municipales de 2019 o 2023, PP frente a PSOE.",ana:"Comparación directa y regresión discontinua en las elecciones ajustadas, con comprobaciones de equilibrio, ventanas y cortes falsos.",res:`Salto en el empate en el cambio de la deuda por habitante 2019–2023: ${e0.j?E(e0.j.j):"—"}${e0.ci?` [${Ep(e0.ci[0])}; ${Ep(e0.ci[1])}]`:""}.`,con:sig.length?"Alguna diferencia según quién ganó; leer con las comprobaciones.":"Quién gana por poco no cambia la deuda municipal; las diferencias de conjunto vienen de dónde gobierna cada partido."});
+}
+
+// ---------- precio de los alimentos frente a sueldos y resto de precios (data/alimentos.json) ----------
+async function studyAlimentos(B){
+  await loadRegional(); const AB=abstract(B), A=await getJSON("/data/alimentos.json"), P=A.meses, I=A.ipc, S=A.salario, SP=S.periodos;
+  const yav=(v,per,y)=>{ const x=v?per.map((p,i)=>p.startsWith(String(y))?v[i]:null).filter(z=>z!=null):[]; return x.length?d3.mean(x):null; };
+  const lastY=+P[P.length-1].slice(0,4), Y=d3.range(2008,lastY+1), B0=2019, LY=lastY-1;   // último año completo
+  const ix=(v,per,b=B0)=>{ const z=yav(v,per,b); return Y.map(y=>{ const q=yav(v,per,y); return q!=null&&z?q/z*100:null; }); };
+  const iF=ix(I.es.alimentos,P), iG=ix(I.es.general,P), iW=ix(S.es,SP);
+  const at=(a,y)=>a[Y.indexOf(y)], gF=at(iF,LY)-100, gG=at(iG,LY)-100, gW=at(iW,LY)-100, buy=(at(iW,LY)/at(iF,LY)-1)*100;
+  const l08=(v,per)=>(yav(v,per,LY)/yav(v,per,2008)-1)*100, gF08=l08(I.es.alimentos,P), gG08=l08(I.es.general,P), gW08=l08(S.es,SP);
+  // relativo: alimentos / IPC general, mensual desde 2002 (2002 = 100)
+  const rel=P.map((p,i)=>I.es.alimentos[i]&&I.es.general[i]?I.es.alimentos[i]/I.es.general[i]:null), r0=d3.mean(rel.slice(0,12)), relI=rel.map(v=>v==null?null:v/r0*100);
+  const relY=d3.range(2002,lastY+1), relA=relY.map(y=>yav(relI,P,y)), relLast=relA[relA.length-1];
+  // comunidades
+  const CC=Object.entries(I.ccaa).filter(([c])=>S.ccaa[c]&&!["18","19"].includes(c)).map(([c,o])=>{ const f=yav(o.alimentos,P,LY)/yav(o.alimentos,P,B0), w=yav(S.ccaa[c],SP,LY)/yav(S.ccaa[c],SP,B0); return {c,n:(REG&&REG.ccaa[c])||c,f:(f-1)*100,w:(w-1)*100,b:(w/f-1)*100}; }).sort((a,b)=>a.b-b.b);
+  const f1=v=>nf1.format(v), f0=v=>nf0.format(v), sg=v=>sgn(v);
+  const SUB=A.subclases;
+
+  sec(B,"ctx",`<p>Pocas cosas se notan tanto en el bolsillo como el ticket del supermercado. Entre 2021 y 2023 la comida se encareció a un ritmo que no se veía desde los años noventa: la guerra de Ucrania, la sequía, el precio de la energía y de los fertilizantes. Luego la inflación general se moderó, pero los precios no vuelven atrás: lo que subió, subido está.</p>
+    <p>La pregunta que importa en casa no es cuánto suben los precios, sino <b>si los sueldos han subido lo mismo</b>. Es lo que se llama inflación «real»: cuánta comida se puede comprar hoy con un sueldo, comparado con antes.</p>`);
+  sec(B,"int",`<p>No hay una medida concreta: es un análisis descriptivo de cómo han evolucionado los precios de los alimentos frente al resto de precios y frente a los salarios desde 2002, en España y por comunidades.</p>`,{title:"Qué se mira"});
+  sec(B,"ana",`<p>Para los precios, el IPC del INE: el índice general y el de alimentos y bebidas no alcohólicas, mes a mes desde 2002, en España y en cada comunidad. Para los sueldos, el coste salarial total por trabajador y mes de la Encuesta Trimestral de Coste Laboral (lo que cobra en bruto, de media, un asalariado). Se comparan medias anuales; ${lastY} va hasta ${MES[+P[P.length-1].slice(5)]} y no se usa en las comparaciones de año completo. El año de referencia es ${B0}, el último antes de la pandemia: en 2020 los ERTE bajaron el salario medio de forma artificial.</p>`);
+
+  const s1=res(B,`Desde ${B0}, la comida ha subido un ${f0(gF)}${NB}% y los sueldos un ${f0(gW)}${NB}%`,`<p>Índice, media de ${B0} = 100.</p>`);
+  const yy=Y.filter(y=>y>=2015&&y<=lastY);
+  lineChart(s1,{title:`Alimentos, todos los precios y sueldos (${B0} = 100)`,sub:`España, medias anuales${lastY>LY?`; ${lastY}, hasta ${MES[+P[P.length-1].slice(5)]}`:""}`,source:"Fuente: INE, IPC y Encuesta Trimestral de Coste Laboral. Cálculo de Indicio.",series:[{n:"Alimentos",v:yy.map(y=>at(iF,y)),c:"--rust",main:true},{n:"Todos los precios (IPC)",v:yy.map(y=>at(iG,y)),c:"--stone"},{n:"Sueldo medio",v:yy.map(y=>at(iW,y)),c:"--slate"}],years:yy,fmt:v=>f1(v),xticks:[2015,B0,LY]});
+  lect(s1,`<p>Hasta 2021 las tres líneas iban casi juntas. Entre 2021 y 2023 la comida se despega: en dos años sube más que en los quince anteriores. Los sueldos suben también, más que antes, pero al ritmo del resto de precios, no al de la comida. En ${LY} los alimentos cuestan un ${f0(gF)}${NB}% más que en ${B0}; todos los precios juntos, un ${f0(gG)}${NB}%; el sueldo medio ha subido un ${f0(gW)}${NB}%.</p>
+    <p>Dicho de otra forma: <b>con el sueldo medio de ${LY} se compra un ${f0(Math.abs(buy))}${NB}% ${buy<0?"menos":"más"} de comida que con el de ${B0}</b>. Para el conjunto de la cesta (vivienda, transporte, ropa…), el sueldo medio ha subido más o menos lo mismo que los precios; para la comida, no.</p>`);
+
+  const s2=res(B,`La comida es hoy un ${f0(relLast-100)}${NB}% más cara respecto al resto de cosas que en 2002`,`<p>Precio de los alimentos dividido por el IPC general, 2002 = 100. Si sube, la comida se encarece más que el resto; si baja, menos.</p>`);
+  lineChart(s2,{title:"Precio relativo de los alimentos (2002 = 100)",sub:"Alimentos y bebidas no alcohólicas / IPC general, medias anuales",source:"Fuente: INE, IPC. Cálculo de Indicio.",series:[{n:"Precio relativo",v:relA,c:"--rust",main:true}],years:relY,fmt:v=>f1(v),xticks:[2002,2012,2021,lastY]});
+  lect(s2,`<p>Durante casi veinte años la comida se encareció algo más que el resto de cosas, pero muy poco a poco. El salto de 2022 y 2023 cambia de escala, y no se ha deshecho: aunque desde 2024 los alimentos suben menos, siguen arriba. Para los hogares que gastan una parte grande de su presupuesto en comer, que suelen ser los de menos renta, la inflación real ha sido mayor que la del IPC.</p>
+    <p>A más largo plazo, desde 2008: alimentos ${sg(gF08)}, todos los precios ${sg(gG08)}, sueldo medio ${sg(gW08)}.</p>`);
+
+  const s3=res(B,`En ninguna comunidad los sueldos han seguido a la comida`,`<p>Cambio entre ${B0} y ${LY} del precio de los alimentos y del sueldo medio en cada comunidad, y cuánta más (o menos) comida se compra con el sueldo.</p>`);
+  hbars(s3,CC.map(x=>({l:x.n,v:x.b})),{fmt:v=>sg(v),ref:buy,refLabel:"España"});
+  table(s3,["Comunidad","Alimentos","Sueldo medio","Comida que compra el sueldo"],CC.map(x=>[x.n,sg(x.f),sg(x.w),sg(x.b)]),{max:700});
+  lect(s3,`<p>${CC.filter(x=>x.b>=0).length?`Solo en ${listY(CC.filter(x=>x.b>=0).map(x=>x.n))} el sueldo medio ha subido al menos como la comida.`:"En todas las comunidades la comida ha subido más que el sueldo medio."} Donde peor ha ido, ${listY(CC.slice(0,2).map(x=>x.n))}, con el sueldo de ${LY} se compra en torno a un ${f0(Math.abs(CC[0].b))}${NB}% menos de comida que en ${B0}. Las diferencias vienen más de los sueldos que de los precios: la comida sube parecido en todas partes; los sueldos, no.</p>`);
+
+  if(SUB&&SUB.s&&Object.keys(SUB.s).length){
+    const sp=SUB.periodos, rows=Object.entries(SUB.s).map(([n,v])=>{ const a=yav(v,sp,B0), b=yav(v,sp,LY); return a&&b?{n:n.replace(/^[\d.]+\s*/,""),g:(b/a-1)*100}:null; }).filter(Boolean).sort((a,b)=>b.g-a.g);
+    const s4=res(B,`Lo que más ha subido: ${listY(rows.slice(0,3).map(r=>low(r.n)))}`,`<p>Subida de precio de cada tipo de alimento entre ${B0} y ${LY} (IPC por subclases).</p>`);
+    hbars(s4,rows.map(r=>({l:r.n,v:r.g})),{fmt:v=>sg(v),ref:gF,refLabel:"Alimentos",scroll:true});
+    lect(s4,`<p>La media esconde mucha variedad. ${listY(rows.slice(0,3).map(r=>`${low(r.n)} (${sg(r.g)})`))} encabezan la lista; en el otro extremo, ${listY(rows.slice(-3).map(r=>`${low(r.n)} (${sg(r.g)})`))}. Detrás de los primeros hay causas concretas: la sequía en el aceite de oliva, la gripe aviar en los huevos, la energía en los productos más elaborados.</p>`);
+  }
+
+  sec(B,"con",`<p><b>La comida es hoy bastante más cara en proporción al sueldo que antes de la pandemia.</b> Entre ${B0} y ${LY} los alimentos subieron un ${f0(gF)}${NB}% y el sueldo medio un ${f0(gW)}${NB}%: con el mismo sueldo se compra un ${f0(Math.abs(buy))}${NB}% ${buy<0?"menos":"más"} de comida. Para el resto de la cesta, en cambio, los sueldos han seguido a los precios.</p>
+    <p>Esto ayuda a entender por qué tanta gente dice que «todo está más caro» aunque el IPC ya no suba tanto: el IPC mide cuánto suben los precios cada año, no dónde se quedan; y la comida, que se compra cada semana, es lo que más se nota.</p>
+    <ul class="defs"><li><b>Sueldo medio no es tu sueldo.</b> Es una media de todos los asalariados; los sueldos bajos han subido más (el salario mínimo pasó de 900 euros en 2019 a 1.184 en 2025, un +32 %), y los altos, menos. Tampoco incluye a autónomos ni pensionistas.</li>
+    <li><b>Bruto.</b> El coste salarial es antes de impuestos y cotizaciones; el sueldo neto ha podido subir algo distinto.</li>
+    <li><b>La cesta media.</b> El IPC de alimentos pesa cada producto según lo que gasta el hogar medio; tu cesta puede ser distinta.</li></ul>`);
+  methods(B,[["En pocas palabras","Se compara cuánto han subido los precios de los alimentos, el resto de precios y el sueldo medio desde 2019 y desde 2008, en España y por comunidades."],["Datos","INE: IPC por comunidades, índice general y de alimentos y bebidas no alcohólicas, mensual desde 2002 (tabla 76136)"+(SUB?", e IPC nacional por subclases (tabla 76128)":"")+"; Encuesta Trimestral de Coste Laboral, coste salarial total por trabajador y mes (tabla 6061)."],["Medias anuales","Media de los meses (precios) o de los trimestres (sueldos) de cada año. El último año incompleto solo se usa en el primer gráfico."],["Comida que compra el sueldo","Índice del sueldo medio dividido por el índice de precios de los alimentos, menos uno."],["Precio relativo","Índice de alimentos dividido por el índice general, con 2002 = 100."]]);
+  AB.fill({ctx:"Entre 2021 y 2023 la comida se encareció como no se veía desde los años noventa.",intT:"Qué se mira",int:"Precios de los alimentos frente al resto de precios y al sueldo medio, 2002–2026.",ana:"IPC del INE (general y alimentos, por comunidades) y coste salarial por trabajador (ETCL), medias anuales.",res:`${B0}–${LY}: alimentos ${sg(gF)}, IPC ${sg(gG)}, sueldo medio ${sg(gW)}; con el sueldo se compra un ${f0(Math.abs(buy))} % ${buy<0?"menos":"más"} de comida.`,con:"Los sueldos han seguido al conjunto de precios, pero no a la comida."});
+}
+
+// ---------- vivienda protegida: de 1 de cada 10 viviendas nuevas a casi ninguna ----------
+async function studyVPO(B){
+  const AB=abstract(B); await loadRegional();
+  const D=REG.data, es=D.es.ES, Y=d3.range(1996,2026), ys=Y.map(String);
+  const prot=ys.map(y=>es.viv_protegidas[y]??null), lib=ys.map(y=>es.viv_iniciadas[y]!=null?es.viv_iniciadas[y]*10:null);
+  const share=ys.map((y,i)=>prot[i]!=null&&lib[i]!=null?prot[i]/(prot[i]+lib[i])*100:null);
+  const avg=(o,y0,y1)=>{ const v=d3.range(y0,y1+1).map(y=>o&&o[y]).filter(x=>x!=null); return v.length?d3.mean(v):null; };
+  const pBoom=avg(es.viv_protegidas,2005,2008), pNow=avg(es.viv_protegidas,2021,2025), lBoom=avg(es.viv_iniciadas,2005,2008)*10, lNow=avg(es.viv_iniciadas,2021,2025)*10;
+  const pad=REFS.es.pad, PY=REFS.padYears, pop=y=>pad[PY.indexOf(y)];
+  const nBoom=pBoom*pop(2007)/1e4, nNow=pNow*pop(2024)/1e4;
+  const i12=Y.indexOf(2012), i13=Y.indexOf(2013), iMx=d3.maxIndex(share), sh10=share[iMx], yMx=Y[iMx], sh25=d3.mean(d3.range(2021,2026).map(y=>share[Y.indexOf(y)]));
+  const CC=Object.entries(REG.ccaa).filter(([c])=>!["18","19"].includes(c)).map(([c,n])=>{ const o=(D.ccaa[c]||{}).viv_protegidas; return {c,n,a:avg(o,2005,2008),b:avg(o,2021,2025)}; }).filter(x=>x.a!=null&&x.b!=null).sort((a,b)=>b.b-a.b);
+  const top=CC.slice(0,3), low=CC.filter(x=>x.b<0.5);
+  const cp=(D.es.ES.comp_protegida)||{}, cY=d3.range(2004,2026);
+  const f1=v=>nf1.format(v), f0=v=>nf0.format(v);
+
+  sec(B,"ctx",`<p>Durante décadas, la vivienda protegida fue una de las vías principales para comprar casa en España: pisos con precio máximo, para hogares por debajo de un límite de renta, construidos por promotores públicos o privados con ayudas. En plena burbuja, entre 2005 y 2008, se terminaban unas <b>${f0(Math.round(nBoom/1000)*1000)}</b> al año.</p>
+    <p>Hoy, cuando el acceso a la vivienda es la primera preocupación en muchas encuestas, la vivienda protegida vuelve a estar en todos los programas. Antes de discutir cuánta hace falta conviene saber cuánta se hace: <b>¿qué pasó con la vivienda protegida?</b></p>`);
+  sec(B,"int",`<p>La crisis de 2008 hundió la construcción. La libre cayó primero; la protegida aguantó unos años, porque se terminaban promociones ya empezadas y los planes de vivienda seguían en marcha. A partir de 2012 llegaron los recortes: el Plan Estatal 2013–2016 eliminó las ayudas a la promoción de vivienda protegida en propiedad y se centró en el alquiler y la rehabilitación. Desde entonces, cada comunidad ha seguido su camino.</p>`,{title:"Qué cambió"});
+  sec(B,"ana",`<p>Se cuentan las viviendas protegidas que reciben cada año la <b>calificación definitiva</b> (el sello que se da al terminarlas), de planes estatales y autonómicos, según el Ministerio de Vivienda, y se comparan con las <b>viviendas libres que se empiezan</b> cada año (visados de dirección de obra). Para comparar territorios de distinto tamaño, todo va por habitante con el padrón. Es un análisis descriptivo: cuenta qué ha pasado, no por qué.</p>`);
+
+  const s1=res(B,`La vivienda protegida pasó de ${f1(pBoom)} a ${f1(pNow)} por cada 10.000 habitantes al año`,`<p>Viviendas por cada 10.000 habitantes y año en España. La libre, por las que se empiezan; la protegida, por las que se terminan.</p>`);
+  lineChart(s1,{title:"Viviendas nuevas por cada 10.000 habitantes",sub:"España, 1996–2025",source:"Fuente: Ministerio de Vivienda y padrón. Cálculo de Indicio.",series:[{n:"Libre",v:lib,c:"--slate"},{n:"Protegida",v:prot,c:"--rust",main:true}],years:Y,fmt:v=>f1(v),xticks:[1996,2008,2013,2025]});
+  lect(s1,`<p>Las dos líneas cuentan dos crisis distintas. La vivienda libre se desplomó entre 2007 y 2009, de casi 150 a menos de 20 viviendas por cada 10.000 habitantes, y desde 2014 se recupera despacio: hoy se empiezan unas ${f0(lNow)}, menos de una quinta parte que en la burbuja. La protegida aguantó hasta 2012 por encima de 11 y luego cayó de golpe en un solo año, de ${f1(prot[i12])} a ${f1(prot[i13])}. No se ha recuperado: en 2021–2025 se terminan unas ${f0(Math.round(nNow/100)*100)} al año en toda España, frente a unas ${f0(Math.round(nBoom/1000)*1000)} en 2005–2008.</p>`);
+
+  const s2=res(B,`De cada 100 viviendas nuevas, la protegida llegó a ser ${f0(sh10)} en ${yMx}; hoy son ${f0(sh25)}`,`<p>Peso de la protegida en la vivienda nueva: protegidas terminadas sobre la suma de protegidas terminadas y libres iniciadas de cada año. Es una aproximación (una cifra cuenta al terminar y la otra al empezar), pero muestra bien el cambio de escala.</p>`);
+  lineChart(s2,{title:"Protegida, % de la vivienda nueva (aproximado)",sub:"España",source:"Fuente: Ministerio de Vivienda. Cálculo de Indicio.",series:[{n:"Protegida",v:share,c:"--rust",main:true}],years:Y,fmt:v=>pc(v),tickFmt:v=>f0(v)+"%",xticks:[1996,2010,2025]});
+  lect(s2,`<p>El pico de 2009–2012 no es un auge de la protegida, sino el hundimiento de la libre: mientras nadie empezaba pisos libres, se seguían terminando protegidos. Desde 2013 el peso vuelve a la escala de antes de la crisis, en torno a uno de cada diez, pero sobre un total mucho más pequeño. Y también se vende menos: las compraventas de vivienda protegida, que incluyen las de segunda mano, han bajado del ${pc(cp["2011"])} de todas las compraventas en 2011 al ${pc(cp["2025"])} en 2025.</p>`);
+
+  const s3=res(B,`Solo ${top.map(x=>x.n).join(", ").replace(/, ([^,]*)$/," y $1")} mantienen algo de vivienda protegida`,`<p>Viviendas protegidas terminadas por cada 10.000 habitantes y año, media de 2021 a 2025, con la media de 2005–2008 al lado.</p>`);
+  hbars(s3,CC.map(x=>({l:x.n,v:x.b})),{fmt:v=>f1(v),ref:pNow,refLabel:"España"});
+  table(s3,["Comunidad","2005–2008","2021–2025","Cambio"],CC.map(x=>[x.n,f1(x.a),f1(x.b),x.a?`−${f0((1-x.b/x.a)*100)}${NB}%`:"—"]),{max:640});
+  lect(s3,`<p>Todas las comunidades hacen hoy mucha menos vivienda protegida que en la burbuja, pero las diferencias son enormes. ${top.map(x=>`${x.n} (${f1(x.b)})`).join(", ").replace(/, ([^,]*)$/," y $1")} siguen terminando varias viviendas protegidas por cada 10.000 habitantes al año; ${low.length} comunidades no llegan a media vivienda: ${low.map(x=>x.n).join(", ").replace(/, ([^,]*)$/," y $1")}. La vivienda protegida depende hoy sobre todo de la política de cada comunidad y de sus ayuntamientos.</p>`);
+
+  sec(B,"con",`<p><b>La vivienda protegida se ha reducido a una sexta parte de lo que era.</b> Se terminan unas ${f0(Math.round(nNow/100)*100)} al año, cuando antes de la crisis eran unas ${f0(Math.round(nBoom/1000)*1000)}, y fuera de un puñado de comunidades apenas se hace. El hundimiento no fue gradual: llegó en 2013, cuando se cortaron las ayudas a la promoción.</p>
+    <p>Para el debate actual, el dato importante es que el parque protegido no se está renovando. En muchas comunidades las viviendas protegidas pierden la protección pasados unos años (en algunas, como el País Vasco, es permanente), así que con tan pocas nuevas el número de pisos con precio limitado va menguando aunque nadie lo decida.</p>
+    <ul class="defs"><li><b>No cuenta todo el alquiler social.</b> Las viviendas públicas de alquiler que no pasan por la calificación de los planes, o la compra de viviendas por los ayuntamientos, pueden no aparecer aquí.</li>
+    <li><b>Dos momentos distintos.</b> La protegida se cuenta al terminar y la libre al empezar; el peso de la protegida es aproximado.</li>
+    <li><b>Es descriptivo.</b> Que la protegida cayera con los recortes de 2012–2013 encaja con el calendario, pero aquí no se separa del resto de la crisis de la construcción.</li></ul>`);
+  methods(B,[["En pocas palabras","Se cuentan las viviendas protegidas terminadas y las libres iniciadas cada año, por habitante, en España y en cada comunidad, de 1996 a 2025."],["Datos","Ministerio de Vivienda y Agenda Urbana: calificaciones definitivas de vivienda protegida, planes estatales y autonómicos (Tabla 1.6), viviendas libres iniciadas (Tabla 3.1) y transacciones inmobiliarias de vivienda (notarios); INE, padrón municipal a 1 de enero."],["Por habitante","Viviendas del año entre la población a 1 de enero del mismo año, por 10.000 habitantes. Las comunidades suman sus provincias."],["Peso en la vivienda nueva","Protegidas terminadas / (protegidas terminadas + libres iniciadas), cada año."],["Comunidades","Media de los años 2005–2008 y 2021–2025; sin Ceuta ni Melilla."]]);
+  AB.fill({ctx:"La vivienda protegida, con precio máximo y para hogares con rentas limitadas, fue durante décadas una vía principal para comprar casa.",intT:"Qué cambió",int:"La crisis de 2008 hundió la construcción y en 2013 se cortaron las ayudas estatales a la promoción de vivienda protegida en propiedad.",ana:"Viviendas protegidas terminadas y libres iniciadas por habitante, España y comunidades, 1996–2025 (Ministerio de Vivienda).",res:`De ${f1(pBoom)} a ${f1(pNow)} protegidas por cada 10.000 habitantes al año (2005–2008 frente a 2021–2025); caída en seco en 2013; solo ${top.map(x=>x.n).join(", ").replace(/, ([^,]*)$/," y $1")} mantienen algo.`,con:"El parque protegido no se renueva: con tan pocas viviendas nuevas, el número de pisos con precio limitado mengua solo."});
 }
 
 async function studyAve(B){

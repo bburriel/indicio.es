@@ -192,3 +192,56 @@ ILLUS["iva-alimentos"]=svg("iva-alimentos","Una cesta de la compra con pan, lech
     G("translate(60 186)",C(0,0,26,"sb",` fill="none" stroke-width="5"`)+P("M-10 10 L10 -10","sb",` fill="none" stroke-width="5" stroke-linecap="round"`)+C(-8,-8,4,"k1")+C(8,8,4,"k1")))+
   C(140,80,28,"k3")+tree(220,300,1.3)+tree(1120,300,1));
 FOCUS["iva-alimentos"]=330;
+
+ILLUS["vivienda-protegida"]=svg("vivienda-protegida","Un bloque de vivienda protegida con un escudo, una grúa parada y edificios altos al fondo",
+  hills(250,"k8",24,1.3)+R(0,300,1200,60,"k9")+
+  [[760,230,"k4"],[840,280,"k2"],[930,210,"k1"],[1010,260,"k4"],[1090,190,"k2"]].map(([x,h,c],i)=>bldg(x,300,70,h,c,"k7",2,[i*2%5])).join("")+
+  G("translate(560 0)",R(0,70,10,230,"k2")+R(-120,70,250,10,"k2")+R(110,80,8,14,"ki")+L(-90,80,-90,170,"sk",` stroke-width="2"`)+R(-102,170,24,16,"k3")+
+    P("M-120 70 L5 40 L130 70","sk",` fill="none" stroke-width="2"`)+R(-10,290,30,10,"ki"))+
+  bldg(190,300,190,150,"kc","k7",4,[2,5],"k3")+R(190,140,190,10,"k1")+
+  G("translate(285 182)",P("M0 -26 L22 -18 L22 2 C22 16 10 24 0 28 C-10 24 -22 16 -22 2 L-22 -18 Z","kr")+P("M-9 1 L-2 9 L11 -8","sc",` fill="none" stroke-width="4" stroke-linecap="round"`))+
+  tree(110,300,1.2)+tree(430,300,0.9)+person(470,300,"k5",1)+C(140,70,26,"k3"));
+FOCUS["vivienda-protegida"]=240;
+
+ILLUS["reforma-laboral"]=svg("reforma-laboral","Trabajadores ante un tablón de contratos, con un sello de indefinido",
+  hills(262,"k8",20,0.4)+R(0,300,1200,60,"k9")+
+  G("translate(470 70)",R(0,0,260,170,"kc")+R(0,0,260,170,"sk",` fill="none" stroke-width="3"`)+R(-8,170,276,10,"k2")+R(20,180,10,50,"ki")+R(230,180,10,50,"ki")+
+    [[20,20,"k7"],[95,20,"k7"],[170,20,"k3"],[20,95,"k7"],[95,95,"k3"],[170,95,"k3"]].map(([x,y,c])=>R(x,y,66,58,c)+R(x+8,y+12,48,5,"ki")+R(x+8,y+24,36,5,"ki")+R(x+8,y+36,42,5,"ki")).join("")+
+    G("translate(200 150) rotate(-12)",C(0,0,30,"sr",` fill="none" stroke-width="5"`)+P("M-13 1 L-3 11 L14 -9","sr",` fill="none" stroke-width="5" stroke-linecap="round"`)))+
+  person(380,300,"k1",1.3)+person(820,300,"k5",1.2)+person(880,300,"k2",1.1)+
+  bldg(990,300,90,170,"k4","k7",2,[1,4])+bldg(1090,300,80,120,"k1","k7",2,[2])+tree(160,300,1.2)+tree(260,300,0.9)+C(120,70,26,"k3"));
+FOCUS["reforma-laboral"]=300;
+
+ILLUS["smi-empleo-hogar"]=svg("smi-empleo-hogar","Una casa con una persona limpiando la ventana y una nómina con el salario mínimo",
+  hills(255,"k8",22,2.1)+R(0,300,1200,60,"k9")+
+  house(380,300,320,180,"kc","k2","k1")+R(420,160,80,64,"k7")+R(590,160,80,64,"k3")+L(460,160,460,224,"sk",` stroke-width="3"`)+L(630,160,630,224,"sk",` stroke-width="3"`)+
+  person(560,300,"k5",1.4)+R(574,232,6,40,"ki")+R(566,224,24,10,"k7")+
+  G("translate(820 90) rotate(5)",R(0,0,170,200,"kc")+R(0,0,170,36,"k1")+[56,78,100,122].map((y,i)=>R(16,y,[110,80,120,70][i],8,"kr")).join("")+R(16,150,60,20,"k3")+P("M100 165 l12 -14 l12 14","sc",` fill="none" stroke-width="4"`))+
+  tree(180,300,1.3)+tree(1120,300,1)+C(150,70,26,"k3"));
+FOCUS["smi-empleo-hogar"]=330;
+
+ILLUS["tope-compraventas"]=svg("tope-compraventas","Edificios con un cartel de se vende y una llave junto a una flecha de alquiler limitada",
+  hills(250,"k8",24,0.9)+R(0,300,1200,60,"k9")+
+  bldg(300,300,120,210,"k2","k7",3,[1,5])+bldg(430,300,100,160,"k4","k7",2,[3])+bldg(540,300,130,230,"k1","k7",3,[2,7],"k3")+
+  G("translate(790 120)",R(0,0,10,180,"ki")+R(-70,10,150,70,"kr")+R(-58,24,126,10,"kc")+R(-58,44,90,10,"kc")+R(-58,62,60,8,"kc"))+
+  G("translate(920 120)",P("M0 120 L70 50 L120 90 L200 10","sb",` fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"`)+R(-10,0,230,12,"kr")+P("M190 10 l20 -2 l-6 20","sb",` fill="none" stroke-width="6"`))+
+  tree(160,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
+FOCUS["tope-compraventas"]=300;
+
+ILLUS["deuda-quien-gobierna"]=svg("deuda-quien-gobierna","Un ayuntamiento con dos banderas y unas monedas apiladas",
+  hills(258,"k8",20,1.7)+R(0,300,1200,60,"k9")+
+  G("translate(470 0)",R(0,150,260,150,"kc")+P("M-14 150 L130 92 L274 150 Z","k2")+R(110,60,40,60,"kc")+C(130,82,13,"k7")+L(130,82,130,74,"sk",` stroke-width="2"`)+L(130,82,137,86,"sk",` stroke-width="2"`)+
+    [24,84,150,210].map(x=>R(x,180,30,46,"k7")).join("")+R(108,240,44,60,"k1")+R(-10,296,280,8,"ki")+
+    L(40,150,40,40,"ki",` stroke-width="4"`)+P("M40 42 L96 52 L40 66 Z","k4")+L(220,150,220,40,"ki",` stroke-width="4"`)+P("M220 42 L276 52 L220 66 Z","k1"))+
+  stack(330,300,6,30,"k3","k8")+stack(390,300,3,30,"k3","k8")+stack(860,300,4,30,"k3","k8")+stack(920,300,8,30,"k3","k8")+
+  tree(170,300,1.2)+tree(1080,300,1.1)+C(140,70,26,"k3"));
+FOCUS["deuda-quien-gobierna"]=300;
+
+ILLUS["precio-alimentos"]=svg("precio-alimentos","Un carro de la compra con alimentos junto a una balanza con monedas",
+  hills(255,"k8",22,0.2)+R(0,300,1200,60,"k9")+
+  G("translate(330 120)",P("M0 30 L40 30 L70 140 L240 140 L270 50 L55 50","sk",` fill="none" stroke-width="7" stroke-linejoin="round"`)+C(95,168,14,"ki")+C(220,168,14,"ki")+
+    R(80,10,50,60,"k7")+R(80,10,50,16,"k1")+E(170,40,40,24,"k3")+C(220,30,20,"k2")+C(245,44,16,"k5")+R(140,-20,18,70,"k4",` rx="4"`))+
+  G("translate(820 80)",R(96,0,8,200,"ki")+R(40,196,120,10,"ki")+L(10,40,190,20,"sk",` stroke-width="5"`)+
+    P("M-20 40 L40 40 L30 80 L-10 80 Z","k7")+stack(10,72,2,22,"k3","k8")+P("M160 20 L220 20 L210 60 L170 60 Z","k7")+E(190,46,24,12,"k2")+C(180,36,10,"k5"))+
+  tree(170,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
+FOCUS["precio-alimentos"]=300;
