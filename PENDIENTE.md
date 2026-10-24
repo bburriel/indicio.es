@@ -40,16 +40,16 @@ Desde el entorno en la nube no se puede descargar directamente de INE ni de Euro
 
 ### Propuestos con los datos de octubre de 2026 (para hacer más adelante)
 
-1. **Reforma laboral de 2022 y temporalidad.** Contratos iniciales indefinidos y temporales por municipio y mes (SEPE, 2019–2026). Diseño: diferencias en diferencias según el peso de la temporalidad (o de la hostelería y el campo) antes de la reforma. Ojo: el SEPE no separa los fijos discontinuos.
-2. **Salario mínimo de 2019 y empleo de hogar.** Afiliados al régimen de empleados de hogar por municipio (Seguridad Social, 2011–2025) antes y después de la subida del 22 %; exposición por provincia según el salario medio o el % de trabajadores cerca del SMI (INE, tabla 28182, solo España). También agrario y hostelería.
+1. ✅ (hecho: «¿Costó empleo la reforma laboral?») **Reforma laboral de 2022 y temporalidad.** Contratos iniciales indefinidos y temporales por municipio y mes (SEPE, 2019–2026). Diseño: diferencias en diferencias según el peso de la temporalidad (o de la hostelería y el campo) antes de la reforma. Ojo: el SEPE no separa los fijos discontinuos.
+2. ✅ (hecho: «¿Hundió la subida del salario mínimo el empleo de hogar?») **Salario mínimo de 2019 y empleo de hogar.** Afiliados al régimen de empleados de hogar por municipio (Seguridad Social, 2011–2025) antes y después de la subida del 22 %; exposición por provincia según el salario medio o el % de trabajadores cerca del SMI (INE, tabla 28182, solo España). También agrario y hostelería.
 3. **Compras de extranjeros y precio de la vivienda.** % de compraventas por extranjeros por provincia (Ministerio de Vivienda, 2007–2025) frente a la subida del valor tasado y del IPV; municipal con las compraventas y el valor tasado (municipios de más de 25.000 habitantes).
 4. **Deuda de los ayuntamientos desde 2015.** Quién la redujo y quién no (regla de gasto), por tamaño, renta y provincia; casos extremos (Jaén, Los Barrios, Vallada).
-5. **El hundimiento de la vivienda protegida.** Calificaciones definitivas por provincia desde 1991 frente a la población y los precios.
+5. ✅ (hecho) **El hundimiento de la vivienda protegida.** Calificaciones definitivas por provincia desde 1991 frente a la población y los precios.
 6. **¿Se construye donde llega gente?** Viviendas libres iniciadas por provincia (1991–2025) frente al saldo migratorio y el crecimiento del padrón.
 7. **Quién se recuperó de la crisis de 2008.** Paro registrado por municipio 2007–2025 (SEPE) y estructura sectorial de 2011 (Seguridad Social).
 8. **Pandemia y turismo, con empleo.** Afiliados en hostelería por municipio, diciembre de 2019 frente a 2020 y 2021 (mejor que el paro registrado).
 9. **España en Europa.** Convergencia del PIB por habitante en paridad de poder de compra, paro estructural y abandono escolar de las regiones españolas frente a las europeas (Eurostat, 2010–2024).
-10. **Zonas tensionadas y compraventas.** ¿Cambió la compraventa de vivienda en los municipios con tope al alquiler? (Ministerio de Vivienda, trimestral por municipio).
+10. ✅ (hecho: «¿Se vendieron más pisos al llegar el tope del alquiler?») **Zonas tensionadas y compraventas.** ¿Cambió la compraventa de vivienda en los municipios con tope al alquiler? (Ministerio de Vivienda, trimestral por municipio).
 11. **Teletrabajo y migración interior tras la pandemia** (por comunidad, EPA y saldo migratorio).
 
 ### Apuntados antes

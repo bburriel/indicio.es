@@ -58,3 +58,5 @@ Todo se puede repetir con `bash scripts/datos/todo.sh limpiar` (sin volver a des
 | `series_otras.py` | las series limpias | series por municipio en `data/prov/*.json` (afil, contr, contrT, paroL, comp, vtas, deuda) y totales de provincia y España en `data/refs.json` (`otras`) | |
 
 `regional.py` conserva las variables de la versión anterior de `data/regional.json` que no puede recalcular (por ejemplo, en la tarea mensual de GitHub, que solo tiene el INE).
+
+`causales.py` prepara `data/causales.json` para los análisis de la reforma laboral, del salario mínimo y el empleo de hogar y de las compraventas con el tope del alquiler (necesita además `mivau_trim.py`, compraventas por municipio y trimestre).

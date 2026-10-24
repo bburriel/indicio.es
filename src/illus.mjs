@@ -202,3 +202,28 @@ ILLUS["vivienda-protegida"]=svg("vivienda-protegida","Un bloque de vivienda prot
   G("translate(285 182)",P("M0 -26 L22 -18 L22 2 C22 16 10 24 0 28 C-10 24 -22 16 -22 2 L-22 -18 Z","kr")+P("M-9 1 L-2 9 L11 -8","sc",` fill="none" stroke-width="4" stroke-linecap="round"`))+
   tree(110,300,1.2)+tree(430,300,0.9)+person(470,300,"k5",1)+C(140,70,26,"k3"));
 FOCUS["vivienda-protegida"]=240;
+
+ILLUS["reforma-laboral"]=svg("reforma-laboral","Trabajadores ante un tablón de contratos, con un sello de indefinido",
+  hills(262,"k8",20,0.4)+R(0,300,1200,60,"k9")+
+  G("translate(470 70)",R(0,0,260,170,"kc")+R(0,0,260,170,"sk",` fill="none" stroke-width="3"`)+R(-8,170,276,10,"k2")+R(20,180,10,50,"ki")+R(230,180,10,50,"ki")+
+    [[20,20,"k7"],[95,20,"k7"],[170,20,"k3"],[20,95,"k7"],[95,95,"k3"],[170,95,"k3"]].map(([x,y,c])=>R(x,y,66,58,c)+R(x+8,y+12,48,5,"ki")+R(x+8,y+24,36,5,"ki")+R(x+8,y+36,42,5,"ki")).join("")+
+    G("translate(200 150) rotate(-12)",C(0,0,30,"sr",` fill="none" stroke-width="5"`)+P("M-13 1 L-3 11 L14 -9","sr",` fill="none" stroke-width="5" stroke-linecap="round"`)))+
+  person(380,300,"k1",1.3)+person(820,300,"k5",1.2)+person(880,300,"k2",1.1)+
+  bldg(990,300,90,170,"k4","k7",2,[1,4])+bldg(1090,300,80,120,"k1","k7",2,[2])+tree(160,300,1.2)+tree(260,300,0.9)+C(120,70,26,"k3"));
+FOCUS["reforma-laboral"]=300;
+
+ILLUS["smi-empleo-hogar"]=svg("smi-empleo-hogar","Una casa con una persona limpiando la ventana y una nómina con el salario mínimo",
+  hills(255,"k8",22,2.1)+R(0,300,1200,60,"k9")+
+  house(380,300,320,180,"kc","k2","k1")+R(420,160,80,64,"k7")+R(590,160,80,64,"k3")+L(460,160,460,224,"sk",` stroke-width="3"`)+L(630,160,630,224,"sk",` stroke-width="3"`)+
+  person(560,300,"k5",1.4)+R(574,232,6,40,"ki")+R(566,224,24,10,"k7")+
+  G("translate(820 90) rotate(5)",R(0,0,170,200,"kc")+R(0,0,170,36,"k1")+[56,78,100,122].map((y,i)=>R(16,y,[110,80,120,70][i],8,"kr")).join("")+R(16,150,60,20,"k3")+P("M100 165 l12 -14 l12 14","sc",` fill="none" stroke-width="4"`))+
+  tree(180,300,1.3)+tree(1120,300,1)+C(150,70,26,"k3"));
+FOCUS["smi-empleo-hogar"]=330;
+
+ILLUS["tope-compraventas"]=svg("tope-compraventas","Edificios con un cartel de se vende y una llave junto a una flecha de alquiler limitada",
+  hills(250,"k8",24,0.9)+R(0,300,1200,60,"k9")+
+  bldg(300,300,120,210,"k2","k7",3,[1,5])+bldg(430,300,100,160,"k4","k7",2,[3])+bldg(540,300,130,230,"k1","k7",3,[2,7],"k3")+
+  G("translate(790 120)",R(0,0,10,180,"ki")+R(-70,10,150,70,"kr")+R(-58,24,126,10,"kc")+R(-58,44,90,10,"kc")+R(-58,62,60,8,"kc"))+
+  G("translate(920 120)",P("M0 120 L70 50 L120 90 L200 10","sb",` fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"`)+R(-10,0,230,12,"kr")+P("M190 10 l20 -2 l-6 20","sb",` fill="none" stroke-width="6"`))+
+  tree(160,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
+FOCUS["tope-compraventas"]=300;
