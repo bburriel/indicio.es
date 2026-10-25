@@ -139,7 +139,7 @@ for(const route of ["/laboratorio/","/laboratorio/metodo/","/municipio/","/quien
   page({route,title:P.t,desc:P.d,main,robots:route==="/comparar/"?"noindex,follow":""});
   if(route!=="/comparar/") addUrl(route,route==="/laboratorio/"?0.9:0.6);
 }
-for(const v of ["mapa","ranking","cruce","grupos","tabla","distribucion","burbujas","paises"]){
+for(const v of ["mapa","ranking","cruce","grupos","tabla","distribucion","burbujas","paises","matriz","pendientes","piramide","composicion"]){
   const P=PAGES["/laboratorio/"], route="/laboratorio/"+v+"/";
   page({route,title:"Laboratorio · "+v[0].toUpperCase()+v.slice(1)+" · Indicio",desc:P.d,main:`<header class="phead"><h1>Laboratorio</h1><p class="dek">${esc(P.d)}</p></header><p class="loading">Cargando datos…</p>`,robots:"noindex,follow"});
 }

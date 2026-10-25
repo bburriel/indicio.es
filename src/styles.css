@@ -1197,3 +1197,7 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .dp-list .lv-es,.dp-list .lv-pa{background:color-mix(in srgb,#2f6db5 14%,transparent); color:#2f6db5}
 .dp-list button.far b{font-weight:500} .dp-list small u{text-decoration:none; font-style:italic}
 .psb{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0 6px 26px} .psb .sel{width:auto}
+.lbseg{flex-wrap:wrap} .lbseg button{flex:1 1 auto}
+.matpairs{max-width:680px;margin-top:10px} .matpairs h3{font-size:15px;margin:0 0 4px} .matpairs ol{margin:0;padding-left:20px} .matpairs li{margin:3px 0;font-size:14.5px}
+.compleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--ink-2);margin:2px 0 8px} .compleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.lbl{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
