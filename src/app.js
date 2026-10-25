@@ -2163,17 +2163,16 @@ function psBar(bar){
   const yrs=psYears(), yOpt=(sel)=>yrs.map(y=>`<option ${y===sel?"selected":""}>${y}</option>`).join("");
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.paises}.</p></div>
-    <div class="lb-step"><h4><i>2</i>Qué dato</h4><div class="slot full"><span class="nm" style="flex:1"><small>${esMode?"Serie principal":"Dato"}</small><button type="button" class="pick" id="pspick" aria-haspopup="dialog"><span class="pv">${esc(esMode?(cur?cur.l:""):PSIND[PS.k].l)}</span><span class="pg">${esc(esMode?(cur?cur.g.replace(/ \(.*\)$/,""):""):"Países")}</span></button></span></div>
-      <p class="hint">${esc(esMode?(cur?`${cur.l}. Fuente: ${cur.src}.`:""):PSIND[PS.k].d)}</p></div>
-    <div class="lb-step"><h4><i>3</i>${esMode?"Qué más series":"Qué países"}</h4>
-      ${esMode?`${PS.s.slice(1).map(k=>`<div class="slot full"><span class="nm" style="flex:1"><small>Comparar con</small><button type="button" class="pick" data-sw="${k}" aria-haspopup="dialog"><span class="pv">${esc((SE[k]||{}).l||k)}</span><span class="pg">${esc(((SE[k]||{}).g||"").replace(/ \(.*\)$/,""))}</span></button></span><button type="button" data-rs="${k}" aria-label="Quitar">×</button></div>`).join("")}
-        ${PS.s.length<7?`<div class="slot"><span class="nm" style="flex:1"><small>Añadir otra serie (opcional)</small><button type="button" class="pick add" id="psadd" aria-haspopup="dialog"><span class="pv">+ elige una serie</span></button></span></div>`:""}
+    ${esMode?`<div class="lb-step"><h4><i>2</i>Qué series</h4>`:`<div class="lb-step"><h4><i>2</i>Qué dato</h4><div class="slot full"><span class="nm" style="flex:1"><small>Dato</small><button type="button" class="pick" id="pspick" aria-haspopup="dialog"><span class="pv">${esc(PSIND[PS.k].l)}</span><span class="pg">Países</span></button></span></div><p class="hint">${esc(PSIND[PS.k].d)}</p></div>
+    <div class="lb-step"><h4><i>3</i>Qué países</h4>`}
+      ${esMode?`${PS.s.map((k,i)=>`<div class="slot full"><span class="nm" style="flex:1"><small>Serie ${i+1}</small><button type="button" class="pick" ${i===0?'id="pspick"':`data-sw="${k}"`} aria-haspopup="dialog"><span class="pv">${esc((SE[k]||{}).l||k)}</span><span class="pg">${esc(((SE[k]||{}).g||"").replace(/ \(.*\)$/,""))}</span></button></span>${PS.s.length>1?`<button type="button" data-rs="${k}" aria-label="Quitar">×</button>`:""}</div>`).join("")}
+        ${PS.s.length<7?`<div class="slot"><span class="nm" style="flex:1"><small>Añadir una serie</small><button type="button" class="pick add" id="psadd" aria-haspopup="dialog"><span class="pv">+ elige una serie</span></button></span></div>`:""}
         ${cur&&!cur.g.startsWith("Precios")&&!PS.s.includes("ipc_general")?`<button type="button" class="ed-go psq" id="psipc">+ Añadir el IPC general, para comparar</button>`:""}
         ${scoped?`<div style="margin-top:12px"><label class="blk">Dónde</label><div class="seg sm" role="group" aria-label="Ámbito"><button type="button" data-l="es" aria-pressed="${sc.lev==="es"}">España</button>${sc.code?`<button type="button" data-l="prov" aria-pressed="${sc.lev==="prov"}">${esc(provShort(PROVS[sc.P]))}</button><button type="button" data-l="mun" aria-pressed="${sc.lev==="mun"}">${esc(dispName(BYCODE.get(sc.code)[F.name]))}</button>`:""}</div>
           <div class="search" id="ps-s" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="margin:8px 0 0;flex:none;min-width:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="ps-q" type="search" placeholder="${sc.code?"Otro municipio":"Elige un municipio"}" autocomplete="off" aria-label="Elegir municipio"><ul id="ps-r" class="results" role="listbox" hidden></ul></div>
           <p class="hint">Los precios, los sueldos y el gasto público son de toda España.</p></div>`:""}`
         :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
-    <div class="lb-step"><h4><i>4</i>Comprobar</h4>
+    <div class="lb-step"><h4><i>${esMode?3:4}</i>Comprobar</h4>
       <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
       <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
       ${esMode?`<label class="chk"><input type="checkbox" id="psidx" ${PS.idx?"checked":""}> Como índice, con un año de referencia = 100</label>
@@ -2265,10 +2264,7 @@ async function exBurbujas(out){
   const keysA=BSER.map(b=>b[0]).filter(k=>CATK[k]), keysR=CAT.filter(c=>c.reg&&c.np>=40).map(c=>c.k), keys=[...keysA,...keysR];
   let bx=keys.includes(EX.d[0])?EX.d[0]:"renta", by=keys.includes(EX.d[1])?EX.d[1]:"pobreza"; if(bx===by) by=keys.find(k=>k!==bx);
   EX.d=[bx,by];
-  const opt=sel=>`<optgroup label="Atlas de Renta (media de los municipios)">${keysA.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("")}</optgroup><optgroup label="Datos oficiales por provincia">${keysR.map(k=>`<option value="${k}" ${k===sel?"selected":""}>${esc(labK(k))}</option>`).join("")}</optgroup>`;
-  out.innerHTML=`<div class="exrow"><label class="exlab" for="bbx">Horizontal</label><select class="sel" id="bbx">${opt(bx)}</select><label class="exlab" for="bby">Vertical</label><select class="sel" id="bby">${opt(by)}</select></div><div class="bubctl"><button type="button" class="sel" id="bplay" aria-label="Reproducir">▶ Reproducir</button><input type="range" id="byr" min="0" max="${YEARS.length-1}" value="${YEARS.length-1}" aria-label="Año"><b id="byl"></b></div><div id="bubbox"><p class="loading">Cargando las provincias…</p></div>`;
-  document.getElementById("bbx").addEventListener("change",e=>{ EX.d=[e.target.value,by]; exUpdate(); });
-  document.getElementById("bby").addEventListener("change",e=>{ EX.d=[bx,e.target.value]; exUpdate(); });
+  out.innerHTML=`<div class="bubctl"><button type="button" class="sel" id="bplay" aria-label="Reproducir">▶ Reproducir</button><input type="range" id="byr" min="0" max="${YEARS.length-1}" step="0.01" value="${YEARS.length-1}" aria-label="Año"><b id="byl"></b></div><div id="bubbox"><p class="loading">Cargando las provincias…</p></div>`;
   const regS=(k,p)=>{ const s=((REG.data.prov[p]||{})[k.slice(2)])||{}; return YEARS.map(y=>s[y]??null); };
   let data; try{ data=await Promise.all(Object.keys(PROVS).map(async p=>{ const t=await loadProv(p), m=Object.values(t); const avg=k=>YEARS.map((_,i)=>{ let a=0,b=0; for(const z of m){ const v=z.s[k]&&z.s[k][i], w=z.s.population[i]; if(v!=null&&w){ a+=v*w; b+=w; } } return b?a/b:null; });
       const ser=k=>isReg(k)?regS(k,p):avg(BSER.find(b=>b[0]===k)[1]);
@@ -2281,7 +2277,7 @@ async function exBurbujas(out){
   const xs=data.flatMap(d=>d.x), ys=data.flatMap(d=>d.y), q=(a,p)=>d3.quantile(a.slice().sort(d3.ascending),p);
   const X=d3.scaleLinear().domain([q(xs,.0),q(xs,1)]).nice().range([m.l,W-m.r]), Y=d3.scaleLinear().domain([q(ys,0),q(ys,1)]).nice().range([H-m.b,m.t]), R=d3.scaleSqrt().domain([0,d3.max(data,d=>d3.max(d.pop))]).range([2,Math.min(30,W/22)]);
   const fx=fmtK(bx), fy=fmtK(by), short=(fm,v)=>fm(v).replace(/ (%|€)$/,"$1").replace(/(\d)\.000 ?€$/,"$1 mil €");
-  const box=document.getElementById("bubbox"); box.innerHTML=`<div class="bubwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Provincias: ${esc(labK(bx))} frente a ${esc(labK(by))} por años"></svg><div class="maptip" hidden></div></div><p class="figcap">Cada burbuja es una provincia, más grande cuanta más población. Fuente: ${esc(CATK[bx].src)}${CATK[by].src!==CATK[bx].src?` y ${esc(CATK[by].src)}`:""}.</p>`;
+  const box=document.getElementById("bubbox"); box.innerHTML=`<div class="bubwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Provincias: ${esc(labK(bx))} frente a ${esc(labK(by))} por años"></svg><div class="maptip" hidden></div></div><p class="figcap">Cada burbuja es una provincia. <b>El tamaño es su número de habitantes</b> en ese año (padrón del INE). Fuente: ${esc(CATK[bx].src)}${CATK[by].src!==CATK[bx].src?` y ${esc(CATK[by].src)}`:""}.</p>`;
   const svg=d3.select(box).select("svg"), tip=box.querySelector(".maptip");
   svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Y).attr("y2",Y);
   svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>short(fy,v));
@@ -2292,11 +2288,18 @@ async function exBurbujas(out){
   g.append("circle").attr("fill",css("--rust")).attr("fill-opacity",.4).attr("stroke",css("--rust")).style("cursor","default");
   g.append("text").attr("text-anchor","middle").attr("class","lab strong").attr("dy",-3).text(d=>big.has(d.p)?d.n:"");
   const yl=document.getElementById("byl"), rg=document.getElementById("byr");
-  const draw=i=>{ yl.textContent=YEARS[i]; g.attr("transform",d=>`translate(${X(d.x[i])},${Y(d.y[i])})`).select("circle").attr("r",d=>R(d.pop[i]||1)); }; draw(last);
-  g.on("pointermove",(ev,d)=>{ const i=+rg.value, bb=box.querySelector(".bubwrap").getBoundingClientRect(); tip.innerHTML=`<b>${esc(d.n)}</b> · ${YEARS[i]}<br>${esc(labK(bx))}: ${fx(d.x[i])}<br>${esc(labK(by))}: ${fy(d.y[i])}`; tip.hidden=false; tip.style.left=Math.max(70,Math.min(bb.width-70,X(d.x[i])/W*bb.width))+"px"; tip.style.top=(Y(d.y[i])/H*bb.height-12)+"px"; }).on("pointerleave",()=>tip.hidden=true);
-  rg.addEventListener("input",()=>draw(+rg.value));
-  const pl=document.getElementById("bplay"); pl.addEventListener("click",()=>{ if(BUB_T){ BUB_T.stop(); BUB_T=null; pl.textContent="▶ Reproducir"; return; } let k=+rg.value>=last?0:+rg.value; pl.textContent="❚❚ Pausa";
-    BUB_T=d3.interval(()=>{ rg.value=k; draw(k); if(++k>last){ BUB_T.stop(); BUB_T=null; pl.textContent="▶ Reproducir"; } },650); });
+  // leyenda del tamaño
+  { const lg=svg.append("g").attr("class","axis").attr("transform",`translate(${W-m.r-8},${m.t+4})`), ps=[1e6,5e6].filter(v=>R(v)<40); let yy=0;
+    lg.append("text").attr("x",0).attr("y",8).attr("text-anchor","end").text("Habitantes"); yy=18;
+    ps.forEach(v=>{ const r=R(v); lg.append("circle").attr("cx",-r).attr("cy",yy+r).attr("r",r).attr("fill","none").attr("stroke",css("--muted")); lg.append("text").attr("x",-2*r-6).attr("y",yy+r+4).attr("text-anchor","end").text(v>=1e6?nf0.format(v/1e6)+" millón"+(v>1e6?"es":""):nf0.format(v)); yy+=2*r+6; }); }
+  // entre un año y el siguiente se interpola, para que el movimiento sea continuo
+  const at=(a,t)=>{ const i=Math.floor(t), f=t-i; if(i>=last) return a[last]; const u=a[i], w=a[i+1]; return u==null?w:w==null?u:u+(w-u)*f; };
+  const draw=t=>{ yl.textContent=YEARS[Math.round(t)]; g.attr("transform",d=>`translate(${X(at(d.x,t))},${Y(at(d.y,t))})`).select("circle").attr("r",d=>R(at(d.pop,t)||1)); }; draw(last);
+  g.on("pointermove",(ev,d)=>{ const i=Math.round(+rg.value), bb=box.querySelector(".bubwrap").getBoundingClientRect(); tip.innerHTML=`<b>${esc(d.n)}</b> · ${YEARS[i]}<br>${esc(labK(bx))}: ${fx(d.x[i])}<br>${esc(labK(by))}: ${fy(d.y[i])}`; tip.hidden=false; tip.style.left=Math.max(70,Math.min(bb.width-70,X(d.x[i])/W*bb.width))+"px"; tip.style.top=(Y(d.y[i])/H*bb.height-12)+"px"; }).on("pointerleave",()=>tip.hidden=true);
+  rg.addEventListener("input",()=>{ if(BUB_T){ BUB_T.stop(); BUB_T=null; pl.textContent="▶ Reproducir"; } draw(+rg.value); });
+  rg.addEventListener("change",()=>{ if(!BUB_T){ rg.value=Math.round(+rg.value); draw(+rg.value); } });
+  const pl=document.getElementById("bplay"); pl.addEventListener("click",()=>{ if(BUB_T){ BUB_T.stop(); BUB_T=null; pl.textContent="▶ Reproducir"; return; } const t0=+rg.value>=last?0:+rg.value; pl.textContent="❚❚ Pausa";
+    const MS=1100; BUB_T=d3.timer(el=>{ const t=Math.min(last,t0+el/MS); rg.value=t; draw(t); if(t>=last){ BUB_T.stop(); BUB_T=null; pl.textContent="▶ Reproducir"; } }); });
 }
 // ---------- distribución ----------
 function exDist(out){
@@ -3110,7 +3113,7 @@ function nbDraw(){
 }
 
 // ---------- panel lateral ----------
-const SLOTS={mapa:{get n(){return EX.bv?2:1},get l(){ return EX.bv?["Primer dato (azul)","Segundo dato (rosa)"]:["Color del mapa"]; }},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
+const SLOTS={burbujas:{n:2,l:["Horizontal ↔","Vertical ↕"]},mapa:{get n(){return EX.bv?2:1},get l(){ return EX.bv?["Primer dato (azul)","Segundo dato (rosa)"]:["Color del mapa"]; }},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
 // ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
 const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Precios","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
@@ -3184,7 +3187,7 @@ function exBar(){
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC[EX.v]}.</p></div>
-    <div class="lb-step"><h4><i>2</i>Qué datos</h4>${EX.v==="cruce"?"":""}${isB?`<p class="hint" style="margin:0">Elige los dos datos encima del gráfico.</p>`:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
+    <div class="lb-step"><h4><i>2</i>Qué datos</h4>${EX.v==="cruce"?"":""}${isB?slots+`<p class="hint">El tamaño de cada burbuja es el número de habitantes de la provincia.</p>`:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
     ${isEvo||isB?"":`<div class="lb-step"><h4><i>3</i>Qué municipios</h4>
       <select class="sel" id="exprov" aria-label="Provincia">${`<option value="">Toda España</option>`+Object.keys(PROVS).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")).map(p=>`<option value="${p}" ${p===EX.p?"selected":""}>${esc(provShort(PROVS[p]))}</option>`).join("")}</select>
       <select class="sel" id="exsize" aria-label="Tamaño">${EXSIZES.map(([k,l])=>`<option value="${k}" ${k===EX.t?"selected":""}>${l}</option>`).join("")}</select>
@@ -3199,7 +3202,7 @@ function exBar(){
       :`<p class="hint" style="margin:0">Para ver si una relación aguanta al comparar entre iguales, pásala a una relación; para medir el efecto de una ley o un suceso, usa <b>Antes y después</b>.</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
   const regOK=EX.v==="cruce", euOK=EX.v==="cruce"&&EX.u==="eu";
-  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); await loadAllCat(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,all:true,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
+  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); await loadAllCat(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,all:true,...(isB?{here:k=>BSER.some(x=>x[0]===k)||(isReg(k)&&CATK[k].np>=40),jump:false}:{}),onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
   bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{current:null,excl:EX.d,all:true,onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,6); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-x]").forEach(b=>b.addEventListener("click",()=>{ if(EX.d.length<=1) return; EX.d.splice(+b.dataset.x,1); exUpdate(); }));
   bar.querySelectorAll("button[data-q]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.q; if(EX.v==="cruce"||EX.v==="tabla"||EX.v==="grupos"){ const S=SLOTS[EX.v]; if(EX.d.length<S.n&&EX.v!=="cruce") EX.d.push(k); else { const pos=EX.v==="cruce"?1:Math.min(EX.d.length,S.n)-1; EX.d=EX.d.filter(x=>x!==k); EX.d.splice(pos,1,k); } } else { EX.d=[k,...EX.d.filter(x=>x!==k)]; } EX.d=EX.d.slice(0,6); exUpdate(); }));
