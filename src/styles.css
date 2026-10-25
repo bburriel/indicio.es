@@ -1054,7 +1054,7 @@ svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg 
 .okc{color:var(--ok); font-weight:700} .koc{color:var(--ko); font-weight:700}
 .bubctl{display:flex; align-items:center; gap:12px; margin:6px 0 10px} .bubctl input[type=range]{flex:1; max-width:340px; accent-color:var(--rust)} .bubctl b{font:600 20px var(--serif,Georgia),serif; min-width:3ch}
 .bub circle{transition:none} svg .bub text{pointer-events:none; paint-order:stroke; stroke:var(--bg); stroke-width:3px}
-.hbars.wide .hb{grid-template-columns:minmax(90px,150px) minmax(0,1fr) 124px} .hbars.wide .hb>span:last-child{white-space:nowrap}
+.hbars.wide .hb{grid-template-columns:minmax(80px,140px) minmax(0,1fr) auto} .hbars.wide .hb>*:last-child{white-space:nowrap; font-size:13px}
 .bubwrap{position:relative} .bubwrap svg{display:block; width:100%; height:auto}
 
 /* quién soy: historia */
