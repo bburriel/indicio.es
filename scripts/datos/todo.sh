@@ -36,7 +36,7 @@ paso () { echo; echo "=== $(date '+%H:%M:%S') · $1"; }
   python3 $D/regional.py | tail -8
   paso "Laboratorio: indicadores municipales (data/extra.json) y series (data/prov, data/refs.json)"
   python3 $D/indicadores_otras.py && python3 $D/construir.py otras && python3 $D/series_otras.py | tail -1
-  python3 $D/mivau_trim.py && python3 $D/causales.py && python3 $D/alimentos.py
+  python3 $D/mivau_trim.py && python3 $D/causales.py && python3 $D/alimentos.py && python3 $D/sueldos.py
   paso "Hecho"
   du -sh $D/cache/* 2>/dev/null
 } 2>&1 | caffeinate -i tee -a "$LOG"

@@ -27,10 +27,12 @@ jobs:
         run: |
           python3 scripts/datos/ine_compactar.py
           python3 scripts/datos/regional.py
+          python3 scripts/datos/alimentos.py
+          python3 scripts/datos/sueldos.py
       - name: Commit si hay cambios
         run: |
           git config user.name "indicio-datos"
           git config user.email "actions@users.noreply.github.com"
-          git add data/regional.json
-          git diff --cached --quiet || git commit -m "Datos INE: actualización mensual de data/regional.json"
+          git add data/regional.json data/alimentos.json data/sueldos.json
+          git diff --cached --quiet || git commit -m "Datos INE: actualización mensual (regional, alimentos, sueldos)"
           git push
