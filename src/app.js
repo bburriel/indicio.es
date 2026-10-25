@@ -3137,6 +3137,19 @@ function fixScale(){
   if(EX.d.slice(0,2).some(isReg)){ if(!scaleOK(EX.u)) EX.u=scaleOK("prov")?"prov":"ccaa"; EX.c=[]; }
 }
 const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"],["eu","Europa"]];
+// etiquetas de un gráfico de puntos sin que se pisen: prueba a la derecha, a la izquierda, arriba y abajo; si no cabe, no la pone
+function placeLabels(sel,pts,{x,y,r,t,fs=11,W=1e9,fill="var(--ink-2)"}){
+  const cw=fs*0.56, boxes=[], ov=(a,b)=>a.x0<b.x1&&b.x0<a.x1&&a.y0<b.y1&&b.y0<a.y1;
+  pts.forEach(p=>boxes.push({x0:x(p)-r(p),x1:x(p)+r(p),y0:y(p)-r(p),y1:y(p)+r(p),dot:true}));
+  const out=[];
+  for(const p of pts){ const s=t(p), w=s.length*cw, h=fs+1, px=x(p), py=y(p), rr=r(p)+3;
+    const cand=[[px+rr,py-h/2,"start"],[px-rr-w,py-h/2,"end"],[px-w/2,py-rr-h,"middle"],[px-w/2,py+rr,"middle"]];
+    for(const [bx,by,anc] of cand){ const b={x0:bx,x1:bx+w,y0:by,y1:by+h}; if(b.x0<0||b.x1>W) continue;
+      if(boxes.some(o=>ov(b,o)&&!(o.dot&&Math.abs((o.x0+o.x1)/2-px)<0.5&&Math.abs((o.y0+o.y1)/2-py)<0.5))) continue;
+      boxes.push(b); out.push({p,s,x:anc==="start"?bx:anc==="end"?bx+w:bx+w/2,y:by+h-2,anc}); break; } }
+  sel.selectAll("text").data(out).join("text").attr("x",o=>o.x).attr("y",o=>o.y).attr("text-anchor",o=>o.anc).attr("font-size",fs).attr("fill",fill).text(o=>o.s);
+  return out.length;
+}
 function scaleBar(){ const anyR=EX.d.slice(0,2).some(isReg);
   const h=EX.u==="eu"?"Cada punto es una región europea (NUTS 2); en granate, las españolas. Datos de Eurostat.":EX.u?(anyR?`Datos oficiales de cada ${EX.u==="prov"?"provincia":"comunidad"}${EX.d.slice(0,2).every(isReg)?"":"; los datos municipales, media de sus municipios ponderada por población"}.`:"Cada punto es la media de sus municipios, ponderada por población."):"Cada punto es un municipio.";
   return `<div class="lbscale" role="group" aria-label="Escala de la comparación"><span class="lbscale-l">Comparar</span><div class="seg">${SCALES.map(([u,l])=>{ const ok=scaleOK(u)||u==="eu"||EX.u==="eu"; return `<button type="button" data-u="${u}" aria-pressed="${(EX.u||"")===u}"${ok?"":` disabled title="Uno de los datos elegidos no existe a esta escala"`}>${l}</button>`; }).join("")}</div><span class="lbscale-h">${h}</span></div>`; }
@@ -3179,7 +3192,7 @@ function exCruceAgg(out,x,y){
   const g=sv.append("g").selectAll("g").data(P.slice().sort((a,b)=>b.pop-a.pop)).join("g");
   g.append("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>Rr(p.pop)).attr("fill","var(--rust)").attr("fill-opacity",.55).attr("stroke","var(--rust)").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)} (${nf0.format(p.n)} municipios)`);
   const lab=u==="ccaa"?P:P.filter(p=>{ const zx=Math.abs(p.x-d3.mean(P,q=>q.x))/(d3.deviation(P,q=>q.x)||1), zy=Math.abs(p.y-d3.mean(P,q=>q.y))/(d3.deviation(P,q=>q.y)||1); return zx+zy>1.6||p.pop>3e6; });
-  sv.append("g").selectAll("text").data(lab).join("text").attr("x",p=>X(p.x)+Rr(p.pop)+3).attr("y",p=>Y(p.y)+4).attr("font-size",11).attr("fill","var(--ink-2)").text(p=>p.l);
+  placeLabels(sv.append("g"),lab.slice().sort((a,b)=>b.pop-a.pop),{x:p=>X(p.x),y:p=>Y(p.y),r:p=>Rr(p.pop),t:p=>p.l,fs:11,W});
   add(box,"figcaption",null,`${nf0.format(P.length)} ${u==="prov"?"provincias":"comunidades y ciudades autónomas"}; el tamaño del punto es la población. ${anyR?`Datos oficiales de ${AGGY}${isReg(x)&&isReg(y)?"":"; el otro dato, media de los municipios con dato ponderada por población"}. Fuente: ${[x,y].filter(isReg).map(k=>CATK[k].src).join("; ")}.`:`Medias de los municipios con dato, ponderadas por población${EX.p||EX.t?", con el filtro de arriba":""}.`}`);
   // la escala cambia la respuesta
   const rF=o=>o?`r = ${rFmt(o.r)}`:"—", bar=o=>o?`<span class="scb"><i style="width:${Math.abs(o.r)*100}%;background:var(${o.r<0?"--slate":"--rust"})"></i></span>`:"";
@@ -3213,7 +3226,7 @@ function exCruceEU(out,x,y){
   if(c){ const [a,b]=X.domain(); sv.append("line").attr("clip-path",`url(#${cid})`).attr("x1",X(a)).attr("x2",X(b)).attr("y1",Y(c.my+c.b*(a-c.mx))).attr("y2",Y(c.my+c.b*(b-c.mx))).attr("stroke","var(--brand)").attr("stroke-width",2).attr("stroke-dasharray","6 5"); }
   const dots=P.slice().sort((a,b)=>a.es-b.es);
   sv.append("g").selectAll("circle").data(dots).join("circle").attr("cx",p=>X(p.x)).attr("cy",p=>Y(p.y)).attr("r",p=>p.es?5.5:3.5).attr("fill",p=>p.es?"var(--rust)":"var(--slate)").attr("fill-opacity",p=>p.es?.85:.35).attr("stroke",p=>p.es?"var(--rust)":"none").append("title").text(p=>`${p.l}: ${fx(p.x)} · ${fy(p.y)}`);
-  sv.append("g").selectAll("text").data(P.filter(p=>p.es)).join("text").attr("x",p=>X(p.x)+7).attr("y",p=>Y(p.y)+4).attr("font-size",10.5).attr("fill","var(--ink-2)").text(p=>p.l.replace(/^Comunidad (de |Foral de )?|^Región de |^Principado de |^Comunitat |^Illes /,""));
+  placeLabels(sv.append("g"),P.filter(p=>p.es),{x:p=>X(p.x),y:p=>Y(p.y),r:()=>5.5,t:p=>p.l.replace(/^Comunidad (de |Foral de )?|^Región de |^Principado de |^Comunitat |^Illes /,"").replace(/^Ciudad (Autónoma )?de /,""),fs:10.5,W});
   const ES=D.ES||{}, EU=D.EU27_2020||{}, v=(o,k)=>((o[k]||{})[yr]);
   add(box,"figcaption",null,`${nf0.format(P.length)} regiones europeas (NUTS 2) en ${yr}; en granate, las ${nf0.format(P.filter(p=>p.es).length)} españolas. Fuente: ${CATK[x].src.split(" · ")[0]}${CATK[y].src.split(" · ")[0]!==CATK[x].src.split(" · ")[0]?" y "+CATK[y].src.split(" · ")[0]:""}.`);
   const tst=document.getElementById("lbtest");
