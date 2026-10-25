@@ -1196,3 +1196,4 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .dp-list .lv-mu{background:color-mix(in srgb,var(--brand) 13%,transparent); color:var(--brand)}
 .dp-list .lv-es,.dp-list .lv-pa{background:color-mix(in srgb,#2f6db5 14%,transparent); color:#2f6db5}
 .dp-list button.far b{font-weight:500} .dp-list small u{text-decoration:none; font-style:italic}
+.psb{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0 6px 26px} .psb .sel{width:auto}
