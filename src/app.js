@@ -1701,7 +1701,7 @@ function exSetHash(){ try{ history.replaceState(null,"",keyToPath(exHash())); }c
 async function exMapa(out){
   const k=EX.d[0], f=fmtK(k);
   const g=add(out,"div","exmap");
-  const left=add(g,"div"), right=add(g,"div");
+  const left=add(g,"div","exmap-m"), right=add(g,"div","exlists");
   add(left,"div","cs",esc(CATK[k].src||""));
   const mb=add(left,"div","mapbox",'<div class="maploading">Dibujando el mapa…</div>'), lg=add(left,"div","legend");
   // listas
@@ -2918,7 +2918,7 @@ function nbDraw(){
 }
 
 // ---------- panel lateral ----------
-const SLOTS={mapa:{get n(){return EX.bv?2:1},l:["Color del mapa (azul)","Segundo dato (rosa)"]},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
+const SLOTS={mapa:{get n(){return EX.bv?2:1},get l(){ return EX.bv?["Primer dato (azul)","Segundo dato (rosa)"]:["Color del mapa"]; }},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
 // ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
 const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));

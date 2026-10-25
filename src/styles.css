@@ -1167,3 +1167,10 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .seo-extra .near{line-height:1.9; max-width:820px}
 .provlist{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:6px 18px; margin:10px 0 30px}
 .provlist a{padding:6px 0; border-bottom:1px solid var(--rule)} .provlist small{color:var(--muted)}
+/* laboratorio, mapa: el mapa ocupa todo el ancho y las listas van debajo, en dos columnas */
+.lb-out .exmap, .exmap{grid-template-columns:minmax(0,1fr)}
+.exmap-m .mapbox{max-width:860px; margin:0 auto}
+.exlists{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px 36px; border-top:1px solid var(--rule); padding-top:16px}
+.exlists .lista + .lista{margin-top:0}
+.exlists figcaption{grid-column:1/-1}
+@media (max-width:640px){ .exlists{grid-template-columns:minmax(0,1fr)} .exlists .lista + .lista{margin-top:18px} }
