@@ -1178,3 +1178,10 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .pschips{display:grid; grid-template-columns:1fr 1fr; gap:2px 10px}
 .pschips .chk{font-size:14px}
 .reading[hidden]{display:none!important}
+/* análisis de gobiernos: selector de países y referencias en la tabla */
+.psbar{display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; position:sticky; top:58px; z-index:5; background:var(--bg); padding:10px 0; border-bottom:1px solid var(--rule)}
+.psbar-l{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-right:4px}
+.pschip{font:inherit; font-size:14px; padding:4px 10px; border:1px solid var(--rule-2); border-radius:999px; background:var(--card); color:var(--ink-2); cursor:pointer}
+.pschip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+.psref{display:block; font-size:12.5px; color:var(--muted); white-space:nowrap}
+.psref i{display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:4px; vertical-align:middle}

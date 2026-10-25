@@ -14,6 +14,10 @@ En campaña, cada partido elige el dato que le conviene. El paro bajó, la deuda
 
 Si el paro baja en España y en toda Europa, el mérito del Gobierno es poco. Si baja en España mucho más que en Europa, algo distinto pasó aquí. Por eso en este análisis cada dato de cada mandato va acompañado del mismo dato para la media de la Unión Europea en los mismos años.
 
+Por defecto comparamos con la media europea, pero puedes añadir los países que quieras: los gráficos y la tabla se actualizan.
+
+[[grafico:paises]]
+
 [[grafico:tabla]]
 
 ## La foto larga: volvemos a estar donde en 1995
