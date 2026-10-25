@@ -8,7 +8,8 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
-import {SITE,STUDIES,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
+import {SITE,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
+import {STUDIES,ALL,HIDDEN,MDBODY} from "./src/analisis.mjs";
 import {ILLUS,TILL,FOCUS} from "./src/illus.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
@@ -37,7 +38,7 @@ const CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
 fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js);
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:HIDDEN,md:MDBODY,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 
@@ -98,15 +99,15 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
   const main=snapshot("/preguntas/")||`<header class="phead"><h1>Análisis</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
   page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Análisis",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
   addUrl("/preguntas/",0.9);
-  for(const S of STUDIES){
+  for(const S of ALL){
     const route="/preguntas/"+S.id+"/";
     const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p>${ILLUS[S.id]||""}</header>
       <section class="finding"><h2>La respuesta corta</h2><div class="txt"><p>${esc(S.a)}</p><p>La respuesta completa, con los gráficos y el método paso a paso, se calcula con los datos al abrir la página. <a href="/laboratorio/">Ponla a prueba en el laboratorio →</a></p></div></section>${sources}`;
     const og=exists("og/"+S.id+".png")?"/og/"+S.id+".png":null;
-    page({route,title:S.t+" · Indicio",desc:S.a,ogTitle:S.t,main,type:"article",ogImage:og,
+    page({route,title:S.t+" · Indicio",desc:S.a,ogTitle:S.t,main,type:"article",ogImage:og,robots:S.oculto?"noindex":"",
       jsonld:[{"@context":"https://schema.org","@type":"Article",headline:S.t,description:S.d,datePublished:S.pub,dateModified:S.upd||S.pub,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url},mainEntityOfPage:SITE.url+route,image:SITE.url+(og||"/og-image.png"),articleSection:topicName(S.tema)},
         breadcrumb([["Análisis","/preguntas/"],[S.t,route]])]});
-    addUrl(route,0.8,S.upd||S.pub);
+    if(!S.oculto) addUrl(route,0.8,S.upd||S.pub);
   }
 }
 
@@ -132,7 +133,7 @@ for(const route of ["/laboratorio/","/laboratorio/metodo/","/municipio/","/quien
   page({route,title:P.t,desc:P.d,main,robots:route==="/comparar/"?"noindex,follow":""});
   if(route!=="/comparar/") addUrl(route,route==="/laboratorio/"?0.9:0.6);
 }
-for(const v of ["mapa","ranking","cruce","evolucion","grupos","reparto","tabla","antes"]){
+for(const v of ["mapa","ranking","cruce","evolucion","grupos","reparto","tabla","antes","distribucion","burbujas"]){
   const P=PAGES["/laboratorio/"], route="/laboratorio/"+v+"/";
   page({route,title:"Laboratorio · "+v[0].toUpperCase()+v.slice(1)+" · Indicio",desc:P.d,main:`<header class="phead"><h1>Laboratorio</h1><p class="dek">${esc(P.d)}</p></header><p class="loading">Cargando datos…</p>`,robots:"noindex,follow"});
 }

@@ -1054,7 +1054,7 @@ svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg 
 .okc{color:var(--ok); font-weight:700} .koc{color:var(--ko); font-weight:700}
 .bubctl{display:flex; align-items:center; gap:12px; margin:6px 0 10px} .bubctl input[type=range]{flex:1; max-width:340px; accent-color:var(--rust)} .bubctl b{font:600 20px var(--serif,Georgia),serif; min-width:3ch}
 .bub circle{transition:none} svg .bub text{pointer-events:none; paint-order:stroke; stroke:var(--bg); stroke-width:3px}
-.hbars.wide .hb{grid-template-columns:minmax(90px,150px) minmax(0,1fr) 124px} .hbars.wide .hb>span:last-child{white-space:nowrap}
+.hbars.wide .hb{grid-template-columns:minmax(80px,140px) minmax(0,1fr) auto} .hbars.wide .hb>*:last-child{white-space:nowrap; font-size:13px}
 .bubwrap{position:relative} .bubwrap svg{display:block; width:100%; height:auto}
 
 /* quién soy: historia */
@@ -1150,3 +1150,14 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .tstud em{font-style:normal; font-size:14px; font-weight:700; color:var(--brand-2)}
 .tstud a:hover b{color:var(--brand-2)}
 .lbscale button[disabled]{opacity:.42;cursor:not-allowed}
+/* análisis en Markdown */
+.md-falta{color:var(--ko); text-decoration:line-through wavy; font-weight:700}
+.md-chart{margin:14px 0 18px}
+.md-intro{font-size:19px; line-height:1.55; max-width:720px}
+.md-intro p+p{margin-top:12px}
+.ruler{position:relative; height:16px; margin-top:14px; border-radius:8px; background:linear-gradient(90deg,var(--ramp-1),var(--ramp-5))}
+.ruler b{position:absolute; top:3px; bottom:3px; width:1px; background:var(--bg); opacity:.8}
+.ruler i{position:absolute; top:-5px; width:4px; height:26px; margin-left:-2px; border-radius:2px; background:var(--ink)}
+.ruler-l{display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-top:4px}
+.calc .seg.sm{flex-wrap:wrap}
+.md-method .txt, .md-method li{font-size:15px; line-height:1.5}
