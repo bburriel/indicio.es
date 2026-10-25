@@ -26,6 +26,17 @@ DATASETS = {
     "prc_hpi_a": "Índice de precios de la vivienda por país (anual)",
     "ilc_lvho07a": "Sobrecarga del coste de la vivienda por país",
     "ilc_lvho02": "Régimen de tenencia de la vivienda por país",
+    # vivienda: oferta, demanda y esfuerzo, para comparar España con Europa
+    "ilc_lvho07c": "Sobrecarga del coste de la vivienda por régimen de tenencia (propietario, inquilino a precio de mercado…)",
+    "ilc_mded01": "Peso del gasto en vivienda en la renta disponible, por tipo de hogar y nivel de renta",
+    "ilc_lvho05a": "Hacinamiento por edad, sexo y nivel de renta",
+    "ilc_lvps08": "Jóvenes de 25 a 34 años que viven con sus padres",
+    "yth_demo_030": "Edad media a la que los jóvenes se van de casa de sus padres",
+    "nama_10_an6": "Formación bruta de capital fijo por tipo de activo (viviendas)",
+    "sts_cobp_a": "Licencias de construcción por país (anual)",
+    "lfst_hhnhtych": "Número de hogares por tipo de hogar y país",
+    "demo_gind": "Población y su cambio por país",
+    "prc_hpi_q": "Índice de precios de la vivienda por país (trimestral)",
 }
 
 
