@@ -2165,8 +2165,8 @@ function psBar(bar){
   const on=(id,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener("change",fn); };
   const pk=document.getElementById("pspick"); if(pk) pk.addEventListener("click",async()=>{ await loadAllCat(); openPicker(pk,{all:true,here:k=>/^(es|pais):/.test(k),current:esMode?"es:"+PS.s[0]:"pais:"+PS.k,onPick:v=>{
     if(v.startsWith("es:")){ const k=v.slice(3); PS.s=[k,...PS.s.slice(1).filter(x=>x!==k)]; if(PS.s.length===1) PS.idx=SE[k]&&SE[k].idx?1:0; } else { PS.k=v.slice(5); PS.s=[]; } PS.desde=PS.hasta=null; exUpdate(); }}); });
-  const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",async()=>{ await loadAllCat(); openPicker(ad,{all:true,here:k=>k.startsWith("es:"),current:null,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}); });
-  bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{all:true,here:k=>k.startsWith("es:"),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }}); }));
+  const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",async()=>{ await loadAllCat(); openPicker(ad,{all:true,jump:false,here:k=>k.startsWith("es:"),current:null,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}); });
+  bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{all:true,jump:false,here:k=>k.startsWith("es:"),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-rs]").forEach(b=>b.addEventListener("click",()=>{ PS.s=PS.s.filter(x=>x!==b.dataset.rs); exUpdate(); }));
   on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
   on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
@@ -3103,12 +3103,12 @@ function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remov
 function pickKey(e){ if(e.key==="Escape"){ closePicker(); return; }
   if(e.key==="Tab"){ const p=document.getElementById("dpick"); if(!p) return; const f=[...p.querySelectorAll("input,button")].filter(x=>!x.disabled); if(!f.length) return;
     if(e.shiftKey&&document.activeElement===f[0]){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); } else if(!p.contains(document.activeElement)){ e.preventDefault(); f[0].focus(); } } }
-function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,all=false,here=null}){
+function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,all=false,here=null,jump=true}){
   closePicker();
   // los datos de provincias y comunidades solo en «Relación»; en la escala de Europa, solo los de Europa
   const okC=here?(c=>here(c.k)):(c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg)&&!c.nat));
   // con «all», el buscador enseña todos los datos, marcados por nivel; los que no sirven aquí abren la vista que les sirve
-  const POOL=all?[...CAT,...natItems()]:CAT.filter(okC); let lv="";
+  const POOL=all?[...CAT,...natItems()].filter(c=>jump||okC(c)):CAT.filter(okC); let lv="";
   const groups=[...new Set([...PICK_ORDER,...POOL.map(c=>c.g)])].filter(g=>POOL.some(c=>c.g===g));
   let tab=extras&&!(CATK[current]||{}).g?"Opciones":(CATK[current]||{}).g||groups[0], q="";
   const EXG="Opciones", tabs=extras?[EXG,...groups]:groups;
@@ -3116,7 +3116,7 @@ function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,a
   const avail=c=>(!excl.includes(c.k)||c.k===current)&&(!lv||LVL(c)[0]===lv||(lv==="eu"&&LVL(c)[0]==="pa"));
   const covTxt=c=>c.nat==="es"?"año a año, "+c.yrs:c.nat==="pais"?"España y otros países, año a año":c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
   const VIEWN={es:"Series",pa:"Series",eu:"Relación",rg:"Relación",mu:"el mapa"};
-  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${all?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVLF.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
+  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${all&&jump?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVLF.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
   const draw=()=>{
     const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k+" "+LVL(c)[1]).includes(nq);
     const vis=tabs.filter(g=>g===EXG||!lv||POOL.some(c=>c.g===g&&avail(c))); if(!vis.includes(tab)) tab=vis[0];
