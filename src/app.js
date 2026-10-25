@@ -1666,7 +1666,7 @@ const CCAA_OF={"01":"País Vasco","20":"País Vasco","48":"País Vasco","02":"Ca
 const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si la relación aguanta entre iguales"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Distribución","Cómo se reparte un dato entre la población"],["burbujas","Años","Provincias en movimiento: dos datos año a año"],["paises","Series","Series año a año: precios, sueldos, vivienda, empleo o población de España, una provincia o un municipio, y España frente a otros países"]];
 const EXSIZES=[["","Todos los tamaños",0,Infinity],["s1","Menos de 1.000 hab.",0,1000],["s2","1.000 a 10.000 hab.",1000,10000],["s3","10.000 a 50.000 hab.",10000,50000],["s4","Más de 50.000 hab.",50000,Infinity],["g1","1.000 hab. o más",1000,Infinity],["g10","10.000 hab. o más",10000,Infinity]];
 const EXQ=[["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Suben los sueldos como los precios?","paises",{ser:["sal_mediana","viv_alq","ipc_general"],b:2015}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}],["¿Dónde pesa más la brecha de empleo entre hombres y mujeres?","mapa",{d:["brechaEmpleo","empleoMujeres"]}],["¿Más estudios, menos contratos temporales?","cruce",{d:["superiores2539","temporales"],t:"g1"}],["¿Quién vive de qué? Renta de trabajo frente a renta del capital","cruce",{d:["irpfTrabajo","irpfBruta"],t:"g1"}]];
-let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0,bv:0,u:""};
+let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0,bv:0,u:"",dg:""};
 
 function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=...&b=2015&r=1
   const m=h.match(/^explorar(?:\/([a-z]+))?(?:\?(.*))?$/); if(!m) return;
@@ -1682,7 +1682,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(q.has("d")) EX.d=q.get("d").split(",").filter(k=>CATK[k]).slice(0,6);
   if(q.has("p")) EX.p=PROVS[q.get("p")]?q.get("p"):""; if(q.has("t")) EX.t=EXSIZES.some(s=>s[0]===q.get("t"))?q.get("t"):""; if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
   if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=["ccaa","prov","size","q"].includes(q.get("gb"))?q.get("gb"):"ccaa"; if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa","eu"].includes(q.get("u"))?q.get("u"):"";
-  if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0;
+  if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0; EX.dg=["ccaa","prov","size","renta"].includes(q.get("dg"))?q.get("dg"):"";
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=["es","prov","mun"].includes(q.get("lv"))?q.get("lv"):"es"; if(EX.v==="evolucion"&&q.has("m")&&BYCODE.has(q.get("m"))) ES_.mun=q.get("m");
   if(EX.v==="paises"){ if(q.has("ind")&&PSIND[q.get("ind")]) PS.k=q.get("ind"); if(q.has("pa")) PS.c=["ES",...q.get("pa").split(",").filter(g=>/^[A-Z0-9_]{2,10}$/.test(g)&&g!=="ES")].slice(0,7); PS.gob=q.get("gob")==="0"?0:1; PS.rel=q.get("rel")==="1"?1:0; PS.ref=q.has("ref")&&/^[A-Z0-9_]{2,10}$/.test(q.get("ref"))?q.get("ref"):"EU27_2020";
@@ -1694,7 +1694,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
 function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParams();
   if(S.d&&S.d.length) q.set("d",S.d.join(",")); if(S.p) q.set("p",S.p); if(S.t) q.set("t",S.t); if(S.m) q.set("m",S.m); if(S.c&&S.c.length) q.set("c",S.c.join(","));
   if(S.v==="grupos") q.set("gb",S.gb); if(S.o) q.set("o",S.o); if(!S.w) q.set("w","0"); if(S.lx) q.set("lx","1");
-  if(S.v==="mapa"&&S.bv) q.set("bv","1");
+  if(S.v==="mapa"&&S.bv) q.set("bv","1"); if(S.v==="distribucion"&&S.dg) q.set("dg",S.dg);
   if(S.v==="cruce"){ if(S.u) q.set("u",S.u); if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ ["d","p","t","c","o","m"].forEach(k=>q.delete(k)); q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es"){ q.set("lv",ES_.lev); if(ES_.mun) q.set("m",ES_.mun); } }
   if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); else if(PS.b) q.set("b",PS.b); if(PS.real) q.set("r","1"); if(PS.m&&PS.s.some(k=>/^ev_/.test(k))){ q.set("m",PS.m); if(PS.lev!=="mun") q.set("lv",PS.lev); } } else { q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
@@ -2308,6 +2308,11 @@ function exDist(out){
   const ctl=add(out,"div","exrow");
   ctl.innerHTML=`<span class="exlab">Contar</span><div class="seg" role="group"><button type="button" data-w="1" aria-pressed="${!!EX.w}">Personas</button><button type="button" data-w="0" aria-pressed="${!EX.w}">Municipios</button></div>`;
   ctl.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ EX.w=+b.dataset.w; exUpdate(); }));
+  const DG=[["","Todos juntos"],["ccaa","Por comunidad"],["prov","Por provincia"],["size","Por tamaño"],...(k!=="renta"?[["renta","Por nivel de renta"]]:[])];
+  if(!DG.some(d=>d[0]===EX.dg)) EX.dg="";
+  const ctl2=add(out,"div","exrow"); ctl2.innerHTML=`<span class="exlab">Comparar</span><div class="seg" role="group" aria-label="Comparar grupos">${DG.map(([v,l])=>`<button type="button" data-dg="${v}" aria-pressed="${EX.dg===v}">${l}</button>`).join("")}</div>`;
+  ctl2.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ EX.dg=b.dataset.dg; exUpdate(); }));
+  if(EX.dg){ exViolin(out,k,rows); return; }
   const vals=rows.map(r=>r[F[k]]).sort((a,b)=>a-b), lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99);
   const x=d3.scaleLinear().domain([lo,hi]).nice(30), bins=d3.bin().domain(x.domain()).thresholds(x.ticks(30)).value(r=>Math.max(lo,Math.min(hi,r[F[k]])))(rows);
   const wq=(p)=>{ const s=rows.slice().sort((a,b)=>a[F[k]]-b[F[k]]), tot=d3.sum(s,r=>EX.w?r[F.pop]:1); let acc=0; for(const r of s){ acc+=EX.w?r[F.pop]:1; if(acc>=p*tot) return r[F[k]]; } return null; };
@@ -2325,6 +2330,48 @@ function exDist(out){
   mk.forEach(([v,t,j])=>{ const xx=X(Math.max(lo,Math.min(hi,v))); svg.append("line").attr("x1",xx).attr("x2",xx).attr("y1",m.t-[26,10,-6][j]).attr("y2",H-m.b).attr("stroke",css(["--ink","--slate","--rust"][j])).attr("stroke-width",1.4).attr("stroke-dasharray",j?"4 3":null);
     svg.append("text").attr("class","lab strong").attr("x",xx+(xx>W*0.7?-5:5)).attr("y",m.t-[28,12,-4][j]).attr("text-anchor",xx>W*0.7?"end":"start").style("fill",css(["--ink","--slate","--rust"][j])).text(t); });
   add(out,"p",null,`<b>${EX.w?"La mitad de la población":"La mitad de los municipios"}</b> ${EX.w?"vive en municipios con":"tiene"} menos de ${f(p50)}. El 10${NB}% ${EX.w?"de la población":"de los municipios"} está por debajo de ${f(p10)} y otro 10${NB}% por encima de ${f(p90)}: ${p10>0&&!/pct_chg|pts/.test(CATK[k].f||"")?`el de arriba tiene ${nf1.format(p90/p10)} veces lo del de abajo.`:`hay ${f(p90-p10).replace(/^\+/,"")} de distancia entre uno y otro.`}`).style.cssText="max-width:680px;margin-top:12px;color:var(--ink-2)";
+}
+// violines: la distribución de un dato en cada grupo (comunidad, provincia, tamaño o nivel de renta)
+function exViolin(out,k,rows){
+  const f=fmtK(k), wt=r=>EX.w?r[F.pop]:1, val=r=>r[F[k]];
+  const sizeB=[[0,1000,"Menos de 1.000 hab."],[1000,5000,"1.000–5.000 hab."],[5000,20000,"5.000–20.000 hab."],[20000,100000,"20.000–100.000 hab."],[100000,1e12,"Más de 100.000 hab."]];
+  let key, order=null;
+  if(EX.dg==="ccaa") key=r=>CCAA_OF[r[F.prov]];
+  else if(EX.dg==="prov") key=r=>provShort(PROVS[r[F.prov]]);
+  else if(EX.dg==="size"){ key=r=>{ const b=sizeB.find(s=>r[F.pop]>=s[0]&&r[F.pop]<s[1]); return b?b[2]:null; }; order=sizeB.map(s=>s[2]); }
+  else { const s=rowsAll().filter(r=>r[F.renta]!=null&&r[F.pop]).sort((a,b)=>a[F.renta]-b[F.renta]), tot=d3.sum(s,r=>r[F.pop]); let acc=0; const qm=new Map(); s.forEach(r=>{ qm.set(r[F.code],Math.min(4,Math.floor((acc+r[F.pop]/2)/tot*5))); acc+=r[F.pop]; });
+    order=["20 % con menos renta","Segundo 20 %","20 % central","Cuarto 20 %","20 % con más renta"]; key=r=>qm.has(r[F.code])?order[qm.get(r[F.code])]:null; }
+  const all=rows.map(val).sort((a,b)=>a-b), lo=d3.quantile(all,.01), hi=d3.quantile(all,.99);
+  const wq=(rs,p)=>{ const s=rs.slice().sort((a,b)=>val(a)-val(b)), tot=d3.sum(s,wt); let acc=0; for(const r of s){ acc+=wt(r); if(acc>=p*tot) return val(r); } return null; };
+  // densidad (kernel gaussiano), ponderada por población si se cuentan personas; el mismo ancho de banda para todos los grupos
+  const sd=d3.deviation(all.filter(v=>v>=lo&&v<=hi))||1, h=Math.max(1e-9,1.06*sd*Math.pow(all.length,-0.2)*1.2), G=d3.range(61).map(i=>lo+(hi-lo)*i/60);
+  let groups=d3.groups(rows.filter(r=>key(r)!=null),key).filter(([,rs])=>rs.length>=5).map(([g,rs])=>{ const tw=d3.sum(rs,wt);
+    const dens=G.map(x=>d3.sum(rs,r=>{ const z=(Math.max(lo,Math.min(hi,val(r)))-x)/h; return wt(r)*Math.exp(-.5*z*z); })/tw);
+    return {g,n:rs.length,dens,p10:wq(rs,.1),p25:wq(rs,.25),p50:wq(rs,.5),p75:wq(rs,.75),p90:wq(rs,.9)}; });
+  if(order) groups.sort((a,b)=>order.indexOf(a.g)-order.indexOf(b.g)); else groups.sort((a,b)=>b.p50-a.p50);
+  if(!groups.length){ add(out,"p","loading","No hay grupos con municipios suficientes en esta selección."); return; }
+  const med=wq(rows,.5), dmax=d3.max(groups,g=>d3.max(g.dens));
+  const W=Math.max(320,out.clientWidth||900), rh=groups.length>25?26:groups.length>8?36:52, lw=Math.min(190,W*0.3), m={t:30,r:70,b:28,l:lw};
+  const H=m.t+m.b+groups.length*rh;
+  const fg=fig(out,{title:`${labK(k)}: cómo se reparte ${EX.dg==="ccaa"?"en cada comunidad":EX.dg==="prov"?"en cada provincia":EX.dg==="size"?"según el tamaño del municipio":"según el nivel de renta del municipio"}`,
+    sub:`Cada forma es más ancha donde se concentran ${EX.w?"más personas":"más municipios"}. La barra oscura va del 25 % al 75 %; el punto blanco es la mediana`,
+    source:`${EX.dg==="renta"?"Grupos con la misma población, de menos a más renta por persona. ":""}Los valores extremos (1 % por cada lado) se agrupan en los bordes. La raya discontinua es la mediana de toda la selección. Fuente: ${CATK[k].src}.`});
+  const X=d3.scaleLinear().domain([lo,hi]).range([m.l,W-m.r]), Hh=d3.scaleLinear().domain([0,dmax]).range([0,rh*0.46]);
+  const svg=d3.select(fg.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`Distribución de ${labK(k)} por grupos`);
+  svg.append("g").attr("class","grid").selectAll("line").data(X.ticks(W<600?4:7)).join("line").attr("x1",X).attr("x2",X).attr("y1",m.t-6).attr("y2",H-m.b);
+  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(W<600?4:7)).join("text").attr("x",X).attr("y",H-8).attr("text-anchor","middle").text(v=>f(v).replace(/ (%|€)$/,"$1"));
+  svg.append("line").attr("x1",X(med)).attr("x2",X(med)).attr("y1",m.t-14).attr("y2",H-m.b).attr("stroke",css("--ink")).attr("stroke-dasharray","4 3");
+  svg.append("text").attr("class","lab strong").attr("x",X(med)+5).attr("y",m.t-16).text("Mediana: "+f(med));
+  const area=d3.area().x((d,i)=>X(G[i])).y0(d=>-Hh(d)).y1(d=>Hh(d)).curve(d3.curveBasis);
+  const gg=svg.append("g").selectAll("g").data(groups).join("g").attr("transform",(d,i)=>`translate(0,${m.t+i*rh+rh/2})`);
+  gg.append("path").attr("d",d=>area(d.dens)).attr("fill",css("--rust")).attr("fill-opacity",.35).attr("stroke",css("--rust")).attr("stroke-width",1);
+  gg.append("line").attr("x1",d=>X(d.p25)).attr("x2",d=>X(d.p75)).attr("stroke",css("--ink")).attr("stroke-width",Math.max(3,rh*0.12)).attr("stroke-linecap","round");
+  gg.append("circle").attr("cx",d=>X(d.p50)).attr("r",Math.max(2.5,rh*0.08)).attr("fill","#fff").attr("stroke",css("--ink"));
+  gg.append("text").attr("class","lab").attr("x",m.l-8).attr("y",4).attr("text-anchor","end").text(d=>d.g.length>28?d.g.slice(0,27)+"…":d.g);
+  gg.append("text").attr("class","lab strong").attr("x",W-m.r+6).attr("y",4).text(d=>f(d.p50).replace(/ (%|€)$/,"$1"));
+  gg.append("title").text(d=>`${d.g}: mediana ${f(d.p50)}; la mitad central, de ${f(d.p25)} a ${f(d.p75)}; el 10 % más bajo, por debajo de ${f(d.p10)} y el 10 % más alto, por encima de ${f(d.p90)} (${nf0.format(d.n)} municipios)`);
+  const hiG=groups.reduce((a,b)=>b.p50>a.p50?b:a), loG=groups.reduce((a,b)=>b.p50<a.p50?b:a), spread=groups.reduce((a,b)=>(b.p75-b.p25)>(a.p75-a.p25)?b:a);
+  add(out,"p",null,`La mediana más alta está en <b>${esc(hiG.g)}</b> (${f(hiG.p50)}) y la más baja en <b>${esc(loG.g)}</b> (${f(loG.p50)}). Donde más diferencias hay por dentro es en <b>${esc(spread.g)}</b>: la mitad central va de ${f(spread.p25)} a ${f(spread.p75)}.`).style.cssText="max-width:680px;margin-top:6px";
 }
 // =====================================================================
 // ESTUDIOS: preguntas causales, contadas paso a paso
@@ -3199,7 +3246,7 @@ function exBar(){
       <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Escala logarítmica en horizontal</label>
       <button type="button" class="sel" id="exswap" style="margin-top:6px">⇄ Intercambiar ejes</button>
       <p class="hint">Debajo del gráfico: <b>¿aguanta la relación?</b> Marca qué igualar y mira cuánto queda. Para hablar de causa, usa <b>Antes y después</b>.</p>`
-      :`<p class="hint" style="margin:0">Para ver si una relación aguanta al comparar entre iguales, pásala a una relación; para medir el efecto de una ley o un suceso, usa <b>Antes y después</b>.</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
+      :`<p class="hint" style="margin:0">Para ver si una relación aguanta al comparar entre iguales, pásala a una relación.</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
   const regOK=EX.v==="cruce", euOK=EX.v==="cruce"&&EX.u==="eu";
   bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); await loadAllCat(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,all:true,...(isB?{here:k=>BSER.some(x=>x[0]===k)||(isReg(k)&&CATK[k].np>=40),jump:false}:{}),onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
@@ -3264,6 +3311,7 @@ function lbSay(){
   if(EX.v==="grupos"){ const by={ccaa:r=>CCAA_OF[r[F.prov]],prov:r=>provShort(PROVS[r[F.prov]])}[EX.gb]; if(!by) return `<b>Qué estás viendo:</b> la media de cada dato en cada grupo, ponderada por población. La raya es la media de España.`;
     const g=d3.rollups(rows.filter(r=>r[F.pop]&&by(r)),wm,by).filter(x=>x[1]!=null).sort((a,b)=>b[1]-a[1]); if(!g.length) return "";
     return `<b>Qué estás viendo:</b> ${low(labK(k))} de media en cada ${EX.gb==="ccaa"?"comunidad":"provincia"}. La más alta es ${esc(g[0][0])} (${f(g[0][1])}) y la más baja, ${esc(g[g.length-1][0])} (${f(g[g.length-1][1])}). La raya es la media de España.`; }
+  if(EX.dg) return `<b>Qué estás viendo:</b> una forma por grupo, más ancha donde se concentran ${EX.w?"más personas":"más municipios"}. Así se ve no solo qué grupo está más alto, sino si dentro de cada uno todos se parecen (forma estrecha) o hay mucha diferencia (forma ancha o con dos jorobas).${mtxt}`;
   return `<b>Qué estás viendo:</b> cuánta ${EX.w?"población":"cantidad de municipios"} hay en cada nivel de ${low(labK(k))}. Una montaña estrecha quiere decir que casi todos se parecen; una ancha o con dos jorobas, que hay mucha diferencia.${mtxt}`;
 }
 function exDraw(){
