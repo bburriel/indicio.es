@@ -2140,20 +2140,43 @@ const loadSeriesES=()=>SERES_P||(SERES_P=Promise.all([getJSON("/data/alimentos.j
   add("sal_smi",{l:"Salario mínimo (€ al mes)",g:"Sueldos",u:"€",t:"nivel",v:num(S.smiLegal),src:"BOE"});
   SERES=out; return out; }));
 // estado de la vista «Series»: modo país (un dato, varios países) o modo España (varias series de España)
+// selector genérico con buscador y pestañas (el mismo aspecto que el de los datos municipales)
+function openListPicker(btn,{items,current,excl=[],onPick,placeholder="Busca un dato…"}){
+  closePicker();
+  const groups=[...new Set(items.map(x=>x.g))]; let tab=(items.find(x=>x.k===current)||items[0]||{}).g, q="";
+  const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p); PICK_BTN=btn;
+  const avail=x=>!excl.includes(x.k)||x.k===current;
+  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="${esc(placeholder)}" autocomplete="off" aria-label="Buscar"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
+  const draw=()=>{ const nq=norm(q.trim()), hit=x=>norm(x.l+" "+x.g+" "+(x.sub||"")).includes(nq);
+    document.getElementById("dpt").innerHTML=groups.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${items.filter(x=>x.g===g&&avail(x)).length}</small></button>`).join("");
+    const L=items.filter(x=>avail(x)&&(nq?hit(x):x.g===tab));
+    document.getElementById("dpl").innerHTML=L.length?L.map(x=>`<li><button type="button" data-k="${esc(x.k)}" class="${x.k===current?"on":""}"><b>${esc(x.l)}</b><small>${nq?`<i>${esc(x.g)}</i> · `:""}${esc(x.sub||"")}</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`;
+    p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
+    p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); })); };
+  draw();
+  document.getElementById("dpq").addEventListener("input",e=>{ q=e.target.value; draw(); });
+  p.querySelector(".dp-x").addEventListener("click",closePicker);
+  document.addEventListener("keydown",pickKey);
+  if(window.innerWidth>900){ const r=btn.getBoundingClientRect(), h=Math.min(p.offsetHeight,window.innerHeight-16); p.style.left=Math.min(window.innerWidth-p.offsetWidth-12,r.right+10)+"px"; p.style.top=Math.max(8,Math.min(window.innerHeight-h-8,r.top-10))+"px"; }
+  setTimeout(()=>{ const i=document.getElementById("dpq"); if(i&&window.innerWidth>900) i.focus(); else { const x=p.querySelector(".dp-x"); if(x) x.focus({preventScroll:true}); } },20);
+}
 function psRange(ys){ const a=PS.desde&&PS.desde>=ys[0]?PS.desde:ys[0], b=PS.hasta&&PS.hasta<=ys[ys.length-1]?PS.hasta:ys[ys.length-1]; return ys.filter(y=>y>=a&&y<=b); }
+function psItems(onlyES){ const Pz=PAIS?PAIS.paises:{}, SE=SERES||{};
+  const pais=onlyES?[]:Object.entries(PSIND).filter(([k])=>!PAIS||(Pz.ES||{})[k]).map(([k,v])=>({k:"pais:"+k,l:v.l,g:"Países",sub:"Eurostat · España frente a otros países"}));
+  const yr=o=>{ const y=Object.keys(o.v).sort(); return y.length?`${y[0]}–${y[y.length-1]}`:""; };
+  return pais.concat(Object.entries(SE).sort((a,b)=>a[1].l.localeCompare(b[1].l,"es")).map(([k,o])=>({k:"es:"+k,l:o.l,g:o.g.replace(/ \(.*\)$/,""),sub:`${o.src} · ${yr(o)}`}))); }
 function psBar(bar){
   const Pz=PAIS?PAIS.paises:{}, all=Object.entries(Pz).filter(([g,o])=>o[PS.k]), esMode=PS.s.length>0, SE=SERES||{};
-  const groups=[...new Set(Object.values(SE).map(o=>o.g))];
-  const optsPais=Object.entries(PSIND).filter(([k])=>!PAIS||(Pz.ES||{})[k]).map(([k,v])=>`<option value="${k}" ${!esMode&&k===PS.k?"selected":""}>${esc(v.l)}</option>`).join("");
-  const optsES=groups.map(g=>`<optgroup label="España · ${esc(g)}">${Object.entries(SE).filter(([,o])=>o.g===g).sort((a,b)=>a[1].l.localeCompare(b[1].l,"es")).map(([k,o])=>`<option value="es:${k}" ${esMode&&PS.s[0]===k?"selected":""}>${esc(o.l)}</option>`).join("")}</optgroup>`).join("");
-  const cur=esMode?SE[PS.s[0]]:null, sib=cur?Object.entries(SE).filter(([k,o])=>o.g===cur.g).sort((a,b)=>a[1].l.localeCompare(b[1].l,"es")):[];
+  const cur=esMode?SE[PS.s[0]]:null;
   const yrs=psYears(), yOpt=(sel)=>yrs.map(y=>`<option ${y===sel?"selected":""}>${y}</option>`).join("");
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.paises}.</p></div>
-    <div class="lb-step"><h4><i>2</i>Qué dato</h4><select class="sel" id="psk" aria-label="Qué dato"><optgroup label="Comparar países">${optsPais}</optgroup>${optsES}</select>
+    <div class="lb-step"><h4><i>2</i>Qué dato</h4><div class="slot full"><span class="nm" style="flex:1"><small>${esMode?"Serie principal":"Dato"}</small><button type="button" class="pick" id="pspick" aria-haspopup="dialog"><span class="pv">${esc(esMode?(cur?cur.l:""):PSIND[PS.k].l)}</span><span class="pg">${esc(esMode?(cur?cur.g.replace(/ \(.*\)$/,""):""):"Países")}</span></button></span></div>
       <p class="hint">${esc(esMode?(cur?`${cur.l}. Fuente: ${cur.src}.`:""):PSIND[PS.k].d)}</p></div>
     <div class="lb-step"><h4><i>3</i>${esMode?"Qué más series":"Qué países"}</h4>
-      ${esMode?`<div class="pschips pslist">${sib.map(([k,o])=>`<label class="chk"><input type="checkbox" data-s="${k}" ${PS.s.includes(k)?"checked":""} ${k===PS.s[0]?"disabled":""}> ${esc(o.l)}</label>`).join("")}</div>${cur&&cur.g!=="Precios (IPC por grupos)"?`<label class="chk"><input type="checkbox" id="psipc" ${PS.s.includes("ipc_general")?"checked":""}> Añadir el IPC general, para comparar</label>`:""}`
+      ${esMode?`${PS.s.slice(1).map(k=>`<div class="slot full"><span class="nm" style="flex:1"><small>Comparar con</small><button type="button" class="pick" data-sw="${k}" aria-haspopup="dialog"><span class="pv">${esc((SE[k]||{}).l||k)}</span><span class="pg">${esc(((SE[k]||{}).g||"").replace(/ \(.*\)$/,""))}</span></button></span><button type="button" data-rs="${k}" aria-label="Quitar">×</button></div>`).join("")}
+        ${PS.s.length<7?`<div class="slot"><span class="nm" style="flex:1"><small>Añadir otra serie (opcional)</small><button type="button" class="pick add" id="psadd" aria-haspopup="dialog"><span class="pv">+ elige una serie</span></button></span></div>`:""}
+        ${cur&&!cur.g.startsWith("Precios")&&!PS.s.includes("ipc_general")?`<button type="button" class="ed-go psq" id="psipc">+ Añadir el IPC general, para comparar</button>`:""}`
         :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
     <div class="lb-step"><h4><i>4</i>Comprobar</h4>
       <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
@@ -2164,16 +2187,19 @@ function psBar(bar){
       <p class="hint">${esMode?"Con el índice, todas las series empiezan en 100 y se ve cuál ha subido más desde el año que elijas.":"La economía depende mucho del ciclo europeo. Comparar con otros países separa lo que pasó en todas partes de lo que fue propio de España."}</p></div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; navTo(exHash()); }));
   const on=(id,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener("change",fn); };
-  on("psk",e=>{ const v=e.target.value; if(v.startsWith("es:")){ const k=v.slice(3); PS.s=[k]; PS.idx=SE[k]&&SE[k].idx?1:0; } else { PS.k=v; PS.s=[]; } PS.desde=PS.hasta=null; exUpdate(); });
+  const pk=document.getElementById("pspick"); if(pk) pk.addEventListener("click",()=>openListPicker(pk,{items:psItems(false),current:esMode?"es:"+PS.s[0]:"pais:"+PS.k,placeholder:"Busca un dato: paro, aceite, alquiler…",onPick:v=>{
+    if(v.startsWith("es:")){ const k=v.slice(3); PS.s=[k,...PS.s.slice(1).filter(x=>x!==k)]; if(PS.s.length===1) PS.idx=SE[k]&&SE[k].idx?1:0; } else { PS.k=v.slice(5); PS.s=[]; } PS.desde=PS.hasta=null; exUpdate(); }}));
+  const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",()=>openListPicker(ad,{items:psItems(true),current:null,excl:PS.s.map(k=>"es:"+k),placeholder:"Busca una serie: huevos, sueldo, alquiler…",onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}));
+  bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",()=>openListPicker(b,{items:psItems(true),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }})));
+  bar.querySelectorAll("button[data-rs]").forEach(b=>b.addEventListener("click",()=>{ PS.s=PS.s.filter(x=>x!==b.dataset.rs); exUpdate(); }));
   on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
   on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
   on("psref",e=>{ PS.ref=e.target.value; exUpdate(); });
   on("psidx",e=>{ PS.idx=e.target.checked?1:0; exUpdate(); });
-  on("psipc",e=>{ PS.s=e.target.checked?[...PS.s,"ipc_general"]:PS.s.filter(k=>k!=="ipc_general"); exUpdate(); });
+  const ip=document.getElementById("psipc"); if(ip) ip.addEventListener("click",()=>{ PS.s=[...PS.s,"ipc_general"]; exUpdate(); });
   on("psd",e=>{ PS.desde=+e.target.value; if(PS.hasta&&PS.hasta<PS.desde) PS.hasta=null; exUpdate(); });
   on("psh",e=>{ PS.hasta=+e.target.value; if(PS.desde&&PS.desde>PS.hasta) PS.desde=null; exUpdate(); });
   bar.querySelectorAll(".pschips input[data-g]").forEach(i=>i.addEventListener("change",()=>{ const g=i.dataset.g; PS.c=i.checked?[...new Set([...PS.c,g])].slice(0,7):PS.c.filter(x=>x!==g); if(!PS.c.includes("ES")) PS.c.unshift("ES"); exUpdate(); }));
-  bar.querySelectorAll(".pschips input[data-s]").forEach(i=>i.addEventListener("change",()=>{ const k=i.dataset.s; PS.s=i.checked?[...new Set([...PS.s,k])].slice(0,7):PS.s.filter(x=>x!==k); exUpdate(); }));
 }
 // años disponibles para el dato elegido
 function psYears(){ if(PS.s.length&&SERES) return [...new Set(PS.s.flatMap(k=>Object.keys((SERES[k]||{}).v||{}).map(Number)))].sort((a,b)=>a-b);

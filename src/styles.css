@@ -1188,3 +1188,4 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .psrange{display:flex; gap:10px; margin-bottom:8px} .psrange label{display:flex; flex-direction:column; gap:3px; font-size:13px; color:var(--muted); flex:1}
 .pslist{grid-template-columns:1fr; max-height:240px; overflow:auto; padding-right:4px}
 .psbar-y{display:flex; gap:10px; margin-left:auto; font-size:13px; color:var(--muted)} .psbar-y select{font:inherit; font-size:13px; padding:2px 4px; border:1px solid var(--rule-2); border-radius:6px; background:var(--card)}
+.psq{display:inline-block;margin-top:6px;font-size:14px;background:none;border:0;padding:0;cursor:pointer}
