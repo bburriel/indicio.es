@@ -37,20 +37,28 @@ DATASETS = {
     "lfst_hhnhtych": "Número de hogares por tipo de hogar y país",
     "demo_gind": "Población y su cambio por país",
     "prc_hpi_q": "Índice de precios de la vivienda por país (trimestral)",
+    # economía por país (para comparar gobiernos); con filtros en la URL para no bajar tablas enormes
+    "nama_10_pc?na_item=B1GQ&unit=CLV20_EUR_HAB&unit=CP_PPS_EU27_2020_HAB&unit=CP_EUR_HAB": "PIB por habitante (euros constantes, PPC y euros corrientes)",
+    "nama_10_gdp?na_item=B1GQ&unit=CLV_PCH_PRE": "Crecimiento del PIB real",
+    "une_rt_a?unit=PC_ACT&sex=T&age=Y15-74&age=Y_LT25": "Tasa de paro (total y menores de 25)",
+    "gov_10dd_edpt1?unit=PC_GDP&sector=S13&na_item=GD&na_item=B9": "Deuda y déficit públicos (% del PIB)",
+    "prc_hicp_aind?unit=RCH_A_AVG&coicop=CP00": "Inflación (IPCA, media anual)",
+    "lfsi_emp_a?indic_em=EMP_LFS&sex=T&age=Y20-64&unit=PC_POP": "Tasa de empleo de 20 a 64 años",
+    "gov_10a_main?unit=PC_GDP&sector=S13&na_item=TE&na_item=TR": "Gasto e ingresos públicos (% del PIB)",
 }
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
     for code, desc in DATASETS.items():
-        dest = os.path.join(OUT, code + ".json")
+        dest = os.path.join(OUT, code.split("?")[0] + ".json")
         if os.path.exists(dest) and os.path.getsize(dest) > 1000:
             print("ya  ", code)
             continue
-        r = subprocess.run(["curl", "-sS", "-L", "-m", "600", "-o", dest, "-w", "%{http_code}", API + code + "?format=JSON&lang=EN"],
+        r = subprocess.run(["curl", "-sS", "-L", "-m", "600", "-o", dest, "-w", "%{http_code}", API + code + ("&" if "?" in code else "?") + "format=JSON&lang=EN"],
                            capture_output=True, text=True)
         ok = r.stdout.strip().startswith("2") and os.path.exists(dest) and os.path.getsize(dest) > 1000
-        print(("ok   " if ok else "FALLO"), r.stdout.strip(), code, desc)
+        print(("ok   " if ok else "FALLO"), r.stdout.strip(), code.split("?")[0], desc)
         if not ok and os.path.exists(dest):
             os.remove(dest)
 
