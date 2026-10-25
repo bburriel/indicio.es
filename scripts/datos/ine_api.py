@@ -122,7 +122,7 @@ REGLAS = {
     486: ("Producción de la construcción", r"."),
     33: ("Indicadores demográficos básicos (esperanza de vida, fecundidad, edad media)", r"provincia|comunidad"),
     326: ("Proyecciones de población", r"comunidad|provincia|CCAA|autónom"),
-    70: ("Proyección de hogares", r"comunidad|provincia|CCAA|autónom"),
+    70: ("Proyección de hogares", r"."),
     125: ("Sociedades mercantiles creadas y disueltas", r"provincia|comunidad"),
     314: ("Encuesta de presupuestos familiares: gasto de los hogares", r"comunidad"),
     234: ("Movilidad laboral y geográfica", r"comunidad|provincia"),
