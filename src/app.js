@@ -100,7 +100,7 @@ function pathToKey(){
   if((m=p.match(/^\/municipio\/(\d{5})(?:-[^/]*)?(?:\/([a-z]+))?$/))) return "m"+m[1]+(m[2]?"-"+m[2]:"");
   if(p==="/quien-soy") return "sobre";
   if(p==="/quien-soy/contacto") return "sobre-contacto";
-  if(/^\/provincia(\/[\w-]+)?$/.test(p)) return "__static";
+  if(/^\/(provincia|rankings)(\/[\w-]+)?$/.test(p)) return "__static";
   if((m=p.match(/^\/comparar(?:\/(\d{5})?(?:-(\d{5}))?)?$/))) return "comparar"+(m[1]?"-"+m[1]:"")+(m[2]?"-"+m[2]:"");
   return "__404";
 }
@@ -119,7 +119,7 @@ function urlInit(){
     if(a.target==="_blank"||a.hasAttribute("download")||a.origin!==location.origin) return;
     const href=a.getAttribute("href")||"";
     if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); navTo(k); return; }
-    if(/^\/(data|og|provincia)(\/|$)/.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
+    if(/^\/(data|og|provincia|rankings)(\/|$)/.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
     if(href.startsWith("/")){ e.preventDefault(); navTo(href); }
   });
   // los enlaces #antiguos que generan las plantillas pasan a ruta real (también para el HTML pre-renderizado)
