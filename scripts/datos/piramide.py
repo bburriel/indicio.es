@@ -23,8 +23,9 @@ from regional_otras import geo_row  # noqa: E402
 
 API = "https://servicios.ine.es/wstempus/js/ES/"
 CACHE = os.path.join(HERE, "cache", "piramide")
-TABLAS = [56934, 56940, 56945, 69792]   # «Población residente por fecha, sexo y edad (desde 1971)»: España, CCAA, provincias…
+TABLAS = [56934, 56940, 56945]   # «Población residente por fecha, sexo y edad (desde 1971)»: España, comunidades, provincias
 ATRAS = 20                               # años para la comparación con el pasado
+UNIPROV = {"03": "33", "04": "07", "06": "39", "13": "28", "14": "30", "15": "31", "17": "26", "18": "51", "19": "52"}   # comunidad → su provincia
 GR = [f"{a}-{a + 4}" for a in range(0, 100, 5)] + ["100+"]
 
 
@@ -69,6 +70,7 @@ def grupo(a):
 out = {"fuente": "INE, Estadística Continua de Población", "grupos": GR, "es": None, "ccaa": {}, "prov": {}}
 past = {"es": None, "ccaa": {}, "prov": {}}
 fechas = set()
+visto = set()   # cada tabla repite España (y la de provincias, las comunidades): cada serie se cuenta una vez
 for tid in TABLAS:
     d = tabla(tid)
     if not d:
@@ -79,7 +81,7 @@ for tid in TABLAS:
         meta = s.get("MetaData") or []
         sexo = ed = geo = None
         for m in meta:
-            var = ((m.get("Variable") or {}).get("Nombre") or "").lower()
+            var = (m.get("T3_Variable") or (m.get("Variable") or {}).get("Nombre") or "").lower()
             nom = m.get("Nombre") or ""
             if var.startswith("sexo"):
                 sexo = {"hombres": "H", "mujeres": "M"}.get(nom.lower())
@@ -89,14 +91,20 @@ for tid in TABLAS:
                 geo = ("es", None)
             elif "comunidad" in var or "provincia" in var:
                 g = geo_row(nom, ccaa_code)
-                if g:
+                if g and var.startswith("provincia") and g[0] == "ccaa":   # comunidades de una sola provincia
+                    g = ("prov", UNIPROV.get(str(g[1]).zfill(2)))
+                if g and g[1]:
                     geo = (g[0], g[1])
         if not sexo or ed is None or not geo:
             continue
+        clave = (geo, sexo, ed)
+        if clave in visto:
+            continue
+        visto.add(clave)
         datos = [x for x in (s.get("Data") or []) if x.get("Valor") is not None]
         if not datos:
             continue
-        datos.sort(key=lambda x: x.get("Fecha") or 0)
+        datos.sort(key=lambda x: str(x.get("Fecha") or ""))
         ult = datos[-1]
         anyo = int(ult.get("Anyo"))
         ant = [x for x in datos if int(x.get("Anyo")) == anyo - ATRAS]
@@ -132,6 +140,8 @@ if out["es"]:
 def fecha_txt(f):
     try:
         import datetime
+        if isinstance(f, str) and re.match(r"\d{4}-\d{2}-\d{2}", f):
+            return f[:10]
         return datetime.datetime.utcfromtimestamp(int(f) / 1000).strftime("%Y-%m-%d")
     except Exception:  # noqa: BLE001
         return str(f)
