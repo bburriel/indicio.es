@@ -40,7 +40,7 @@ DATASETS = {
     # economía por país (para comparar gobiernos); con filtros en la URL para no bajar tablas enormes
     "nama_10_pc?na_item=B1GQ&unit=CLV20_EUR_HAB&unit=CP_PPS_EU27_2020_HAB&unit=CP_EUR_HAB": "PIB por habitante (euros constantes, PPC y euros corrientes)",
     "nama_10_gdp?na_item=B1GQ&unit=CLV_PCH_PRE": "Crecimiento del PIB real",
-    "une_rt_a?unit=PC_ACT&sex=T&age=Y15-74&age=Y_LT25": "Tasa de paro (total y menores de 25)",
+    "une_rt_a?unit=PC_ACT&sex=T&age=Y15-74&age=Y15-24": "Tasa de paro (total y menores de 25)",
     "gov_10dd_edpt1?unit=PC_GDP&sector=S13&na_item=GD&na_item=B9": "Deuda y déficit públicos (% del PIB)",
     "prc_hicp_aind?unit=RCH_A_AVG&coicop=CP00": "Inflación (IPCA, media anual)",
     "lfsi_emp_a?indic_em=EMP_LFS&sex=T&age=Y20-64&unit=PC_POP": "Tasa de empleo de 20 a 64 años",

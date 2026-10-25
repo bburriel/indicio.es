@@ -11,7 +11,7 @@ import os
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__)); C = f"{HERE}/cache"; EU = f"{C}/eurostat"; WB = f"{C}/worldbank"
-GEO = {"ES": ("España", "ESP"), "EU27_2020": ("Unión Europea", None), "EA20": ("Zona euro", None), "DE": ("Alemania", "DEU"), "FR": ("Francia", "FRA"),
+GEO = {"ES": ("España", "ESP"), "EU27_2020": ("Unión Europea", "EUU"), "EA20": ("Zona euro", "EMU"), "DE": ("Alemania", "DEU"), "FR": ("Francia", "FRA"),
        "IT": ("Italia", "ITA"), "PT": ("Portugal", "PRT"), "NL": ("Países Bajos", "NLD"), "IE": ("Irlanda", "IRL"), "GR": ("Grecia", "GRC"),
        "BE": ("Bélgica", "BEL"), "AT": ("Austria", "AUT"), "SE": ("Suecia", "SWE"), "DK": ("Dinamarca", "DNK"), "FI": ("Finlandia", "FIN"), "PL": ("Polonia", "POL")}
 
@@ -38,7 +38,7 @@ os.makedirs(WB, exist_ok=True)
 wb = {}
 codes = ";".join(v[1] for v in GEO.values() if v[1])
 for k, ind in WBI.items():
-    f = f"{WB}/{ind}.json"
+    f = f"{WB}/{ind}-{len(codes.split(';'))}.json"   # el nombre cambia si cambia la lista de países
     if not (os.path.exists(f) and os.path.getsize(f) > 1000):
         url = f"https://api.worldbank.org/v2/country/{codes}/indicator/{ind}?format=json&per_page=20000&date=1970:2025"
         r = subprocess.run(["curl", "-sS", "-L", "-m", "300", "-o", f, "-w", "%{http_code}", url], capture_output=True, text=True)
@@ -58,7 +58,7 @@ specs = {
     "pibpcPPC": ("nama_10_pc", dict(na_item="B1GQ", unit="CP_PPS_EU27_2020_HAB")),
     "crecimiento": ("nama_10_gdp", dict(na_item="B1GQ", unit="CLV_PCH_PRE")),
     "paro": ("une_rt_a", dict(unit="PC_ACT", sex="T", age="Y15-74")),
-    "paroJuvenil": ("une_rt_a", dict(unit="PC_ACT", sex="T", age="Y_LT25")),
+    "paroJuvenil": ("une_rt_a", dict(unit="PC_ACT", sex="T", age="Y15-24")),
     "deuda": ("gov_10dd_edpt1", dict(unit="PC_GDP", sector="S13", na_item="GD")),
     "deficit": ("gov_10dd_edpt1", dict(unit="PC_GDP", sector="S13", na_item="B9")),
     "inflacion": ("prc_hicp_aind", dict(unit="RCH_A_AVG", coicop="CP00")),
