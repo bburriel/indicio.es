@@ -1860,7 +1860,7 @@ function mdRender(B,id,V={},G={}){
   const flushP=()=>{ if(para.length){ add(box,"p",null,mdInline(para.join(" "))); para=[]; } };
   const flushL=()=>{ if(list){ add(box,list.t,null,list.items.map(i=>`<li>${mdInline(i)}</li>`).join("")); list=null; } };
   const flushQ=()=>{ if(quote){ const lab=(quote[0].match(/^\[([^\]]+)\]\s*/)||[])[1]; if(lab) quote[0]=quote[0].replace(/^\[[^\]]+\]\s*/,"");
-      lect(cur,quote.join("\n").split(/\n\s*\n/).map(p=>`<p>${mdInline(p.replace(/\n/g," "))}</p>`).join(""),lab||"Qué nos dice"); quote=null; } };
+      lect(cur,quote.join("\n").split(/\n\s*\n/).map(p=>`<p>${mdInline(p.replace(/\n/g," "))}</p>`).join(""),lab||"Qué nos dice"); quote=null;  box=add(cur,"div","txt"); } };
   const flush=()=>{ flushP(); flushL(); flushQ(); };
   for(const ln of lines){
     let m;
@@ -4318,65 +4318,59 @@ async function studyDeudaGob(B){
 
 // ---------- precio de los alimentos frente a sueldos y resto de precios (data/alimentos.json) ----------
 async function studyAlimentos(B){
-  await loadRegional(); const AB=abstract(B), A=await getJSON("/data/alimentos.json"), P=A.meses, I=A.ipc, S=A.salario, SP=S.periodos;
+  // El texto está en contenido/analisis/precio-alimentos.md; aquí solo las cifras (V) y los gráficos (G).
+  await loadRegional();
+  const [A,D]=await Promise.all([getJSON("/data/alimentos.json"),getJSON("/data/sueldos.json")]);
+  const P=A.meses, I=A.ipc, mi=p=>+p.slice(5), my=p=>+p.slice(0,4);
   const yav=(v,per,y)=>{ const x=v?per.map((p,i)=>p.startsWith(String(y))?v[i]:null).filter(z=>z!=null):[]; return x.length?d3.mean(x):null; };
-  const lastY=+P[P.length-1].slice(0,4), Y=d3.range(2008,lastY+1), B0=2019, LY=lastY-1;   // último año completo
-  const ix=(v,per,b=B0)=>{ const z=yav(v,per,b); return Y.map(y=>{ const q=yav(v,per,y); return q!=null&&z?q/z*100:null; }); };
-  const iF=ix(I.es.alimentos,P), iG=ix(I.es.general,P), iW=ix(S.es,SP);
-  const at=(a,y)=>a[Y.indexOf(y)], gF=at(iF,LY)-100, gG=at(iG,LY)-100, gW=at(iW,LY)-100, buy=(at(iW,LY)/at(iF,LY)-1)*100;
-  const l08=(v,per)=>(yav(v,per,LY)/yav(v,per,2008)-1)*100, gF08=l08(I.es.alimentos,P), gG08=l08(I.es.general,P), gW08=l08(S.es,SP);
-  // relativo: alimentos / IPC general, mensual desde 2002 (2002 = 100)
-  const rel=P.map((p,i)=>I.es.alimentos[i]&&I.es.general[i]?I.es.alimentos[i]/I.es.general[i]:null), r0=d3.mean(rel.slice(0,12)), relI=rel.map(v=>v==null?null:v/r0*100);
-  const relY=d3.range(2002,lastY+1), relA=relY.map(y=>yav(relI,P,y)), relLast=relA[relA.length-1];
-  // comunidades
-  const CC=Object.entries(I.ccaa).filter(([c])=>S.ccaa[c]&&!["18","19"].includes(c)).map(([c,o])=>{ const f=yav(o.alimentos,P,LY)/yav(o.alimentos,P,B0), w=yav(S.ccaa[c],SP,LY)/yav(S.ccaa[c],SP,B0); return {c,n:(REG&&REG.ccaa[c])||c,f:(f-1)*100,w:(w-1)*100,b:(w/f-1)*100}; }).sort((a,b)=>a.b-b.b);
-  const f1=v=>nf1.format(v), f0=v=>nf0.format(v), sg=v=>sgn(v);
-  const SUB=A.subclases;
-
-  sec(B,"ctx",`<p>Pocas cosas se notan tanto en el bolsillo como el ticket del supermercado. Entre 2021 y 2023 la comida se encareció a un ritmo que no se veía desde los años noventa: la guerra de Ucrania, la sequía, el precio de la energía y de los fertilizantes. Luego la inflación general se moderó, pero los precios no vuelven atrás: lo que subió, subido está.</p>
-    <p>La pregunta que importa en casa no es cuánto suben los precios, sino <b>si los sueldos han subido lo mismo</b>. Es lo que se llama inflación «real»: cuánta comida se puede comprar hoy con un sueldo, comparado con antes.</p>`);
-  sec(B,"int",`<p>No hay una medida concreta: es un análisis descriptivo de cómo han evolucionado los precios de los alimentos frente al resto de precios y frente a los salarios desde 2002, en España y por comunidades.</p>`,{title:"Qué se mira"});
-  sec(B,"ana",`<p>Para los precios, el IPC del INE: el índice general y el de alimentos y bebidas no alcohólicas, mes a mes desde 2002, en España y en cada comunidad. Para los sueldos, el coste salarial total por trabajador y mes de la Encuesta Trimestral de Coste Laboral (lo que cobra en bruto, de media, un asalariado). Se comparan medias anuales; ${lastY} va hasta ${MES[+P[P.length-1].slice(5)]} y no se usa en las comparaciones de año completo. El año de referencia es ${B0}, el último antes de la pandemia: en 2020 los ERTE bajaron el salario medio de forma artificial.</p>`);
-
-  const s1=res(B,`Desde ${B0}, la comida ha subido un ${f0(gF)}${NB}% y los sueldos un ${f0(gW)}${NB}%`,`<p>Índice, media de ${B0} = 100.</p>`);
-  const yy=Y.filter(y=>y>=2015&&y<=lastY);
-  lineChart(s1,{title:`Alimentos, todos los precios y sueldos (${B0} = 100)`,sub:`España, medias anuales${lastY>LY?`; ${lastY}, hasta ${MES[+P[P.length-1].slice(5)]}`:""}`,source:"Fuente: INE, IPC y Encuesta Trimestral de Coste Laboral. Cálculo de Indicio.",series:[{n:"Alimentos",v:yy.map(y=>at(iF,y)),c:"--rust",main:true},{n:"Todos los precios (IPC)",v:yy.map(y=>at(iG,y)),c:"--stone"},{n:"Sueldo medio",v:yy.map(y=>at(iW,y)),c:"--slate"}],years:yy,fmt:v=>f1(v),xticks:[2015,B0,LY]});
-  lect(s1,`<p>Hasta 2021 las tres líneas iban casi juntas. Entre 2021 y 2023 la comida se despega: en dos años sube más que en los quince anteriores. Los sueldos suben también, más que antes, pero al ritmo del resto de precios, no al de la comida. En ${LY} los alimentos cuestan un ${f0(gF)}${NB}% más que en ${B0}; todos los precios juntos, un ${f0(gG)}${NB}%; el sueldo medio ha subido un ${f0(gW)}${NB}%.</p>
-    <p>Dicho de otra forma: <b>con el sueldo medio de ${LY} se compra un ${f0(Math.abs(buy))}${NB}% ${buy<0?"menos":"más"} de comida que con el de ${B0}</b>. Para el conjunto de la cesta (vivienda, transporte, ropa…), el sueldo medio ha subido más o menos lo mismo que los precios; para la comida, no.</p>`);
-
-  const s2=res(B,`La comida es hoy un ${f0(relLast-100)}${NB}% más cara respecto al resto de cosas que en 2002`,`<p>Precio de los alimentos dividido por el IPC general, 2002 = 100. Si sube, la comida se encarece más que el resto; si baja, menos.</p>`);
-  lineChart(s2,{title:"Precio relativo de los alimentos (2002 = 100)",sub:"Alimentos y bebidas no alcohólicas / IPC general, medias anuales",source:"Fuente: INE, IPC. Cálculo de Indicio.",series:[{n:"Precio relativo",v:relA,c:"--rust",main:true}],years:relY,fmt:v=>f1(v),xticks:[2002,2012,2021,lastY]});
-  lect(s2,`<p>Durante casi veinte años la comida se encareció algo más que el resto de cosas, pero muy poco a poco. El salto de 2022 y 2023 cambia de escala, y no se ha deshecho: aunque desde 2024 los alimentos suben menos, siguen arriba. Para los hogares que gastan una parte grande de su presupuesto en comer, que suelen ser los de menos renta, la inflación real ha sido mayor que la del IPC.</p>
-    <p>A más largo plazo, desde 2008: alimentos ${sg(gF08)}, todos los precios ${sg(gG08)}, sueldo medio ${sg(gW08)}.</p>`);
-
-  const s3=res(B,`En ninguna comunidad los sueldos han seguido a la comida`,`<p>Cambio entre ${B0} y ${LY} del precio de los alimentos y del sueldo medio en cada comunidad, y cuánta más (o menos) comida se compra con el sueldo.</p>`);
-  hbars(s3,CC.map(x=>({l:x.n,v:x.b})),{fmt:v=>sg(v),ref:buy,refLabel:"España"});
-  table(s3,["Comunidad","Alimentos","Sueldo medio","Comida que compra el sueldo"],CC.map(x=>[x.n,sg(x.f),sg(x.w),sg(x.b)]),{max:700});
-  lect(s3,`<p>${CC.filter(x=>x.b>=0).length?`Solo en ${listY(CC.filter(x=>x.b>=0).map(x=>x.n))} el sueldo medio ha subido al menos como la comida.`:"En todas las comunidades la comida ha subido más que el sueldo medio."} Donde peor ha ido, ${listY(CC.slice(0,2).map(x=>x.n))}, con el sueldo de ${LY} se compra en torno a un ${f0(Math.abs(CC[0].b))}${NB}% menos de comida que en ${B0}. Las diferencias vienen más de los sueldos que de los precios: la comida sube parecido en todas partes; los sueldos, no.</p>`);
-
-  if(SUB&&SUB.s&&Object.keys(SUB.s).length){
-    const sp=SUB.periodos, W=SUB.pesos||{}, rows=Object.entries(SUB.s).map(([n,v])=>{ const a=yav(v,sp,B0), b=yav(v,sp,LY); return a&&b?{n,g:(b/a-1)*100,w:W[n]||0}:null; }).filter(Boolean).sort((a,b)=>b.g-a.g);
-    const SHORT={"Carne, fresca, refrigerada o congelada":"carne fresca","Carne, seca, salada, en salmuera o ahumada":"embutidos y carne curada","Pan y productos de panadería":"pan y bollería","Pescado,  fresco, refrigerado o congelado":"pescado fresco","Chocolate, cacao y productos alimenticios a base de cacao":"chocolate y cacao","Zumos de frutas y hortalizas":"zumos","Aceites vegetales":"aceite","Café y sucedáneos de café":"café","Hortalizas, tubérculos y legumbres, molidos y en otras preparaciones":"conservas y preparados de hortalizas","Frutas y frutos secos procesados (en conserva, tostados, molidos, etc.)":"fruta en conserva y frutos secos procesados","Otros productos a base de cereales y de grano molidos":"otros productos de cereales","Frutos secos naturales, con o sin cáscara":"frutos secos"};
-    const sh=n=>SHORT[n]||low(n.split(",")[0].split(" (")[0]);
-    const CAUSA={"Huevos":"la gripe aviar en los huevos","Zumos de frutas y hortalizas":"las malas cosechas de naranja en los zumos","Chocolate, cacao y productos alimenticios a base de cacao":"el precio mundial del cacao en el chocolate","Aceites vegetales":"la sequía en el aceite de oliva","Azúcar de caña y azúcar de remolacha":"el precio mundial del azúcar"};
-    const top=rows.slice(0,6), cs=top.filter(r=>CAUSA[r.n]);
-    const s4=res(B,`Lo que más ha subido: ${listY(rows.slice(0,3).map(r=>sh(r.n)))}`,`<p>Subida de precio de cada tipo de alimento y bebida no alcohólica entre ${B0} y ${LY} (IPC por subclases, ${rows.length} tipos).</p>`);
-    hbars(s4,rows.map(r=>({l:r.n,v:r.g})),{fmt:v=>sg(v),ref:gF,refLabel:"Alimentos",scroll:true});
-    lect(s4,`<p>La media esconde mucha variedad. ${cap(listY(top.slice(0,3).map(r=>`${sh(r.n)} (${sg(r.g)})`)))} encabezan la lista; en el otro extremo, ${listY(rows.slice(-3).map(r=>`${sh(r.n)} (${sg(r.g)})`))}. ${cs.length?`Detrás de los que más suben hay causas concretas: ${listY(cs.map(r=>CAUSA[r.n]))}.`:""}</p>`);
-    // contribución: peso en la cesta × subida
-    const tw=d3.sum(rows,r=>r.w), con=rows.map(r=>({...r,c:r.w*r.g})).sort((a,b)=>b.c-a.c), tc=d3.sum(con,r=>r.c);
-    if(tw>0){ const s5=res(B,`Lo que más ha encarecido la cesta: ${listY(con.slice(0,3).map(r=>sh(r.n)))}`,`<p>No es lo mismo que suba mucho algo que se compra poco que algo que se compra cada semana. Cuánto ha aportado cada tipo de alimento a la subida total, según lo que pesa en el gasto de los hogares (ponderaciones del IPC de ${SUB.pesosAño||"2026"}).</p>`);
-      table(s5,["Tipo de alimento","Peso en la cesta de alimentos","Subida","Parte de la subida total"],con.slice(0,10).map(r=>[r.n,pc(r.w/tw*100),sg(r.g),pc(r.c/tc*100)]),{max:820});
-      lect(s5,`<p>${cap(listY(con.slice(0,3).map(r=>sh(r.n))))} explican juntos un ${f0(d3.sum(con.slice(0,3),r=>r.c)/tc*100)}${NB}% de lo que ha subido la cesta de alimentos: no son los que más se han encarecido en porcentaje, pero son los que más se compran. ${top.filter(r=>r.w/tw<0.02).length?`En cambio, ${listY(top.filter(r=>r.w/tw<0.02).slice(0,2).map(r=>sh(r.n)))}, que encabezan la lista de subidas, pesan poco en el gasto.`:""}</p>`); }
-  }
-
-  sec(B,"con",`<p><b>La comida es hoy bastante más cara en proporción al sueldo que antes de la pandemia.</b> Entre ${B0} y ${LY} los alimentos subieron un ${f0(gF)}${NB}% y el sueldo medio un ${f0(gW)}${NB}%: con el mismo sueldo se compra un ${f0(Math.abs(buy))}${NB}% ${buy<0?"menos":"más"} de comida. Para el resto de la cesta, en cambio, los sueldos han seguido a los precios.</p>
-    <p>Esto ayuda a entender por qué tanta gente dice que «todo está más caro» aunque el IPC ya no suba tanto: el IPC mide cuánto suben los precios cada año, no dónde se quedan; y la comida, que se compra cada semana, es lo que más se nota.</p>
-    <ul class="defs"><li><b>Sueldo medio no es tu sueldo.</b> Es una media de todos los asalariados; los sueldos bajos han subido más (el salario mínimo pasó de 900 euros en 2019 a 1.184 en 2025, un +32 %), y los altos, menos. Tampoco incluye a autónomos ni pensionistas.</li>
-    <li><b>Bruto.</b> El coste salarial es antes de impuestos y cotizaciones; el sueldo neto ha podido subir algo distinto.</li>
-    <li><b>La cesta media.</b> El IPC de alimentos pesa cada producto según lo que gasta el hogar medio; tu cesta puede ser distinta.</li></ul>`);
-  methods(B,[["En pocas palabras","Se compara cuánto han subido los precios de los alimentos, el resto de precios y el sueldo medio desde 2019 y desde 2008, en España y por comunidades."],["Datos","INE: IPC por comunidades, índice general y de alimentos y bebidas no alcohólicas, mensual desde 2002 (tabla 76136)"+(SUB?", e IPC nacional por subclases (tabla 76128)":"")+"; Encuesta Trimestral de Coste Laboral, coste salarial total por trabajador y mes (tabla 6061)."],["Medias anuales","Media de los meses (precios) o de los trimestres (sueldos) de cada año. El último año incompleto solo se usa en el primer gráfico."],["Comida que compra el sueldo","Índice del sueldo medio dividido por el índice de precios de los alimentos, menos uno."],["Precio relativo","Índice de alimentos dividido por el índice general, con 2002 = 100."]]);
-  AB.fill({ctx:"Entre 2021 y 2023 la comida se encareció como no se veía desde los años noventa.",intT:"Qué se mira",int:"Precios de los alimentos frente al resto de precios y al sueldo medio, 2002–2026.",ana:"IPC del INE (general y alimentos, por comunidades) y coste salarial por trabajador (ETCL), medias anuales.",res:`${B0}–${LY}: alimentos ${sg(gF)}, IPC ${sg(gG)}, sueldo medio ${sg(gW)}; con el sueldo se compra un ${f0(Math.abs(buy))} % ${buy<0?"menos":"más"} de comida.`,con:"Los sueldos han seguido al conjunto de precios, pero no a la comida."});
+  const last12=(v,per)=>d3.mean(v.slice(-12).filter(x=>x!=null));
+  const lastY=my(P[P.length-1]), LY=mi(P[P.length-1])===12?lastY:lastY-1;      // último año completo
+  const mes=p=>`${MES[mi(p)]} de ${my(p)}`;
+  const yoy=v=>v.map((x,i)=>i>=12&&x!=null&&v[i-12]?(x/v[i-12]-1)*100:null);
+  const yF=yoy(I.es.alimentos), yG=yoy(I.es.general), iF=d3.maxIndex(yF.map(x=>x==null?-1e9:x)), iG=d3.maxIndex(yG.map(x=>x==null?-1e9:x));
+  const E=D.ees, EY=E.años.map(Number), eY=EY[EY.length-1], at=(a,y)=>a[EY.indexOf(y)];
+  const fA=y=>yav(I.es.alimentos,P,y), fG=y=>yav(I.es.general,P,y);
+  const pw=(a,y,b,pr)=>(at(a,y)/at(a,b)/(pr(y)/pr(b))-1)*100;
+  const SMI=D.smiLegal, smiYs=Object.keys(SMI).map(Number), smiLast=smiYs[smiYs.length-1];
+  // precio relativo: alimentos / general, 2002 = 100
+  const rel=P.map((p,i)=>I.es.alimentos[i]&&I.es.general[i]?I.es.alimentos[i]/I.es.general[i]:null), r0=d3.mean(rel.slice(0,12)), relY=d3.range(2002,LY+1), relA=relY.map(y=>yav(rel.map(v=>v==null?null:v/r0*100),P,y));
+  // subclases
+  const SUB=A.subclases, sp=SUB.periodos, W=SUB.pesos||{};
+  const SHORT={"Carne, fresca, refrigerada o congelada":"la carne fresca","Carne, seca, salada, en salmuera o ahumada":"los embutidos","Pan y productos de panadería":"el pan y la bollería","Pescado,  fresco, refrigerado o congelado":"el pescado fresco","Chocolate, cacao y productos alimenticios a base de cacao":"el chocolate","Zumos de frutas y hortalizas":"los zumos","Aceites vegetales":"el aceite","Café y sucedáneos de café":"el café","Huevos":"los huevos","Leche entera":"la leche entera","Queso":"el queso","Bayas frescas":"las bayas","Azúcar de caña y azúcar de remolacha":"el azúcar","Agua":"el agua embotellada","Refrescos":"los refrescos","Frutos secos naturales, con o sin cáscara":"los frutos secos","Alimentos preparados":"los platos preparados","Yogur y productos similares":"los yogures","Frutas y frutos secos procesados (en conserva, tostados, molidos, etc.)":"la fruta en conserva y los frutos secos tostados","Bebida vegetal":"las bebidas vegetales","Despojos comestibles":"la casquería","Mantequilla y otros aceites y grasas derivados de la leche":"la mantequilla","Otras frutas frescas":"otras frutas frescas","Cítricos frescos":"los cítricos","Patatas y otros tubérculos":"las patatas","Legumbres secas":"las legumbres secas","Harina de cereales":"la harina","Macarrones, tallarines, cuscús y pastas alimenticias similares":"la pasta"};
+  const sh=n=>SHORT[n]||low(n.split(",")[0].split(" (")[0]);
+  const rows=Object.entries(SUB.s).map(([n,v])=>{ const a=yav(v,sp,2019), b=yav(v,sp,LY); return a&&b?{n,v,a,g:(b/a-1)*100,w:W[n]||0}:null; }).filter(Boolean).sort((a,b)=>b.g-a.g);
+  const tw=d3.sum(rows,r=>r.w), con=rows.map(r=>({...r,c:r.w*r.g})).sort((a,b)=>b.c-a.c), tc=d3.sum(con,r=>r.c);
+  const ac=rows.find(r=>r.n==="Aceites vegetales"); let acP=null;
+  if(ac){ const k=d3.maxIndex(ac.v.map(x=>x==null?-1:x)); acP={g:(ac.v[k]/ac.a-1)*100,p:sp[k],u:(last12(ac.v,sp)/ac.a-1)*100}; }
+  // comunidades: comida frente al sueldo mediano, 2019 → último año de sueldos
+  const CC=Object.entries(E.ccaa).filter(([c])=>I.ccaa[c]).map(([c,o])=>{ const f=yav(I.ccaa[c].alimentos,P,eY)/yav(I.ccaa[c].alimentos,P,2019); return {c,n:(REG&&REG.ccaa[c])||c,f:(f-1)*100,w:(at(o.Mediana,eY)/at(o.Mediana,2019)-1)*100,b:(at(o.Mediana,eY)/at(o.Mediana,2019)/f-1)*100}; }).sort((a,b)=>b.b-a.b);
+  const V={picoAli:yF[iF],picoAliMes:mes(P[iF]),picoGen:yG[iG],picoGenMes:mes(P[iG]),yoyAliUlt:yF[yF.length-1],yoyGenUlt:yG[yG.length-1],ultMes:mes(P[P.length-1]),
+    aliUlt19:(last12(I.es.alimentos,P)/fA(2019)-1)*100,gen19:(last12(I.es.general,P)/fG(2019)-1)*100,añoSueldo:eY,med19:(at(E.es.Mediana,eY)/at(E.es.Mediana,2019)-1)*100,
+    poderMed:pw(E.es.Mediana,eY,2019,fA),poderMedIPC:pw(E.es.Mediana,eY,2019,fG),poderP10:pw(E.es["Percentil 10"],eY,2019,fA),poderP90:pw(E.es["Percentil 90"],eY,2019,fA),
+    smi19:SMI["2019"],smiUlt:SMI[String(smiLast)],smiUltAño:smiLast,smiSubida:(SMI[String(smiLast)]/SMI["2019"]-1)*100,
+    rel02:relA[relA.length-1]-100,ali2123:(fA(2023)/fA(2021)-1)*100,ali0821:(fA(2021)/fA(2008)-1)*100,
+    sub1N:sh(rows[0].n),sub1:rows[0].g,sub2N:sh(rows[1].n),sub2:rows[1].g,sub3N:sh(rows[2].n),sub3:rows[2].g,low1N:sh(rows[rows.length-1].n),low1:rows[rows.length-1].g,low2N:sh(rows[rows.length-2].n),low2:rows[rows.length-2].g,
+    aceitePico:acP&&acP.g,aceitePicoMes:acP&&mes(acP.p),aceiteUlt:acP&&acP.u,
+    con1N:sh(con[0].n),con2N:sh(con[1].n),con3N:sh(con[2].n),con3:d3.sum(con.slice(0,3),r=>r.c)/tc*100,
+    ccaaMejorN:CC[0].n,ccaaMejor:CC[0].b,ccaaPeorN:CC[CC.length-1].n,ccaaPeor:CC[CC.length-1].b};
+  const SRC="Fuente: INE, IPC.", sg=v=>sgn(v);
+  const G={
+    olas:el=>{ const i0=P.indexOf("2019M01"), per=P.slice(i0).map(p=>MES[mi(p)].slice(0,3)+". "+my(p)); lineChart(el,{title:"Cuánto suben los precios respecto al mismo mes del año anterior",sub:"España, % mensual",source:SRC,years:per,xticks:per.filter(p=>p.startsWith("ene")),tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>pc(v),
+      series:[{n:"Alimentos",v:yF.slice(i0),c:"--rust",main:true},{n:"Todos los precios",v:yG.slice(i0),c:"--slate"}]}); },
+    carrera:el=>{ const Y=d3.range(2015,lastY+1); lineChart(el,{title:"Alimentos, todos los precios y sueldo mediano (2019 = 100)",sub:`España, medias anuales${lastY>LY?`; ${lastY}, hasta ${MES[mi(P[P.length-1])]}`:""}. Sueldos hasta ${eY}`,source:"Fuente: INE, IPC y Encuesta Anual de Estructura Salarial.",years:Y,xticks:[2015,2019,2022,lastY],
+      series:[{n:"Alimentos",v:Y.map(y=>fA(y)/fA(2019)*100),c:"--rust",main:true},{n:"Todos los precios",v:Y.map(y=>fG(y)/fG(2019)*100),c:"--slate"},{n:"Sueldo mediano",v:Y.map(y=>EY.includes(y)?at(E.es.Mediana,y)/at(E.es.Mediana,2019)*100:null),c:"--ink"}]}); },
+    compra:el=>{ const f=fig(el,{title:`Cuánta más (o menos) comida compra el sueldo de ${eY} que el de 2019`,sub:"Subida del sueldo comparada con la de los alimentos",source:"Fuente: INE, Encuesta Anual de Estructura Salarial e IPC."});
+      table(f.body,["Sueldo","Subida del sueldo","Subida de la comida","Comida que compra"],[["El 10 % que menos cobra",E.es["Percentil 10"]],["El cuarto de abajo",E.es["Cuartil inferior"]],["Mediano",E.es.Mediana],["El cuarto de arriba",E.es["Cuartil superior"]],["El 10 % que más cobra",E.es["Percentil 90"]]].map(([l,a])=>[l,sg((at(a,eY)/at(a,2019)-1)*100),sg((fA(eY)/fA(2019)-1)*100),`<b>${sg(pw(a,eY,2019,fA))}</b>`]),{max:700}); },
+    relativo:el=>lineChart(el,{title:"Precio de la comida en relación con el resto de precios (2002 = 100)",sub:"Alimentos y bebidas no alcohólicas entre el IPC general, medias anuales",source:SRC+" Cálculo de Indicio.",years:relY,xticks:[2002,2008,2014,2019,LY],series:[{n:"Precio relativo",v:relA,c:"--rust",main:true}]}),
+    subidas:el=>{ const f=fig(el,{title:`Subida de cada tipo de alimento, 2019–${LY}`,sub:`IPC por subclases, ${rows.length} tipos; la raya es la media de los alimentos`,source:SRC});
+      hbars(f.body,rows.map(r=>({l:r.n,v:r.g})),{fmt:sg,ref:(fA(LY)/fA(2019)-1)*100,refLabel:"Alimentos",scroll:true}); },
+    cesta:el=>{ const f=fig(el,{title:`Lo que más ha aportado a la subida de la cesta, 2019–${LY}`,sub:"Peso de cada tipo de alimento en la cesta × su subida",source:SRC+" Cálculo de Indicio."});
+      table(f.body,["Tipo de alimento","Peso en la cesta","Subida","Parte de la subida total"],con.slice(0,10).map(r=>[r.n,pc(r.w/tw*100),sg(r.g),pc(r.c/tc*100)]),{max:820}); },
+    ccaa:el=>{ const f=fig(el,{title:`Comida que compra el sueldo mediano de ${eY} frente al de 2019, por comunidad`,sub:"La raya es España",source:"Fuente: INE, IPC por comunidades y Encuesta Anual de Estructura Salarial."});
+      hbars(f.body,CC.map(x=>({l:x.n,v:x.b})),{fmt:sg,ref:V.poderMed,refLabel:"España",wide:true});
+      table(f.body,["Comunidad","Comida","Sueldo mediano","Comida que compra"],CC.map(x=>[x.n,sg(x.f),sg(x.w),sg(x.b)]),{max:700}); }
+  };
+  mdRender(B,"precio-alimentos",V,G);
 }
 
 // ---------- sueldos: dónde estás en la fila y cómo se ha movido cada escalón ----------
