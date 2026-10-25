@@ -1188,3 +1188,11 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .psrange{display:flex; gap:10px; margin-bottom:8px} .psrange label{display:flex; flex-direction:column; gap:3px; font-size:13px; color:var(--muted); flex:1}
 .pslist{grid-template-columns:1fr; max-height:240px; overflow:auto; padding-right:4px}
 .psbar-y{display:flex; gap:10px; margin-left:auto; font-size:13px; color:var(--muted)} .psbar-y select{font:inherit; font-size:13px; padding:2px 4px; border:1px solid var(--rule-2); border-radius:6px; background:var(--card)}
+.psq{display:inline-block;margin-top:6px;font-size:14px;background:none;border:0;padding:0;cursor:pointer}
+.dp-lv{display:flex; gap:4px; flex-wrap:wrap; padding:0 10px 8px; flex:none}
+.dp-lv button{border:0; background:none; padding:2px 7px; border-radius:6px; font:inherit; font-size:12.5px; color:var(--muted); cursor:pointer}
+.dp-lv button[aria-pressed="true"]{background:var(--band); color:var(--ink); font-weight:600}
+.dp-list .lv{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:0 5px; border-radius:4px; margin-right:6px; background:var(--band); color:var(--ink-2); vertical-align:1px}
+.dp-list .lv-mu{background:color-mix(in srgb,var(--brand) 13%,transparent); color:var(--brand)}
+.dp-list .lv-es,.dp-list .lv-pa{background:color-mix(in srgb,#2f6db5 14%,transparent); color:#2f6db5}
+.dp-list button.far b{font-weight:500} .dp-list small u{text-decoration:none; font-style:italic}
