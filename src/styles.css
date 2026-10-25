@@ -1174,3 +1174,6 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .exlists .lista + .lista{margin-top:0}
 .exlists figcaption{grid-column:1/-1}
 @media (max-width:640px){ .exlists{grid-template-columns:minmax(0,1fr)} .exlists .lista + .lista{margin-top:18px} }
+/* laboratorio, países */
+.pschips{display:grid; grid-template-columns:1fr 1fr; gap:2px 10px}
+.pschips .chk{font-size:14px}
