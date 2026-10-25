@@ -227,7 +227,7 @@ const SRC={
   tensionadas:"BOE: resoluciones de 14 de marzo y 8 de octubre de 2024 con los municipios catalanes declarados zona de mercado residencial tensionado", erte:"Seguridad Social: trabajadores en ERTE por provincia a 30 de abril de 2020 (nota de afiliación de abril de 2020)",
   ave:"Adif, Renfe y prensa: estaciones con servicio de alta velocidad abierto entre 2021 y 2023 (lista en el repositorio)", vut:"Boletines oficiales y prensa: municipios con moratoria o prohibición de nuevas viviendas turísticas, con fecha (lista en el repositorio)",
   geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN",
-  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", ees:"INE: Encuesta Anual de Estructura Salarial (percentiles de la ganancia anual y tramos de salario mínimo)", epaSal:"INE: EPA, salarios del empleo principal por deciles (con datos fiscales)", ecvRenta:"INE: Encuesta de Condiciones de Vida, deciles de renta por unidad de consumo", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
+  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", ipv:"INE: Índice de Precios de Vivienda, por comunidad", mivauViv:"Ministerio de Vivienda: valor tasado de la vivienda libre, viviendas libres iniciadas y terminadas, viviendas protegidas", ecvTen:"INE: Encuesta de Condiciones de Vida, hogares por régimen de tenencia y renta", eurostatViv:"Eurostat: precios de la vivienda, sobrecarga del gasto en vivienda, emancipación, inversión en vivienda y hogares", ees:"INE: Encuesta Anual de Estructura Salarial (percentiles de la ganancia anual y tramos de salario mínimo)", epaSal:"INE: EPA, salarios del empleo principal por deciles (con datos fiscales)", ecvRenta:"INE: Encuesta de Condiciones de Vida, deciles de renta por unidad de consumo", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
   deuda:"Ministerio de Hacienda: deuda viva de cada ayuntamiento a 31 de diciembre, 2015–2025 (sin 2017)", contratos:"SEPE: contratos iniciales indefinidos y temporales por municipio y mes (2005–2026) y paro registrado por municipio", afil:"Seguridad Social: afiliados por municipio, régimen y actividad, diciembre de 2011 a 2025", compr:"Ministerio de Vivienda: compraventas de vivienda por municipio y trimestre (notarios), 2004–2026",
   mivau:"Ministerio de Vivienda: viviendas protegidas con calificación definitiva (planes estatales y autonómicos, 1991–2025), viviendas libres iniciadas (1991–2025) y transacciones de vivienda de los notarios (2004–2025)"
 };
@@ -1841,7 +1841,7 @@ function res(B,title,html){ if(!B.querySelector(".psec-res")) sec(B,"res"); cons
 const MDB=(window.__INDICIO&&window.__INDICIO.md)||{};
 const MDFMT={n0:v=>nf0.format(v),n1:v=>nf1.format(v),n2:v=>nf2.format(v),pct0:v=>nf0.format(v)+NB+"%",pct1:v=>nf1.format(v)+NB+"%",
   pcts0:v=>(v>0?"+":v<0?"−":"")+nf0.format(Math.abs(v))+NB+"%",pcts1:v=>sgn(v),eur:v=>nf0.format(v)+NB+"€",eur2:v=>nf2.format(v)+NB+"€",
-  mil:v=>nf0.format(v/1000)+NB+"000",pts0:v=>nf0.format(v)+" puntos",pts1:v=>nf1.format(v)+" puntos",veces:v=>nf1.format(v)+" veces",
+  mil:v=>nf0.format(Math.round(v/1000)*1000),pts0:v=>nf0.format(v)+" puntos",pts1:v=>nf1.format(v)+" puntos",veces:v=>nf1.format(v)+" veces",
   abs:v=>Math.abs(v),r100:v=>Math.round(v/100)*100,r1000:v=>Math.round(v/1000)*1000};
 function mdVars(src,V,id){
   return src.replace(/\{\{\s*([\p{L}\p{N}_.]+)\s*((?:\|\s*\w+\s*)*)\}\}/gu,(m,k,pipes)=>{
@@ -2144,7 +2144,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","padron","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo"],"cerca-ciudad":["padron","atlas","mig","geo"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","ees"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"]};
+  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","ees"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -2192,7 +2192,7 @@ function renderEstudios(id){
   document.title=S.t+" · Indicio";
   view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(TOPICL(S.tema))} › ${S.m}</nav>`+pageHead(S.t,S.d,"",`<p class="byline">${byline(S)}</p>${(window.__INDICIO&&window.__INDICIO.illus||{})[S.id]||""}`)+`<div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"cerca-ciudad":studyCerca,"votar-pueblos":studyVotar,
-    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"tope-compraventas":studyTopeComp,"deuda-quien-gobierna":studyDeudaGob,"precio-alimentos":studyAlimentos,"sueldos":studySueldos})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
+    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"tope-compraventas":studyTopeComp,"deuda-quien-gobierna":studyDeudaGob,"precio-alimentos":studyAlimentos,"sueldos":studySueldos,"vivienda":studyVivienda})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
   const B=document.getElementById("sbody");
   // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
   const needSeries=["deuda-quien-gobierna","tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos","iva-alimentos"].includes(S.id);
@@ -4471,6 +4471,71 @@ async function studySueldos(B){
       hbars(f.body,CC.map(x=>({l:x.n,v:x.v})),{fmt:eur,ref:V.med,refLabel:"España",wide:true}); }
   };
   mdRender(B,"sueldos",V,G);
+}
+
+// ---------- vivienda: por qué cuesta tanto pagar una casa ----------
+// El texto está en contenido/analisis/vivienda.md; aquí las cifras (V) y los gráficos (G).
+async function studyVivienda(B){
+  const [D,S,A]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json")]);
+  const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
+  const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
+  const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
+  const aY=+lastK(E.alqMes), tY=+lastK(E.valorTasado), vY=+lastK(E.ipv);
+  const city=n=>(D.ciudades[n]||{}).alqMes||{}, CN={"Alacant/Alicante":"Alicante","Hospitalet de Llobregat, L'":"L'Hospitalet","Palmas de Gran Canaria, Las":"Las Palmas","Palma de Mallorca":"Palma"}, cn=n=>CN[n]||n;
+  const CIT=Object.keys(D.ciudades).map(n=>({n:cn(n),v:g(city(n),"2015",String(aY))})).filter(x=>x.v!=null).sort((a,b)=>b.v-a.v);
+  const vt=E.valorTasado, yrs80=y=>vt[y]&&ees[y]?vt[y]*80/ees[y]:null, tYs=Math.min(tY,eY);
+  const ten=E.tenencia, tenY=lastK(ten.prop);
+  const euL=(geo,k)=>{ const o=(EU[geo]||{})[k]||{}; const y=lastK(o); return y?{y,v:o[y]}:{}; };
+  const hog=EU.ES.hogares, hY=lastK(hog), avg=(o,a,b)=>d3.mean(d3.range(a,b+1).map(y=>o[y]).filter(v=>v!=null));
+  const termTot=y=>E.terminadas[y]!=null?E.terminadas[y]+(E.protegidas[y]||0):null;
+  const pob=EU.ES.poblacion, pY=lastK(pob);
+  const proy=E.hogaresProy, pyK=Object.keys(proy).sort(), proyAño=(proy[pyK[4]]-proy[pyK[0]])/4;
+  // viviendas que no son residencia habitual, por tamaño del municipio (Censo 2021)
+  const band=(lo,hi)=>{ const rs=rowsAll().filter(r=>r[F.pop]>=lo&&r[F.pop]<hi&&r[F.noPrincipal]!=null), w=d3.sum(rs,r=>r[F.pop]); return {np:d3.sum(rs,r=>r[F.noPrincipal]*r[F.pop])/w, vp:d3.sum(rs.filter(r=>r[F.varPob]!=null),r=>r[F.varPob]*r[F.pop])/d3.sum(rs.filter(r=>r[F.varPob]!=null),r=>r[F.pop])}; };
+  const BANDS=[[0,1000,"Menos de 1.000"],[1000,5000,"1.000 a 5.000"],[5000,20000,"5.000 a 20.000"],[20000,100000,"20.000 a 100.000"],[100000,1e9,"Más de 100.000"]].map(([a,b,l])=>({l,...band(a,b)}));
+  const vtRows=rowsAll().filter(r=>r[F.vt]!=null&&r[F.pop]), vtES=d3.sum(vtRows,r=>r[F.vt]*r[F.pop])/d3.sum(vtRows,r=>r[F.pop]);
+  const hpi=geo=>{ const o=(EU[geo]||{}).hpi||{}, y=lastK(o); return o["2015"]&&y?(o[y]/o["2015"]-1)*100:null; };
+  const V={
+    alq15:g(E.alqMes,"2015",String(aY)), sal15:g(ees,"2015",String(Math.min(aY,eY))), ipv15:g(E.ipv,"2015",String(vY)), ipc15:(ipcY(aY)/ipcY(2015)-1)*100, añoAlq:aY,
+    vlc15:city("València")["2015"], vlc24:city("València")[aY], mlg15:city("Málaga")["2015"], mlg24:city("Málaga")[aY],
+    ciudad1:CIT[0].n, ciudad1v:CIT[0].v, ciudad2:CIT[1].n, ciudad2v:CIT[1].v, ciudad3:CIT[2].n, ciudad3v:CIT[2].v,
+    añoT:tYs, precio80:vt[tYs]*80, años80:yrs80(tYs), años80_08:yrs80("2008"), años80_19:yrs80("2019"), ipv19:g(E.ipv,"2019",String(vY)), sal19:g(ees,"2019",String(eY)),
+    vt25:g(vt,String(tYs),lastK(vt)), añoVt:lastK(vt), entrada:vt[tYs]*80*0.3, entradaAños:vt[tYs]*80*0.3/ees[tYs],
+    prop08:ten.prop["2008"], propUlt:ten.prop[tenY], alq08:ten.alqMercado["2008"], alqUlt:ten.alqMercado[tenY], añoTen:tenY,
+    sobreES:euL("ES","sobrecargaInquilinos").v, sobreEU:euL("EU27_2020","sobrecargaInquilinos").v, añoEU:euL("ES","sobrecargaInquilinos").y, sobreES14:(EU.ES.sobrecargaInquilinos||{})["2014"],
+    padresES:euL("ES","conPadres2534").v, padresEU:euL("EU27_2020","conPadres2534").v, edadES:euL("ES","edadEmancipacion").v, edadEU:euL("EU27_2020","edadEmancipacion").v,
+    hog19:(hog[hY]-hog["2019"])*1000, hogAño:(hog[hY]-hog["2019"])*1000/(+hY-2019), añoHog:hY,
+    termAño:avg(Object.fromEntries(d3.range(2019,+hY+1).map(y=>[y,termTot(y)])),2019,+hY),
+    pob19:pob[pY]-pob["2019"], proyAño, term06:termTot(2006), termMax:d3.max(d3.range(2013,2026),y=>termTot(y)),
+    prot0009:avg(E.protegidas,2000,2009), prot1925:avg(E.protegidas,2019,2025),
+    npPeq:BANDS[0].np, npGr:BANDS[4].np, vpPeq:BANDS[0].vp, vpGr:BANDS[4].vp, vtES,
+    hpiES:hpi("ES"), hpiEU:hpi("EU27_2020"), hpiNL:hpi("NL"), hpiPT:hpi("PT"),
+    inv06:(EU.ES.inversionVivienda||{})["2006"], invES:euL("ES","inversionVivienda").v, invEU:euL("EU27_2020","inversionVivienda").v,
+    socialES:ten.alqSocial[tenY], socialAT:euL("AT","alquilerReducido").v, socialNL:euL("NL","alquilerReducido").v };
+  const eur=v=>nf0.format(v)+NB+"€", SRC="Fuente: INE y Ministerio de Vivienda.";
+  const G={
+    carrera:el=>{ const Y=d3.range(2015,Math.max(aY,vY)+1), ix=(o,y)=>o&&o[y]&&o["2015"]?o[y]/o["2015"]*100:null;
+      lineChart(el,{title:"Compra, alquiler, sueldos y precios (2015 = 100)",sub:"España, medias anuales",source:"Fuente: INE (IPV, alquiler medio de los contratos declarados, Encuesta de Estructura Salarial, IPC).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
+        series:[{n:"Precio de compra",v:Y.map(y=>ix(E.ipv,y)),c:"--rust",main:true},{n:"Alquiler medio",v:Y.map(y=>ix(E.alqMes,y)),c:"--plum",main:true},{n:"Sueldo mediano",v:Y.map(y=>ix(ees,y)),c:"--ink"},{n:"IPC",v:Y.map(y=>ipcY(y)&&ipcY(2015)?ipcY(y)/ipcY(2015)*100:null),c:"--slate",dash:true}]}); },
+    ciudades:el=>{ const f=fig(el,{title:`Subida del alquiler medio, 2015–${aY}`,sub:"Grandes ciudades con datos; la raya es España",source:"Fuente: INE, indicadores urbanos (alquiler mensual medio de los contratos declarados)."});
+      hbars(f.body,CIT.map(x=>({l:x.n,v:x.v})),{fmt:v=>sgn(v),ref:V.alq15,refLabel:"España",wide:true}); },
+    compra:el=>{ const Y=d3.range(2004,tYs+1).map(String); lineChart(el,{title:"Años de sueldo mediano bruto para pagar 80 m²",sub:"Valor tasado medio de la vivienda libre × 80 m², entre el sueldo mediano anual",source:"Fuente: Ministerio de Vivienda (valor tasado) e INE (Encuesta de Estructura Salarial).",years:Y.map(Number),xticks:[2008,2013,2019,tYs],tickFmt:v=>nf0.format(v),fmt:v=>nf1.format(v)+" años",
+      series:[{n:"Años de sueldo",v:Y.map(y=>yrs80(y)),c:"--rust",main:true}]}); },
+    tenencia:el=>{ const Y=Object.keys(ten.prop).sort(); lineChart(el,{title:"Hogares según el régimen de su vivienda",sub:"% de los hogares",source:"Fuente: INE, Encuesta de Condiciones de Vida.",years:Y.map(Number),xticks:[+Y[0],2008,2014,2019,+Y[Y.length-1]],tickFmt:v=>nf0.format(v)+NB+"%",fmt:pc,
+      series:[{n:"En propiedad",v:Y.map(y=>ten.prop[y]),c:"--slate"},{n:"Alquiler de mercado",v:Y.map(y=>ten.alqMercado[y]),c:"--rust",main:true},{n:"Alquiler reducido",v:Y.map(y=>ten.alqSocial[y]),c:"--mustard"}]}); },
+    padres:el=>{ const C=[["ES","España"],["IT","Italia"],["PT","Portugal"],["IE","Irlanda"],["EU27_2020","Unión Europea"],["AT","Austria"],["FR","Francia"],["DE","Alemania"],["NL","Países Bajos"],["DK","Dinamarca"]];
+      const f=fig(el,{title:"Jóvenes de 25 a 34 años que viven con sus padres",sub:`${V.añoEU}`,source:"Fuente: Eurostat (ilc_lvps08)."});
+      hbars(f.body,C.map(([k,l])=>({l,v:euL(k,"conPadres2534").v,c:k==="ES"?"--rust":k==="EU27_2020"?"--slate":null})).filter(x=>x.v!=null).sort((a,b)=>b.v-a.v),{fmt:pc,wide:true}); },
+    oferta:el=>{ const Y=d3.range(2010,+hY+1); lineChart(el,{title:"Hogares nuevos y viviendas terminadas cada año",sub:"España, miles",source:"Fuente: Eurostat (hogares, EPA) y Ministerio de Vivienda (viviendas libres terminadas y protegidas con calificación definitiva).",years:Y,xticks:[2010,2013,2019,+hY],tickFmt:v=>nf0.format(v),fmt:v=>nf0.format(v)+" mil",
+      series:[{n:"Hogares nuevos",v:Y.map(y=>hog[y]!=null&&hog[y-3]!=null?(hog[y]-hog[y-3])/3:null),c:"--ink",main:true},{n:"Viviendas terminadas",v:Y.map(y=>termTot(y)!=null?termTot(y)/1000:null),c:"--rust",main:true}]});
+      add(el,"p","muted","Hogares nuevos: media de los tres últimos años, porque el número de hogares salta de un año a otro por cambios de la encuesta (por ejemplo, en 2021).").style.cssText="font-size:13px;margin-top:-6px"; },
+    vacias:el=>{ const f=fig(el,{title:"Viviendas que no son residencia habitual, según el tamaño del municipio",sub:"% de las viviendas (vacías o segundas residencias), Censo de 2021",source:"Fuente: INE, Censo de 2021 y padrón."});
+      hbars(f.body,BANDS.map(b=>({l:b.l+" hab.",v:b.np})),{fmt:pc,wide:true}); },
+    europa:el=>{ const Y=d3.range(2015,+lastK(EU.ES.hpi)+1), C=[["ES","España","--rust",true],["EU27_2020","Unión Europea","--ink"],["PT","Portugal","--plum"],["NL","Países Bajos","--mustard"],["DE","Alemania","--slate"],["FR","Francia","--stone"],["IT","Italia","--olive"]];
+      lineChart(el,{title:"Precio de la vivienda en Europa (2015 = 100)",sub:"Índice de precios de la vivienda, medias anuales",source:"Fuente: Eurostat (prc_hpi_a).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
+        series:C.map(([k,n,c,main])=>({n,c,main,v:Y.map(y=>{ const o=(EU[k]||{}).hpi||{}; return o[y]&&o["2015"]?o[y]/o["2015"]*100:null; })}))}); }
+  };
+  mdRender(B,"vivienda",V,G);
 }
 
 // ---------- vivienda protegida: de 1 de cada 10 viviendas nuevas a casi ninguna ----------
