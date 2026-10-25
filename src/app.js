@@ -1663,7 +1663,7 @@ const CCAA_OF={"01":"País Vasco","20":"País Vasco","48":"País Vasco","02":"Ca
   "04":"Andalucía","11":"Andalucía","14":"Andalucía","18":"Andalucía","21":"Andalucía","23":"Andalucía","29":"Andalucía","41":"Andalucía","05":"Castilla y León","09":"Castilla y León","24":"Castilla y León","34":"Castilla y León","37":"Castilla y León","40":"Castilla y León","42":"Castilla y León","47":"Castilla y León","49":"Castilla y León",
   "06":"Extremadura","10":"Extremadura","07":"Illes Balears","08":"Cataluña","17":"Cataluña","25":"Cataluña","43":"Cataluña","15":"Galicia","27":"Galicia","32":"Galicia","36":"Galicia","22":"Aragón","44":"Aragón","50":"Aragón",
   "26":"La Rioja","28":"Madrid","30":"Murcia","31":"Navarra","33":"Asturias","35":"Canarias","38":"Canarias","39":"Cantabria","51":"Ceuta","52":"Melilla"};
-const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si la relación aguanta entre iguales"],["evolucion","Evolución","Cuánto ha crecido cada dato desde un año"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Reparto","Cómo se reparte un dato entre la población"],["burbujas","Años","Provincias en movimiento: dos datos año a año"],["paises","Países","España frente a otros países, año a año, y quién gobernaba"],["antes","Antes y después","Qué pasó tras una ley o un suceso, frente a municipios gemelos"]];
+const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si la relación aguanta entre iguales"],["evolucion","Evolución","Cuánto ha crecido cada dato desde un año"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Reparto","Cómo se reparte un dato entre la población"],["burbujas","Años","Provincias en movimiento: dos datos año a año"],["paises","Series","Un dato año a año: España frente a otros países, o precios, sueldos y vivienda, con quién gobernaba"],["antes","Antes y después","Qué pasó tras una ley o un suceso, frente a municipios gemelos"]];
 const EXSIZES=[["","Todos los tamaños",0,Infinity],["s1","Menos de 1.000 hab.",0,1000],["s2","1.000 a 10.000 hab.",1000,10000],["s3","10.000 a 50.000 hab.",10000,50000],["s4","Más de 50.000 hab.",50000,Infinity],["g1","1.000 hab. o más",1000,Infinity],["g10","10.000 hab. o más",10000,Infinity]];
 const EXQ=[["¿Frenó el tope el alquiler? Antes y después","antes",{ad:{ev:"tensionadas",y:"ipva"}}],["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Suben los sueldos como los precios?","evolucion",{e:["salMed","alq","ipc"]}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}],["¿Dónde pesa más la brecha de empleo entre hombres y mujeres?","mapa",{d:["brechaEmpleo","empleoMujeres"]}],["¿Más estudios, menos contratos temporales?","cruce",{d:["superiores2539","temporales"],t:"g1"}],["¿Quién vive de qué? Renta de trabajo frente a renta del capital","cruce",{d:["irpfTrabajo","irpfBruta"],t:"g1"}]];
 let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0,bv:0,u:""};
@@ -1680,7 +1680,8 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0;
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=["es","prov","mun"].includes(q.get("lv"))?q.get("lv"):"es"; if(EX.v==="evolucion"&&q.has("m")&&BYCODE.has(q.get("m"))) ES_.mun=q.get("m");
-  if(EX.v==="paises"){ if(q.has("ind")&&PSIND[q.get("ind")]) PS.k=q.get("ind"); if(q.has("pa")) PS.c=["ES",...q.get("pa").split(",").filter(g=>/^[A-Z0-9_]{2,10}$/.test(g)&&g!=="ES")].slice(0,7); PS.gob=q.get("gob")==="0"?0:1; PS.rel=q.get("rel")==="1"?1:0; PS.ref=q.has("ref")&&/^[A-Z0-9_]{2,10}$/.test(q.get("ref"))?q.get("ref"):"EU27_2020"; }
+  if(EX.v==="paises"){ if(q.has("ind")&&PSIND[q.get("ind")]) PS.k=q.get("ind"); if(q.has("pa")) PS.c=["ES",...q.get("pa").split(",").filter(g=>/^[A-Z0-9_]{2,10}$/.test(g)&&g!=="ES")].slice(0,7); PS.gob=q.get("gob")==="0"?0:1; PS.rel=q.get("rel")==="1"?1:0; PS.ref=q.has("ref")&&/^[A-Z0-9_]{2,10}$/.test(q.get("ref"))?q.get("ref"):"EU27_2020";
+    PS.s=q.has("ser")?q.get("ser").split(",").filter(k=>/^[\w]{2,60}$/.test(k)).slice(0,7):[]; PS.idx=q.get("idx")==="0"?0:1; PS.desde=+q.get("desde")||null; PS.hasta=+q.get("hasta")||null; }
   if(EX.v==="antes"){ adSet(q.has("ev")&&ADEV[q.get("ev")]?q.get("ev"):AD.ev); if(q.has("oy")&&ADY[q.get("oy")]) AD.y=q.get("oy"); if(q.has("yr")) AD.yr=+q.get("yr")||AD.yr; if(q.has("cc")) AD.cc=q.get("cc"); if(q.has("pv")) AD.pv=q.get("pv");
     if(q.has("ms")) AD.ms=q.get("ms").split(",").filter(c=>BYCODE.has(c)).slice(0,200); if(q.has("mc")) AD.mc=+q.get("mc"); if(q.has("mp")) AD.mp=+q.get("mp"); if(q.has("mt")) AD.mt=q.get("mt")==="sint"?"sint":"gem"; }
 }
@@ -1690,7 +1691,8 @@ function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParam
   if(S.v==="mapa"&&S.bv) q.set("bv","1");
   if(S.v==="cruce"){ if(S.u) q.set("u",S.u); if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ ["d","p","t","c","o","m"].forEach(k=>q.delete(k)); q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es"){ q.set("lv",ES_.lev); if(ES_.mun) q.set("m",ES_.mun); } }
-  if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(!PS.gob) q.set("gob","0"); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
+  if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); } else { q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
+    if(!PS.gob) q.set("gob","0"); if(PS.desde) q.set("desde",PS.desde); if(PS.hasta) q.set("hasta",PS.hasta); }
   if(S.v==="antes"){ ["d","p","t","c","m","o"].forEach(k=>q.delete(k)); const A={...AD,...(S.ad||{})}; q.set("ev",A.ev); q.set("oy",A.y); if(ADEV[A.ev].free) q.set("yr",A.yr); if(A.ev==="ccaa"&&A.cc) q.set("cc",A.cc); if(A.ev==="prov"&&A.pv) q.set("pv",A.pv); if(A.ev==="lista"&&A.ms.length) q.set("ms",A.ms.join(",")); { const dmc=ADEV[A.ev].mc||0; if(A.mc!==dmc) q.set("mc",A.mc?"1":"0"); } if(A.mp!==ADEV[A.ev].mp) q.set("mp",A.mp); if(A.mt==="sint") q.set("mt","sint"); }
   return "/laboratorio/"+S.v+"/"+(q.toString()?"?"+q.toString().replace(/%2C/g,","):""); }
 // enlace desde los informes
@@ -2080,7 +2082,7 @@ const PSIND={pibpc:{l:"PIB por habitante",u:"€ de 2020",t:"nivel",f:v=>nf0.for
   inflacion:{l:"Inflación",u:"%",t:"flujo",f:v=>sgn(v),d:"Subida media de los precios de consumo en el año."},
   gasto:{l:"Gasto público",u:"% del PIB",t:"tasa",f:pc,d:"Gasto total de las administraciones públicas, en % del PIB."},
   ingresos:{l:"Ingresos públicos",u:"% del PIB",t:"tasa",f:pc,d:"Ingresos totales de las administraciones públicas, en % del PIB."}};
-const PS={k:"pibpc",c:["ES","EU27_2020"],gob:1,rel:0,ref:"EU27_2020"};
+const PS={k:"pibpc",c:["ES","EU27_2020"],gob:1,rel:0,ref:"EU27_2020",s:[],idx:1,desde:null,hasta:null};
 const PSCOL=["--rust","--ink","--slate","--mustard","--plum","--olive","--stone"];
 const PARTYC={PSOE:"#d6342c",PP:"#1f6fb5",UCD:"#2f8f4e"};
 // años de cada mandato: los que el presidente pasó más de la mitad en el cargo
@@ -2088,28 +2090,9 @@ function psMandatos(){ const G=(PAIS&&PAIS.gobiernos.ES)||[], now=new Date();
   return G.map(g=>{ const a=new Date(g.desde), b=g.hasta?new Date(g.hasta):now, ys=[];
     for(let y=a.getFullYear();y<=b.getFullYear();y++){ const s=new Date(Math.max(a,new Date(y,0,1))), e=new Date(Math.min(b,new Date(y,11,31))); if((e-s)/864e5>=183) ys.push(y); }
     return {...g,a,b,ys,ape:g.p.split(" ").slice(-1)[0].replace("Zapatero","Zapatero")}; }).map(g=>({...g,ape:{"José Luis Rodríguez Zapatero":"Zapatero","Leopoldo Calvo-Sotelo":"Calvo-Sotelo"}[g.p]||g.p.split(" ").slice(-1)[0]})); }
-function psBar(bar){
-  const Pz=PAIS?PAIS.paises:{}, all=Object.entries(Pz).filter(([g,o])=>o[PS.k]);
-  bar.innerHTML=`
-    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.paises}.</p></div>
-    <div class="lb-step"><h4><i>2</i>Qué dato</h4><select class="sel" id="psk" aria-label="Qué dato">${Object.entries(PSIND).filter(([k])=>!PAIS||(PAIS.paises.ES||{})[k]).map(([k,v])=>`<option value="${k}" ${k===PS.k?"selected":""}>${esc(v.l)}</option>`).join("")}</select><p class="hint">${esc(PSIND[PS.k].d)}</p></div>
-    <div class="lb-step"><h4><i>3</i>Qué países</h4><div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div></div>
-    <div class="lb-step"><h4><i>4</i>Comprobar</h4>
-      <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
-      <label class="blk" for="psref">Comparar con</label><select class="sel" id="psref">${Object.entries(Pz).filter(([g,o])=>g!=="ES"&&o[PS.k]).map(([g,o])=>`<option value="${g}" ${g===PS.ref?"selected":""}>${esc(o.n)}</option>`).join("")}</select>
-      <label class="chk"><input type="checkbox" id="psrel" ${PS.rel?"checked":""}> Ver cada país como diferencia con ${esc((Pz[PS.ref]||{}).n||"la referencia")}</label>
-      <p class="hint">La economía depende mucho del ciclo europeo. Comparar con la media de la UE separa lo que pasó en todas partes de lo que fue propio de España.</p></div>`;
-  bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; navTo(exHash()); }));
-  const on=(id,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener("change",fn); };
-  on("psk",e=>{ PS.k=e.target.value; exUpdate(); });
-  on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
-  on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
-  on("psref",e=>{ PS.ref=e.target.value; exUpdate(); });
-  bar.querySelectorAll(".pschips input[data-g]").forEach(i=>i.addEventListener("change",()=>{ const g=i.dataset.g; PS.c=i.checked?[...new Set([...PS.c,g])].slice(0,7):PS.c.filter(x=>x!==g); if(!PS.c.includes("ES")) PS.c.unshift("ES"); exUpdate(); }));
-}
 // ---------- gráfico de líneas por años con los gobiernos de España de fondo (laboratorio «Países» y análisis) ----------
 function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height}){
-  const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:120,b:26,l:52};
+  const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:138,b:26,l:52};
   const X=d3.scaleLinear().domain(d3.extent(years)).range([m.l,W-m.r]);
   const vals=series.flatMap(s=>years.map(y=>s.v[y])).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(zero?[0]:[])); const pad=(hi-lo)*0.08||1;
   const Y=d3.scaleLinear().domain([lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
@@ -2127,7 +2110,7 @@ function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=
     svg.append("g").selectAll("circle").data(pts.filter(d=>d[1]!=null)).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",s.main?2.6:1.8).attr("fill",c).append("title").text(d=>`${s.n}, ${d[0]}: ${fmt(d[1])}`);
     const l=pts.filter(d=>d[1]!=null).pop(); if(l) ends.push({y:Y(l[1]),x:X(l[0]),t:`${s.n} ${fmt(l[1])}`,c,main:s.main}); });
   ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<14) ends[i].y=ends[i-1].y+14;
-  ends.forEach(e=>svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c).text(e.t));
+  ends.forEach(e=>{ const t=svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c), mc=W<520?14:18, nm=e.t.length>mc+6?e.t.replace(/ \([^)]*\)/,"").replace(/^(.{0,}?)(\S+)$/,(m,a,b)=>(a.length>mc?a.slice(0,mc-1)+"… ":a)+b):e.t; t.text(nm); if(nm!==e.t) t.append("title").text(e.t); });
   return f;
 }
 // cambio de un indicador en los años de un mandato: crecimiento medio anual (nivel), media (flujo) o cambio en puntos (tasa).
@@ -2136,48 +2119,106 @@ function psWindow(o,ys){ const yy=ys.filter(y=>o&&o[y]!=null); if(!yy.length) re
 function psChange(o,w,t){ if(!o||!w) return null;
   if(t==="flujo"){ const v=w.yy.map(y=>o[y]); return v.some(x=>x==null)?null:d3.mean(v); }
   if(o[w.a]==null||o[w.b]==null||w.a===w.b) return null; return t==="nivel"?(Math.pow(o[w.b]/o[w.a],1/(w.b-w.a))-1)*100:o[w.b]-o[w.a]; }
+// series de España (solo España): precios de la compra, IPC por grupos, vivienda y sueldos, año a año
+let SERES=null, SERES_P=null;
+const loadSeriesES=()=>SERES_P||(SERES_P=Promise.all([getJSON("/data/alimentos.json"),getJSON("/data/sueldos.json"),getJSON("/data/vivienda.json")]).then(([A,S,Vv])=>{
+  const out={}, yavg=(v,per)=>{ const g={}; per.forEach((p,i)=>{ if(v[i]==null) return; (g[p.slice(0,4)]=g[p.slice(0,4)]||[]).push(v[i]); }); return Object.fromEntries(Object.entries(g).filter(([,x])=>x.length===12).map(([y,x])=>[y,d3.mean(x)])); };
+  const add=(k,o)=>{ if(o.v&&Object.keys(o.v).length>=3) out[k]=o; };
+  const IPCG={general:"Todos los precios (IPC general)",alimentos:"Alimentos y bebidas no alcohólicas",vestido:"Ropa y calzado",vivienda:"Vivienda, agua, electricidad y gas",transporte:"Transporte",restaurantes:"Restaurantes y hoteles"};
+  Object.entries(IPCG).forEach(([k,l])=>A.ipc.es[k]&&add("ipc_"+k,{l,g:"Precios (IPC por grupos)",u:"índice",t:"nivel",idx:true,v:yavg(A.ipc.es[k],A.meses),src:"INE, IPC"}));
+  const SH={"Aceites vegetales":"Aceite","Huevos":"Huevos","Leche entera":"Leche entera","Leche desnatada y semidesnatada":"Leche desnatada","Pan y productos de panadería":"Pan y bollería","Carne, fresca, refrigerada o congelada":"Carne fresca","Pescado,  fresco, refrigerado o congelado":"Pescado fresco","Frutas de hueso y frutas de pepita, frescas":"Fruta fresca (hueso y pepita)","Cítricos frescos":"Cítricos","Patatas y otros tubérculos":"Patatas","Café y sucedáneos de café":"Café","Chocolate, cacao y productos alimenticios a base de cacao":"Chocolate","Azúcar de caña y azúcar de remolacha":"Azúcar","Queso":"Queso","Yogur y productos similares":"Yogures","Macarrones, tallarines, cuscús y pastas alimenticias similares":"Pasta","Cereales":"Arroz y cereales","Agua":"Agua embotellada","Refrescos":"Refrescos","Zumos de frutas y hortalizas":"Zumos","Carne, seca, salada, en salmuera o ahumada":"Embutidos","Legumbres secas":"Legumbres","Bayas frescas":"Fresas y otras bayas","Mantequilla y otros aceites y grasas derivados de la leche":"Mantequilla","Alimentos para bebé":"Alimentos para bebé"};
+  const SUB=A.subclases; if(SUB) Object.entries(SUB.s).forEach(([n,v])=>add("sub_"+norm(n).replace(/ /g,"_").slice(0,40),{l:SH[n]||n,g:"Lista de la compra (IPC)",u:"índice",t:"nivel",idx:true,v:yavg(v,SUB.periodos),src:"INE, IPC por subclases"}));
+  const E=Vv.es, num=o=>o?Object.fromEntries(Object.entries(o).map(([y,v])=>[y,+v])):null;
+  add("viv_ipv",{l:"Precio de compra de la vivienda (IPV)",g:"Vivienda",u:"índice",t:"nivel",idx:true,v:num(E.ipv),src:"INE, IPV"});
+  add("viv_alq",{l:"Alquiler medio (€ al mes)",g:"Vivienda",u:"€",t:"nivel",v:num(E.alqMes),src:"INE, alquiler declarado"});
+  add("viv_vt",{l:"Valor tasado de la vivienda (€/m²)",g:"Vivienda",u:"€",t:"nivel",v:num(E.valorTasado),src:"Ministerio de Vivienda"});
+  add("viv_term",{l:"Viviendas libres terminadas",g:"Vivienda",u:"viviendas",t:"nivel",v:num(E.terminadas),src:"Ministerio de Vivienda"});
+  add("viv_ini",{l:"Viviendas libres iniciadas",g:"Vivienda",u:"viviendas",t:"nivel",v:num(E.iniciadas),src:"Ministerio de Vivienda"});
+  add("viv_prot",{l:"Viviendas protegidas terminadas",g:"Vivienda",u:"viviendas",t:"nivel",v:num(E.protegidas),src:"Ministerio de Vivienda"});
+  const EY=S.ees.años, es=k=>Object.fromEntries(EY.map((y,i)=>[y,S.ees.es[k][i]]).filter(([,v])=>v!=null));
+  [["Mediana","Sueldo mediano"],["Media","Sueldo medio"],["Percentil 10","Sueldo del 10 % que menos cobra (P10)"],["Percentil 90","Sueldo del 10 % que más cobra (P90)"]].forEach(([k,l])=>add("sal_"+norm(k).replace(/ /g,""),{l:l+" (€ al año)",g:"Sueldos",u:"€",t:"nivel",v:es(k),src:"INE, Encuesta de Estructura Salarial"}));
+  add("sal_smi",{l:"Salario mínimo (€ al mes)",g:"Sueldos",u:"€",t:"nivel",v:num(S.smiLegal),src:"BOE"});
+  SERES=out; return out; }));
+// estado de la vista «Series»: modo país (un dato, varios países) o modo España (varias series de España)
+function psRange(ys){ const a=PS.desde&&PS.desde>=ys[0]?PS.desde:ys[0], b=PS.hasta&&PS.hasta<=ys[ys.length-1]?PS.hasta:ys[ys.length-1]; return ys.filter(y=>y>=a&&y<=b); }
+function psBar(bar){
+  const Pz=PAIS?PAIS.paises:{}, all=Object.entries(Pz).filter(([g,o])=>o[PS.k]), esMode=PS.s.length>0, SE=SERES||{};
+  const groups=[...new Set(Object.values(SE).map(o=>o.g))];
+  const optsPais=Object.entries(PSIND).filter(([k])=>!PAIS||(Pz.ES||{})[k]).map(([k,v])=>`<option value="${k}" ${!esMode&&k===PS.k?"selected":""}>${esc(v.l)}</option>`).join("");
+  const optsES=groups.map(g=>`<optgroup label="España · ${esc(g)}">${Object.entries(SE).filter(([,o])=>o.g===g).sort((a,b)=>a[1].l.localeCompare(b[1].l,"es")).map(([k,o])=>`<option value="es:${k}" ${esMode&&PS.s[0]===k?"selected":""}>${esc(o.l)}</option>`).join("")}</optgroup>`).join("");
+  const cur=esMode?SE[PS.s[0]]:null, sib=cur?Object.entries(SE).filter(([k,o])=>o.g===cur.g).sort((a,b)=>a[1].l.localeCompare(b[1].l,"es")):[];
+  const yrs=psYears(), yOpt=(sel)=>yrs.map(y=>`<option ${y===sel?"selected":""}>${y}</option>`).join("");
+  bar.innerHTML=`
+    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.paises}.</p></div>
+    <div class="lb-step"><h4><i>2</i>Qué dato</h4><select class="sel" id="psk" aria-label="Qué dato"><optgroup label="Comparar países">${optsPais}</optgroup>${optsES}</select>
+      <p class="hint">${esc(esMode?(cur?`${cur.l}. Fuente: ${cur.src}.`:""):PSIND[PS.k].d)}</p></div>
+    <div class="lb-step"><h4><i>3</i>${esMode?"Qué más series":"Qué países"}</h4>
+      ${esMode?`<div class="pschips pslist">${sib.map(([k,o])=>`<label class="chk"><input type="checkbox" data-s="${k}" ${PS.s.includes(k)?"checked":""} ${k===PS.s[0]?"disabled":""}> ${esc(o.l)}</label>`).join("")}</div>${cur&&cur.g!=="Precios (IPC por grupos)"?`<label class="chk"><input type="checkbox" id="psipc" ${PS.s.includes("ipc_general")?"checked":""}> Añadir el IPC general, para comparar</label>`:""}`
+        :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
+    <div class="lb-step"><h4><i>4</i>Comprobar</h4>
+      <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
+      <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
+      ${esMode?`<label class="chk"><input type="checkbox" id="psidx" ${PS.idx?"checked":""}> Como índice: el primer año de la ventana = 100</label>`
+        :`<label class="blk" for="psref">Comparar con</label><select class="sel" id="psref">${Object.entries(Pz).filter(([g,o])=>g!=="ES"&&o[PS.k]).map(([g,o])=>`<option value="${g}" ${g===PS.ref?"selected":""}>${esc(o.n)}</option>`).join("")}</select>
+      <label class="chk"><input type="checkbox" id="psrel" ${PS.rel?"checked":""}> Ver cada país como diferencia con ${esc((Pz[PS.ref]||{}).n||"la referencia")}</label>`}
+      <p class="hint">${esMode?"Con el índice, todas las series empiezan en 100 y se ve cuál ha subido más desde el año que elijas.":"La economía depende mucho del ciclo europeo. Comparar con otros países separa lo que pasó en todas partes de lo que fue propio de España."}</p></div>`;
+  bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; navTo(exHash()); }));
+  const on=(id,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener("change",fn); };
+  on("psk",e=>{ const v=e.target.value; if(v.startsWith("es:")){ const k=v.slice(3); PS.s=[k]; PS.idx=SE[k]&&SE[k].idx?1:0; } else { PS.k=v; PS.s=[]; } PS.desde=PS.hasta=null; exUpdate(); });
+  on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
+  on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
+  on("psref",e=>{ PS.ref=e.target.value; exUpdate(); });
+  on("psidx",e=>{ PS.idx=e.target.checked?1:0; exUpdate(); });
+  on("psipc",e=>{ PS.s=e.target.checked?[...PS.s,"ipc_general"]:PS.s.filter(k=>k!=="ipc_general"); exUpdate(); });
+  on("psd",e=>{ PS.desde=+e.target.value; if(PS.hasta&&PS.hasta<PS.desde) PS.hasta=null; exUpdate(); });
+  on("psh",e=>{ PS.hasta=+e.target.value; if(PS.desde&&PS.desde>PS.hasta) PS.desde=null; exUpdate(); });
+  bar.querySelectorAll(".pschips input[data-g]").forEach(i=>i.addEventListener("change",()=>{ const g=i.dataset.g; PS.c=i.checked?[...new Set([...PS.c,g])].slice(0,7):PS.c.filter(x=>x!==g); if(!PS.c.includes("ES")) PS.c.unshift("ES"); exUpdate(); }));
+  bar.querySelectorAll(".pschips input[data-s]").forEach(i=>i.addEventListener("change",()=>{ const k=i.dataset.s; PS.s=i.checked?[...new Set([...PS.s,k])].slice(0,7):PS.s.filter(x=>x!==k); exUpdate(); }));
+}
+// años disponibles para el dato elegido
+function psYears(){ if(PS.s.length&&SERES) return [...new Set(PS.s.flatMap(k=>Object.keys((SERES[k]||{}).v||{}).map(Number)))].sort((a,b)=>a-b);
+  if(!PAIS) return []; const P=PAIS.paises; return [...new Set(PS.c.flatMap(g=>Object.keys((P[g]||{})[PS.k]||{}).map(Number)))].sort((a,b)=>a-b); }
 async function exPaises(out){
-  out.innerHTML='<p class="loading">Cargando los datos por país…</p>';
-  try{ await loadPaises(); }catch(e){ out.innerHTML='<p class="loading">No se pudieron cargar los datos por país.</p>'; return; }
-  if(EX.v!=="paises") return; out.innerHTML=""; exBar(); { const t=document.getElementById("lbtitle"); if(t) t.textContent=lbTitle(); }
+  out.innerHTML='<p class="loading">Cargando los datos…</p>';
+  try{ await Promise.all([loadPaises(),loadSeriesES()]); }catch(e){ out.innerHTML='<p class="loading">No se pudieron cargar los datos.</p>'; return; }
+  if(EX.v!=="paises") return; PS.s=PS.s.filter(k=>SERES[k]); out.innerHTML=""; exBar(); { const t=document.getElementById("lbtitle"); if(t) t.textContent=lbTitle(); }
+  return PS.s.length?psDrawES(out):psDrawPais(out);
+}
+// tabla por mandato: para cada serie, el cambio en los años de cada Gobierno
+function psMandTable(out,cols,t,title,sub,note){
+  const M=psMandatos(), base=cols[0].v, fm=t==="tasa"?(v=>v==null?"—":(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts"):(v=>v==null?"—":sgn(v));
+  const rows=M.filter(g=>g.ys.some(y=>base[y]!=null&&(!PS.desde||y>=PS.desde)&&(!PS.hasta||y<=PS.hasta))).map(g=>{ const ys=g.ys.filter(y=>(!PS.desde||y>=PS.desde)&&(!PS.hasta||y<=PS.hasta)), w0=psWindow(base,ys), w=w0&&PS.desde&&w0.a<PS.desde?{...w0,a:w0.yy[0]}:w0, full=w&&w.yy[0]===g.ys[0]&&w.yy[w.yy.length-1]===g.ys[g.ys.length-1];
+    return [`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${g.ys[0]}–${g.hasta?g.ys[g.ys.length-1]:"hoy"}${w&&!full?` (${w.yy[0]}–${w.yy[w.yy.length-1]})`:""}</small>`,...cols.map(c=>fm(psChange(c.v,w,t)))]; });
+  if(!rows.length) return; const f=fig(out,{title,sub,source:note}); table(f.body,["Presidente",...cols.map(c=>esc(c.n))],rows,{max:980});
+}
+function psDrawES(out){
+  const SE=SERES, ks=PS.s, all=[...new Set(ks.flatMap(k=>Object.keys(SE[k].v).map(Number)))].sort((a,b)=>a-b), years=psRange(all);
+  if(years.length<2){ out.innerHTML='<p class="loading">Elige una ventana de al menos dos años.</p>'; return; }
+  const units=[...new Set(ks.map(k=>SE[k].u))], idx=PS.idx||units.length>1, y0=years[0];
+  const ser=ks.map((k,i)=>{ const o=SE[k], b=o.v[y0]??o.v[years.find(y=>o.v[y]!=null)]; return {n:o.l,c:k==="ipc_general"?"--ink":["--rust","--slate","--mustard","--plum","--olive","--stone","--ink-2"][i%7],main:i===0,dash:k==="ipc_general",v:Object.fromEntries(years.filter(y=>o.v[y]!=null).map(y=>[y,idx?o.v[y]/b*100:o.v[y]]))}; });
+  const u=units[0], fmt=idx?(v=>nf1.format(v)):u==="€"?(v=>nf0.format(v)+NB+"€"):(v=>nf0.format(v));
+  govChart(out,{title:listY(ks.map(k=>SE[k].l.replace(/ \(.*\)$/,""))).replace(/^./,c=>c.toUpperCase()),sub:idx?`Índice: ${y0} = 100${units.length>1&&!PS.idx?" (las series tienen unidades distintas)":""}. Medias anuales`:`${u==="€"?"Euros de cada año":u}. Medias anuales`,
+    source:`Fuente: ${[...new Set(ks.map(k=>SE[k].src))].join("; ")}.${PS.gob?" Fondo: presidente del Gobierno; cada año se asigna a quien gobernó más de la mitad.":""}`,years,series:ser,fmt,tick:v=>idx?nf0.format(v):u==="€"&&v>=10000?nf0.format(v/1000)+" mil":nf0.format(v),gob:!!PS.gob});
+  const ch=ser.map(s=>{ const a=s.v[years[0]], b=s.v[years[years.length-1]]; return a&&b?{n:s.n,g:(b/a-1)*100}:null; }).filter(Boolean);
+  if(ch.length) add(out,"p",null,`Entre ${years[0]} y ${years[years.length-1]}: ${ch.map(c=>`<b>${esc(c.n.replace(/ \(.*\)$/,""))}</b> ${sgn(c.g)}`).join(" · ")}.`).style.cssText="max-width:760px;font-size:15px;margin-top:4px";
+  if(PS.gob) psMandTable(out,ks.map(k=>({n:SE[k].l.replace(/ \((€|índice).*\)$/,""),v:SE[k].v})),"nivel","Con cada Gobierno","Subida media anual en los años de cada mandato","Subida media anual entre el año anterior al primero del mandato y el último, dentro de la ventana elegida. En precios, es la inflación de ese producto.");
+}
+function psDrawPais(out){
   const I=PSIND[PS.k], P=PAIS.paises; if(!P[PS.ref]||!P[PS.ref][PS.k]) PS.ref="EU27_2020"; const EU=P[PS.ref]&&P[PS.ref][PS.k], refN=P[PS.ref].n;
   const sel=PS.c.filter(g=>P[g]&&P[g][PS.k]&&(!PS.rel||g!==PS.ref));
   const val=(g,y)=>{ const v=P[g][PS.k][y]; if(v==null) return null; if(!PS.rel) return v; const e=EU&&EU[y]; if(e==null) return null; return I.t==="nivel"?(v/e-1)*100:v-e; };
-  const years=[...new Set(sel.flatMap(g=>Object.keys(P[g][PS.k]).map(Number)))].sort((a,b)=>a-b).filter(y=>sel.some(g=>val(g,y)!=null));
-  if(!years.length){ out.innerHTML='<p class="loading">No hay datos para esta combinación.</p>'; return; }
+  const years=psRange([...new Set(sel.flatMap(g=>Object.keys(P[g][PS.k]).map(Number)))].sort((a,b)=>a-b).filter(y=>sel.some(g=>val(g,y)!=null)));
+  if(years.length<2){ out.innerHTML='<p class="loading">No hay datos para esta combinación o la ventana es demasiado corta.</p>'; return; }
   const fmt=PS.rel?(I.t==="nivel"?v=>sgn(v):v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts"):I.f;
-  const f=fig(out,{title:PS.rel?`${I.l}: diferencia con ${refN}`:I.l,sub:PS.rel?(I.t==="nivel"?`% por encima (o por debajo) de ${refN}`:`Puntos por encima (o por debajo) de ${refN}`):I.u,source:`Fuente: Eurostat${years[0]<1995?" (desde 1995) y Banco Mundial (antes)":""}.${PS.gob?" Fondo: presidente del Gobierno de España; cada año se asigna a quien gobernó más de la mitad.":""}`});
-  const W=Math.max(320,out.clientWidth||900), H=Math.min(420,Math.max(280,W*0.45)), m={t:PS.gob?34:14,r:118,b:26,l:56};
-  const X=d3.scaleLinear().domain(d3.extent(years)).range([m.l,W-m.r]);
-  const vals=sel.flatMap(g=>years.map(y=>val(g,y))).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(PS.rel||I.t==="flujo"?[0]:[])); const pad=(hi-lo)*0.08||1;
-  const Y=d3.scaleLinear().domain([I.t==="nivel"&&!PS.rel?Math.max(0,lo-pad):lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
-  const svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",I.l+" por país y año");
-  if(PS.gob){ const M=psMandatos().filter(g=>g.ys.length&&g.ys[g.ys.length-1]>=years[0]&&g.ys[0]<=years[years.length-1]);
-    M.forEach((g,i)=>{ const a=Math.max(years[0],g.ys[0])-0.5, b=Math.min(years[years.length-1],g.ys[g.ys.length-1])+0.5, x0=Math.max(m.l,X(a)), x1=Math.min(W-m.r,X(b)); if(x1<=x0) return;
-      svg.append("rect").attr("x",x0).attr("y",m.t).attr("width",x1-x0).attr("height",H-m.b-m.t).attr("fill",PARTYC[g.partido]||"#999").attr("opacity",i%2?0.07:0.12);
-      if(x1-x0>34) svg.append("text").attr("x",(x0+x1)/2).attr("y",m.t-8).attr("text-anchor","middle").attr("font-size",11.5).attr("font-weight",700).attr("fill",PARTYC[g.partido]||"#666").text(x1-x0>70?`${g.ape} (${g.partido})`:g.ape).append("title").text(`${g.p} (${g.partido}), ${g.desde.slice(0,4)}–${g.hasta?g.hasta.slice(0,4):"hoy"}`); }); }
-  svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Y).attr("y2",Y);
-  svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>PS.rel||I.u!=="€ de 2020"?nf0.format(v):nf0.format(v/1000)+" mil");
-  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/90))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-6).attr("text-anchor","middle").text(String);
-  if(Y.domain()[0]<0&&Y.domain()[1]>0) svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Y(0)).attr("y2",Y(0)).attr("stroke",css("--ink")).attr("stroke-width",1);
-  const line=d3.line().defined(d=>d[1]!=null).x(d=>X(d[0])).y(d=>Y(d[1]));
-  const ends=[];
-  sel.slice().reverse().forEach(g=>{ const i=sel.indexOf(g), c=css(PSCOL[i%PSCOL.length]), pts=years.map(y=>[y,val(g,y)]), main=g==="ES";
-    svg.append("path").attr("d",line(pts)).attr("fill","none").attr("stroke",c).attr("stroke-width",main?3:1.8);
-    svg.append("g").selectAll("circle").data(pts.filter(d=>d[1]!=null)).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",main?2.6:1.8).attr("fill",c).append("title").text(d=>`${P[g].n}, ${d[0]}: ${fmt(d[1])}`);
-    const l=pts.filter(d=>d[1]!=null).pop(); if(l) ends.push({y:Y(l[1]),x:X(l[0]),t:`${P[g].n} ${fmt(l[1])}`,c,main}); });
-  ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<14) ends[i].y=ends[i-1].y+14;
-  ends.forEach(e=>svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c).text(e.t));
-  // tabla por mandato (España): cambio en el mandato y lo mismo para la UE en esos años
-  if(PS.gob){ const ES=P.ES[PS.k], M=psMandatos().filter(g=>g.ys.some(y=>ES[y]!=null));
-
+  govChart(out,{title:PS.rel?`${I.l}: diferencia con ${refN}`:I.l,sub:PS.rel?(I.t==="nivel"?`% por encima (o por debajo) de ${refN}`:`Puntos por encima (o por debajo) de ${refN}`):I.u,
+    source:`Fuente: Eurostat${years[0]<1995?" (desde 1995) y Banco Mundial (antes)":""}.${PS.gob?" Fondo: presidente del Gobierno de España; cada año se asigna a quien gobernó más de la mitad.":""}`,
+    years,series:sel.map((g,i)=>({n:P[g].n,c:PSCOL[i%PSCOL.length],main:g==="ES",v:Object.fromEntries(years.map(y=>[y,val(g,y)]).filter(([,v])=>v!=null))})),fmt,
+    tick:v=>PS.rel||I.u!=="€ de 2020"?nf0.format(v):nf0.format(v/1000)+" mil",zero:PS.rel||I.t==="flujo",gob:!!PS.gob});
+  if(PS.gob){ const OT=[...new Set([PS.ref,...PS.c.filter(g=>g!=="ES")])].filter(g=>P[g]&&P[g][PS.k]);
     const lab=I.t==="flujo"?"Media anual":I.t==="nivel"?"Crecimiento medio anual":"Cambio en puntos";
-    const fm=I.t==="tasa"?(v=>v==null?"—":(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts"):(v=>v==null?"—":sgn(v)), fd=v=>v==null?"—":(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts";
-    const OT=[...new Set([PS.ref,...PS.c.filter(g=>g!=="ES")])].filter(g=>P[g]&&P[g][PS.k]);
-    const rows=M.map(g=>{ const w=psWindow(ES,g.ys), e=psChange(ES,w,I.t), o=OT.map(c=>psChange(P[c][PS.k],w,I.t)), u=o[0], full=w&&w.yy[0]===g.ys[0]; return [`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${g.ys[0]}–${g.hasta?g.ys[g.ys.length-1]:"hoy"}${w&&!full?` (datos desde ${w.yy[0]})`:""}</small>`,fm(e),...o.map(fm),e!=null&&u!=null?fd(e-u):"—"]; });
-    const t=fig(out,{title:`${I.l} con cada Gobierno`,sub:`${lab} en los años de cada mandato, en España y en los países elegidos`,source:I.t==="tasa"?"Cambio entre el año anterior al primer año del mandato y el último. Los primeros meses de cada mandato dependen todavía de lo que hizo el Gobierno anterior.":I.t==="nivel"?"Crecimiento medio anual entre el año anterior al primer año del mandato y el último.":"Media de los años de cada mandato."});
-    table(t.body,["Presidente","España",...OT.map(c=>P[c].n.replace("Unión Europea","UE")),`España menos ${P[PS.ref].n.replace("Unión Europea","UE")}`],rows,{max:960});
-    add(out,"p","muted",`Un dato que mejora con un Gobierno no prueba que fuera mérito suyo, ni lo contrario: la economía española se mueve sobre todo con el ciclo europeo y mundial, y las políticas tardan años en notarse. La columna de la derecha ayuda a separar lo que fue común a toda Europa.`).style.cssText="max-width:720px;font-size:14px;margin-top:8px"; }
+    psMandTable(out,[{n:"España",v:P.ES[PS.k]},...OT.map(c=>({n:P[c].n.replace("Unión Europea","UE"),v:P[c][PS.k]}))],I.t,`${I.l} con cada Gobierno`,`${lab} en los años de cada mandato, en España y en los países elegidos`,
+      (I.t==="tasa"?"Cambio entre el año anterior al primer año del mandato y el último":I.t==="nivel"?"Crecimiento medio anual entre el año anterior al primer año del mandato y el último":"Media de los años de cada mandato")+", dentro de la ventana elegida. Los primeros meses de cada mandato dependen todavía de lo que hizo el Gobierno anterior.");
+    add(out,"p","muted",`Un dato que mejora con un Gobierno no prueba que fuera mérito suyo, ni lo contrario: la economía española se mueve sobre todo con el ciclo europeo y mundial, y las políticas tardan años en notarse. Comparar con otros países en los mismos años ayuda a separar lo que fue común.`).style.cssText="max-width:720px;font-size:14px;margin-top:8px"; }
 }
 // ---------- burbujas por años (provincias) ----------
 const BSER=[["renta","net_income_pc"],["pobreza","poverty"],["gini","gini"],["edad","mean_age"],["extr","pct_foreign"],["mayores65","pct_over65"],["menores18","pct_under18"],["solos","pct_single_hh"],["rentaHog","net_income_hh"]];
@@ -2981,8 +3022,8 @@ async function renderVoto(){
 const LBTYPES=[["mapa","Mapa",`<path d="M6 4h12l4 6 10 1 3 10H8z"/>`],["tabla","Ranking",`<rect x="4" y="3" width="30" height="5"/><rect x="4" y="10" width="22" height="5"/><rect x="4" y="17" width="14" height="5"/>`],
   ["cruce","Relación",`<circle cx="8" cy="20" r="2.2"/><circle cx="14" cy="16" r="2.2"/><circle cx="20" cy="14" r="2.2"/><circle cx="26" cy="9" r="2.2"/><circle cx="32" cy="6" r="2.2"/>`],["evolucion","Evolución",`<polyline points="3,22 12,17 20,18 28,9 37,4" style="fill:none;stroke-width:2.5"/>`],
   ["grupos","Grupos",`<rect x="5" y="10" width="6" height="13"/><rect x="14" y="5" width="6" height="18"/><rect x="23" y="13" width="6" height="10"/><rect x="32" y="8" width="6" height="15"/>`],["distribucion","Reparto",`<rect x="3" y="18" width="5" height="5"/><rect x="9" y="11" width="5" height="12"/><rect x="15" y="5" width="5" height="18"/><rect x="21" y="9" width="5" height="14"/><rect x="27" y="15" width="5" height="8"/><rect x="33" y="19" width="5" height="4"/>`],["burbujas","Años",`<circle cx="9" cy="17" r="4"/><circle cx="21" cy="11" r="6"/><circle cx="33" cy="15" r="3"/>`],
-  ["paises","Países",`<rect x="5" y="4" width="2.5" height="20"/><path d="M7.5 5h22l-4 5 4 5h-22z"/>`],["antes","Antes y después",`<path d="M20 2v22" style="stroke-width:1.5;stroke-dasharray:2 2;fill:none"/><polyline points="3,18 9,17 15,16 20,15 26,9 32,6 37,4" style="fill:none;stroke-width:2.5"/><polyline points="3,19 9,18 15,17 20,16 26,15 32,14 37,14" style="fill:none;stroke-width:1.5"/>`]];
-const LBDESC={paises:"¿Cómo le ha ido a España frente a otros países? Un dato año a año, con quién gobernaba",mapa:"¿Dónde es más alto o más bajo? Un dato, municipio a municipio",tabla:"¿Quiénes encabezan la lista? Ordena y filtra por varios datos",cruce:"¿Van juntos dos datos? Mira si la relación aguanta al comparar entre iguales",antes:"¿Cambió algo tras una ley o un suceso? Afectados frente a gemelos, año a año",evolucion:"¿Cómo ha cambiado? Cuánto ha crecido cada dato desde un año",grupos:"¿Qué zona destaca? Medias por comunidad, provincia, tamaño o nivel",distribucion:"¿Cómo se reparte? Un dato entre toda la población",burbujas:"¿Cómo se mueven las provincias? Dos datos, año a año"};
+  ["paises","Series",`<rect x="5" y="4" width="2.5" height="20"/><path d="M7.5 5h22l-4 5 4 5h-22z"/>`],["antes","Antes y después",`<path d="M20 2v22" style="stroke-width:1.5;stroke-dasharray:2 2;fill:none"/><polyline points="3,18 9,17 15,16 20,15 26,9 32,6 37,4" style="fill:none;stroke-width:2.5"/><polyline points="3,19 9,18 15,17 20,16 26,15 32,14 37,14" style="fill:none;stroke-width:1.5"/>`]];
+const LBDESC={paises:"¿Cómo ha cambiado con cada Gobierno? Un dato año a año: España frente a otros países, o precios de la compra, vivienda y sueldos",mapa:"¿Dónde es más alto o más bajo? Un dato, municipio a municipio",tabla:"¿Quiénes encabezan la lista? Ordena y filtra por varios datos",cruce:"¿Van juntos dos datos? Mira si la relación aguanta al comparar entre iguales",antes:"¿Cambió algo tras una ley o un suceso? Afectados frente a gemelos, año a año",evolucion:"¿Cómo ha cambiado? Cuánto ha crecido cada dato desde un año",grupos:"¿Qué zona destaca? Medias por comunidad, provincia, tamaño o nivel",distribucion:"¿Cómo se reparte? Un dato entre toda la población",burbujas:"¿Cómo se mueven las provincias? Dos datos, año a año"};
 const typeIcon=(svg,on)=>`<svg width="40" height="26" viewBox="0 0 40 26" aria-hidden="true" style="fill:var(--rule-2);stroke:var(--rule-2)">${svg}</svg>`;
 const QUICK=["renta","paroReg","edad","alquiler","part","superiores","varPob","vt"];
 const NBKEY="cifrario.cuaderno";
@@ -3125,6 +3166,7 @@ function lbTitle(){
   const L=k=>labK(k), d=EX.d;
   if(EX.v==="mapa"&&EX.bv&&d[1]) return `${L(d[0])} y ${low(L(d[1]))} · ${EX.p?provShort(PROVS[EX.p]):"España"}`;
   if(EX.v==="burbujas") return `Provincias año a año: ${low(L(d[0]))} y ${low(L(d[1]))}`;
+  if(EX.v==="paises"&&PS.s.length) return SERES&&SERES[PS.s[0]]?(PS.s.length===1?SERES[PS.s[0]].l:`${SERES[PS.s[0]].l} frente a ${listY(PS.s.slice(1).filter(k=>SERES[k]).map(k=>low(SERES[k].l)))}`):"Series de España";
   if(EX.v==="paises") return `${PSIND[PS.k].l}: España${PS.c.length>1&&PAIS?" frente a "+listY(PS.c.filter(g=>g!=="ES"&&PAIS.paises[g]).map(g=>PAIS.paises[g].n)):""}`;
   if(EX.v==="mapa") return `${L(d[0])} · ${EX.p?provShort(PROVS[EX.p]):"España"}`;
   if(EX.v==="tabla"){ const o=(EX.o||"").replace(/^-/,""), asc=(EX.o||"").startsWith("-"); return `Municipios ordenados por ${o==="pop"?"habitantes":low(L(o&&d.includes(o)?o:d[0]))}${asc?", de menos a más":""}`; }
@@ -4672,17 +4714,22 @@ async function studyGobiernos(B){
   const pr=ES.paro, prY=Object.keys(pr).sort(), prMax=prY.reduce((a,b)=>pr[b]>pr[a]?b:a);
   Object.assign(V,{paroMax:pr[prMax],paroMaxAño:+prMax,paroMaxUE:EU.paro[prMax],paroUlt:pr[prY[prY.length-1]],paroUltUE:EU.paro[prY[prY.length-1]],paroUltAño:+prY[prY.length-1],paroMin:Math.min(...prY.filter(y=>y>=2000).map(y=>pr[y])),
     crec20:ES.crecimiento["2020"],crec20UE:EU.crecimiento["2020"],deudaUlt:ES.deuda[Object.keys(ES.deuda).sort().pop()],deudaUltUE:EU.deuda[Object.keys(EU.deuda).sort().pop()],deuda07:ES.deuda["2007"],deudaMax:Math.max(...Object.values(ES.deuda)),deudaMaxAño:+Object.keys(ES.deuda).reduce((a,b)=>ES.deuda[b]>ES.deuda[a]?b:a)});
-  const yrs=(o,from)=>Object.keys(o).map(Number).filter(y=>y>=from).sort((a,b)=>a-b);
+  const SEL={c:["EU27_2020"],desde:null,hasta:null}, RD=[];
+  const yrs=(o,from)=>Object.keys(o).map(Number).filter(y=>y>=Math.max(from,SEL.desde||0)&&y<=(SEL.hasta||9999)).sort((a,b)=>a-b);
   const pcf=v=>pc(v), SRC="Fuente: Eurostat (desde 1995) y Banco Mundial (antes). Fondo: presidente del Gobierno; cada año se asigna a quien gobernó más de la mitad.";
-  // países con los que comparar: los elige el lector; todos los gráficos y la tabla se redibujan
-  const SEL={c:["EU27_2020"]}, RD=[], COLS=["--ink","--slate","--mustard","--plum","--olive","--stone"];
+  // países con los que comparar y ventana de años: los elige el lector; todos los gráficos y la tabla se redibujan
+  const _u=0, COLS=["--ink","--slate","--mustard","--plum","--olive","--stone"];
   const live=fn=>el=>{ const draw=()=>{ el.innerHTML=""; fn(el); }; RD.push(draw); draw(); };
   const refs=()=>SEL.c.filter(g=>P[g]).map((g,i)=>({g,n:P[g].n,c:COLS[i%COLS.length]}));
   const lines=(key,es,from)=>[{n:"España",v:es||ES[key],c:"--rust",main:true},...refs().map(r=>({n:r.n,v:key==="ppc"?Object.fromEntries(Object.keys(P[r.g].pibpcPPC||{}).filter(y=>EU.pibpcPPC[y]).map(y=>[y,P[r.g].pibpcPPC[y]/EU.pibpcPPC[y]*100])):P[r.g][key]||{},c:r.c,dash:r.g==="EU27_2020"}))];
   const mand=(g,key,t)=>{ const w=psWindow(ES[key],g.ys); return {w,es:psChange(ES[key],w,t),o:refs().map(r=>({...r,v:psChange(P[r.g][key],w,t)}))}; };
   const G={
     paises:el=>{ const all=Object.entries(P).filter(([g])=>g!=="ES");
-      el.innerHTML=`<div class="psbar"><span class="psbar-l">Comparar España con</span>${all.map(([g,o])=>`<button type="button" class="pschip" data-g="${g}" aria-pressed="${SEL.c.includes(g)}">${esc(o.n)}</button>`).join("")}</div>`;
+      const YS=d3.range(1980,+Object.keys(ES.crecimiento).sort().pop()+1), yo=(sel,def)=>YS.map(y=>`<option ${y===(sel||def)?"selected":""}>${y}</option>`).join("");
+      el.innerHTML=`<div class="psbar"><span class="psbar-l">Comparar España con</span>${all.map(([g,o])=>`<button type="button" class="pschip" data-g="${g}" aria-pressed="${SEL.c.includes(g)}">${esc(o.n)}</button>`).join("")}
+        <span class="psbar-y"><label>Gráficos desde <select id="gbd">${yo(SEL.desde,YS[0])}</select></label><label>hasta <select id="gbh">${yo(SEL.hasta,YS[YS.length-1])}</select></label></span></div>`;
+      el.querySelector("#gbd").addEventListener("change",e=>{ SEL.desde=+e.target.value; if(SEL.hasta&&SEL.hasta<=SEL.desde) SEL.hasta=null; RD.forEach(f=>f()); });
+      el.querySelector("#gbh").addEventListener("change",e=>{ SEL.hasta=+e.target.value; if(SEL.desde&&SEL.desde>=SEL.hasta) SEL.desde=null; RD.forEach(f=>f()); });
       el.querySelectorAll(".pschip").forEach(b=>b.addEventListener("click",()=>{ const g=b.dataset.g; SEL.c=SEL.c.includes(g)?SEL.c.filter(x=>x!==g):[...SEL.c,g].slice(-6); if(!SEL.c.length) SEL.c=["EU27_2020"];
         el.querySelectorAll(".pschip").forEach(x=>x.setAttribute("aria-pressed",String(SEL.c.includes(x.dataset.g)))); RD.forEach(f=>f()); })); },
     ppc:live(el=>govChart(el,{title:"PIB por habitante, en % de la media de la UE",sub:"En poder de compra (corrige las diferencias de precios). 100 = media de la Unión Europea",source:SRC,years:yrs(ppc,1995),series:lines("ppc",ppc).map(s=>s.n==="Unión Europea"?{...s,v:Object.fromEntries(Object.keys(ppc).map(y=>[y,100]))}:s),fmt:v=>nf1.format(v)})),
