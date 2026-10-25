@@ -100,6 +100,7 @@ function pathToKey(){
   if((m=p.match(/^\/municipio\/(\d{5})(?:-[^/]*)?(?:\/([a-z]+))?$/))) return "m"+m[1]+(m[2]?"-"+m[2]:"");
   if(p==="/quien-soy") return "sobre";
   if(p==="/quien-soy/contacto") return "sobre-contacto";
+  if(/^\/(provincia|rankings)(\/[\w-]+)?$/.test(p)) return "__static";
   if((m=p.match(/^\/comparar(?:\/(\d{5})?(?:-(\d{5}))?)?$/))) return "comparar"+(m[1]?"-"+m[1]:"")+(m[2]?"-"+m[2]:"");
   return "__404";
 }
@@ -118,7 +119,7 @@ function urlInit(){
     if(a.target==="_blank"||a.hasAttribute("download")||a.origin!==location.origin) return;
     const href=a.getAttribute("href")||"";
     if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); navTo(k); return; }
-    if(/^\/(data|og)\//.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
+    if(/^\/(data|og|provincia|rankings)(\/|$)/.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
     if(href.startsWith("/")){ e.preventDefault(); navTo(href); }
   });
   // los enlaces #antiguos que generan las plantillas pasan a ruta real (también para el HTML pre-renderizado)
@@ -132,6 +133,9 @@ function render404(){ document.title="Página no encontrada · Indicio"; view.in
 let lastMun=null; try{ const lm=localStorage.getItem("cifrario.mun"); if(lm&&/^\d{5}$/.test(lm)) lastMun=lm; }catch(e){}
 function route(){
   const h=pathToKey();
+  // bloques estáticos de las fichas (preguntas frecuentes, municipios cercanos): solo en la página para la que se generaron
+  document.querySelectorAll(".seo-extra").forEach(e=>{ e.hidden=!(h===e.dataset.key||h.startsWith(e.dataset.key+"-")); });
+  if(h==="__static") return;   // páginas solo estáticas (provincias): el HTML ya trae todo
   const m=h.match(/^m(\d{5})(?:-([a-z]+))?$/), rt=h.match(/^(?:renta|riqueza)(?:-(\d{5}))?$/), cr=h.match(/^(?:cruces|relaciones)(?:-([a-zA-Z0-9]+)-([a-zA-Z0-9]+))?$/);
   document.querySelectorAll(".nav a,.nav .ddb").forEach(a=>a.removeAttribute("aria-current")); ddClose();
   // dos pilares: todo lo ya analizado (preguntas, temas, municipios) cuelga de «Análisis»; lo demás es el laboratorio
