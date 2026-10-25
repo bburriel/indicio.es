@@ -76,6 +76,11 @@ function page({route,title,desc,ogTitle,main,jsonld,ogImage,type="website",robot
 }
 const breadcrumb=items=>({"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:items.map(([n,u],i)=>({"@type":"ListItem",position:i+1,name:n,item:SITE.url+u}))});
 const sources=`<footer class="method"><p><b>De dónde salen los datos.</b> INE: Atlas de Distribución de Renta de los Hogares, padrón municipal, Censo de Población y Viviendas 2021, Estadística de Migraciones, Índice de Precios de Vivienda en Alquiler, viviendas turísticas, Encuesta de Estructura Salarial e IPC. SEPE: paro registrado por municipio. Ministerio del Interior: resultados electorales. Eurostat: gasto público.</p></footer>`;
+// imágenes para compartir de rankings, provincias y municipios: el build deja la lista en dist/og-extra.json y
+// `npm run snapshot` las dibuja en og/<fichero>.jpg (solo las que cambian); el build siguiente ya las enlaza
+const OGX=[]; const ogFor=(file,spec)=>{ OGX.push({file,...spec}); return exists("og/"+file+".jpg")?"/og/"+file+".jpg":null; };
+// IndexNow (Bing, Yandex…): la clave se publica en /<clave>.txt; .github/workflows/indexnow.yml avisa al publicar
+const INDEXNOW_KEY="0b32a63914d9a143d8bf765fc1576ef8";
 const urls=[]; const addUrl=(loc,pri,mod)=>urls.push({loc:SITE.url+loc,pri,mod:mod||SITE.dataUpdated});
 
 // ---------- portada ----------
@@ -106,7 +111,8 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
     const og=exists("og/"+S.id+".png")?"/og/"+S.id+".png":null;
     page({route,title:S.t+" · Indicio",desc:S.a,ogTitle:S.t,main,type:"article",ogImage:og,robots:S.oculto?"noindex":"",
       jsonld:[{"@context":"https://schema.org","@type":"Article",headline:S.t,description:S.d,datePublished:S.pub,dateModified:S.upd||S.pub,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url},mainEntityOfPage:SITE.url+route,image:SITE.url+(og||"/og-image.png"),articleSection:topicName(S.tema)},
-        breadcrumb([["Análisis","/preguntas/"],[S.t,route]])]});
+        breadcrumb([["Análisis","/preguntas/"],[S.t,route]]),
+        {"@context":"https://schema.org","@type":"FAQPage",mainEntity:[{"@type":"Question",name:S.t,acceptedAnswer:{"@type":"Answer",text:S.a}}]}]});
     if(!S.oculto) addUrl(route,0.8,S.upd||S.pub);
   }
 }
@@ -206,7 +212,8 @@ for(const r of rows){
     breadcrumb([["Municipios","/municipio/"],["Provincia de "+prov,"/provincia/"+provSlug(r[F.prov])+"/"],[name,route]]),
     {"@context":"https://schema.org","@type":"WebPage",name:`${name}: renta, población, paro y vivienda`,url:SITE.url+route,inLanguage:"es",dateModified:SITE.dataUpdated,about:{"@type":"City",name},author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url}},
     ...(faq.length?[{"@context":"https://schema.org","@type":"FAQPage",mainEntity:faq.map(([q,a])=>({"@type":"Question",name:q,acceptedAnswer:{"@type":"Answer",text:a}}))}]:[])];
-  page({route,title:`${name}: renta, población, paro y vivienda · Indicio`,desc,ogTitle:`${name} en datos`,main,jsonld,after});
+  const ogImage=pop>=20000?ogFor("m-"+code,{k:"Provincia de "+prov,t:name,stats:[["Habitantes",nf0.format(pop),vs("varPob")!=null?`${vs("varPob")>=0?"+":"−"}${nf1.format(Math.abs(vs("varPob")))} % desde 2015`:""],["Renta por persona",renta!=null?nf0.format(renta)+" €":"—",renta!=null?`España: ${nf0.format(esMean.renta)} €`:""],["Paro registrado",vs("paroReg")!=null?pctS(vs("paroReg")):"—",`España: ${pctS(esMean.paroReg)}`]]}):null;
+  page({route,title:`${name}: renta, población, paro y vivienda · Indicio`,desc,ogTitle:`${name} en datos`,main,jsonld,after,ogImage});
   munUrls.push({loc:SITE.url+route,pri:pop>=20000?0.6:0.4}); nMun++;
 }
 
@@ -235,7 +242,8 @@ for(const r of rows){
       ${list.map(r=>`<tr><td>${L(r)}</td><td class="r num">${cell(r,"pop",nf0.format)}</td><td class="r num">${cell(r,"renta",x=>nf0.format(x)+" €")}</td><td class="r num">${cell(r,"paroReg",pctS)}</td><td class="r num">${cell(r,"edad",x=>nf1.format(x))}</td></tr>`).join("")}
       </tbody></table></div><p class="muted" style="font-size:13px">Renta: ${esc(srcOf("renta"))}. Paro registrado: SEPE, media de 2025, sobre la población de 16 a 64 años. Edad: ${esc(srcOf("edad"))}. En los municipios muy pequeños el INE no publica todos los datos.</p></section>
       <section class="finding"><div class="txt"><p><a href="/laboratorio/mapa/?d=renta&p=${p}">Ver la provincia en el mapa del laboratorio →</a> · <a href="/provincia/">Otras provincias →</a></p></div></section>${sources}`;
-    page({route,title:`Municipios de ${prov}: renta, población y paro · Indicio`,desc:facts.slice(0,2).join(" ").slice(0,300),ogTitle:`Municipios de la provincia de ${prov}`,main,
+    const ogImage=ogFor("p-"+provSlug(p),{k:"Provincia de "+prov,t:`Los ${nf0.format(list.length)} municipios de ${prov}`,text:rich&&poor&&rich!==poor?`El de más renta: ${rich[F.name]} (${nf0.format(rich[F.renta])} €). El de menos: ${poor[F.name]} (${nf0.format(poor[F.renta])} €).`:facts[0]});
+    page({route,title:`Municipios de ${prov}: renta, población y paro · Indicio`,desc:facts.slice(0,2).join(" ").slice(0,300),ogTitle:`Municipios de la provincia de ${prov}`,main,ogImage,
       jsonld:[breadcrumb([["Municipios","/municipio/"],["Provincias","/provincia/"],["Provincia de "+prov,route]]),{"@context":"https://schema.org","@type":"Dataset",name:`Municipios de la provincia de ${prov}: renta, población, paro y edad`,description:facts.join(" "),url:SITE.url+route,license:"https://creativecommons.org/licenses/by/4.0/",creator:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},isBasedOn:["https://www.ine.es","https://www.sepe.es"],spatialCoverage:{"@type":"Place",name:"Provincia de "+prov+", España"},variableMeasured:["Habitantes","Renta neta media por persona","Paro registrado","Edad media"]}]});
     addUrl(route,0.7);
   }
@@ -274,7 +282,8 @@ for(const r of rows){
       ${cities.length>=10?`<section class="finding"><h2>Las ciudades de más de 50.000 habitantes</h2>${tbl(cities,R,20)}</section>`:""}
       ${all.length>big.length&&all[0]!==big[0]?`<section class="finding"><h2>Contando también los pueblos más pequeños</h2><div class="txt"><p>Si se incluyen todos los municipios, el primero es ${L(all[0])} (${PL(all[0])}, ${nf0.format(all[0][F.pop])} habitantes), con ${R.f(all[0][F[R.k]])}.</p></div></section>`:""}
       <section class="finding"><div class="txt"><p>${RANKS.filter(x=>x!==R).slice(0,6).map(x=>`<a href="/rankings/${x.id}/">${esc(x.t)}</a>`).join(" · ")}</p><p><a href="/laboratorio/tabla/?d=${R.k}&t=g1">Ordena y filtra este dato tú mismo en el laboratorio →</a></p><p class="muted" style="font-size:13px">Datos actualizados el ${fechaES(SITE.dataUpdated)}.</p></div></section>${sources}`;
-    page({route,title:`${R.t} · Indicio`,desc:lead.slice(0,300),ogTitle:R.t,main,
+    const ogImage=ogFor("r-"+R.id,{k:"Ranking de municipios",t:R.t,list:big.slice(0,5).map((r,i)=>[i+1,r[F.name],provShort(PROVS[r[F.prov]]),R.f(r[F[R.k]])])});
+    page({route,title:`${R.t} · Indicio`,desc:lead.slice(0,300),ogTitle:R.t,main,ogImage,
       jsonld:[breadcrumb([["Municipios","/municipio/"],["Rankings","/rankings/"],[R.t,route]]),
         {"@context":"https://schema.org","@type":"ItemList",name:R.t,itemListOrder:R.desc?"https://schema.org/ItemListOrderDescending":"https://schema.org/ItemListOrderAscending",numberOfItems:Math.min(50,big.length),itemListElement:big.slice(0,50).map((r,i)=>({"@type":"ListItem",position:i+1,name:r[F.name],url:SITE.url+munPath(r)}))},
         {"@context":"https://schema.org","@type":"FAQPage",mainEntity:[{"@type":"Question",name:R.q,acceptedAnswer:{"@type":"Answer",text:lead+" Fuente: "+src+"."}}]}]});
@@ -322,4 +331,6 @@ fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"
 fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200"].join("\n")+"\n");
 fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
+fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));
+fs.writeFileSync(path.join(OUT,INDEXNOW_KEY+".txt"),INDEXNOW_KEY);
 console.log(`dist/ listo: ${urls.length} páginas + ${nMun} fichas municipales, ${parts.length+1} sitemaps.`);
