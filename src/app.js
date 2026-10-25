@@ -2140,31 +2140,7 @@ const loadSeriesES=()=>SERES_P||(SERES_P=Promise.all([getJSON("/data/alimentos.j
   add("sal_smi",{l:"Salario mínimo (€ al mes)",g:"Sueldos",u:"€",t:"nivel",v:num(S.smiLegal),src:"BOE"});
   SERES=out; return out; }));
 // estado de la vista «Series»: modo país (un dato, varios países) o modo España (varias series de España)
-// selector genérico con buscador y pestañas (el mismo aspecto que el de los datos municipales)
-function openListPicker(btn,{items,current,excl=[],onPick,placeholder="Busca un dato…"}){
-  closePicker();
-  const groups=[...new Set(items.map(x=>x.g))]; let tab=(items.find(x=>x.k===current)||items[0]||{}).g, q="";
-  const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p); PICK_BTN=btn;
-  const avail=x=>!excl.includes(x.k)||x.k===current;
-  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="${esc(placeholder)}" autocomplete="off" aria-label="Buscar"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
-  const draw=()=>{ const nq=norm(q.trim()), hit=x=>norm(x.l+" "+x.g+" "+(x.sub||"")).includes(nq);
-    document.getElementById("dpt").innerHTML=groups.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${items.filter(x=>x.g===g&&avail(x)).length}</small></button>`).join("");
-    const L=items.filter(x=>avail(x)&&(nq?hit(x):x.g===tab));
-    document.getElementById("dpl").innerHTML=L.length?L.map(x=>`<li><button type="button" data-k="${esc(x.k)}" class="${x.k===current?"on":""}"><b>${esc(x.l)}</b><small>${nq?`<i>${esc(x.g)}</i> · `:""}${esc(x.sub||"")}</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`;
-    p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
-    p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); })); };
-  draw();
-  document.getElementById("dpq").addEventListener("input",e=>{ q=e.target.value; draw(); });
-  p.querySelector(".dp-x").addEventListener("click",closePicker);
-  document.addEventListener("keydown",pickKey);
-  if(window.innerWidth>900){ const r=btn.getBoundingClientRect(), h=Math.min(p.offsetHeight,window.innerHeight-16); p.style.left=Math.min(window.innerWidth-p.offsetWidth-12,r.right+10)+"px"; p.style.top=Math.max(8,Math.min(window.innerHeight-h-8,r.top-10))+"px"; }
-  setTimeout(()=>{ const i=document.getElementById("dpq"); if(i&&window.innerWidth>900) i.focus(); else { const x=p.querySelector(".dp-x"); if(x) x.focus({preventScroll:true}); } },20);
-}
 function psRange(ys){ const a=PS.desde&&PS.desde>=ys[0]?PS.desde:ys[0], b=PS.hasta&&PS.hasta<=ys[ys.length-1]?PS.hasta:ys[ys.length-1]; return ys.filter(y=>y>=a&&y<=b); }
-function psItems(onlyES){ const Pz=PAIS?PAIS.paises:{}, SE=SERES||{};
-  const pais=onlyES?[]:Object.entries(PSIND).filter(([k])=>!PAIS||(Pz.ES||{})[k]).map(([k,v])=>({k:"pais:"+k,l:v.l,g:"Países",sub:"Eurostat · España frente a otros países"}));
-  const yr=o=>{ const y=Object.keys(o.v).sort(); return y.length?`${y[0]}–${y[y.length-1]}`:""; };
-  return pais.concat(Object.entries(SE).sort((a,b)=>a[1].l.localeCompare(b[1].l,"es")).map(([k,o])=>({k:"es:"+k,l:o.l,g:o.g.replace(/ \(.*\)$/,""),sub:`${o.src} · ${yr(o)}`}))); }
 function psBar(bar){
   const Pz=PAIS?PAIS.paises:{}, all=Object.entries(Pz).filter(([g,o])=>o[PS.k]), esMode=PS.s.length>0, SE=SERES||{};
   const cur=esMode?SE[PS.s[0]]:null;
@@ -2187,10 +2163,10 @@ function psBar(bar){
       <p class="hint">${esMode?"Con el índice, todas las series empiezan en 100 y se ve cuál ha subido más desde el año que elijas.":"La economía depende mucho del ciclo europeo. Comparar con otros países separa lo que pasó en todas partes de lo que fue propio de España."}</p></div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; navTo(exHash()); }));
   const on=(id,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener("change",fn); };
-  const pk=document.getElementById("pspick"); if(pk) pk.addEventListener("click",()=>openListPicker(pk,{items:psItems(false),current:esMode?"es:"+PS.s[0]:"pais:"+PS.k,placeholder:"Busca un dato: paro, aceite, alquiler…",onPick:v=>{
-    if(v.startsWith("es:")){ const k=v.slice(3); PS.s=[k,...PS.s.slice(1).filter(x=>x!==k)]; if(PS.s.length===1) PS.idx=SE[k]&&SE[k].idx?1:0; } else { PS.k=v.slice(5); PS.s=[]; } PS.desde=PS.hasta=null; exUpdate(); }}));
-  const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",()=>openListPicker(ad,{items:psItems(true),current:null,excl:PS.s.map(k=>"es:"+k),placeholder:"Busca una serie: huevos, sueldo, alquiler…",onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}));
-  bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",()=>openListPicker(b,{items:psItems(true),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }})));
+  const pk=document.getElementById("pspick"); if(pk) pk.addEventListener("click",async()=>{ await loadAllCat(); openPicker(pk,{all:true,here:k=>/^(es|pais):/.test(k),current:esMode?"es:"+PS.s[0]:"pais:"+PS.k,onPick:v=>{
+    if(v.startsWith("es:")){ const k=v.slice(3); PS.s=[k,...PS.s.slice(1).filter(x=>x!==k)]; if(PS.s.length===1) PS.idx=SE[k]&&SE[k].idx?1:0; } else { PS.k=v.slice(5); PS.s=[]; } PS.desde=PS.hasta=null; exUpdate(); }}); });
+  const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",async()=>{ await loadAllCat(); openPicker(ad,{all:true,here:k=>k.startsWith("es:"),current:null,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}); });
+  bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{all:true,here:k=>k.startsWith("es:"),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-rs]").forEach(b=>b.addEventListener("click",()=>{ PS.s=PS.s.filter(x=>x!==b.dataset.rs); exUpdate(); }));
   on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
   on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
@@ -3102,34 +3078,57 @@ function nbDraw(){
 // ---------- panel lateral ----------
 const SLOTS={mapa:{get n(){return EX.bv?2:1},get l(){ return EX.bv?["Primer dato (azul)","Segundo dato (rosa)"]:["Color del mapa"]; }},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
 // ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
-const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
+const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Precios","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
 let PICK_BTN=null;
+// datos que no son de municipios: series anuales de España (IPC, vivienda, sueldos) y comparación entre países
+const NATG={"Lista de la compra (IPC)":"Precios","Precios (IPC por grupos)":"Precios","Vivienda":"Vivienda","Sueldos":"Trabajo"};
+function natItems(){ const out=[], SE=SERES||{}, yr=o=>{ const y=Object.keys(o.v||{}).sort(); return y.length?`${y[0]}–${y[y.length-1]}`:""; };
+  Object.entries(SE).forEach(([k,o])=>out.push({k:"es:"+k,l:o.l,g:NATG[o.g]||o.g,src:o.src,nat:"es",yrs:yr(o)}));
+  if(PAIS) Object.entries(PSIND).filter(([k])=>(PAIS.paises.ES||{})[k]).forEach(([k,v])=>out.push({k:"pais:"+k,l:v.l+" (por países)",g:"Europa",src:"Eurostat",nat:"pais"}));
+  return out; }
+const loadAllCat=()=>Promise.allSettled([loadRegional(),loadPaises(),loadSeriesES(),loadEuropa()]);
+// nivel de cada dato, para marcarlo en el buscador
+const LVL=c=>c.nat==="es"?["es","España"]:c.nat==="pais"?["pa","Países"]:c.eu?["eu","Regiones de Europa"]:c.reg?["rg",c.np>=40?"Provincias":"Comunidades"]:["mu","Municipios"];
+const LVLF=[["","Todos"],["mu","Municipios"],["rg","Provincias"],["es","España"],["eu","Europa"]];
+// un dato que no sirve en la vista actual se abre en la vista que le sirve
+function jumpTo(k){ const c=CATK[k]||{};
+  if(k.startsWith("es:")){ EX.v="paises"; PS.s=[k.slice(3)]; PS.idx=(SERES[k.slice(3)]||{}).idx?1:0; PS.desde=PS.hasta=null; toast("Es una serie de toda España: se abre en «Series».",3200); }
+  else if(k.startsWith("pais:")){ EX.v="paises"; PS.k=k.slice(5); PS.s=[]; PS.desde=PS.hasta=null; toast("Es un dato por países: se abre en «Series».",3200); }
+  else if(c.eu){ EX.v="cruce"; EX.u="eu"; EX.d=[k]; toast("Es un dato de regiones europeas: se abre en «Relación», a escala de Europa.",3600); }
+  else if(c.reg){ const o=EX.d.find(x=>x!==k&&!isEU(x))||"renta"; EX.v="cruce"; EX.d=[k,o]; toast("Es un dato por provincia o comunidad: se abre en «Relación».",3600); }
+  else { if(EX.v==="paises"){ EX.v="mapa"; EX.d=[k]; toast("Es un dato por municipio: se abre en el mapa.",3000); } else { EX.u=""; EX.d=[k,...EX.d.filter(x=>x!==k&&!isEU(x))]; } }
+  fixScale(); navTo(exHash()); }
 function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remove(); document.removeEventListener("keydown",pickKey); if(PICK_BTN&&document.body.contains(PICK_BTN)) PICK_BTN.focus(); PICK_BTN=null; } }
 function pickKey(e){ if(e.key==="Escape"){ closePicker(); return; }
   if(e.key==="Tab"){ const p=document.getElementById("dpick"); if(!p) return; const f=[...p.querySelectorAll("input,button")].filter(x=>!x.disabled); if(!f.length) return;
     if(e.shiftKey&&document.activeElement===f[0]){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); } else if(!p.contains(document.activeElement)){ e.preventDefault(); f[0].focus(); } } }
-function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false}){
+function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,all=false,here=null}){
   closePicker();
   // los datos de provincias y comunidades solo en «Relación»; en la escala de Europa, solo los de Europa
-  const okC=c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg));
-  const groups=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])].filter(g=>CAT.some(c=>c.g===g&&okC(c)));
+  const okC=here?(c=>here(c.k)):(c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg)&&!c.nat));
+  // con «all», el buscador enseña todos los datos, marcados por nivel; los que no sirven aquí abren la vista que les sirve
+  const POOL=all?[...CAT,...natItems()]:CAT.filter(okC); let lv="";
+  const groups=[...new Set([...PICK_ORDER,...POOL.map(c=>c.g)])].filter(g=>POOL.some(c=>c.g===g));
   let tab=extras&&!(CATK[current]||{}).g?"Opciones":(CATK[current]||{}).g||groups[0], q="";
   const EXG="Opciones", tabs=extras?[EXG,...groups]:groups;
   const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p); PICK_BTN=btn;
-  const avail=c=>okC(c)&&(!excl.includes(c.k)||c.k===current);
-  const covTxt=c=>c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
-  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div><div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
+  const avail=c=>(!excl.includes(c.k)||c.k===current)&&(!lv||LVL(c)[0]===lv||(lv==="eu"&&LVL(c)[0]==="pa"));
+  const covTxt=c=>c.nat==="es"?"año a año, "+c.yrs:c.nat==="pais"?"España y otros países, año a año":c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
+  const VIEWN={es:"Series",pa:"Series",eu:"Relación",rg:"Relación",mu:"el mapa"};
+  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${all?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVLF.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
   const draw=()=>{
-    const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k).includes(nq);
-    document.getElementById("dpt").innerHTML=tabs.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${g===EXG?extras.length:CAT.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
+    const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k+" "+LVL(c)[1]).includes(nq);
+    const vis=tabs.filter(g=>g===EXG||!lv||POOL.some(c=>c.g===g&&avail(c))); if(!vis.includes(tab)) tab=vis[0];
+    document.getElementById("dpt").innerHTML=vis.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${g===EXG?extras.length:POOL.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
     const ex=extras&&!nq&&tab===EXG?extras.map(([k,l])=>`<li><button type="button" data-k="${k}" class="${k===current?"on":""}"><b>${esc(l)}</b></button></li>`).join(""):"";
-    const items=tab===EXG&&!nq?[]:CAT.filter(c=>avail(c)&&(nq?hit(c):c.g===tab));
-    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>`<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}"><b>${esc(c.l)}</b><small>${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${covTxt(c)}</small></button></li>`).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
+    const items=tab===EXG&&!nq?[]:POOL.filter(c=>avail(c)&&(nq?hit(c):c.g===tab)).sort((a,b)=>okC(b)-okC(a));
+    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>{ const [lc,ll]=LVL(c), ok=okC(c); return `<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}${ok?"":" far"}"><b>${esc(c.l)}</b><small>${all?`<span class="lv lv-${lc}">${ll}</span>`:""}${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${covTxt(c)}${ok?"":` · <u>se abre en ${VIEWN[lc]==="el mapa"?"el mapa":"«"+VIEWN[lc]+"»"}</u>`}</small></button></li>`; }).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
     p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
-    p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ closePicker(); onPick(b.dataset.k); }));
+    p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.k, c=POOL.find(x=>x.k===k); closePicker(); if(all&&c&&!okC(c)) jumpTo(k); else onPick(k); }));
   };
   draw();
+  p.querySelectorAll("#dplv button").forEach(b=>b.addEventListener("click",()=>{ lv=b.dataset.lv; p.querySelectorAll("#dplv button").forEach(x=>x.setAttribute("aria-pressed",x===b)); draw(); }));
   document.getElementById("dpq").addEventListener("input",e=>{ q=e.target.value; draw(); });
   p.querySelector(".dp-x").addEventListener("click",closePicker);
   document.addEventListener("keydown",pickKey);
@@ -3166,8 +3165,8 @@ function exBar(){
       :`<p class="hint" style="margin:0">Para ver si una relación aguanta al comparar entre iguales, pásala a una relación; para medir el efecto de una ley o un suceso, usa <b>Antes y después</b>.</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
   const regOK=EX.v==="cruce", euOK=EX.v==="cruce"&&EX.u==="eu";
-  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
-  bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",()=>{ openPicker(b,{current:null,excl:EX.d,onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,6); exUpdate(); }}); }));
+  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); await loadAllCat(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,all:true,onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
+  bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{current:null,excl:EX.d,all:true,onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,6); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-x]").forEach(b=>b.addEventListener("click",()=>{ if(EX.d.length<=1) return; EX.d.splice(+b.dataset.x,1); exUpdate(); }));
   bar.querySelectorAll("button[data-q]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.q; if(EX.v==="cruce"||EX.v==="tabla"||EX.v==="grupos"){ const S=SLOTS[EX.v]; if(EX.d.length<S.n&&EX.v!=="cruce") EX.d.push(k); else { const pos=EX.v==="cruce"?1:Math.min(EX.d.length,S.n)-1; EX.d=EX.d.filter(x=>x!==k); EX.d.splice(pos,1,k); } } else { EX.d=[k,...EX.d.filter(x=>x!==k)]; } EX.d=EX.d.slice(0,6); exUpdate(); }));
   const pv=document.getElementById("exprov"); if(pv) pv.addEventListener("change",e=>{ EX.p=e.target.value; exUpdate(); });
