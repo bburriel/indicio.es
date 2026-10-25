@@ -2092,7 +2092,7 @@ function psBar(bar){
   const Pz=PAIS?PAIS.paises:{}, all=Object.entries(Pz).filter(([g,o])=>o[PS.k]);
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.paises}.</p></div>
-    <div class="lb-step"><h4><i>2</i>Qué dato</h4><select class="sel" id="psk" aria-label="Qué dato">${Object.entries(PSIND).map(([k,v])=>`<option value="${k}" ${k===PS.k?"selected":""}>${esc(v.l)}</option>`).join("")}</select><p class="hint">${esc(PSIND[PS.k].d)}</p></div>
+    <div class="lb-step"><h4><i>2</i>Qué dato</h4><select class="sel" id="psk" aria-label="Qué dato">${Object.entries(PSIND).filter(([k])=>!PAIS||(PAIS.paises.ES||{})[k]).map(([k,v])=>`<option value="${k}" ${k===PS.k?"selected":""}>${esc(v.l)}</option>`).join("")}</select><p class="hint">${esc(PSIND[PS.k].d)}</p></div>
     <div class="lb-step"><h4><i>3</i>Qué países</h4><div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div></div>
     <div class="lb-step"><h4><i>4</i>Comprobar</h4>
       <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
@@ -2108,7 +2108,7 @@ function psBar(bar){
 async function exPaises(out){
   out.innerHTML='<p class="loading">Cargando los datos por país…</p>';
   try{ await loadPaises(); }catch(e){ out.innerHTML='<p class="loading">No se pudieron cargar los datos por país.</p>'; return; }
-  if(EX.v!=="paises") return; out.innerHTML=""; exBar();
+  if(EX.v!=="paises") return; out.innerHTML=""; exBar(); { const t=document.getElementById("lbtitle"); if(t) t.textContent=lbTitle(); }
   const I=PSIND[PS.k], P=PAIS.paises, EU=P.EU27_2020&&P.EU27_2020[PS.k];
   const sel=PS.c.filter(g=>P[g]&&P[g][PS.k]&&(!PS.rel||g!=="EU27_2020"));
   const val=(g,y)=>{ const v=P[g][PS.k][y]; if(v==null) return null; if(!PS.rel) return v; const e=EU&&EU[y]; if(e==null) return null; return I.t==="nivel"?(v/e-1)*100:v-e; };
