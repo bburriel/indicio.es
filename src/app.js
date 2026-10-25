@@ -227,7 +227,7 @@ const SRC={
   tensionadas:"BOE: resoluciones de 14 de marzo y 8 de octubre de 2024 con los municipios catalanes declarados zona de mercado residencial tensionado", erte:"Seguridad Social: trabajadores en ERTE por provincia a 30 de abril de 2020 (nota de afiliación de abril de 2020)",
   ave:"Adif, Renfe y prensa: estaciones con servicio de alta velocidad abierto entre 2021 y 2023 (lista en el repositorio)", vut:"Boletines oficiales y prensa: municipios con moratoria o prohibición de nuevas viviendas turísticas, con fecha (lista en el repositorio)",
   geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN",
-  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", ipv:"INE: Índice de Precios de Vivienda, por comunidad", mivauViv:"Ministerio de Vivienda: valor tasado de la vivienda libre, viviendas libres iniciadas y terminadas, viviendas protegidas", ecvTen:"INE: Encuesta de Condiciones de Vida, hogares por régimen de tenencia y renta", eurostatViv:"Eurostat: precios de la vivienda, sobrecarga del gasto en vivienda, emancipación, inversión en vivienda y hogares", ees:"INE: Encuesta Anual de Estructura Salarial (percentiles de la ganancia anual y tramos de salario mínimo)", epaSal:"INE: EPA, salarios del empleo principal por deciles (con datos fiscales)", ecvRenta:"INE: Encuesta de Condiciones de Vida, deciles de renta por unidad de consumo", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
+  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", eurostatPaises:"Eurostat (cuentas nacionales, EPA europea, cuentas públicas e IPCA, desde 1995) y Banco Mundial (indicadores de desarrollo, antes de 1995)", ipv:"INE: Índice de Precios de Vivienda, por comunidad", mivauViv:"Ministerio de Vivienda: valor tasado de la vivienda libre, viviendas libres iniciadas y terminadas, viviendas protegidas", ecvTen:"INE: Encuesta de Condiciones de Vida, hogares por régimen de tenencia y renta", eurostatViv:"Eurostat: precios de la vivienda, sobrecarga del gasto en vivienda, emancipación, inversión en vivienda y hogares", ees:"INE: Encuesta Anual de Estructura Salarial (percentiles de la ganancia anual y tramos de salario mínimo)", epaSal:"INE: EPA, salarios del empleo principal por deciles (con datos fiscales)", ecvRenta:"INE: Encuesta de Condiciones de Vida, deciles de renta por unidad de consumo", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
   deuda:"Ministerio de Hacienda: deuda viva de cada ayuntamiento a 31 de diciembre, 2015–2025 (sin 2017)", contratos:"SEPE: contratos iniciales indefinidos y temporales por municipio y mes (2005–2026) y paro registrado por municipio", afil:"Seguridad Social: afiliados por municipio, régimen y actividad, diciembre de 2011 a 2025", compr:"Ministerio de Vivienda: compraventas de vivienda por municipio y trimestre (notarios), 2004–2026",
   mivau:"Ministerio de Vivienda: viviendas protegidas con calificación definitiva (planes estatales y autonómicos, 1991–2025), viviendas libres iniciadas (1991–2025) y transacciones de vivienda de los notarios (2004–2025)"
 };
@@ -2105,6 +2105,35 @@ function psBar(bar){
   on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
   bar.querySelectorAll(".pschips input[data-g]").forEach(i=>i.addEventListener("change",()=>{ const g=i.dataset.g; PS.c=i.checked?[...new Set([...PS.c,g])].slice(0,7):PS.c.filter(x=>x!==g); if(!PS.c.includes("ES")) PS.c.unshift("ES"); exUpdate(); }));
 }
+// ---------- gráfico de líneas por años con los gobiernos de España de fondo (laboratorio «Países» y análisis) ----------
+function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height}){
+  const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:120,b:26,l:52};
+  const X=d3.scaleLinear().domain(d3.extent(years)).range([m.l,W-m.r]);
+  const vals=series.flatMap(s=>years.map(y=>s.v[y])).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(zero?[0]:[])); const pad=(hi-lo)*0.08||1;
+  const Y=d3.scaleLinear().domain([lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
+  const svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",title||"");
+  if(gob) psMandatos().forEach((g,i)=>{ const a=Math.max(years[0],g.ys[0])-0.5, b=Math.min(years[years.length-1],g.ys[g.ys.length-1])+0.5, x0=Math.max(m.l,X(a)), x1=Math.min(W-m.r,X(b)); if(!g.ys.length||x1<=x0) return;
+    svg.append("rect").attr("x",x0).attr("y",m.t).attr("width",x1-x0).attr("height",H-m.b-m.t).attr("fill",PARTYC[g.partido]||"#999").attr("opacity",i%2?0.07:0.12);
+    if(x1-x0>34) svg.append("text").attr("x",(x0+x1)/2).attr("y",m.t-8).attr("text-anchor","middle").attr("font-size",11.5).attr("font-weight",700).attr("fill",PARTYC[g.partido]||"#666").text(x1-x0>70?`${g.ape} (${g.partido})`:g.ape); });
+  svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Y).attr("y2",Y);
+  svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(tick||(v=>nf0.format(v)));
+  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/90))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-6).attr("text-anchor","middle").text(String);
+  if(Y.domain()[0]<0&&Y.domain()[1]>0) svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Y(0)).attr("y2",Y(0)).attr("stroke",css("--ink")).attr("stroke-width",1);
+  const line=d3.line().defined(d=>d[1]!=null).x(d=>X(d[0])).y(d=>Y(d[1])), ends=[];
+  series.slice().reverse().forEach(s=>{ const c=css(s.c), pts=years.map(y=>[y,s.v[y]??null]);
+    svg.append("path").attr("d",line(pts)).attr("fill","none").attr("stroke",c).attr("stroke-width",s.main?3:1.8).attr("stroke-dasharray",s.dash?"5 4":null);
+    svg.append("g").selectAll("circle").data(pts.filter(d=>d[1]!=null)).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",s.main?2.6:1.8).attr("fill",c).append("title").text(d=>`${s.n}, ${d[0]}: ${fmt(d[1])}`);
+    const l=pts.filter(d=>d[1]!=null).pop(); if(l) ends.push({y:Y(l[1]),x:X(l[0]),t:`${s.n} ${fmt(l[1])}`,c,main:s.main}); });
+  ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<14) ends[i].y=ends[i-1].y+14;
+  ends.forEach(e=>svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c).text(e.t));
+  return f;
+}
+// cambio de un indicador en los años de un mandato: crecimiento medio anual (nivel), media (flujo) o cambio en puntos (tasa).
+// La ventana la marca España (año anterior al primero del mandato → último con dato) y se aplica igual a la UE.
+function psWindow(o,ys){ const yy=ys.filter(y=>o&&o[y]!=null); if(!yy.length) return null; return {a:o[yy[0]-1]!=null?yy[0]-1:yy[0],b:yy[yy.length-1],yy}; }
+function psChange(o,w,t){ if(!o||!w) return null;
+  if(t==="flujo"){ const v=w.yy.map(y=>o[y]); return v.some(x=>x==null)?null:d3.mean(v); }
+  if(o[w.a]==null||o[w.b]==null||w.a===w.b) return null; return t==="nivel"?(Math.pow(o[w.b]/o[w.a],1/(w.b-w.a))-1)*100:o[w.b]-o[w.a]; }
 async function exPaises(out){
   out.innerHTML='<p class="loading">Cargando los datos por país…</p>';
   try{ await loadPaises(); }catch(e){ out.innerHTML='<p class="loading">No se pudieron cargar los datos por país.</p>'; return; }
@@ -2139,12 +2168,10 @@ async function exPaises(out){
   ends.forEach(e=>svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c).text(e.t));
   // tabla por mandato (España): cambio en el mandato y lo mismo para la UE en esos años
   if(PS.gob){ const ES=P.ES[PS.k], M=psMandatos().filter(g=>g.ys.some(y=>ES[y]!=null));
-    const chg=(o,ys)=>{ if(!o) return null; const yy=ys.filter(y=>o[y]!=null); if(!yy.length) return null;
-      if(I.t==="flujo") return d3.mean(yy,y=>o[y]); const a=o[yy[0]-1]!=null?yy[0]-1:yy[0], b=yy[yy.length-1]; if(a===b||o[a]==null) return null;
-      return I.t==="nivel"?(Math.pow(o[b]/o[a],1/(b-a))-1)*100:o[b]-o[a]; };
+
     const lab=I.t==="flujo"?"Media anual":I.t==="nivel"?"Crecimiento medio anual":"Cambio en el mandato";
     const fm=I.t==="tasa"?(v=>v==null?"—":(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts"):(v=>v==null?"—":sgn(v)), fd=v=>v==null?"—":(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts";
-    const rows=M.map(g=>{ const ys=g.ys.filter(y=>ES[y]!=null), e=chg(ES,ys), u=chg(EU,ys); return [`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${ys[0]}–${ys[ys.length-1]}</small>`,fm(e),fm(u),e!=null&&u!=null?fd(e-u):"—"]; });
+    const rows=M.map(g=>{ const w=psWindow(ES,g.ys), e=psChange(ES,w,I.t), u=psChange(EU,w,I.t), full=w&&w.yy[0]===g.ys[0]; return [`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${g.ys[0]}–${g.hasta?g.ys[g.ys.length-1]:"hoy"}${w&&!full?` (datos desde ${w.yy[0]})`:""}</small>`,fm(e),fm(u),e!=null&&u!=null?fd(e-u):"—"]; });
     const t=fig(out,{title:`${I.l} con cada Gobierno`,sub:`${lab} en los años de cada mandato, en España y en la media de la UE`,source:I.t==="tasa"?"Cambio entre el año anterior al primer año del mandato y el último. Los primeros meses de cada mandato dependen todavía de lo que hizo el Gobierno anterior.":I.t==="nivel"?"Crecimiento medio anual entre el año anterior al primer año del mandato y el último.":"Media de los años de cada mandato."});
     table(t.body,["Presidente",`España`,`Media de la UE`,"España menos UE"],rows,{max:780});
     add(out,"p","muted",`Un dato que mejora con un Gobierno no prueba que fuera mérito suyo, ni lo contrario: la economía española se mueve sobre todo con el ciclo europeo y mundial, y las políticas tardan años en notarse. La columna de la derecha ayuda a separar lo que fue común a toda Europa.`).style.cssText="max-width:720px;font-size:14px;margin-top:8px"; }
@@ -2229,7 +2256,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","padron","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo"],"cerca-ciudad":["padron","atlas","mig","geo"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","ees"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
+  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","ees"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"gobiernos":["eurostatPaises"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -2277,7 +2304,7 @@ function renderEstudios(id){
   document.title=S.t+" · Indicio";
   view.innerHTML=`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(TOPICL(S.tema))} › ${S.m}</nav>`+pageHead(S.t,S.d,"",`<p class="byline">${byline(S)}</p>${(window.__INDICIO&&window.__INDICIO.illus||{})[S.id]||""}`)+`<div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"cerca-ciudad":studyCerca,"votar-pueblos":studyVotar,
-    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"tope-compraventas":studyTopeComp,"deuda-quien-gobierna":studyDeudaGob,"precio-alimentos":studyAlimentos,"sueldos":studySueldos,"vivienda":studyVivienda})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
+    "quien-gobierna":studyGobierna,"renta-fuentes":studyFuentes,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"iva-alimentos":studyIVA,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"tope-compraventas":studyTopeComp,"deuda-quien-gobierna":studyDeudaGob,"precio-alimentos":studyAlimentos,"sueldos":studySueldos,"vivienda":studyVivienda,"gobiernos":studyGobiernos})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
   const B=document.getElementById("sbody");
   // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
   const needSeries=["deuda-quien-gobierna","tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","cerca-ciudad","votar-pueblos","quien-gobierna","renta-fuentes","ave","prohibir-pisos-turisticos","iva-alimentos"].includes(S.id);
@@ -4624,6 +4651,36 @@ async function studyVivienda(B){
         series:C.map(([k,n,c,main])=>({n,c,main,v:Y.map(y=>{ const o=(EU[k]||{}).hpi||{}; return o[y]&&o["2015"]?o[y]/o["2015"]*100:null; })}))}); }
   };
   mdRender(B,"vivienda",V,G);
+}
+
+// ---------- análisis: ¿cómo le fue a España con cada Gobierno? (texto en contenido/analisis/gobiernos.md) ----------
+async function studyGobiernos(B){
+  await loadPaises(); const P=PAIS.paises, ES=P.ES, EU=P.EU27_2020, M=psMandatos();
+  const SL={"Adolfo Suárez":"suarez","Leopoldo Calvo-Sotelo":"calvo","Felipe González":"gonzalez","José María Aznar":"aznar","José Luis Rodríguez Zapatero":"zapatero","Mariano Rajoy":"rajoy","Pedro Sánchez":"sanchez"};
+  const IND=[["crec","crecimiento","flujo"],["pibpc","pibpc","nivel"],["paro","paro","tasa"],["deuda","deuda","tasa"],["deficit","deficit","flujo"],["gasto","gasto","tasa"],["ingresos","ingresos","tasa"],["inflacion","inflacion","flujo"],["empleo","empleo","tasa"]];
+  const V={};
+  M.forEach(g=>{ const s=SL[g.p]; if(!s) return; V[s+"_desde"]=g.ys[0]; V[s+"_hasta"]=g.ys[g.ys.length-1];
+    IND.forEach(([k,key,t])=>{ const w=psWindow(ES[key],g.ys); const e=psChange(ES[key],w,t), u=psChange(EU[key],w,t);
+      if(e!=null) V[`${s}_${k}`]=e; if(u!=null) V[`${s}_${k}_ue`]=u; if(e!=null&&u!=null) V[`${s}_${k}_dif`]=e-u;
+      if(w&&t==="tasa"){ V[`${s}_${k}_ini`]=ES[key][w.a]; V[`${s}_${k}_fin`]=ES[key][w.b]; V[`${s}_${k}_a`]=w.a; V[`${s}_${k}_b`]=w.b; } }); });
+  const ppc=Object.fromEntries(Object.keys(ES.pibpcPPC).filter(y=>EU.pibpcPPC[y]).map(y=>[y,ES.pibpcPPC[y]/EU.pibpcPPC[y]*100]));
+  const py=Object.keys(ppc).sort(), pMax=py.reduce((a,b)=>ppc[b]>ppc[a]?b:a), pMin=py.filter(y=>y>=2009).reduce((a,b)=>ppc[b]<ppc[a]?b:a);
+  Object.assign(V,{ppc95:ppc[py[0]],ppcIni:+py[0],ppcMax:ppc[pMax],ppcMaxAño:+pMax,ppc13:ppc["2013"],ppcMin:ppc[pMin],ppcMinAño:+pMin,ppcUlt:ppc[py[py.length-1]],ppcUltAño:+py[py.length-1]});
+  const pr=ES.paro, prY=Object.keys(pr).sort(), prMax=prY.reduce((a,b)=>pr[b]>pr[a]?b:a);
+  Object.assign(V,{paroMax:pr[prMax],paroMaxAño:+prMax,paroMaxUE:EU.paro[prMax],paroUlt:pr[prY[prY.length-1]],paroUltUE:EU.paro[prY[prY.length-1]],paroUltAño:+prY[prY.length-1],paroMin:Math.min(...prY.filter(y=>y>=2000).map(y=>pr[y])),
+    crec20:ES.crecimiento["2020"],crec20UE:EU.crecimiento["2020"],deudaUlt:ES.deuda[Object.keys(ES.deuda).sort().pop()],deudaUltUE:EU.deuda[Object.keys(EU.deuda).sort().pop()],deuda07:ES.deuda["2007"],deudaMax:Math.max(...Object.values(ES.deuda)),deudaMaxAño:+Object.keys(ES.deuda).reduce((a,b)=>ES.deuda[b]>ES.deuda[a]?b:a)});
+  const yrs=(o,from)=>Object.keys(o).map(Number).filter(y=>y>=from).sort((a,b)=>a-b);
+  const pcf=v=>pc(v), SRC="Fuente: Eurostat (desde 1995) y Banco Mundial (antes). Fondo: presidente del Gobierno; cada año se asigna a quien gobernó más de la mitad.";
+  const G={
+    ppc:el=>govChart(el,{title:"PIB por habitante de España, en % de la media de la UE",sub:"En poder de compra (corrige las diferencias de precios). 100 = media de la Unión Europea",source:SRC,years:yrs(ppc,1995),series:[{n:"España",v:ppc,c:"--rust",main:true},{n:"Media UE",v:Object.fromEntries(Object.keys(ppc).map(y=>[y,100])),c:"--ink",dash:true}],fmt:v=>nf1.format(v)}),
+    paro:el=>govChart(el,{title:"Tasa de paro",sub:"% de la población activa",source:SRC,years:yrs(ES.paro,1991),series:[{n:"España",v:ES.paro,c:"--rust",main:true},{n:"Media UE",v:EU.paro,c:"--ink"}],fmt:pcf,tick:v=>nf0.format(v)+NB+"%"}),
+    crecimiento:el=>govChart(el,{title:"Crecimiento del PIB",sub:"% sobre el año anterior",source:SRC,years:yrs(ES.crecimiento,1980),series:[{n:"España",v:ES.crecimiento,c:"--rust",main:true},{n:"Media UE",v:EU.crecimiento,c:"--ink"}],fmt:v=>sgn(v),zero:true}),
+    deuda:el=>govChart(el,{title:"Deuda pública",sub:"% del PIB",source:SRC,years:yrs(ES.deuda,1995),series:[{n:"España",v:ES.deuda,c:"--rust",main:true},{n:"Media UE",v:EU.deuda,c:"--ink"}],fmt:pcf,tick:v=>nf0.format(v)+NB+"%"}),
+    tabla:el=>{ const f=fig(el,{title:"Cada Gobierno, en cifras",sub:"España y, entre paréntesis, la media de la UE en los mismos años",source:"Crecimiento y déficit: media anual del mandato. Paro y deuda: cambio en puntos entre el año anterior al primero del mandato y el último. Sin dato europeo comparable, «—»."});
+      const c=(s,k,f)=>V[`${s}_${k}`]==null?"—":`${f(V[`${s}_${k}`])}${V[`${s}_${k}_ue`]!=null?` <small class="muted">(${f(V[`${s}_${k}_ue`])})</small>`:""}`, pts=v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v));
+      table(f.body,["Presidente","Crecimiento medio","Paro (puntos)","Deuda (puntos)","Déficit medio"],M.filter(g=>SL[g.p]&&V[SL[g.p]+"_crec"]!=null).map(g=>{ const s=SL[g.p]; return [`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${g.ys[0]}–${g.hasta?g.ys[g.ys.length-1]:"hoy"}</small>`,c(s,"crec",sgn),c(s,"paro",pts),c(s,"deuda",pts),c(s,"deficit",v=>(v<0?"−":"")+nf1.format(Math.abs(v))+NB+"%")]; }),{max:900}); }
+  };
+  mdRender(B,"gobiernos",V,G);
 }
 
 // ---------- vivienda protegida: de 1 de cada 10 viviendas nuevas a casi ninguna ----------
