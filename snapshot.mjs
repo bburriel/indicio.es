@@ -6,7 +6,8 @@ import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import {spawn} from "node:child_process";
-import {STUDIES,TOPICS,SITE} from "./src/content.mjs";
+import {TOPICS,SITE} from "./src/content.mjs";
+import {ALL as STUDIES} from "./src/analisis.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
 const PORT=8791, BASE="http://localhost:"+PORT;

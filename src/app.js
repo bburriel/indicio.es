@@ -223,7 +223,7 @@ const SRC={
   tensionadas:"BOE: resoluciones de 14 de marzo y 8 de octubre de 2024 con los municipios catalanes declarados zona de mercado residencial tensionado", erte:"Seguridad Social: trabajadores en ERTE por provincia a 30 de abril de 2020 (nota de afiliación de abril de 2020)",
   ave:"Adif, Renfe y prensa: estaciones con servicio de alta velocidad abierto entre 2021 y 2023 (lista en el repositorio)", vut:"Boletines oficiales y prensa: municipios con moratoria o prohibición de nuevas viviendas turísticas, con fecha (lista en el repositorio)",
   geo:"Distancias a la ciudad más próxima y a la costa calculadas en Indicio en línea recta sobre la cartografía del IGN",
-  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
+  ipcAlim:"INE: Índice de Precios de Consumo por comunidades (general y grupos, desde 2002) y por subclases", ees:"INE: Encuesta Anual de Estructura Salarial (percentiles de la ganancia anual y tramos de salario mínimo)", epaSal:"INE: EPA, salarios del empleo principal por deciles (con datos fiscales)", ecvRenta:"INE: Encuesta de Condiciones de Vida, deciles de renta por unidad de consumo", etcl:"INE: Encuesta Trimestral de Coste Laboral, coste salarial por trabajador y mes, por comunidades",
   deuda:"Ministerio de Hacienda: deuda viva de cada ayuntamiento a 31 de diciembre, 2015–2025 (sin 2017)", contratos:"SEPE: contratos iniciales indefinidos y temporales por municipio y mes (2005–2026) y paro registrado por municipio", afil:"Seguridad Social: afiliados por municipio, régimen y actividad, diciembre de 2011 a 2025", compr:"Ministerio de Vivienda: compraventas de vivienda por municipio y trimestre (notarios), 2004–2026",
   mivau:"Ministerio de Vivienda: viviendas protegidas con calificación definitiva (planes estatales y autonómicos, 1991–2025), viviendas libres iniciadas (1991–2025) y transacciones de vivienda de los notarios (2004–2025)"
 };
@@ -1840,7 +1840,7 @@ const MDFMT={n0:v=>nf0.format(v),n1:v=>nf1.format(v),n2:v=>nf2.format(v),pct0:v=
   mil:v=>nf0.format(v/1000)+NB+"000",pts0:v=>nf0.format(v)+" puntos",pts1:v=>nf1.format(v)+" puntos",veces:v=>nf1.format(v)+" veces",
   abs:v=>Math.abs(v),r100:v=>Math.round(v/100)*100,r1000:v=>Math.round(v/1000)*1000};
 function mdVars(src,V,id){
-  return src.replace(/\{\{\s*([\w.]+)\s*((?:\|\s*\w+\s*)*)\}\}/g,(m,k,pipes)=>{
+  return src.replace(/\{\{\s*([\p{L}\p{N}_.]+)\s*((?:\|\s*\w+\s*)*)\}\}/gu,(m,k,pipes)=>{
     let v=k.split(".").reduce((o,p)=>o==null?o:o[p],V);
     if(v==null||(typeof v==="number"&&!isFinite(v))){ console.warn(`[${id}.md] falta la variable {{${k}}}`); return `<span class="md-falta" title="Variable sin valor: ${esc(k)}">${esc(m)}</span>`; }
     const fs=pipes.split("|").map(x=>x.trim()).filter(Boolean);
@@ -1865,7 +1865,7 @@ function mdRender(B,id,V={},G={}){
   for(const ln of lines){
     let m;
     if((m=ln.match(/^(#{2,3})\s+(.*)$/))){ flush(); const h=m[1].length;
-      cur=add(B,"section",h===2?"finding psec md-sec":"finding pres md-sub"); add(cur,h===2?"h2":"h3",null,mdInline(m[2])); box=add(cur,"div","txt"); secs[norm(m[2]).replace(/ /g,"-")]=cur; continue; }
+      cur=add(B,"section",(h===2?"finding psec md-sec":"finding pres md-sub")+(/^(como esta hecho|metodo|de donde salen)/.test(norm(m[2]))?" md-method":"")); add(cur,h===2?"h2":"h3",null,mdInline(m[2])); box=add(cur,"div","txt"); secs[norm(m[2]).replace(/ /g,"-")]=cur; continue; }
     if((m=ln.match(/^\s*\[\[\s*(grafico|gráfico|bloque)\s*:\s*([\w-]+)\s*\]\]\s*$/i))){ flush(); const d=add(cur,"div","md-chart"); d.dataset.g=m[2];
       if(G[m[2]]){ try{ G[m[2]](d); }catch(e){ console.error(e); d.innerHTML='<p class="loading">No se pudo dibujar este gráfico.</p>'; } }
       else { console.warn(`[${id}.md] no existe el gráfico «${m[2]}». Disponibles: ${Object.keys(G).join(", ")}`); d.innerHTML=`<p class="md-falta">Gráfico «${esc(m[2])}» no encontrado</p>`; }
@@ -2140,7 +2140,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","padron","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo"],"cerca-ciudad":["padron","atlas","mig","geo"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","etcl"]};
+  "quien-gobierna":["interior","padron","sepe","atlas"],"renta-fuentes":["atlas","padron"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"iva-alimentos":["hicp"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"tope-compraventas":["compr","tensionadas","padron","atlas"],"deuda-quien-gobierna":["deuda","interior","padron"],"precio-alimentos":["ipcAlim","ees"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -4377,6 +4377,89 @@ async function studyAlimentos(B){
     <li><b>La cesta media.</b> El IPC de alimentos pesa cada producto según lo que gasta el hogar medio; tu cesta puede ser distinta.</li></ul>`);
   methods(B,[["En pocas palabras","Se compara cuánto han subido los precios de los alimentos, el resto de precios y el sueldo medio desde 2019 y desde 2008, en España y por comunidades."],["Datos","INE: IPC por comunidades, índice general y de alimentos y bebidas no alcohólicas, mensual desde 2002 (tabla 76136)"+(SUB?", e IPC nacional por subclases (tabla 76128)":"")+"; Encuesta Trimestral de Coste Laboral, coste salarial total por trabajador y mes (tabla 6061)."],["Medias anuales","Media de los meses (precios) o de los trimestres (sueldos) de cada año. El último año incompleto solo se usa en el primer gráfico."],["Comida que compra el sueldo","Índice del sueldo medio dividido por el índice de precios de los alimentos, menos uno."],["Precio relativo","Índice de alimentos dividido por el índice general, con 2002 = 100."]]);
   AB.fill({ctx:"Entre 2021 y 2023 la comida se encareció como no se veía desde los años noventa.",intT:"Qué se mira",int:"Precios de los alimentos frente al resto de precios y al sueldo medio, 2002–2026.",ana:"IPC del INE (general y alimentos, por comunidades) y coste salarial por trabajador (ETCL), medias anuales.",res:`${B0}–${LY}: alimentos ${sg(gF)}, IPC ${sg(gG)}, sueldo medio ${sg(gW)}; con el sueldo se compra un ${f0(Math.abs(buy))} % ${buy<0?"menos":"más"} de comida.`,con:"Los sueldos han seguido al conjunto de precios, pero no a la comida."});
+}
+
+// ---------- sueldos: dónde estás en la fila y cómo se ha movido cada escalón ----------
+// El texto está en contenido/analisis/sueldos.md. Variables que ofrece (V) y gráficos (G): ver abajo.
+async function studySueldos(B){
+  await loadRegional();
+  const [D,A]=await Promise.all([getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json")]);
+  const P=A.meses, yav=(v,y)=>{ const x=P.map((p,i)=>p.startsWith(String(y))?v[i]:null).filter(z=>z!=null); return x.length?d3.mean(x):null; };
+  const ipc=y=>yav(A.ipc.es.general,y), ali=y=>yav(A.ipc.es.alimentos,y);
+  const E=D.ees, EY=E.años.map(Number), eY=EY[EY.length-1], at=(arr,y)=>arr[EY.indexOf(y)];
+  const K={p10:"Percentil 10",q1:"Cuartil inferior",med:"Mediana",q3:"Cuartil superior",p90:"Percentil 90",media:"Media"};
+  const es=Object.fromEntries(Object.entries(K).map(([k,n])=>[k,E.es[n]]));
+  const real=(arr,y,b)=>at(arr,y)/at(arr,b)/(ipc(y)/ipc(b))*100-100, nom=(arr,y,b)=>(at(arr,y)/at(arr,b)-1)*100;
+  const SMI=D.smiLegal, smiY=y=>SMI[String(y)], smiYs=Object.keys(SMI).map(Number), smiLast=smiYs[smiYs.length-1];
+  const T=D.smiMult, TY=T.años.map(Number), tr=(n,y)=>T.tramos[n][TY.indexOf(y)];
+  const EP=D.epa, PY=EP.años.map(Number), pv=(arr,y)=>arr[PY.indexOf(y)], preal=(arr,y,b)=>pv(arr,y)/pv(arr,b)/(ipc(y)/ipc(b))*100-100;
+  const C=D.ecv, CY=C.años.map(Number), cv=(arr,y)=>arr[CY.indexOf(y)], cLast=CY[CY.length-1];
+  const creal=(arr,y,b)=>cv(arr,y)/cv(arr,b)/(ipc(y-1)/ipc(b-1))*100-100;   // la ECV de cada año recoge ingresos del anterior
+  const ratio=EY.map((y,i)=>es.p90[i]/es.p10[i]), iMax=d3.maxIndex(ratio);
+  const CC=Object.entries(E.ccaa).map(([c,o])=>({c,n:(REG&&REG.ccaa[c])||c,v:at(o.Mediana,eY),g:real(o.Mediana,eY,2019)})).filter(x=>x.v).sort((a,b)=>b.v-a.v);
+  const AG=Object.entries(EP.edad).filter(([g])=>g!=="Total").map(([g,o])=>({l:g.replace(/^De /,"").replace(" y más años"," o más").replace(" años",""),v:preal(o["0"],eY,2008)}));
+  const ageTot=preal(EP.edad.Total["0"],eY,2008);
+  const V={
+    año:eY, añoIni:EY[0], ...Object.fromEntries(Object.keys(K).map(k=>[k,at(es[k],eY)])),
+    medMes:at(es.med,eY)/14, saltoAbajo:at(es.med,eY)-at(es.p10,eY), saltoArriba:at(es.p90,eY)-at(es.med,eY), mediaSobreMed:(at(es.media,eY)/at(es.med,eY)-1)*100,
+    smiAño:smiY(eY)*14, smiAño2:smiY(eY)*28, tramo01:tr("De 0 a 1 SMI",eY), tramo12:tr("De 1 a 2 SMI",eY), tramo12_15:tr("De 1 a 2 SMI",2015),
+    tramo3:d3.sum(Object.keys(T.tramos).filter(n=>/^De [3-7] a|^Más de/.test(n)),n=>tr(n,eY)),
+    smi18:smiY(2018), smi19:smiY(2019), smiSubida19:(smiY(2019)/smiY(2018)-1)*100, smiUlt:smiY(smiLast), smiUltAño:smiLast,
+    nomMed08:nom(es.med,eY,2008), ipc08:(ipc(eY)/ipc(2008)-1)*100, rMed08:real(es.med,eY,2008),
+    rP10crisis:real(es.p10,2014,2008), rP90crisis:real(es.p90,2014,2008), rP10_19:real(es.p10,eY,2019), rMed19:real(es.med,eY,2019), rP90_19:real(es.p90,eY,2019),
+    ratioMax:ratio[iMax], ratioMaxAño:EY[iMax], ratioUlt:ratio[ratio.length-1],
+    d1:preal(EP.media["1"],eY,2019), d2:preal(EP.media["2"],eY,2019), d10:preal(EP.media["10"],eY,2019),
+    edadJov:AG[0].v, edadMay:AG[AG.length-1].v, edadTot:ageTot,
+    rentaMed:creal(C.limite["Sexto decil"],cLast,2019), rentaP10:creal(C.limite["Segundo decil"],cLast,2019), rentaP90:creal(C.limite["Décimo decil"],cLast,2019),
+    nomMed19:nom(es.med,eY,2019), ipc19:(ipc(eY)/ipc(2019)-1)*100, ali19:(ali(eY)/ali(2019)-1)*100,
+    medAli19:(at(es.med,eY)/at(es.med,2019)/(ali(eY)/ali(2019))-1)*100, p10Ali19:(at(es.p10,eY)/at(es.p10,2019)/(ali(eY)/ali(2019))-1)*100,
+    ccaaMax:CC[0].v, ccaaMaxN:CC[0].n, ccaaMin:CC[CC.length-1].v, ccaaMinN:CC[CC.length-1].n,
+    mujMed:at(E.mujeres.Mediana,eY), homMed:at(E.hombres.Mediana,eY),
+    ratioMuj08:at(E.mujeres.Mediana,2008)/at(E.hombres.Mediana,2008)*100, ratioMujUlt:at(E.mujeres.Mediana,eY)/at(E.hombres.Mediana,eY)*100 };
+  const eur=v=>nf0.format(v)+NB+"€", SRC="Fuente: INE, Encuesta Anual de Estructura Salarial.";
+  // percentil aproximado de un sueldo bruto anual (interpolación en logaritmos entre los percentiles publicados)
+  const pts=[[10,V.p10],[25,V.q1],[50,V.med],[75,V.q3],[90,V.p90]];
+  const pctOf=x=>{ if(!(x>0)) return null; if(x<=pts[0][1]) return Math.max(1,10*x/pts[0][1]);
+    for(let i=1;i<pts.length;i++) if(x<=pts[i][1]){ const [p0,x0]=pts[i-1],[p1,x1]=pts[i]; return p0+(p1-p0)*Math.log(x/x0)/Math.log(x1/x0); }
+    const a=Math.log(25/10)/Math.log(V.p90/V.q3); return Math.min(99.9,100-10*Math.pow(x/V.p90,-a)); };
+  const G={
+    calculadora:el=>{ const c=add(el,"div","calc");
+      c.innerHTML=`<div class="ctl"><label>Tu sueldo bruto<input class="sel" type="number" id="sq" min="0" step="100" inputmode="numeric" value="${Math.round(V.med/100)*100}"></label>
+        <div class="seg sm" role="group" aria-label="Periodo"><button type="button" data-p="1" aria-pressed="true">Al año</button><button type="button" data-p="14" aria-pressed="false">Al mes, 14 pagas</button><button type="button" data-p="12" aria-pressed="false">Al mes, 12 pagas</button></div>
+        <small>Antes de impuestos y cotizaciones. Es lo que pone tu contrato o tu nómina como «total devengado».</small></div><div class="res" aria-live="polite"></div>`;
+      let per=1; const inp=c.querySelector("#sq"), res=c.querySelector(".res");
+      const draw=()=>{ const x=+inp.value*per, p=pctOf(x);
+        if(p==null){ res.innerHTML='<p>Escribe una cantidad.</p>'; return; }
+        const pr=Math.round(p), pos=Math.max(0,Math.min(100,p));
+        res.innerHTML=`<div class="big">${p>=99.5?"más del 99":nf0.format(pr)}${NB}%</div><p>Cobras más que ${p>=99.5?"casi todos los":`el ${nf0.format(pr)}${NB}% de los`} asalariados de España${per!==1?` (${eur(x)} al año)`:""}. ${p<50?`Para llegar al sueldo mediano te faltan unos ${eur(Math.max(100,Math.round((V.med-x)/100)*100))} al año.`:p<90?`Para entrar en el 10${NB}% de arriba harían falta unos ${eur(Math.round((V.p90-x)/100)*100)} más al año.`:`Estás en el 10${NB}% que más cobra.`}</p>
+          <div class="ruler" aria-hidden="true"><i style="left:${pos}%"></i>${[10,25,50,75,90].map(q=>`<b style="left:${q}%"></b>`).join("")}</div><div class="ruler-l" aria-hidden="true"><span>0</span><span>mitad</span><span>100</span></div>`; };
+      inp.addEventListener("input",draw);
+      c.querySelectorAll("button[data-p]").forEach(b=>b.addEventListener("click",()=>{ const np=+b.dataset.p; inp.value=Math.round(+inp.value*per/np/(np===1?100:10))*(np===1?100:10); per=np; c.querySelectorAll("button[data-p]").forEach(z=>z.setAttribute("aria-pressed",String(z===b))); draw(); }));
+      draw(); },
+    escalones:el=>{ const f=fig(el,{title:`Cuánto hay que cobrar para estar en cada punto de la fila (${eY})`,sub:"Sueldo bruto anual por asalariado",source:SRC});
+      hbars(f.body,[["Más que el 10 %",V.p10],["Más que el 25 %",V.q1],["La mitad (mediano)",V.med,"--rust"],["Sueldo medio",V.media,"--slate"],["Más que el 75 %",V.q3],["Más que el 90 %",V.p90]].map(([l,v,c])=>({l,v,c})),{fmt:eur,wide:true}); },
+    tramos:el=>{ const f=fig(el,{title:`Asalariados según cuántas veces cobran el salario mínimo (${eY})`,sub:`Salario mínimo de ${eY}: ${eur(V.smiAño)} al año`,source:"Fuente: INE, Encuesta Anual de Estructura Salarial."});
+      const L=[["De 0 a 1 SMI","Menos de 1 vez"],["De 1 a 2 SMI","De 1 a 2 veces"],["De 2 a 3 SMI","De 2 a 3 veces"],["De 3 a 4 SMI","De 3 a 4 veces"],["De 4 a 5 SMI","De 4 a 5 veces"]];
+      const rows=L.map(([k,l])=>({l,v:tr(k,eY),c:k==="De 1 a 2 SMI"?"--rust":null})); rows.push({l:"5 veces o más",v:d3.sum(Object.keys(T.tramos).filter(n=>/^De [5-7] a|^Más de/.test(n)),n=>tr(n,eY))});
+      hbars(f.body,rows,{fmt:pc,wide:true}); },
+    evolucion:el=>{ const yy=EY; lineChart(el,{title:"Cada escalón, descontada la inflación (2008 = 100)",sub:"Sueldo bruto anual en euros constantes",source:SRC+" IPC del INE.",years:yy,index:true,xticks:[2008,2014,2019,eY],
+      series:[["El 10 % de abajo",es.p10,"--rust",true],["Cuarto de abajo",es.q1,"--mustard"],["Mediano",es.med,"--ink"],["Cuarto de arriba",es.q3,"--slate"],["El 10 % de arriba",es.p90,"--plum"]].map(([n,a,c,main])=>({n,c,main,v:yy.map(y=>at(a,y)/ipc(y)*ipc(2008))}))}); },
+    brecha:el=>lineChart(el,{title:"Cuántas veces cobra el 10 % de arriba lo del 10 % de abajo",sub:"Percentil 90 entre percentil 10 del sueldo bruto anual",source:SRC,years:EY,xticks:[2008,2014,2019,eY],tickFmt:v=>nf1.format(v),fmt:v=>nf1.format(v)+" veces",
+      series:[{n:"Veces",v:ratio,c:"--rust",main:true}]}),
+    deciles:el=>{ const f=fig(el,{title:`Cuánto ha cambiado el sueldo de cada décimo de asalariados, ${2019}–${eY}`,sub:"Sueldo mensual bruto medio de cada decil, descontada la inflación",source:"Fuente: INE, EPA (salarios por deciles) e IPC."});
+      hbars(f.body,d3.range(1,11).map(k=>({l:k===1?"1.º (el que menos cobra)":k===10?"10.º (el que más)":k+".º",v:preal(EP.media[String(k)],eY,2019),c:k<=2?"--rust":null})),{fmt:v=>sgn(v),wide:true}); },
+    edad:el=>{ const f=fig(el,{title:`Sueldo medio por edad, ${2008}–${eY}`,sub:"Cambio descontada la inflación",source:"Fuente: INE, EPA (salarios por deciles) e IPC."});
+      hbars(f.body,[...AG.map(a=>({l:a.l,v:a.v})),{l:"Todos",v:ageTot,c:"--rust"}],{fmt:v=>sgn(v),wide:true}); },
+    renta:el=>{ const f=fig(el,{title:`Renta de los hogares: cambio de cada escalón, ingresos de 2018 a ${cLast-1}`,sub:"Límite de cada decil de renta por unidad de consumo, descontada la inflación",source:"Fuente: INE, Encuesta de Condiciones de Vida e IPC."});
+      const N=["Segundo decil","Tercer decil","Cuarto decil","Quinto decil","Sexto decil","Septimo decil","Octavo decil","Noveno decil","Décimo decil"];
+      hbars(f.body,N.map((n,i)=>({l:i===0?"El 10 % de abajo":i===4?"La mitad":i===8?"El 10 % de arriba":`${(i+1)*10} %`,v:creal(C.limite[n],cLast,2019),c:i===4?"--rust":null})),{fmt:v=>sgn(v),wide:true}); },
+    compra:el=>{ const f=fig(el,{title:`Cuánto más (o menos) compra el sueldo de ${eY} que el de 2019`,sub:"Subida del sueldo comparada con la de los precios",source:"Fuente: INE, Encuesta Anual de Estructura Salarial e IPC."});
+      const g=(a,pr)=>(at(a,eY)/at(a,2019)/pr-1)*100, pI=ipc(eY)/ipc(2019), pA=ali(eY)/ali(2019);
+      table(f.body,["Sueldo","Subida","De todo (IPC)","De comida"],[["El 10 % de abajo",es.p10],["Mediano",es.med],["El 10 % de arriba",es.p90]].map(([l,a])=>[l,sgn(nom(a,eY,2019)),sgn(g(a,pI)),sgn(g(a,pA))]),{max:620}); },
+    ccaa:el=>{ const f=fig(el,{title:`Sueldo mediano por comunidad (${eY})`,sub:"Sueldo bruto anual",source:SRC});
+      hbars(f.body,CC.map(x=>({l:x.n,v:x.v})),{fmt:eur,ref:V.med,refLabel:"España",wide:true}); }
+  };
+  mdRender(B,"sueldos",V,G);
 }
 
 // ---------- vivienda protegida: de 1 de cada 10 viviendas nuevas a casi ninguna ----------

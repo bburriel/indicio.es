@@ -1150,3 +1150,14 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .tstud em{font-style:normal; font-size:14px; font-weight:700; color:var(--brand-2)}
 .tstud a:hover b{color:var(--brand-2)}
 .lbscale button[disabled]{opacity:.42;cursor:not-allowed}
+/* análisis en Markdown */
+.md-falta{color:var(--ko); text-decoration:line-through wavy; font-weight:700}
+.md-chart{margin:14px 0 18px}
+.md-intro{font-size:19px; line-height:1.55; max-width:720px}
+.md-intro p+p{margin-top:12px}
+.ruler{position:relative; height:16px; margin-top:14px; border-radius:8px; background:linear-gradient(90deg,var(--ramp-1),var(--ramp-5))}
+.ruler b{position:absolute; top:3px; bottom:3px; width:1px; background:var(--bg); opacity:.8}
+.ruler i{position:absolute; top:-5px; width:4px; height:26px; margin-left:-2px; border-radius:2px; background:var(--ink)}
+.ruler-l{display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-top:4px}
+.calc .seg.sm{flex-wrap:wrap}
+.md-method .txt, .md-method li{font-size:15px; line-height:1.5}
