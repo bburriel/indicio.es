@@ -59,6 +59,18 @@ const labK=k=>(CATK[k]||{}).l||k;
 
 // media de España ponderada por población, y posición (percentil de población) de cada valor
 const ESMEAN={}, PCTL={};
+// la cifra de España que se enseña junto a un municipio: la oficial cuando existe (padrón, censo,
+// Interior, SEPE), y si no, la media de los municipios ponderada por población. Así las cifras clave,
+// «lo que destaca» y los textos de la ficha dan el mismo número para España.
+function esOff(k){ try{ const es=REFS.es, ce=REFS.census&&REFS.census.es, pe=REFS.paro&&REFS.paro.es;
+    if((k==="part"||k==="turn23")&&VREFS) return VREFS.es[VG()].turnout;
+    if(k==="paroReg"&&pe){ const i=REFS.paroYears.indexOf(2025); return pe.paro[i]/pe.pob1664*100; }
+    if(k==="alquiler"&&ce&&ce.rented!=null) return ce.rented;
+    if(k==="paro"&&ce&&ce.unemp!=null) return ce.unemp;
+    if(k==="superiores"&&ce&&ce.higherEd!=null) return ce.higherEd;
+    if(k==="edad"&&es.mean_age) return lastV(es.mean_age);
+    if(k==="varPob"&&es.pad){ const PY=REFS.padYears; return (lastV(es.pad)/es.pad[PY.indexOf(2015)]-1)*100; }
+  }catch(e){} return esMean(k); }
 function esMean(k){ if(k in ESMEAN) return ESMEAN[k]; const s=rowsAll().filter(r=>r[F[k]]!=null&&r[F.pop]); const w=d3.sum(s,r=>r[F.pop]); return ESMEAN[k]=w?d3.sum(s,r=>r[F[k]]*r[F.pop])/w:null; }
 function pctl(k,v){ if(v==null) return null; if(!PCTL[k]){ const s=rowsAll().filter(r=>r[F[k]]!=null&&r[F.pop]).map(r=>[r[F[k]],r[F.pop]]).sort((a,b)=>a[0]-b[0]); const tot=d3.sum(s,x=>x[1]); let acc=0; PCTL[k]={v:s.map(x=>x[0]),c:s.map(x=>{ const m=acc+x[1]/2; acc+=x[1]; return m/tot*100; })}; }
   const P=PCTL[k]; const i=d3.bisectLeft(P.v,v); return P.c[Math.min(i,P.c.length-1)]; }
@@ -908,9 +920,9 @@ function kpis(box,r,d){
   const K=[["renta",`Renta por persona · 2024`,r[F.renta],esMean("renta"),v=>rel(v,esMean("renta")),["menos","más"]],
     ["varPob","Crecimiento desde 2015",r[F.varPob],gE,v=>`España ${sgn(gE)}`,["pierde","gana"]],
     ["edad","Edad media · 2023",r[F.edad],lastV(es.mean_age),v=>pts_(v,lastV(es.mean_age),"años"),["más joven","mayor"]],
-    ["paroReg","Paro registrado · 2025",r[F.paroReg],pe.paro[10]/pe.pob1664*100,v=>pts_(v,pe.paro[10]/pe.pob1664*100,"puntos"),["menos","más"]],
-    ["alquiler","Hogares de alquiler · 2021",r[F.alquiler],ce.rented,v=>`España ${pc0(ce.rented)}`,["menos","más"]],
-    ["part",`Participación · ${k.slice(2,6)}`,r[F.part],VREFS.es[k].turnout,v=>`España ${pc0(VREFS.es[k].turnout)}`,["menos","más"]]];
+    ["paroReg","Paro registrado · 2025",r[F.paroReg],esOff("paroReg"),v=>`% de 16 a 64 años · ${pts_(v,esOff("paroReg"),"puntos")}`,["menos","más"]],
+    ["alquiler","Hogares de alquiler · 2021",r[F.alquiler],ce.rented,v=>`España ${pc(ce.rented)}`,["menos","más"]],
+    ["part",`Participación · ${k.slice(2,6)}`,r[F.part],VREFS.es[k].turnout,v=>`España ${pc(VREFS.es[k].turnout)}`,["menos","más"]]];
   // «dónde queda entre todos»: cada fila pinta los 8.000 municipios como puntos y marca el tuyo
   box.className="strips"; const n=rowsAll().length;
   box.innerHTML=`<div class="st-h">Dónde queda entre los ${nf0.format(n)} municipios</div>`+K.map(([kk,l,v,e,mid,lr],i)=>`<div class="st-r"><div class="st-l">${l}<small>${v==null?"":mid(v)}</small></div><div class="st-c"><canvas data-i="${i}" aria-hidden="true"></canvas><div class="st-x"><span>${lr[0]}</span><span>${lr[1]}</span></div></div><div class="st-v">${v==null?'<span class="muted">sin dato</span>':fmtK(kk)(v)}</div></div>`).join("");
@@ -933,7 +945,7 @@ function smalls(box,r,d){
   const out=[];
   if(d.pad){ const a=d.pad.slice(i15), b=es.pad.slice(i15); out.push(["Habitantes",`${sgn(ch(a))} · España ${sgn(ch(b))}`,a,b]); }
   const ri=d.s.net_income_pc; if(ri&&ri.some(v=>v!=null)){ const g=ch(ri), real=g==null?null:((1+g/100)/(REFS.ipc[2024]/REFS.ipc[2015])-1)*100; out.push(["Renta por persona",`${sgn(g)} · sin inflación ${sgn(real)}`,ri,es.net_income_pc]); }
-  if(d.paro&&d.paro.y&&d.paro.y.some(v=>v)) out.push(["Paro registrado",`${sgn(ch(d.paro.y))} · España ${sgn(ch(pe.paro))}`,d.paro.y,pe.paro]);
+  if(d.paro&&d.paro.y&&d.paro.y.some(v=>v)){ const k25=REFS.paroYears.indexOf(2025)+1||undefined, py=d.paro.y.slice(0,k25), pes=pe.paro.slice(0,k25); out.push(["Paro registrado, 2015–2025",`${sgn(ch(py))} · España ${sgn(ch(pes))}`,py,pes]); }
   if(d.ipva) out.push(["Alquiler declarado",`${sgn(ch(d.ipva.slice(j15)))} · España ${sgn(ch(es.ipva.slice(j15)))}`,d.ipva.slice(j15),es.ipva.slice(j15)]);
   else if(d.s.mean_age&&d.s.mean_age.some(v=>v!=null)){ const a=d.s.mean_age, f=a.find(v=>v!=null); out.push(["Edad media",`${(lastV(a)-f>=0?"+":"−")+nf1.format(Math.abs(lastV(a)-f))} años · España +${nf1.format(lastV(es.mean_age)-es.mean_age[0])}`,a,es.mean_age]); }
   box.innerHTML=out.map(([t,dd,a,b])=>`<div class="sm"><div class="t">${t}</div><div class="d">${dd}</div>${miniLines(a,b,{w:200,h:54})}</div>`).join("")||'<p class="muted">No hay series publicadas para este municipio.</p>';
@@ -1048,7 +1060,7 @@ function secVive(s,r,d){
   let t="";
   if(inc!=null) t+=`Cada vecino ingresa de media <mark>${eur(inc)} netos al año</mark>${hh!=null?`, unos ${eur(Math.round(hh/100)*100)} por hogar`:""}. Es el ${nf0.format(inc/eInc*100)}${NB}% de la media de España${gI!=null?`, y ha subido un ${nf0.format(gI)}${NB}% desde 2015 (España: ${nf0.format(gE)}${NB}%); descontando la inflación, un ${nf0.format(((1+gI/100)/(REFS.ipc[2024]/REFS.ipc[2015])-1)*100)}${NB}%`:""}.`;
   if(wage!=null&&pen!=null) t+=` De cada 100 euros que entran en los hogares, ${nf0.format(wage)} son salarios y ${nf0.format(pen)} pensiones${pen>=ePen+8?", bastante más que en el conjunto de España":""}.`;
-  if(c.unemp!=null) t+=` En 2021 el paro era del ${pc(c.unemp)} (España: ${pc(ce.unemp)}) y el ${pc(c.higherEd)} de los adultos tenía estudios superiores (${pc(ce.higherEd)}).`;
+  if(c.unemp!=null) t+=` Según el censo de 2021, la tasa de paro (parados entre quienes trabajan o buscan empleo) era del ${pc(c.unemp)} (España: ${pc(ce.unemp)}), una medida distinta del paro registrado y el ${pc(c.higherEd)} de los adultos tenía estudios superiores (${pc(ce.higherEd)}).`;
   lead(s,t||"No hay datos de renta publicados para este municipio.");
   add(s,"div","aside",EXPLAIN_RENTA);
   const g=add(s,"div","cols2"); g.style.marginTop="22px";
@@ -1190,7 +1202,7 @@ function secVoto(s,r,d){
 }
 
 // ---------- lo que destaca: los datos en los que el municipio está más en los extremos ----------
-const DGROUPS=[["edad","mayores65","menores18","pensiones"],["renta","rentaHog","pobreza"],["superiores"],["varPob","var0525"],["migInt"],["migExt","extr"],["paroReg","paro"],["alquiler"],["noPrincipal"],["vt"],["solos"],["gini"],["part"],["alqVar"],["paroRegVar"]];
+const DGROUPS=[["edad","mayores65","menores18","pensiones"],["renta","rentaHog","pobreza"],["superiores"],["varPob","var0525"],["migInt"],["migExt","extr"],["paroReg"],["alquiler"],["noPrincipal"],["vt"],["solos"],["gini"],["part"],["alqVar"],["paroRegVar"]];
 const DPHRASE={renta:["más renta por persona","menos renta por persona"],rentaHog:["más renta por hogar","menos renta por hogar"],pobreza:["más riesgo de pobreza","menos riesgo de pobreza"],gini:["más desigualdad","menos desigualdad"],
   pensiones:["más peso de las pensiones","menos peso de las pensiones"],paro:["más paro","menos paro"],paroReg:["más paro registrado","menos paro registrado"],superiores:["más estudios superiores","menos estudios superiores"],
   alquiler:["más hogares de alquiler","menos hogares de alquiler"],noPrincipal:["más viviendas vacías o secundarias","menos viviendas vacías o secundarias"],vt:["más pisos turísticos","menos pisos turísticos"],
@@ -1234,7 +1246,7 @@ function destaca(box,r){
   if(!top.length){ box.innerHTML=`<div style="grid-column:span 2"><span class="pct" style="color:var(--ink-2)">Sin extremos</span>En casi todo se parece a la mayoría de ${nm} de España.</div>`+simCard; return; }
   box.innerHTML=top.slice(0,simCard?5:6).map(it=>{ const hi=it.p>.5, pct=Math.max(1,Math.round((hi?1-it.p:it.p)*100)), f=fmtK(it.k);
       const pv=prov.filter(x=>x[F[it.k]]!=null).sort((a,b)=>hi?b[F[it.k]]-a[F[it.k]]:a[F[it.k]]-b[F[it.k]]), pos=pv.findIndex(x=>x[F.code]===r[F.code])+1;
-      return `<div><span class="pct${hi?"":" lo"}">Top ${pct}${NB}%</span>de los municipios con ${DPHRASE[it.k][hi?0:1]}<div class="dstrip"><i style="left:${Math.max(2,Math.min(98,it.p*100))}%;background:var(${hi?"--rust":"--slate"})"></i></div><small>${esc(labK(it.k))}: ${f(it.v)} · España: ${f(esMean(it.k))}${pos&&pos<=3&&pv.length>=5?` · ${pos}.º de su provincia`:""}</small></div>`; }).join("")+simCard;
+      return `<div><span class="pct${hi?"":" lo"}">Top ${pct}${NB}%</span>de los municipios con ${DPHRASE[it.k][hi?0:1]}<div class="dstrip"><i style="left:${Math.max(2,Math.min(98,it.p*100))}%;background:var(${hi?"--rust":"--slate"})"></i></div><small>${esc(labK(it.k))}: ${f(it.v)} · España: ${f(esOff(it.k))}${pos&&pos<=3&&pv.length>=5?` · ${pos}.º de su provincia`:""}</small></div>`; }).join("")+simCard;
 }
 
 // ---------- municipios parecidos ----------

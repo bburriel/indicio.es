@@ -59,6 +59,11 @@ const F={}; ix.fields.forEach((f,i)=>F[f]=i);
 const rows=ix.rows; rows.forEach(r=>r[F.name]=disp(r[F.name]));
 const PROVS=ix.provs;
 const esMean={}; for(const c of CAT){ const k=c.k; if(F[k]==null) continue; let s=0,w=0; for(const r of rows){ const v=r[F[k]], p=r[F.pop]; if(v!=null&&p){ s+=v*p; w+=p; } } esMean[k]=w?s/w:null; }
+// la cifra oficial de España cuando existe, la misma que enseña la ficha en la web (esOff en src/app.js)
+{ const R=JSON.parse(rd("data/refs.json")), V=JSON.parse(rd("data/vote_refs.json")), pe=R.paro&&R.paro.es, ce=R.census&&R.census.es;
+  const i25=(R.paroYears||[]).indexOf(2025); if(pe&&i25>=0) esMean.paroReg=pe.paro[i25]/pe.pob1664*100;
+  if(ce&&ce.rented!=null) esMean.alquiler=ce.rented; if(ce&&ce.unemp!=null) esMean.paro=ce.unemp; if(ce&&ce.higherEd!=null) esMean.superiores=ce.higherEd;
+  const g=Object.keys(V.es||{}).filter(k=>k.startsWith("02")).sort().pop(); if(g&&V.es[g].turnout!=null){ esMean.part=V.es[g].turnout; esMean.turn23=V.es[g].turnout; } }
 const FMT={int:v=>nf0.format(v),pct:v=>nf1.format(v)+" %",pct_chg:v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" %",pts:v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" %",eur:v=>nf0.format(v)+" €",years:v=>nf1.format(v)+" años",num1:v=>nf1.format(v),km:v=>nf0.format(v)+" km",dens:v=>(v<10?nf1:nf0).format(v)+" hab./km²"};
 const fmt=(c,v)=>v==null?"—":(FMT[c.f]||(x=>nf1.format(x)))(v);
 const munPath=r=>`/municipio/${r[F.code]}-${slug(r[F.name])}/`;
