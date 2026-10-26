@@ -5307,17 +5307,14 @@ function renderSobre(sec){
   document.getElementById("abgo").addEventListener("click",e=>{ e.preventDefault(); scrollToId("contacto"); });
   const f=document.getElementById("abform"), res=document.getElementById("abres");
   f.addEventListener("submit",async e=>{ e.preventDefault(); res.textContent="Enviando…";
-    // El mensaje va directo al correo a través de FormSubmit (la primera vez hay que activarlo desde el correo que envían).
+    // El mensaje va directo al correo a través de FormSubmit.
     const MAIL="bburriel@gmail.com", fd=new FormData(f);
     if(fd.get("bot-field")){ res.textContent=""; return; }
     try{ const r=await fetch("https://formsubmit.co/ajax/"+MAIL,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
         body:JSON.stringify({nombre:fd.get("nombre"),email:fd.get("email"),motivo:fd.get("motivo"),mensaje:fd.get("mensaje"),_subject:"Indicio · "+(fd.get("motivo")||"Mensaje"),_replyto:fd.get("email"),_template:"table",_captcha:"false"})});
-      if(!r.ok) throw 0; const j=await r.json().catch(()=>({})); if(j.success===false||j.success==="false") throw 0;
+      if(!r.ok) throw 0;
       f.reset(); res.innerHTML="<b>¡Gracias!</b> Te contesto lo antes posible."; }
-    catch(x){ // si falla, se abre el correo de quien escribe con el mensaje ya preparado
-      const href="mailto:"+MAIL+"?subject="+encodeURIComponent("Indicio · "+(fd.get("motivo")||"Mensaje"))+"&body="+encodeURIComponent((fd.get("mensaje")||"")+"\n\n— "+(fd.get("nombre")||"")+" <"+(fd.get("email")||"")+">");
-      res.innerHTML=`Se está abriendo tu correo con el mensaje ya escrito. Si no se abre, escríbeme a <a href="${href}">${MAIL}</a>.`;
-      location.href=href; } });
+    catch(x){ res.textContent="No se ha podido enviar. Revisa tu conexión e inténtalo de nuevo en un momento."; } });
   if(sec==="contacto") setTimeout(()=>scrollToId("contacto"),50);
 }
 function scrollToId(id){ const s=document.getElementById(id); if(s) window.scrollTo({top:s.getBoundingClientRect().top+window.scrollY-(document.getElementById("top").offsetHeight+12),behavior:"smooth"}); }
