@@ -5558,7 +5558,7 @@ async function renderInicio(){
     <h1 class="qh-q">Preguntas sobre cómo vivimos, <em>respondidas con datos</em></h1>
     <p class="qh-a">Cogemos preguntas reales —¿se vacía el campo?, ¿encarecen el alquiler los pisos turísticos?— y las respondemos con datos públicos, municipio a municipio y con el método a la vista. Y si tienes otra, en el laboratorio compruebas tú si una relación aguanta y qué pasó antes y después de una ley.</p>
     <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
-    <a class="qh-art" id="qhart" href="/preguntas/cerca-ciudad/" aria-label="¿Se vacía el campo por la distancia o por la edad?"></a><p class="qh-cap" id="qhc"></p></section>
+    <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que dicen los datos</h2><div class="qg" id="qg"><p class="loading">Cargando…</p></div>
     <p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
   <section class="ed-sec ed-two"><a class="ed-ill" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
@@ -5589,9 +5589,35 @@ async function renderInicio(){
     d.appendChild(s); d.insertAdjacentHTML("beforeend",`<div style="font-size:12.5px;color:var(--ink-2);margin-top:4px">${t}</div>`); }catch(e){ console.error(e); } });
   const Q=L.find(x=>x.id==="campo"); window.__INDICIO_HERO=["campo"];
   const ar=document.getElementById("qhart"), cp=document.getElementById("qhc"); if(!ar||!Q) return;
-  cp.innerHTML=`${esc(Q.cap)} <a href="${Q.href}">¿Se vacía el campo por la distancia o por la edad? →</a>`;
+  cp.innerHTML=`${esc(Q.cap)} <span class="qh-hint">Pasa por encima de un punto para ver qué municipio es; pulsa para abrir su ficha.</span> <a href="${Q.href}">¿Se vacía el campo por la distancia o por la edad? →</a>`;
   if(ARTS.has("hero-campo")){ const mob=wide<700, im=el("img"); im.src="/art/hero-campo"+(mob?"-m":"")+".jpg"; im.width=mob?720:1120; im.height=mob?520:380; im.alt=""; im.decoding="async"; im.className="qimg"; ar.appendChild(im); }
   else { try{ await loadTopo(); }catch(e){ return; } const n=qArt(Q,wide<700?720:1120,wide<700?520:380); if(n&&document.body.contains(ar)) ar.appendChild(n); }
+  heroHover(ar,wide<700?"m":"d");
+}
+
+// la nube de la portada responde al ratón: qué municipio es cada punto y, al pulsar, su ficha.
+// Las posiciones salen de art/hero-campo.json (scripts/hero-swarm.mjs), las mismas del dibujo.
+let HERO_PTS=null;
+function heroHover(ar,key){
+  let P=null, cur=null; const tip=add(ar,"a","spot hv"), ring=add(ar,"div","hv-ring"); tip.hidden=true; ring.hidden=true;
+  const load=()=>{ if(!HERO_PTS) HERO_PTS=getJSON("/art/hero-campo.json").catch(()=>null); return HERO_PTS.then(J=>{ if(!J||P) return; const L=J[key]; P={W:L.W,c:J.c,x:L.x.map(v=>v/10),y:L.y.map(v=>v/10),r:L.r.map(v=>v/10)}; P.q=d3.quadtree().x(i=>P.x[i]).y(i=>P.y[i]).addAll(d3.range(P.c.length)); }); };
+  const media=()=>ar.querySelector("svg,img");
+  const hide=()=>{ cur=null; tip.hidden=true; ring.hidden=true; ar.style.cursor=""; };
+  const hit=e=>{ const m=media(); if(!P||!m) return null; const b=m.getBoundingClientRect(), k=b.width/P.W, vx=(e.clientX-b.left)/k, vy=(e.clientY-b.top)/k;
+    const i=P.q.find(vx,vy,Math.max(22,8/k)); if(i==null) return null; const d=Math.hypot(P.x[i]-vx,P.y[i]-vy); return d<=P.r[i]+Math.max(2,5/k)?{i,k,b}:null; };
+  const show=h=>{ const i=h.i, r=BYCODE.get(P.c[i]); if(!r){ hide(); return; } cur=P.c[i];
+    const ab=ar.getBoundingClientRect(), px=h.b.left-ab.left+P.x[i]*h.k, py=h.b.top-ab.top+P.y[i]*h.k, rr=Math.max(5,P.r[i]*h.k+4);
+    ring.hidden=false; Object.assign(ring.style,{left:(px-rr)+"px",top:(py-rr)+"px",width:rr*2+"px",height:rr*2+"px"});
+    const v=r[F.var0525], ed=r[F.edad];
+    tip.href=munPath(cur); tip.innerHTML=`<b>${esc(dispName(r[F.name]))}</b> <span>${esc(provShort(PROVS[r[F.prov]]))} · ${nf0.format(r[F.pop]||0)} hab.</span><br>${v!=null?`${v>=0?"Ha ganado":"Ha perdido"} un ${nf0.format(Math.abs(v))}${NB}% de vecinos desde 2005`:""}${ed!=null?` · edad media ${nf1.format(ed)} años`:""}<br><small>Ver su ficha →</small>`;
+    tip.hidden=false; const tw=tip.offsetWidth, th=tip.offsetHeight; tip.style.left=Math.max(0,Math.min(ab.width-tw,px+14+tw<ab.width?px+14:px-14-tw))+"px"; tip.style.top=Math.max(0,py-th-12)+"px"; ar.style.cursor="pointer"; };
+  ar.addEventListener("pointerenter",load,{once:true}); ar.addEventListener("touchstart",load,{once:true,passive:true});
+  ar.addEventListener("pointermove",e=>{ if(e.pointerType!=="mouse"||e.target===tip||tip.contains(e.target)) return; const h=hit(e); h?show(h):hide(); });
+  ar.addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse") hide(); });
+  ar.addEventListener("click",e=>{ if(e.target===tip||tip.contains(e.target)) return; load().then(()=>{ const h=hit(e);
+    if(!h){ hide(); return; }
+    if(e.pointerType==="mouse"||matchMedia("(hover:hover)").matches){ navTo("m"+P.c[h.i]); window.scrollTo(0,0); } else show(h); }); });
+  tip.addEventListener("click",e=>{ if(cur){ e.preventDefault(); navTo("m"+cur); window.scrollTo(0,0); } });
 }
 
 // un pueblo al azar, señalado sobre el dibujo

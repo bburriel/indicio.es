@@ -18,6 +18,7 @@ data/             los JSON de datos (index.json, refs, provincias, secciones, to
 vendor/           d3, topojson-client y d3-composite-projections (servidos desde el propio dominio)
 build.mjs         genera dist/: una página HTML por ruta + 8.139 fichas municipales + sitemap + RSS + robots
 tools/check.mjs   abre estudios en un navegador sin cabeza y vuelca su texto y errores (CHROMIUM=<ruta> node tools/check.mjs <id> …)
+scripts/hero-swarm.mjs  posiciones de los puntos de la nube de la portada (art/hero-campo.json), para el tooltip; se regenera con `npm run swarm` si cambia data/index.json
 snapshot.mjs      (opcional) pre-renderiza con un navegador las páginas editoriales en snapshots/ y crea las imágenes Open Graph en og/
 serve.mjs         servidor local que imita a Netlify
 snapshots/, og/   resultado de snapshot.mjs; se versionan para que el build no necesite navegador

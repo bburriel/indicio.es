@@ -1201,3 +1201,10 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .matpairs{max-width:680px;margin-top:10px} .matpairs h3{font-size:15px;margin:0 0 4px} .matpairs ol{margin:0;padding-left:20px} .matpairs li{margin:3px 0;font-size:14.5px}
 .compleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--ink-2);margin:2px 0 8px} .compleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .lbl{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+
+/* nube de la portada: punto señalado y ficha rápida */
+.qh-art .hv-ring{position:absolute; z-index:2; border:2px solid var(--ink); border-radius:50%; pointer-events:none}
+.qh-art .spot.hv{transition:none; text-decoration:none}
+.qh-art .spot.hv small{color:var(--brand); font-weight:600; font-size:12.5px}
+.qh-hint{color:var(--muted); font-style:normal; font-size:13.5px}
+@media (hover:none){ .qh-hint{display:none} }
