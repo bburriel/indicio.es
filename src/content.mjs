@@ -26,7 +26,7 @@ export const STUDIES=[
     upd:"2026-10-24",a:"Sí, poco a poco. La distancia entre los municipios más ricos y los más pobres se ha estrechado desde 2015, también midiéndolo de forma que el punto de partida no engañe."},
   {id:"votar-pueblos",ev:"igual",t:"¿Se vota más en los pueblos?",d:"Los pueblos pequeños tienen una participación mucho más alta. ¿Es por ser pequeños, o porque su población es mayor y los mayores votan más?",m:"Separar dos explicaciones",tema:"voto",pub:"2026-10-22",
     upd:"2026-10-24",a:"Sí. En los municipios de menos de 500 habitantes vota bastante más gente que en las ciudades de más de 50.000. Parte se explica porque allí la población es mayor; el resto, por el tamaño en sí."},
-  {id:"crecer",ev:"igual",t:"¿Qué hace que un pueblo gane vecinos?",d:"Desde 2020 unos pueblos crecen y otros se vacían. Ponemos a competir los sospechosos habituales —renta, edad, estudios, paro, turismo— comparando entre iguales.",m:"Regresión con efectos fijos",tema:"poblacion",pub:"2026-10-22",
+  {id:"crecer",ev:"igual",t:"¿Qué hace que un pueblo gane vecinos?",d:"Desde 2020 unos pueblos crecen y otros se vacían. Ponemos a competir las explicaciones de siempre (renta, edad, estudios, paro, turismo) comparando entre iguales.",m:"Regresión con efectos fijos",tema:"poblacion",pub:"2026-10-22",
     upd:"2026-10-24",a:"La juventud, sobre todo, y los estudios. La costa crece, pero porque sus pueblos son más jóvenes y más ricos: entre pueblos iguales, estar en la costa no añade nada."},
   {id:"tope-cataluna",ev:"natural",t:"¿Frenó el tope de Cataluña el precio del alquiler?",d:"En marzo de 2024 Cataluña empezó a limitar el alquiler en las zonas tensionadas. Comparamos lo que pasó allí con lo que pasó en el resto de España.",m:"Diferencias en diferencias, gemelos y control sintético",tema:"vivienda",pub:"2026-10-22",
     upd:"2026-10-24",a:"Si hay efecto, es pequeño en estos datos: entre medio punto y un punto menos de subida en 2024 en los municipios tensionados, según con quién se comparen. Habrá que repetirlo con los datos de 2025."},
@@ -82,7 +82,7 @@ export const PAGES={
   "/laboratorio/":{t:"Laboratorio · Indicio",d:"Tu lienzo para los datos de España: elige un gráfico, cruza dos datos en los 8.139 municipios, comprueba si la relación aguanta entre iguales y mide qué pasó antes y después de una ley o un suceso."},
   "/laboratorio/metodo/":{t:"De la relación a la causa · Indicio",d:"Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede."},
   "/municipio/":{t:"Municipios · Indicio",d:"Busca tu municipio y mira cómo sale en renta, población, paro, vivienda y voto, comparado con España."},
-  "/quien-soy/":{t:"Quién soy · Indicio",d:"Soy Borja Burriel. Trabajo con datos en empresas como Domestika, Wallapop y Northius, y en Indicio intento explicar los datos públicos de España de forma sencilla y honesta."},
+  "/quien-soy/":{t:"Quién soy · Indicio",d:"Soy Borja Burriel. Trabajo con datos en empresas como Domestika, Wallapop y Northius, y en Indicio intento explicar los datos públicos de España de forma sencilla."},
   "/quien-soy/contacto/":{t:"Escríbeme · Indicio",d:"Una pregunta sobre los datos, un error, una idea o un trabajo a medida: escríbeme."},
   "/comparar/":{t:"Comparar dos municipios · Indicio",d:"Elige dos municipios y compáralos dato a dato."}
 };
