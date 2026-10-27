@@ -1209,8 +1209,8 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .qh-hint{color:var(--muted); font-style:normal; font-size:13.5px}
 @media (hover:none){ .qh-hint{display:none} }
 
-/* ilustraciones a pluma y aguada: imágenes que se recortan como antes se recortaban los dibujos */
-img.il{object-fit:cover; object-position:50% 100%; background:#f5f0e6}
+/* ilustraciones «olas»: SVG de datos que se recortan por el centro */
+img.il{object-fit:cover; object-position:50% 50%; background:#fafaf8}
 img.il.il-c{aspect-ratio:16/9}
 img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .phead img.il{aspect-ratio:1200/330}
