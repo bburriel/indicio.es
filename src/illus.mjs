@@ -245,3 +245,11 @@ ILLUS["precio-alimentos"]=svg("precio-alimentos","Un carro de la compra con alim
     P("M-20 40 L40 40 L30 80 L-10 80 Z","k7")+stack(10,72,2,22,"k3","k8")+P("M160 20 L220 20 L210 60 L170 60 Z","k7")+E(190,46,24,12,"k2")+C(180,36,10,"k5"))+
   tree(170,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
 FOCUS["precio-alimentos"]=300;
+
+// ---------- Ilustraciones a pluma y aguada (octubre de 2026) ----------
+// Sustituyen a los dibujos vectoriales de arriba: son imágenes en /art/il/ que genera scripts/ilustraciones/render.py.
+// Los dibujos de arriba se quedan como referencia y por si se quiere volver atrás.
+import {PLUMA,PLUMA_T} from "./illus-pluma.mjs";
+const escA=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+for(const [id,v] of Object.entries(PLUMA)) ILLUS[id]=`<img class="il il-${id}" src="/art/il/${id}.jpg" alt="${escA(v.l)}" width="1200" height="360" loading="lazy" decoding="async" style="object-position:${v.f}% 100%">`;
+for(const [id,v] of Object.entries(PLUMA_T)) TILL[id]=`<img class="il il-t il-${id}" src="/art/il/t-${id}.jpg" alt="${escA(v.l)}" width="640" height="400" loading="lazy" decoding="async">`;

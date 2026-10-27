@@ -710,7 +710,7 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,.s
 .ab-foto{width:150px; height:150px; border-radius:50%; object-fit:cover; border:4px solid var(--acc)}
 .ab-ph{display:grid; place-items:center; background:var(--mark); color:var(--brand); font-size:44px; font-weight:800}
 .ab-sec{padding:34px 0 6px} .ab-sec h2{font-size:26px; margin-bottom:10px}
-.ab-srv .ab-e{font-size:26px} .ab-srv p{font-size:14px; color:var(--ink-2); line-height:1.45; margin:4px 0 8px}
+.ab-srv .ab-e{font-family:var(--serif); font-size:15px; color:var(--brand); letter-spacing:.06em} .ab-srv p{font-size:14px; color:var(--ink-2); line-height:1.45; margin:4px 0 8px}
 .ab-form{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:26px; margin-top:12px}
 .ab-form form{display:flex; flex-direction:column; gap:12px; background:var(--card); border:1px solid var(--rule); border-radius:14px; padding:20px}
 .ab-form .fld{display:flex; flex-direction:column; gap:5px; font-size:14px; font-weight:600; color:var(--ink-2)}
@@ -1208,3 +1208,9 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .qh-art .spot.hv small{color:var(--brand); font-weight:600; font-size:12.5px}
 .qh-hint{color:var(--muted); font-style:normal; font-size:13.5px}
 @media (hover:none){ .qh-hint{display:none} }
+
+/* ilustraciones a pluma y aguada: imágenes que se recortan como antes se recortaban los dibujos */
+img.il{object-fit:cover; object-position:50% 100%; background:#f5f0e6}
+img.il.il-c{aspect-ratio:16/9}
+img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
+.phead img.il{aspect-ratio:1200/330}

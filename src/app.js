@@ -5272,37 +5272,37 @@ function studyVutBan(B){
 // =====================================================================
 // Rellena estos datos y se colocan solos en la página
 // Quién hay detrás: se rellena desde src/content.mjs (SITE.author)
-const ABOUT=Object.assign({nombre:"", frase:"", foto:"", linkedin:"", web:""},(window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author)||{});
+const ABOUT=Object.assign({nombre:"", name:"", frase:"", foto:"", linkedin:"", web:""},(window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author)||{});
 if(ABOUT.name&&!ABOUT.nombre) ABOUT.nombre=ABOUT.name; if(ABOUT.bio&&!ABOUT.frase) ABOUT.frase=ABOUT.bio;
 const SERVICIOS=[
-  ["🏘️","Informes de tu municipio o comarca","Para ayuntamientos, diputaciones y asociaciones: cómo está vuestro territorio frente a los que se le parecen, en un informe claro y con sus fuentes."],
-  ["📰","Datos y gráficos para medios","Análisis rápidos y gráficos listos para publicar sobre vivienda, empleo, población o voto, con el método explicado."],
-  ["🔎","¿Ha funcionado esta medida?","Evaluación de políticas públicas con datos abiertos: antes y después, grupos de comparación y qué se puede concluir y qué no."],
-  ["🎓","Formación: leer datos sin engañarse","Talleres para equipos, periodistas o docentes: correlación y causa, comparar entre iguales, gráficos que no engañan."]];
+  ["01","Informes de tu municipio o comarca","Para ayuntamientos, diputaciones y asociaciones: cómo está vuestro territorio frente a los que se le parecen, en un informe claro y con sus fuentes."],
+  ["02","Datos y gráficos para medios","Análisis rápidos y gráficos listos para publicar sobre vivienda, empleo, población o voto, con el método explicado."],
+  ["03","¿Ha funcionado esta medida?","Evaluación de políticas públicas con datos abiertos: antes y después, grupos de comparación y qué se puede concluir y qué no."],
+  ["04","Formación: leer datos sin engañarse","Talleres para equipos, periodistas o docentes: correlación y causa, comparar entre iguales, gráficos que no engañan."]];
 function renderSobre(sec){
   document.title="Quién soy · Indicio";
   const A=ABOUT, nm=A.nombre?esc(A.nombre):"";
   const first=(A.nombre||"Borja").split(" ")[0];
   view.innerHTML=`<section class="ab-hero">
-      <div><span class="kk">Quién hay detrás</span><h1>Hola, soy ${esc(first)}</h1>
-      <p class="dek">${A.frase?esc(A.frase):"Soy analista de datos. Llevo años en empresas de producto intentando responder una pregunta sencilla: este cambio, ¿ha funcionado de verdad? Indicio es esa misma pregunta, pero hecha a los datos públicos de España."}</p>
+      <div><span class="kk">Quién hay detrás</span><h1>Soy ${esc(A.name||("Borja Burriel"))}</h1>
+      <p class="dek">${A.frase?esc(A.frase):"Analista de datos. Mi trabajo consiste en medir si un cambio funciona o solo lo parece, en productos digitales como Domestika, Wallapop o Northius. Indicio aplica ese mismo método a los datos públicos de España."}</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
     </section>
     <section class="ab-story">
-      <div class="ab-st"><span class="ab-n">Lo que estudié</span><h3>Desconfiar un poco de los números</h3><p>Estudié un máster en Estadística. Lo más útil que aprendí es que un número casi nunca es exacto: siempre hay que preguntarse cuánto podría equivocarse antes de sacar conclusiones.</p></div>
-      <div class="ab-st"><span class="ab-n">En qué trabajo</span><h3>Saber si un cambio ha salido bien</h3><p>He trabajado en <b>Domestika</b>, <b>Wallapop</b> y <b>Northius</b>. Cuando una de estas empresas cambia algo en su web o en su app, mi trabajo es averiguar si ese cambio ha ayudado de verdad o si solo lo parece. Se hace como con un medicamento: una parte de la gente ve la novedad y otra no, y se comparan. Lo difícil es saber si la diferencia es real o cosa de la casualidad.</p></div>
-      <div class="ab-st"><span class="ab-n">De dónde vengo</span><h3>Empecé con el deporte</h3><p>Antes me dediqué a investigar en <b>deporte</b>: usar datos para entender por qué un jugador o un equipo rinde mejor que otro, más allá de la intuición y de la última jugada que todos recuerdan.</p></div>
+      <div class="ab-st"><span class="ab-n">Formación</span><h3>Estadística, para empezar</h3><p>Hice un máster en Estadística. De ahí me quedó una costumbre que aplico a todo: antes de creerme un número, preguntarme cuánto se puede equivocar.</p></div>
+      <div class="ab-st"><span class="ab-n">Trabajo</span><h3>Experimentos en producto</h3><p>En <b>Domestika</b>, <b>Wallapop</b> y <b>Northius</b> me he dedicado a la experimentación. Cuando se cambia algo en una web o en una app, una parte de los usuarios ve la novedad y otra no, como en un ensayo clínico. Mi trabajo es decir si la diferencia es real o simple ruido.</p></div>
+      <div class="ab-st"><span class="ab-n">Antes</span><h3>Datos y deporte</h3><p>Empecé investigando en <b>deporte</b>: usar datos para explicar por qué un jugador o un equipo rinde más que otro, más allá de la intuición y de la última jugada que todo el mundo recuerda.</p></div>
     </section>
-    <section class="ab-why"><h2>Por qué hago Indicio</h2>
-      <p>Porque con los datos públicos pasa lo mismo que en mi trabajo: es muy fácil ver que dos cosas van juntas y pensar que una provoca la otra. ¿Los pueblos con más pisos turísticos pierden vecinos <i>por culpa</i> de los pisos turísticos? ¿O las dos cosas pasan en los mismos sitios por otra razón?</p>
-      <p>Con un pueblo no se puede hacer una prueba como en una app. Pero sí se puede ser cuidadoso: comparar cada pueblo con otros que se le parecen, mirar cómo han cambiado las cosas con los años y decir siempre <b>hasta qué punto podemos estar seguros</b>. Para eso está el <a href="/laboratorio/">laboratorio</a>: para que cualquiera pueda hacerse estas preguntas sin saber estadística.</p>
-      <p>Indicio es un proyecto personal. No tiene publicidad ni partido, y no tiene más intención que entender mejor cómo vivimos. Los datos públicos son de todos, pero casi nadie tiene tiempo de leerlos.</p>
+    <section class="ab-why"><h2>Por qué Indicio</h2>
+      <p>En España se publican muchísimos datos y casi nadie tiene tiempo de leerlos. Cuando se usan, es fácil caer en la trampa de siempre: ver que dos cosas van juntas y dar por hecho que una causa la otra. ¿Suben los alquileres <i>por</i> los pisos turísticos, o las dos cosas pasan en los mismos sitios por otra razón?</p>
+      <p>Con un municipio no se puede hacer un experimento como en una app, pero sí se puede trabajar con cuidado: comparar cada lugar con otros parecidos, mirar qué cambió antes y después de una ley y decir con claridad <b>hasta dónde llegan los datos</b>. El <a href="/laboratorio/">laboratorio</a> está para que cualquiera pueda hacer lo mismo con sus propias preguntas, sin saber estadística.</p>
+      <p>Es un proyecto personal e independiente: sin publicidad, sin financiación de partidos y con las fuentes y el método a la vista en cada página.</p>
     </section>
     <section class="ci-band"><h2>Cómo trabaja Indicio</h2><div class="ci-steps" style="padding:0">
       <div><i>1</i><span><b>Solo datos oficiales</b>INE, SEPE, Ministerio del Interior y Eurostat. Cada gráfico dice de dónde sale.</span></div>
-      <div><i>2</i><span><b>Sin opinión</b>Los textos describen lo que dicen los datos y lo que no pueden decir. Las conclusiones son tuyas.</span></div>
+      <div><i>2</i><span><b>Lo que se sabe y lo que no</b>Cada análisis dice qué muestran los datos y dónde dejan de servir. Las conclusiones son tuyas.</span></div>
       <div><i>3</i><span><b>Método a la vista</b>Si algo parece una causa, se pone a prueba delante de ti, en el laboratorio y en los estudios.</span></div></div></section>
-    <section class="ab-sec"><h2>En qué te puedo ayudar</h2><p class="lead" style="max-width:680px">Además de la web, hago trabajos a medida con datos públicos. Si tienes una pregunta sobre tu territorio o tu sector, cuéntamela.</p>
+    <section class="ab-sec"><h2>En qué te puedo ayudar</h2><p class="lead" style="max-width:680px">Además de Indicio, hago trabajos a medida con datos públicos. Si tienes una pregunta sobre tu territorio, tu sector o una política concreta, hablemos.</p>
       <div class="g4">${SERVICIOS.map(([e,t,d])=>`<a class="cardx qcard ab-srv" href="/quien-soy/contacto/" data-t="${esc(t)}"><div class="ab-e">${e}</div><div class="t">${t}</div><p>${d}</p><div class="s">Pedir información →</div></a>`).join("")}</div></section>
     <section class="ab-sec" id="contacto"><h2>Escríbeme</h2>
       <div class="ab-form"><form id="abform" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
@@ -5313,7 +5313,7 @@ function renderSobre(sec){
         <label class="fld">Mensaje<textarea class="inp" name="mensaje" rows="5" required></textarea></label>
         <button type="submit" class="sel ab-send">Enviar</button><p class="muted" id="abres" style="font-size:14px" role="status"></p>
       </form>
-      <div class="ab-side"><h3>Antes de escribir</h3><ul class="defs"><li><b>¿Un error en los datos?</b> Dime en qué página y qué dato. Los arreglo y lo cuento en la web.</li><li><b>¿Falta tu pregunta?</b> Las mejores ideas para nuevos estudios vienen de quien lee.</li><li>Uso tu correo solo para responderte.</li></ul></div></div>
+      <div class="ab-side"><h3>Antes de escribir</h3><ul class="defs"><li><b>¿Un error en los datos?</b> Dime en qué página y qué dato. Los arreglo y lo cuento en la web.</li><li><b>¿Falta tu pregunta?</b> Muchos análisis nacen de preguntas que me mandan los lectores.</li><li>Uso tu correo solo para responderte.</li></ul></div></div>
     </section>`;
   view.querySelectorAll(".ab-srv").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); const m=document.getElementById("abmot"); if(m) m.value=a.dataset.t; scrollToId("contacto"); }));
   document.getElementById("abgo").addEventListener("click",e=>{ e.preventDefault(); scrollToId("contacto"); });
