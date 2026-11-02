@@ -1324,3 +1324,11 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .lb-step h4 .iq, label.chk .iq{margin-left:6px; vertical-align:middle}
 .types button{padding-top:6px; padding-bottom:5px}
 .types button svg{margin-bottom:3px}
+
+
+/* panel del laboratorio: textos de apoyo */
+.czplain{margin:8px 0 0; font-size:16px; line-height:1.4; color:var(--ink)}
+.czhelp{margin:10px 0 0; font-size:13px; line-height:1.4; color:var(--muted)}
+.czr .iq,.czpr .iq,.czcap .iq,.czvd .iq,.czc h3 .iq{margin-left:2px; vertical-align:middle}
+.czvd{display:inline-flex; align-items:center; gap:2px}
+.czcard{display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start}
