@@ -347,7 +347,7 @@ const S3=(r,d,key)=>[{n:r[F.name],v:d.s[key],c:"--s-mun",main:true},{n:"Provinci
 // barras horizontales: [{l, v, me}] con línea de referencia opcional
 function hbars(parent,rows,{fmt,ref,refLabel,color,scroll,max,min,wide}={}){
   const f=fmt||(v=>nf1.format(v)); const vals=rows.map(r=>r.v).filter(v=>v!=null);
-  const lo=min!=null?min:Math.min(0,d3.min(vals)), hi=max!=null?max:d3.max(vals.concat(ref!=null?[ref]:[]));
+  const lo=min!=null?min:Math.min(0,d3.min(vals)), hi=max!=null?max:Math.max(0,d3.max(vals.concat(ref!=null?[ref]:[])));
   const w=add(parent,"div","hbars"+(scroll?" scroll":"")+(wide?" wide":""));
   w.innerHTML=rows.map(r=>{ const z=(0-lo)/(hi-lo)*100, p=(r.v-lo)/(hi-lo)*100;
     const left=Math.min(z,p), width=Math.max(0.6,Math.abs(p-z));
@@ -2768,7 +2768,7 @@ const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2
 <p>La regla práctica: controla por lo que pudo influir en las dos cosas y ocurrió antes; no por lo que vino después.</p></div></section>`;
 function renderEstudios(id){
   if(id==="tope-compraventas"){ id="tope-cataluna"; history.replaceState(null,"","/preguntas/tope-cataluna/"); } // se fusionó con el análisis del tope
-  if(id==="iva-alimentos"){ id="precio-alimentos"; history.replaceState(null,"","/preguntas/precio-alimentos/#iva"); } // se fusionó con el de la cesta de la compra
+  if(id==="iva-alimentos"){ id="precio-alimentos"; history.replaceState(null,"","/preguntas/precio-alimentos/"); } // se fusionó con el de la cesta de la compra
   const S=STUDIES.find(s=>s.id===id)||STUDIES_HIDDEN.find(s=>s.id===id);
   if(id==="metodo"){ document.title="De la relación a la causa · Indicio"; view.innerHTML=LABNAV("metodo")+pageHead("De la relación a la causa","Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede.")+METODO+methodNote(); if(/^#[\w-]+$/.test(location.hash)){ const t=document.querySelector(location.hash); if(t) setTimeout(()=>t.scrollIntoView({block:"start"}),60); } return; }
   if(!S){ renderPreguntas(); return; }
