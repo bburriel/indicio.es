@@ -1238,13 +1238,13 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 /* carrusel de la cabecera (borrador) */
 .qh-short .qh-q{min-height:0}
 .qcar{margin:36px 0 0}
-.qcar-stage{position:relative; min-height:430px}
+.qcar-stage{position:relative; min-height:500px}
 .qcar-i{position:absolute; inset:0 auto auto 0; width:100%; display:block;
   text-decoration:none; color:inherit; opacity:0; visibility:hidden; transition:opacity .5s ease}
 .qcar-i.on{opacity:1; visibility:visible}
 .qcar-q{font-family:var(--serif); font-size:21px; line-height:1.25; color:var(--ink-2); max-width:34ch}
-.qcar-fig{margin:14px 0 0; max-width:960px}
-.qcar-fig .qill svg{display:block; width:100%; height:auto}
+.qcar-fig{margin:12px 0 0; max-width:540px}
+.qcar-fig .qill svg,.qcar-fig .qill img{display:block; width:100%; height:auto}
 .qcar-txt{max-width:720px; margin-top:4px}
 .qcar-v{font-family:var(--serif); font-size:31px; line-height:1.12; color:var(--brand); letter-spacing:-.02em; text-wrap:balance}
 .qcar-c{font-size:14.5px; line-height:1.5; color:var(--ink-2); margin-top:8px}
@@ -1255,7 +1255,7 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .qcar-d.on{background:var(--brand)}
 .qcar-d:hover{background:var(--muted)}
 @media(max-width:700px){
-  .qcar-stage{min-height:420px}
+  .qcar-stage{min-height:470px}
   .qcar-q{font-size:18px} .qcar-v{font-size:24px} .qcar-c{font-size:14px}
 }
 @media(prefers-reduced-motion: reduce){.qcar-i{transition:none}}

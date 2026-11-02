@@ -59,7 +59,11 @@ function geoRows(nRows,nb,weight,hiFn){
 }
 
 // ---------- las ilustraciones ----------
-const B=[1200,360], T=[640,400];
+// ILL_CAR=1 saca una segunda versión de cada análisis con la proporción del carrusel
+// de la portada (más alta, para que los mapas no queden minúsculos ni las líneas se
+// desborden) y la escribe como art/il/c-<id>.svg.
+const CAR=process.env.ILL_CAR==="1";
+const B=CAR?[1000,500]:[1200,360], T=[640,400];
 const out={}, lab={};
 const add=(id,label,svg)=>{ out[id]=svg; lab[id]=label; };
 
@@ -238,7 +242,7 @@ const mrows=f=>ROWS.filter(f);
 
 // ---------- temas (640×400) ----------
 const TL={};
-const addT=(id,label,svg)=>{ out["t-"+id]=svg; TL[id]=label; };
+const addT=(id,label,svg)=>{ if(CAR) return; out["t-"+id]=svg; TL[id]=label; };
 // riqueza: histograma de puntos apilados con la renta de los municipios
 { const [W,H]=T, rs=mrows(r=>r[F.renta]).map(r=>r[F.renta]).sort((a,b)=>a-b), X=d3.scaleLinear().domain([8000,28000]).range([20,W-20]).clamp(true), d=5.2, q=d3.scaleQuantize().domain([9000,24000]).range(SEQ.slice(1));
   const bins=d3.bin().domain([8000,28000]).thresholds(d3.range(8000,28000,(20000)/((W-40)/d)))(rs); const mx=d3.max(bins,b=>b.length), per=Math.max(1,Math.ceil(mx/((H-40)/d)));
@@ -287,6 +291,6 @@ const addT=(id,label,svg)=>{ out["t-"+id]=svg; TL[id]=label; };
 
 // ---------- escribir ----------
 const DIR=path.join(ROOT,"art/il"); fs.mkdirSync(DIR,{recursive:true});
-let tot=0; for(const [id,s] of Object.entries(out)){ fs.writeFileSync(path.join(DIR,id+".svg"),s); tot+=s.length; }
-fs.writeFileSync(path.join(ROOT,"src/illus-olas.mjs"),"// Lo genera scripts/ilustraciones/graficos.mjs: no editar a mano.\nexport const OLAS="+JSON.stringify(lab)+";\nexport const OLAS_T="+JSON.stringify(TL)+";\n");
-console.log(Object.keys(out).length,"ilustraciones,",Math.round(tot/1024),"KB");
+let tot=0; for(const [id,s] of Object.entries(out)){ fs.writeFileSync(path.join(DIR,(CAR?"c-":"")+id+".svg"),s); tot+=s.length; }
+if(!CAR) fs.writeFileSync(path.join(ROOT,"src/illus-olas.mjs"),"// Lo genera scripts/ilustraciones/graficos.mjs: no editar a mano.\nexport const OLAS="+JSON.stringify(lab)+";\nexport const OLAS_T="+JSON.stringify(TL)+";\n");
+console.log(Object.keys(out).length,CAR?"ilustraciones del carrusel,":"ilustraciones,",Math.round(tot/1024),"KB");

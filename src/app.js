@@ -5647,8 +5647,11 @@ async function renderInicio(){
   if(car){
     const stage=add(car,"div"); stage.className="qcar-stage";
     const nav=add(car,"div"); nav.className="qcar-nav";
-    // la ilustración entera (1200×360), sin el recorte de las tarjetas
-    const illFull=id=>{ const sv=((window.__INDICIO||{}).illus||{})[id]; if(!sv) return null; const d=el("div"); d.className="qill"; d.innerHTML=sv; return d; };
+    // ilustración propia del carrusel (c-<id>.svg, 1000×500): ni recortada como en las
+    // tarjetas ni desbordada como la banda de cabecera. La genera ILL_CAR=1 en graficos.mjs.
+    const illFull=id=>{ const d=el("div"); d.className="qill";
+      const im=el("img"); im.src="/art/il/c-"+id+".svg"; im.width=1000; im.height=500; im.alt=""; im.loading="lazy"; im.decoding="async"; im.className="il il-c";
+      d.appendChild(im); return d; };
     const items=CAR.map(([id,q,v,c],n)=>{ const a=add(stage,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i"+(n?"":" on"); a.setAttribute("aria-hidden",n?"true":"false");
       a.insertAdjacentHTML("beforeend",`<div class="qcar-q">${esc(q)}</div>`);
       const fig=add(a,"div"); fig.className="qcar-fig"; const ic=illFull(id)||illCard(id); if(ic) fig.appendChild(ic);
