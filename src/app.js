@@ -5462,34 +5462,35 @@ function studyVutBan(B){
 const ABOUT=Object.assign({nombre:"", name:"", frase:"", foto:"", linkedin:"", web:""},(window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author)||{});
 if(ABOUT.name&&!ABOUT.nombre) ABOUT.nombre=ABOUT.name; if(ABOUT.bio&&!ABOUT.frase) ABOUT.frase=ABOUT.bio;
 const SERVICIOS=[
-  ["01","Informes de tu municipio o comarca","Para ayuntamientos, diputaciones y asociaciones: cómo está vuestro territorio frente a los que se le parecen, en un informe claro y con sus fuentes."],
-  ["02","Datos y gráficos para medios","Análisis rápidos y gráficos listos para publicar sobre vivienda, empleo, población o voto, con el método explicado."],
-  ["03","¿Ha funcionado esta medida?","Evaluación de políticas públicas con datos abiertos: antes y después, grupos de comparación y qué se puede concluir y qué no."],
-  ["04","Formación: leer datos sin engañarse","Talleres para equipos, periodistas o docentes: correlación y causa, comparar entre iguales, gráficos que no engañan."]];
+  ["01","Informes territoriales","Diagnóstico de un municipio, comarca o provincia frente a territorios comparables, con las fuentes y el método documentados."],
+  ["02","Datos y gráficos para medios","Análisis y gráficos listos para publicar sobre vivienda, empleo, población o voto, con el método explicado."],
+  ["03","Evaluación de políticas públicas","Antes y después, grupos de comparación y una conclusión clara sobre qué se puede afirmar y qué no."],
+  ["04","Formación en interpretación de datos","Talleres para equipos, periodistas y docentes: correlación y causalidad, comparaciones entre iguales y gráficos que no inducen a error."]];
 function renderSobre(sec){
   document.title="Quién soy · Indicio";
   const A=ABOUT, nm=A.nombre?esc(A.nombre):"";
   const first=(A.nombre||"Borja").split(" ")[0];
   view.innerHTML=`<section class="ab-hero">
-      <div><span class="kk">Quién hay detrás</span><h1>Soy ${esc(A.name||("Borja Burriel"))}</h1>
-      <p class="dek">${A.frase?esc(A.frase):"Analista de datos. Mi trabajo consiste en medir si un cambio funciona o solo lo parece, en productos digitales como Domestika, Wallapop o Northius. Indicio aplica ese mismo método a los datos públicos de España."}</p>
+      <div><span class="kk">Quién soy</span><h1>${esc(A.name||"Borja Burriel")}</h1>
+      <p class="ab-role">Analista de datos · Experimentación y evaluación de impacto</p>
+      <p class="dek">${A.frase?esc(A.frase):"Ayudo a saber si un cambio ha funcionado de verdad: una política pública, una medida o un producto. En Indicio publico análisis independientes con datos públicos de España y trabajo a medida para administraciones, medios y organizaciones."}</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
     </section>
-    <section class="ab-story">
-      <div class="ab-st"><span class="ab-n">Formación</span><h3>Estadística, para empezar</h3><p>Hice un máster en Estadística. De ahí me quedó una costumbre que aplico a todo: antes de creerme un número, preguntarme cuánto se puede equivocar.</p></div>
-      <div class="ab-st"><span class="ab-n">Trabajo</span><h3>Experimentos en producto</h3><p>En <b>Domestika</b>, <b>Wallapop</b> y <b>Northius</b> me he dedicado a la experimentación. Cuando se cambia algo en una web o en una app, una parte de los usuarios ve la novedad y otra no, como en un ensayo clínico. Mi trabajo es decir si la diferencia es real o simple ruido.</p></div>
-      <div class="ab-st"><span class="ab-n">Antes</span><h3>Datos y deporte</h3><p>Empecé investigando en <b>deporte</b>: usar datos para explicar por qué un jugador o un equipo rinde más que otro, más allá de la intuición y de la última jugada que todo el mundo recuerda.</p></div>
+    <dl class="ab-dl" aria-label="Perfil">
+      <div><dt>Especialidad</dt><dd>Diseño y análisis de experimentos; evaluación de políticas con datos observacionales</dd></div>
+      <div><dt>Formación</dt><dd>Máster en Estadística</dd></div>
+      <div><dt>Experiencia</dt><dd>Experimentación de producto en Domestika, Wallapop y Northius</dd></div>
+      <div><dt>Ámbito</dt><dd>Datos públicos de España: vivienda, empleo, población, voto y gasto público</dd></div>
+    </dl>
+    <section class="ab-why"><h2>Sobre Indicio</h2>
+      <p>Indicio responde preguntas sobre cómo vivimos en España con datos públicos de los 8.139 municipios. Es un proyecto independiente, sin publicidad ni financiación de partidos.</p>
+      <p>Cada análisis publica sus fuentes, su método y sus límites. El <a href="/laboratorio/">laboratorio</a> permite repetir los cálculos con tus propias preguntas, sin conocimientos de estadística.</p>
     </section>
-    <section class="ab-why"><h2>Por qué Indicio</h2>
-      <p>En España se publican muchísimos datos y casi nadie tiene tiempo de leerlos. Cuando se usan, es fácil caer en la trampa de siempre: ver que dos cosas van juntas y dar por hecho que una causa la otra. ¿Suben los alquileres <i>por</i> los pisos turísticos, o las dos cosas pasan en los mismos sitios por otra razón?</p>
-      <p>Con un municipio no se puede hacer un experimento como en una app, pero sí se puede trabajar con cuidado: comparar cada lugar con otros parecidos, mirar qué cambió antes y después de una ley y decir con claridad <b>hasta dónde llegan los datos</b>. El <a href="/laboratorio/">laboratorio</a> está para que cualquiera pueda hacer lo mismo con sus propias preguntas, sin saber estadística.</p>
-      <p>Es un proyecto personal e independiente: sin publicidad, sin financiación de partidos y con las fuentes y el método a la vista en cada página.</p>
-    </section>
-    <section class="ci-band"><h2>Cómo trabaja Indicio</h2><div class="ci-steps" style="padding:0">
-      <div><i>1</i><span><b>Solo datos oficiales</b>INE, SEPE, Ministerio del Interior y Eurostat. Cada gráfico dice de dónde sale.</span></div>
-      <div><i>2</i><span><b>Lo que se sabe y lo que no</b>Cada análisis dice qué muestran los datos y dónde dejan de servir. Las conclusiones son tuyas.</span></div>
-      <div><i>3</i><span><b>Método a la vista</b>Si algo parece una causa, se pone a prueba delante de ti, en el laboratorio y en los estudios.</span></div></div></section>
-    <section class="ab-sec"><h2>En qué te puedo ayudar</h2><p class="lead" style="max-width:var(--medida)">Además de Indicio, hago trabajos a medida con datos públicos. Si tienes una pregunta sobre tu territorio, tu sector o una política concreta, hablemos.</p>
+    <section class="ab-how"><h2>Cómo trabajo</h2><div class="ci-steps" style="padding:0">
+      <div><i>1</i><span><b>Fuentes oficiales</b>INE, SEPE, Seguridad Social, Interior o Eurostat. Cada gráfico indica de dónde sale.</span></div>
+      <div><i>2</i><span><b>Conclusiones con límites</b>Cada análisis separa lo que muestran los datos de lo que no se puede afirmar.</span></div>
+      <div><i>3</i><span><b>Método a la vista</b>Comparaciones entre iguales, antes y después, grupos de control. Se explica y se puede repetir en el laboratorio.</span></div></div></section>
+    <section class="ab-sec"><h2>Servicios</h2><p class="lead" style="max-width:var(--medida)">Trabajos a medida con datos públicos para administraciones, medios, asociaciones y equipos. Cuéntame tu caso.</p>
       <div class="g4">${SERVICIOS.map(([e,t,d])=>`<a class="cardx qcard ab-srv" href="/quien-soy/contacto/" data-t="${esc(t)}"><div class="ab-e">${e}</div><div class="t">${t}</div><p>${d}</p><div class="s">Pedir información →</div></a>`).join("")}</div></section>
     <section class="ab-sec" id="contacto"><h2>Escríbeme</h2>
       <div class="ab-form"><form id="abform" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
