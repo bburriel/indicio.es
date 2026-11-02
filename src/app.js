@@ -2283,6 +2283,7 @@ function psBar(bar){
         :`<label class="blk" for="psref">Comparar con</label><select class="sel" id="psref">${Object.entries(Pz).filter(([g,o])=>g!=="ES"&&o[PS.k]).map(([g,o])=>`<option value="${g}" ${g===PS.ref?"selected":""}>${esc(o.n)}</option>`).join("")}</select>
       <label class="chk"><input type="checkbox" id="psrel" ${PS.rel?"checked":""}> Ver cada país como diferencia con ${esc((Pz[PS.ref]||{}).n||"la referencia")}</label>`}
       <p class="hint">${esMode?"Con el índice, todas las series valen 100 en el año de referencia: una línea en 130 ha crecido un 30 % desde entonces. Así se comparan euros, precios y personas.":"La economía depende mucho del ciclo europeo. Comparar con otros países separa lo que pasó en todas partes de lo que fue propio de España."}</p></div>`;
+  typesTips(bar);
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; navTo(exHash()); }));
   const on=(id,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener("change",fn); };
   const pk=document.getElementById("pspick"); if(pk) pk.addEventListener("click",async()=>{ await loadAllCat(); openPicker(pk,{all:true,here:k=>/^(es|pais):/.test(k),current:esMode?"es:"+PS.s[0]:"pais:"+PS.k,onPick:v=>{
@@ -2662,7 +2663,7 @@ function exComposicion(out){
 
 // ---------- barras laterales de las vistas nuevas ----------
 const typesStep=()=>`<div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML(EX.v)}</div>`;
-function wireTypes(bar){ bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; viewDefaults(); navTo(exHash()); })); }
+function wireTypes(bar){ typesTips(bar); bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; viewDefaults(); navTo(exHash()); })); }
 function viewDefaults(){
   if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta");
   if(EX.v==="matriz"){ EX.d=EX.d.filter(k=>CATK[k]&&!isReg(k)&&!isEU(k)); MATDEF.forEach(k=>{ if(EX.d.length<6&&!EX.d.includes(k)&&CATK[k]) EX.d.push(k); }); }
@@ -3471,9 +3472,9 @@ const LBTYPES=[["mapa","Mapa",`<path d="M6 4h12l4 6 10 1 3 10H8z"/>`],["tabla","
 const LBDESC={matriz:"¿Qué datos van juntos? Todas las parejas de datos a la vez, municipio a municipio",pendientes:"¿Quién ha mejorado y quién se ha quedado atrás? Cada provincia o comunidad, entre dos años",piramide:"¿Cómo es la población? Hombres y mujeres por edad, en España, una comunidad o una provincia",composicion:"¿De qué se compone? Sectores, voto o edades en cada comunidad, provincia, tamaño o nivel de renta",paises:"¿Cómo ha cambiado? Las series que quieras, año a año, con un año de referencia si quieres: precios, sueldos, vivienda, empleo… de España, tu provincia o tu municipio, o España frente a otros países",mapa:"¿Dónde es más alto o más bajo? Un dato, municipio a municipio",tabla:"¿Quiénes encabezan la lista? Ordena y filtra por varios datos",cruce:"¿Van juntos dos datos? Mira si la relación aguanta al comparar entre iguales",antes:"¿Cambió algo tras una ley o un suceso? Afectados frente a gemelos, año a año",evolucion:"¿Cómo ha cambiado? Cuánto ha crecido cada dato desde un año",grupos:"¿Qué zona destaca? Medias por comunidad, provincia, tamaño o nivel",distribucion:"¿Cómo se reparte? Un dato entre toda la población",burbujas:"¿Cómo se mueven las provincias? Dos datos y el tamaño, año a año"};
 // Paso 1 del laboratorio: cada gráfico se nombra por la pregunta que responde, con el nombre del gráfico debajo
 const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Qué va con qué",grupos:"Qué zona destaca",distribucion:"Cómo se reparte",matriz:"Todo con todo",paises:"Cómo ha cambiado",pendientes:"Quién mejoró",burbujas:"Cómo se mueven",piramide:"Por edades",composicion:"De qué se compone"};
-const LBFAM=[["Ver dónde",["mapa","tabla"]],["Comparar",["cruce","grupos","distribucion","matriz"]],["Ver el cambio",["paises","pendientes","burbujas"]],["Ver la estructura",["piramide","composicion"]]];
 const LBEJ={mapa:"dónde hay más paro registrado",tabla:"los municipios con la renta más alta",cruce:"si donde se estudia más se gana más",grupos:"la renta media por comunidad",distribucion:"cuántos municipios tienen mucho paro y cuántos poco",matriz:"qué datos se mueven juntos en los municipios",paises:"cómo han subido los alquileres en tu provincia",pendientes:"qué provincias han mejorado su renta desde 2015",burbujas:"cómo se mueven las provincias en renta y paro",piramide:"cómo de envejecida está una provincia",composicion:"qué sectores dan trabajo en cada comunidad"};
-const typesHTML=cur=>`<div class="types">${LBFAM.map(([f,ks])=>`<p class="tfam">${f}</p>${ks.map(k=>{ const t=LBTYPES.find(x=>x[0]===k); return `<button type="button" data-v="${k}" aria-pressed="${k===cur}" title="${LBDESC[k]}">${typeIcon(t[2])}<b>${LBQ[k]}</b><small>${t[1]}</small></button>`; }).join("")}`).join("")}</div>`;
+const typesHTML=cur=>`<div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===cur}">${typeIcon(svg)}<b>${LBQ[k]}</b><small>${l}</small></button>`).join("")}</div>`;
+const typesTips=root=>tipBind(root.querySelectorAll(".types button"),b=>{ const k=b.dataset.v; return `<b>${LBQ[k]}</b> <span style="opacity:.7">· ${LBTYPES.find(t=>t[0]===k)[1]}</span><br>${LBDESC[k]}.${LBEJ[k]?`<br><i>Ejemplo: ${LBEJ[k]}.</i>`:""}`; });
 const lbh=(t,l)=>`<button type="button" class="iq lbh" data-h="${esc(t)}" aria-label="${esc(l||"Más información")}"><i>ı</i></button>`;
 const lbBind=root=>{ const ns=root.querySelectorAll(".lbh"); tipBind(ns,b=>esc(b.dataset.h)); ns.forEach(b=>b.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); }));};
 const nfG=new Intl.NumberFormat("es-ES",{useGrouping:"always",maximumFractionDigits:0});
@@ -4124,6 +4125,7 @@ function adBar(bar){
       ${AD.mt==="sint"?"":`<label class="chk"><input type="checkbox" id="admc" ${AD.mc?"checked":""} ${["ccaa"].includes(AD.ev)?"disabled":""}> Gemelos de la misma comunidad</label>`}
       <p class="hint">${ADY[AD.y].note}</p></div>
     <div class="lb-step"><h4><i>4</i>Comprobar</h4><p class="hint" style="margin:0">Debajo del gráfico: si <b>antes iban parejos</b>, si <b>después se separan</b> y si una separación así es <b>rara entre grupos elegidos al azar</b>.</p></div>`;
+  typesTips(bar);
   bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta"); navTo(exHash()); }));
   const on=(id,ev,fn)=>{ const e=document.getElementById(id); if(e) e.addEventListener(ev,fn); };
   on("adev","change",e=>{ adSet(e.target.value); exUpdate(); });
