@@ -210,13 +210,6 @@ const mrows=f=>ROWS.filter(f);
   s+=line(40,H-24,W-40,H-24,INK,1);
   add("smi-empleo-hogar","La escalera del salario mínimo desde 2008; en granate, el salto de 2019, cuando subió un 22 %",s+"</svg>"); }
 
-// 19. Tope a las compraventas: un pequeño gráfico por provincia; en granate, las catalanas
-{ const [W,H]=B, P=PROVS.filter(p=>REFS.prov[p].vtp&&REFS.prov[p].vtp.every(v=>v!=null)).sort((a,b)=>(CAT.has(b)-CAT.has(a))||(d3.mean(REFS.prov[b].vtp)-d3.mean(REFS.prov[a].vtp)));
-  const cols=13, rowsN=Math.ceil(P.length/cols), cw=(W-30)/cols, ch=(H-20)/rowsN; let s=svgOpen(W,H);
-  P.forEach((p,k)=>{ const v=REFS.prov[p].vtp, x0=15+(k%cols)*cw+8, y0=10+Math.floor(k/cols)*ch+6, w=cw-16, h=ch-14, lo=d3.min(v), hi=d3.max(v)||1, c=CAT.has(p);
-    const pts=v.map((d,i)=>[x0+w*i/(v.length-1),y0+h-(d-lo)/((hi-lo)||1)*h]); s+=`<path d="${pathD(pts)}L${r1(x0+w)},${r1(y0+h)}L${r1(x0)},${r1(y0+h)}Z" fill="${c?WASH:"#f0eee9"}"/><path d="${pathD(pts)}" fill="none" stroke="${c?WINE:DARK}" stroke-width="${c?1.8:1.1}"/>`+line(x0,y0+h,x0+w,y0+h,LINE,.8); });
-  add("tope-compraventas","Un gráfico por provincia con sus compraventas de vivienda desde 2020; en granate, las catalanas",s+"</svg>"); }
-
 // 20. Deuda municipal: deuda por habitante de los ayuntamientos de cada provincia en 2015 (círculo vacío) y ahora (granate)
 { const [W,H]=B, D=CAU.deuda, n=D.years.length; const P=PROVS.map(p=>{ const S=Object.entries(D.s).filter(([c])=>c.slice(0,2)===p); const pop=d3.sum(S,([c])=>BY.get(c)?.[F.pop]||0)||1; return {a:d3.sum(S,([c,v])=>v[0]||0)/pop,b:d3.sum(S,([c,v])=>v[n-1]||0)/pop}; }).filter(p=>p.a>0).sort((x,y)=>y.a-x.a);
   const w=(W-60)/P.length, Y=d3.scaleSqrt().domain([0,d3.max(P,p=>Math.max(p.a,p.b))]).range([H-24,24]);

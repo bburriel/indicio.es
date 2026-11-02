@@ -220,13 +220,6 @@ ILLUS["smi-empleo-hogar"]=svg("smi-empleo-hogar","Una casa con una persona limpi
   tree(180,300,1.3)+tree(1120,300,1)+C(150,70,26,"k3"));
 FOCUS["smi-empleo-hogar"]=330;
 
-ILLUS["tope-compraventas"]=svg("tope-compraventas","Edificios con un cartel de se vende y una llave junto a una flecha de alquiler limitada",
-  hills(250,"k8",24,0.9)+R(0,300,1200,60,"k9")+
-  bldg(300,300,120,210,"k2","k7",3,[1,5])+bldg(430,300,100,160,"k4","k7",2,[3])+bldg(540,300,130,230,"k1","k7",3,[2,7],"k3")+
-  G("translate(790 120)",R(0,0,10,180,"ki")+R(-70,10,150,70,"kr")+R(-58,24,126,10,"kc")+R(-58,44,90,10,"kc")+R(-58,62,60,8,"kc"))+
-  G("translate(920 120)",P("M0 120 L70 50 L120 90 L200 10","sb",` fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"`)+R(-10,0,230,12,"kr")+P("M190 10 l20 -2 l-6 20","sb",` fill="none" stroke-width="6"`))+
-  tree(160,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
-FOCUS["tope-compraventas"]=300;
 
 ILLUS["deuda-quien-gobierna"]=svg("deuda-quien-gobierna","Un ayuntamiento con dos banderas y unas monedas apiladas",
   hills(258,"k8",20,1.7)+R(0,300,1200,60,"k9")+
