@@ -208,11 +208,14 @@ label.chk{display:flex; align-items:center; gap:7px; font-size:14px; color:var(-
 .glance td{padding:8px 10px 8px 0; border-bottom:1px solid var(--rule); vertical-align:middle}
 .glance tr.grp td{padding-top:18px; font-weight:700; font-size:14px; color:var(--ink); border-bottom:1px solid var(--rule-2)}
 .glance td.lab small{display:block; color:var(--muted); font-size:12.5px}
-/* icono «i»: abre la burbuja que explica qué mide el dato de esa fila */
-.iq{display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:6px; padding:0; vertical-align:1px;
-    border:1px solid var(--rule-2); border-radius:50%; background:none; color:var(--muted); cursor:help;
-    font-family:var(--serif); font-style:italic; font-weight:600; font-size:11px; line-height:1; transition:color .12s, border-color .12s, background .12s}
-.iq:hover,.iq:focus-visible{color:var(--brand); border-color:var(--brand); background:var(--mark)}
+/* icono de ayuda: abre la burbuja que explica qué mide el dato de esa fila.
+   Es la «i» del logotipo: la letra sin punto (ı) en serifa y el punto en granate, puesto aparte. */
+.iq{position:relative; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; margin-left:4px; padding:0;
+    border:1px solid transparent; border-radius:50%; background:none; color:var(--muted); cursor:help;
+    font-family:var(--serif); font-weight:500; font-size:17px; line-height:1; transition:color .12s, border-color .12s, background .12s}
+.iq i{display:block; font-style:normal}
+.iq::after{content:""; position:absolute; left:50%; top:2px; width:3px; height:3px; border-radius:50%; background:var(--brand); transform:translateX(-50%)}
+.iq:hover,.iq:focus-visible{color:var(--brand); border-color:var(--acc); background:var(--mark)}
 .glance td.v{font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums}
 .glance td.e{color:var(--ink-2); white-space:nowrap; font-variant-numeric:tabular-nums}
 .glance td.pos{width:34%}

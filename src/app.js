@@ -1028,7 +1028,7 @@ const QUEMIDE={
   vox:"Votos a Vox por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco).",
   sumar:"Votos a Sumar y sus aliados por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco)."};
 // el icono que abre la explicación; sin texto para esa clave, no se pinta nada
-const iQue=(k,lab)=>QUEMIDE[k]?`<button type="button" class="iq" data-q="${k}" data-ql="${esc(lab||labK(k))}" aria-label="Qué mide ${esc(lab||labK(k))}">i</button>`:"";
+const iQue=(k,lab)=>QUEMIDE[k]?`<button type="button" class="iq" data-q="${k}" data-ql="${esc(lab||labK(k))}" aria-label="Qué mide ${esc(lab||labK(k))}"><i>ı</i></button>`:"";
 const bindQue=root=>tipBind(root.querySelectorAll(".iq"),b=>`<b>${esc(b.dataset.ql)}:</b> ${esc(QUEMIDE[b.dataset.q])}`);
 
 // ---------- de un vistazo ----------
