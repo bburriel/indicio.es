@@ -150,11 +150,11 @@ function route(){
   const h=pathToKey();
   // bloques estáticos de las fichas (preguntas frecuentes, municipios cercanos): solo en la página para la que se generaron
   document.querySelectorAll(".seo-extra").forEach(e=>{ e.hidden=!(h===e.dataset.key||h.startsWith(e.dataset.key+"-")); });
-  if(h==="__static") return;   // páginas solo estáticas (provincias): el HTML ya trae todo
+  if(h==="__static"){ const e=document.getElementById("nav-municipio"); if(e) e.setAttribute("aria-current","page"); return; }   // páginas solo estáticas (provincias, rankings): el HTML ya trae todo
   const m=h.match(/^m(\d{5})(?:-([a-z]+))?$/), rt=h.match(/^(?:renta|riqueza)(?:-(\d{5}))?$/), cr=h.match(/^(?:cruces|relaciones)(?:-([a-zA-Z0-9]+)-([a-zA-Z0-9]+))?$/);
   document.querySelectorAll(".nav a,.nav .ddb").forEach(a=>a.removeAttribute("aria-current")); ddClose();
-  // dos pilares: todo lo ya analizado (preguntas, temas, municipios) cuelga de «Análisis»; lo demás es el laboratorio
-  const cur=id=>{ id=({temas:"preguntas",municipio:"preguntas"})[id]||id; const e=document.getElementById("nav-"+id); if(e) e.setAttribute("aria-current","page"); };
+  // cuatro entradas: «Análisis» (preguntas y temas), «Municipios» (fichas, comparar, provincias, rankings), el laboratorio y quién soy
+  const cur=id=>{ id=({temas:"preguntas"})[id]||id; const e=document.getElementById("nav-"+id); if(e) e.setAttribute("aria-current","page"); };
   if(INIT_T){ clearInterval(INIT_T); INIT_T=null; } if(typeof QH_T!=="undefined"&&QH_T){ clearInterval(QH_T); QH_T=null; } if(typeof QSPOT_T!=="undefined"&&QSPOT_T){ clearInterval(QSPOT_T); QSPOT_T=null; }
   if(m && BYCODE.has(m[1])){ cur("municipio"); EXF={prov:"",min:0,max:Infinity}; if(!myOk(lastMun)){ setMyMun(m[1],{silent:true}); setTimeout(()=>{ const t=toast(`📍 Hemos guardado <b>${esc(myName(m[1]))}</b> como tu municipio: lo verás destacado en temas y gráficos. <button type="button" id="tchg">Cambiar</button>`,4500); const c=document.getElementById("tchg"); if(c) c.addEventListener("click",()=>{ t.remove(); myPop(); }); },600); } renderMun(m[1], m[2]); return; }
   if(/^explorar/.test(h)){ cur("lab"); const same=document.querySelector(".lb"); renderExplorar(h); if(!same) window.scrollTo(0,0); return; }
@@ -180,20 +180,23 @@ function route(){
 }
 let INIT_T=null;
 const saveMun=()=>{ try{ localStorage.setItem("cifrario.mun",lastMun); }catch(e){} };
-// menú de Análisis: al pasar por encima (o con la flecha, en táctil) se abre un panel con los temas y los municipios
-const TOP=document.getElementById("top"), DDB=document.getElementById("nav-an-btn"), NAVDD=document.getElementById("navdd"), MEGA=document.getElementById("mega-an");
+// menús desplegables (Análisis y Municipios): al pasar por encima (o con la flecha, en táctil) se abre su panel
+const TOP=document.getElementById("top");
+const DDS=[...document.querySelectorAll(".navdd")].map(dd=>({dd, btn:dd.querySelector(".ddb"), mega:document.getElementById(dd.dataset.mega)})).filter(x=>x.btn&&x.mega);
 let MEGA_T=null;
-function megaOpen(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.add("mega-open"); if(DDB) DDB.setAttribute("aria-expanded","true"); }
-function ddClose(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.remove("mega-open"); if(DDB) DDB.setAttribute("aria-expanded","false"); const r=document.getElementById("mq-r"); if(r) r.hidden=true; }
+function megaOpen(x){ clearTimeout(MEGA_T); if(!TOP) return; DDS.forEach(y=>{ const on=y===x; y.mega.classList.toggle("on",on); y.btn.setAttribute("aria-expanded",on?"true":"false"); }); TOP.classList.add("mega-open"); }
+function ddClose(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.remove("mega-open"); DDS.forEach(y=>{ y.mega.classList.remove("on"); y.btn.setAttribute("aria-expanded","false"); }); const r=document.getElementById("mq-r"); if(r) r.hidden=true; }
 const megaSoon=()=>{ clearTimeout(MEGA_T); MEGA_T=setTimeout(ddClose,180); };
-if(DDB&&MEGA){
+if(DDS.length){
   const HOVER=!!(window.matchMedia&&matchMedia("(hover:hover)").matches);
-  // con ratón, el panel ya se abre al pasar por encima: el clic en la flecha lo deja abierto; en táctil alterna
-  DDB.addEventListener("click",e=>{ e.stopPropagation(); (HOVER||!TOP.classList.contains("mega-open"))?megaOpen():ddClose(); });
-  if(HOVER){ [NAVDD,MEGA].forEach(x=>{ x.addEventListener("mouseenter",megaOpen); x.addEventListener("mouseleave",megaSoon); }); }
-  document.addEventListener("click",e=>{ if(TOP.classList.contains("mega-open")&&!MEGA.contains(e.target)&&!NAVDD.contains(e.target)) ddClose(); });
+  DDS.forEach(x=>{
+    // con ratón, el panel ya se abre al pasar por encima: el clic en la flecha lo deja abierto; en táctil alterna
+    x.btn.addEventListener("click",e=>{ e.stopPropagation(); (HOVER||!x.mega.classList.contains("on"))?megaOpen(x):ddClose(); });
+    if(HOVER){ [x.dd,x.mega].forEach(el=>{ el.addEventListener("mouseenter",()=>megaOpen(x)); el.addEventListener("mouseleave",megaSoon); }); }
+    x.mega.addEventListener("click",e=>{ if(e.target.closest("a")) ddClose(); });
+  });
+  document.addEventListener("click",e=>{ if(TOP.classList.contains("mega-open")&&!DDS.some(x=>x.mega.contains(e.target)||x.dd.contains(e.target))) ddClose(); });
   document.addEventListener("keydown",e=>{ if(e.key==="Escape") ddClose(); });
-  MEGA.addEventListener("click",e=>{ if(e.target.closest("a")) ddClose(); });
 }
 const go=(code,sec)=>{ navTo("m"+code+(sec?"-"+sec:"")); };
 
@@ -898,7 +901,7 @@ async function renderMun(code,sec){
   view.innerHTML=`
     <header class="mf-hero">
       <div>
-        <nav class="tp-crumb" aria-label="Ruta"><a href="/preguntas/">Análisis</a> › <a href="/municipio/">Tu municipio</a> › Provincia de ${esc(provShort(PROVS[P]))}</nav>
+        <nav class="tp-crumb" aria-label="Ruta"><a href="/municipio/">Municipios</a> › Provincia de ${esc(provShort(PROVS[P]))}</nav>
         <h1>${esc(r[F.name])}</h1>
         <p class="dek">${summary(r,d)}</p>
         <div class="chipsq"><span id="mychips" style="display:contents">${myChip(code)}</span><a href="#comparar-${code}">⇄ Comparar con otro</a><a href="${exHash({v:"mapa",d:["renta","paroReg"],p:code.slice(0,2),t:"",m:code,c:[]})}">Verlo en el laboratorio</a><button type="button" id="mshare">Compartir</button><span class="muted" style="font-size:12.5px">Municipio de ${esc(bandLab)} Código INE ${esc(code)}.</span></div>
@@ -3238,12 +3241,12 @@ function pathImg(k){
 // TU MUNICIPIO (portada de la sección)
 // =====================================================================
 async function renderMunLanding(){
-  document.title="Tu municipio · Indicio";
+  document.title="Municipios · Indicio";
   view.innerHTML=`<section class="ci-hero" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
-    <div><span class="kk">Tu municipio</span><h1>Busca tu municipio y míralo de un vistazo</h1>
+    <div><span class="kk">Municipios</span><h1>Busca tu municipio y míralo de un vistazo</h1>
       <p class="dek">Sus cifras clave frente a España, cómo ha cambiado desde 2015, en qué destaca y a qué municipios se parece. Con todo el detalle plegado por si quieres más.</p>
       ${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}
-      <p style="margin-top:18px;font-size:15px"><a href="#comparar">O compara dos municipios lado a lado</a></p></div>
+      <p style="margin-top:18px;font-size:15px"><a href="#comparar">Comparar dos municipios</a> · <a href="/provincia/">Municipios por provincia</a> · <a href="/rankings/">Rankings</a></p></div>
     <div class="ci-map"><div class="mlab"><span><b>O pulsa en el mapa</b> · color según la renta por persona</span></div><div id="mlmap" style="min-height:240px"></div></div>
   </section>
   <section class="ci-band" style="margin-top:6px"><h2>Qué vas a encontrar en la ficha</h2><div class="g3">
