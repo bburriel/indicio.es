@@ -3478,6 +3478,49 @@ const typesHTML=cur=>`<div class="types">${LBTYPES.map(([k,l,svg])=>`<button typ
 const typesTips=root=>tipBind(root.querySelectorAll(".types button"),b=>{ const k=b.dataset.v; return `<b>${LBQ[k]}</b> <span style="opacity:.7">· ${LBTYPES.find(t=>t[0]===k)[1]}</span><br>${LBDESC[k]}.${LBEJ[k]?`<br><i>Ejemplo: ${LBEJ[k]}.</i>`:""}`; });
 const lbh=(t,l)=>`<button type="button" class="iq lbh" data-h="${esc(t)}" aria-label="${esc(l||"Más información")}"><i>ı</i></button>`;
 const lbBind=root=>{ const ns=root.querySelectorAll(".lbh"); tipBind(ns,b=>esc(b.dataset.h)); ns.forEach(b=>b.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); }));};
+
+// Ayudas del menú del laboratorio: cada botón, casilla y selector explica qué hace al pasar el ratón o al tabular
+const LBTIPS=[
+  [".slot:not(.enc) button.pick[data-i]","Cambiar el dato","Pulsa para elegir otro dato. Puedes buscar por nombre o por tema (trabajo, vivienda, renta…)."],
+  ["button.pick[data-add]","Añadir otro dato","Suma un dato más al gráfico."],
+  ["button.pick[data-enc=sz]","Tamaño del punto","Los municipios con más valor en este dato se dibujan con un punto más grande. Si no eliges nada, el tamaño es la población."],
+  ["button.pick[data-enc=col]","Color del punto","Colorea los puntos según un tercer dato, para ver si hay algún patrón."],
+  ["button.pick[data-bsz]","Tamaño de la burbuja","Cuanto mayor es el valor de este dato en una provincia, más grande su burbuja. Por defecto, los habitantes."],
+  ["button[data-x]","Quitar este dato","Lo quita del gráfico."],
+  ["button[data-xenc],button[data-xbsz]","Quitar","Vuelve a la opción por defecto."],
+  ["#exmu button[data-u='']","Municipios","Cada punto o zona es un municipio. Es el detalle máximo: 8.139 en toda España."],
+  ["#exmu button[data-u=prov]","Provincias","Agrupa por provincia: se lee mejor, pero solo con datos que existan a esa escala."],
+  ["#exmu button[data-u=ccaa]","Comunidades","Agrupa por comunidad autónoma: la vista más general."],
+  ["#exprov","Provincia","Limita el gráfico a una provincia, o déjalo en Toda España."],
+  ["#exsize","Tamaño de los municipios","Quita los municipios pequeños, cuyas cifras suelen ser poco fiables porque salen de pocos vecinos."],
+  ["#lbmy","Resaltar en el gráfico","Los municipios que elijas aparecen resaltados en el gráfico para encontrarlos enseguida. Por defecto, el tuyo."],
+  ["label.chk:has(#exbv)","Mapa de dos colores","Colorea cada municipio según dos datos a la vez, para ver dónde coinciden: por ejemplo, poca renta y mucho paro."],
+  ["label.chk:has(#exw)","Peso de los municipios grandes","Por defecto cada municipio cuenta igual, sea una aldea o Madrid. Si lo marcas, cuentan según sus habitantes."],
+  ["label.chk:has(#exq)","Cuatro zonas","Traza dos líneas, una en la media de cada dato, y separa los municipios por encima y por debajo de las dos: por ejemplo, mucho paro y poca renta."],
+  ["label.chk:has(#exlx)","Ampliar los valores bajos","Escala logarítmica. Útil cuando unos pocos municipios tienen valores enormes y aplastan al resto: separa mejor los pequeños."],
+  ["label.chk:has(#vomw)","Peso de los municipios grandes","Por defecto cada municipio cuenta igual. Si lo marcas, cuentan según sus habitantes."],
+  ["#exswap","Intercambiar ejes","Cambia qué dato va en horizontal y cuál en vertical. La relación es la misma, vista desde el otro lado."],
+  ["#exgo","Ver como relación","Cruza este dato con otro para ver si van juntos."],
+  ["#vow button[data-v='1']","Personas","Cada persona cuenta una vez: pesan más los municipios grandes."],
+  ["#vow button[data-v='0']","Municipios","Cada municipio cuenta una vez, sea grande o pequeño."],
+  ["#vodg button[data-v='']","Todos juntos","Un único reparto con todos los municipios."],
+  ["#vodg button[data-v=ccaa]","Por comunidad","Un reparto por cada comunidad autónoma, para compararlas."],
+  ["#vodg button[data-v=prov]","Por provincia","Un reparto por cada provincia, para compararlas."],
+  ["#vodg button[data-v=size]","Por tamaño","Separa los pueblos pequeños de las ciudades grandes."],
+  ["#vodg button[data-v=renta]","Por nivel de renta","Separa los municipios ricos de los pobres."],
+  ["#vogb button[data-v=ccaa]","Por comunidad","Una barra por comunidad autónoma."],
+  ["#vogb button[data-v=prov]","Por provincia","Una barra por provincia."],
+  ["#vogb button[data-v=size]","Por tamaño","Una barra por tamaño de municipio, de pueblos a grandes ciudades."],
+  ["#vogb button[data-v=q]","Por nivel del dato","Divide los municipios en tramos, de los que tienen menos a los que tienen más de este dato."],
+  ["#slu button[data-v=prov]","Provincias","Compara provincias."],
+  ["#slu button[data-v=ccaa]","Comunidades","Compara comunidades autónomas."]
+];
+function lbTips(root){ if(!root) return;
+  LBTIPS.forEach(([sel,t,d])=>{ let ns; try{ ns=root.querySelectorAll(sel); }catch(e){ return; }
+    ns.forEach(n=>{ if(n._lbt) return; n._lbt=1; const show=()=>tipShow(n,`<b>${t}</b><br>${d}`);
+      n.addEventListener("mouseenter",show); n.addEventListener("focusin",show); n.addEventListener("mouseleave",tipHide); n.addEventListener("focusout",tipHide); }); }); }
+function lbTipsWatch(){ const bar=document.getElementById("exbar"); if(!bar||bar._lbw) return; bar._lbw=1; let pend=false;
+  new MutationObserver(()=>{ if(pend) return; pend=true; requestAnimationFrame(()=>{ pend=false; lbTips(bar); }); }).observe(bar,{childList:true,subtree:true}); lbTips(bar); }
 const nfG=new Intl.NumberFormat("es-ES",{useGrouping:"always",maximumFractionDigits:0});
 const hintHTML=v=>`<p class="hint">${LBDESC[v]}.${LBEJ[v]?` <span class="ex">Ejemplo: ${LBEJ[v]}.</span>`:""}</p>`;
 const typeIcon=(svg,on)=>`<svg width="40" height="26" viewBox="0 0 40 26" aria-hidden="true" style="fill:var(--rule-2);stroke:var(--rule-2)">${svg}</svg>`;
@@ -3520,7 +3563,7 @@ async function renderExplorar(h){
   document.getElementById("lbimg").addEventListener("click",exPNG);
   const lsv=document.getElementById("lbsaved"); if(lsv) lsv.addEventListener("click",()=>document.getElementById("lbnb").scrollIntoView({behavior:"smooth"}));
   view.querySelectorAll("[data-gq]").forEach(b=>b.addEventListener("click",()=>{ const [l,v,o]=EXQ[+b.dataset.gq]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null}; if(o.ser){ Object.assign(PS,{s:o.ser.slice(),idx:1,b:o.b||null,desde:null,hasta:null,real:0}); } navTo(exHash()); }));
-  exBar(); exDraw(); nbDraw();
+  lbTipsWatch(); exBar(); exDraw(); nbDraw();
 }
 
 function nbDraw(){
@@ -3615,10 +3658,10 @@ function exBar(){
       <select class="sel" id="exsize" aria-label="Tamaño">${EXSIZES.map(([k,l])=>`<option value="${k}" ${k===EX.t?"selected":""}>${l}</option>`).join("")}</select>
       <div class="slot lbmy" id="lbmy" role="button" tabindex="0"><span class="nm" style="flex:1"><small>Resaltar en el gráfico</small>${myOk(lastMun)?`📍 ${esc(myName(lastMun))}${myOk(MUN2)?` <span class="muted">y</span> ${esc(myName(MUN2))}`:""}`:`<span class="muted">Elige tu municipio</span>`}</span><span class="muted" style="font-size:12.5px">Cambiar</span></div>
       <p class="hint" id="excount"></p></div>`}
-    <div class="lb-step"><h4><i>${isEvo||isB||isMapAgg?3:4}</i>${VOPT[EX.v]||isMapAgg?"Cómo verlo":"Ajustes"}${VOPT[EX.v]||isMapAgg?"":lbh("Cambios opcionales. Puedes dejarlo todo como está.","Qué son los ajustes")}</h4>${VOPT[EX.v]?VOPT[EX.v].html():isMapAgg?`<p class="hint" style="margin:0">${isReg(EX.d[0])?"Dato oficial de cada "+(EX.u==="prov"?"provincia":"comunidad")+".":"Cada "+(EX.u==="prov"?"provincia":"comunidad")+" muestra la media de sus municipios, ponderada por población."} Al elegir dato, salen los que existen a esta escala.</p>`:EX.v==="mapa"?`<label class="chk"><input type="checkbox" id="exbv" ${EX.bv?"checked":""}> Añadir un segundo dato (mapa de dos colores)${lbh("Colorea cada municipio según dos datos a la vez, para ver dónde coinciden: por ejemplo, poca renta y mucho paro.","Qué es el mapa de dos colores")}</label>${EX.bv?"":`<p class="hint">Así ves a la vez dónde coinciden, por ejemplo, poca renta y mucho paro.</p>`}`:EX.v==="cruce"?`
-      <label class="chk"><input type="checkbox" id="exw" ${EX.w?"checked":""}> Dar más peso a los municipios grandes${lbh("Por defecto cada municipio cuenta igual, sea una aldea o Madrid. Si lo marcas, cuentan según sus habitantes.","Qué hace esta casilla")}</label>
-      <label class="chk"><input type="checkbox" id="exq" ${EX.q?"checked":""}> Dividir en cuatro zonas${lbh("Traza dos líneas, una en la media de cada dato, y separa los municipios por encima y por debajo de las dos: por ejemplo, mucho paro y poca renta.","Qué son los cuadrantes")}</label>
-      <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Ampliar los valores bajos (horizontal)${lbh("Es una escala logarítmica. Sirve cuando unos pocos municipios tienen valores enormes y aplastan al resto: separa mejor los pequeños.","Qué es la escala logarítmica")}</label>
+    <div class="lb-step"><h4><i>${isEvo||isB||isMapAgg?3:4}</i>${VOPT[EX.v]||isMapAgg?"Cómo verlo":"Ajustes"}${VOPT[EX.v]||isMapAgg?"":lbh("Cambios opcionales. Puedes dejarlo todo como está.","Qué son los ajustes")}</h4>${VOPT[EX.v]?VOPT[EX.v].html():isMapAgg?`<p class="hint" style="margin:0">${isReg(EX.d[0])?"Dato oficial de cada "+(EX.u==="prov"?"provincia":"comunidad")+".":"Cada "+(EX.u==="prov"?"provincia":"comunidad")+" muestra la media de sus municipios, ponderada por población."} Al elegir dato, salen los que existen a esta escala.</p>`:EX.v==="mapa"?`<label class="chk"><input type="checkbox" id="exbv" ${EX.bv?"checked":""}> Añadir un segundo dato (mapa de dos colores)</label>${EX.bv?"":`<p class="hint">Así ves a la vez dónde coinciden, por ejemplo, poca renta y mucho paro.</p>`}`:EX.v==="cruce"?`
+      <label class="chk"><input type="checkbox" id="exw" ${EX.w?"checked":""}> Dar más peso a los municipios grandes</label>
+      <label class="chk"><input type="checkbox" id="exq" ${EX.q?"checked":""}> Dividir en cuatro zonas</label>
+      <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Ampliar los valores bajos (horizontal)</label>
       <button type="button" class="sel" id="exswap" style="margin-top:6px">⇄ Intercambiar ejes</button>
       <p class="hint">Debajo del gráfico podrás comprobar si la relación es real o se explica por otra cosa.</p>`
       :`<p class="hint" style="margin:0">Para comprobar si dos datos van juntos, pásalo a «Qué va con qué».</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
