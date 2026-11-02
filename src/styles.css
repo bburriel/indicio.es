@@ -430,6 +430,14 @@ ul.semaforo li.ok .ic{background:#4f8a5b} ul.semaforo li.ko .ic{background:var(-
 /* pie */
 .method{font-size:14px; color:var(--ink-2); display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--rule-2); padding-top:16px; margin-top:56px}
 .method p{max-width:820px}
+/* la lista de fuentes va plegada: se abre pulsando el rótulo o la flecha */
+.method details.srcs > summary{cursor:pointer; list-style:none; display:inline-flex; align-items:center; gap:9px; font-weight:700; color:var(--ink-2)}
+.method details.srcs > summary::-webkit-details-marker{display:none}
+.method details.srcs > summary::after{content:""; width:6px; height:6px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:translateY(-2px) rotate(45deg); transition:transform .15s}
+.method details.srcs[open] > summary::after{transform:translateY(1px) rotate(-135deg)}
+.method details.srcs > summary:hover{color:var(--brand)}
+.method details.srcs > summary:hover::after{border-color:var(--brand)}
+.method details.srcs > p{margin-top:8px}
 @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important; scroll-behavior:auto!important} }
 /* ===== rediseño: portada, ficha, temas, laboratorio ===== */
 .kk{font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--acc-ink)}

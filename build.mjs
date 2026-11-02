@@ -80,7 +80,7 @@ function page({route,title,desc,ogTitle,main,jsonld,ogImage,type="website",robot
   const dir=path.join(OUT,route); fs.mkdirSync(dir,{recursive:true}); fs.writeFileSync(path.join(dir,"index.html"),html);
 }
 const breadcrumb=items=>({"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:items.map(([n,u],i)=>({"@type":"ListItem",position:i+1,name:n,item:SITE.url+u}))});
-const sources=`<footer class="method"><p><b>De dónde salen los datos.</b> INE: Atlas de Distribución de Renta de los Hogares, padrón municipal, Censo de Población y Viviendas 2021, censos anuales de población, Estadística de Migraciones, Índice de Precios de Vivienda en Alquiler, viviendas turísticas, Encuesta de Estructura Salarial e IPC. SEPE: paro registrado por municipio. Ministerio del Interior: resultados electorales. Eurostat: gasto público.</p></footer>`;
+const sources=`<footer class="method"><details class="srcs"><summary>De dónde salen los datos</summary><p>INE: Atlas de Distribución de Renta de los Hogares, padrón municipal, Censo de Población y Viviendas 2021, censos anuales de población, Estadística de Migraciones, Índice de Precios de Vivienda en Alquiler, viviendas turísticas, Encuesta de Estructura Salarial e IPC. SEPE: paro registrado por municipio. Ministerio del Interior: resultados electorales. Eurostat: gasto público.</p></details></footer>`;
 // imágenes para compartir de rankings, provincias y municipios: el build deja la lista en dist/og-extra.json y
 // `npm run snapshot` las dibuja en og/<fichero>.jpg (solo las que cambian); el build siguiente ya las enlaza
 const OGX=[]; const ogFor=(file,spec)=>{ OGX.push({file,...spec}); return exists("og/"+file+".jpg")?"/og/"+file+".jpg":null; };

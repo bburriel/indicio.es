@@ -263,7 +263,7 @@ const SRC={
 function methodNote(keys){
   const ks=keys||Object.keys(SRC).filter(k=>!["tensionadas","erte","ave","vut","eurostat"].includes(k));
   return `<footer class="method">
-    <p><b>De dónde salen los datos.</b> ${ks.map(k=>SRC[k]).join(". ")}.</p>
+    <details class="srcs"><summary>De dónde salen los datos</summary><p>${ks.map(k=>SRC[k]).join(". ")}.</p></details>
     <p><b>Cómo leerlos.</b> La renta sale de las declaraciones de la renta y no incluye la economía sumergida. Salvo que se indique «descontando la inflación», los euros son de cada año. Las cifras de provincia y de España son medias de sus municipios ponderadas por población. En los municipios muy pequeños el INE no publica todos los datos. El cálculo exacto detrás de cada etiqueta («a igual edad», «entre iguales», «explica») está en <a href="/laboratorio/metodo/">la guía del método</a>, y el código en <a href="https://github.com/bburriel/indicio.es" target="_blank" rel="noopener">GitHub</a>.</p>
   </footer>`;
 }
@@ -2967,7 +2967,7 @@ async function renderGasto(){
   const s5=finding(B,"¿Son sostenibles las pensiones?",`<p>En el laboratorio hay un estudio que separa por qué ha crecido el gasto en pensiones y qué pasará cuando se jubilen las generaciones más numerosas, con una calculadora para probar escenarios.</p><p>${exLink("evolucion",{e:["govTot","govJub","govSan","govEdu","govInt","pib"]},"Compara la evolución del gasto con el PIB en el explorador")} · <a class="exlink" href="/preguntas/pensiones/">Leer el estudio →</a></p>`);
   panoExtra("gasto",B);
 }
-function govNote(){ return `<footer class="method"><p><b>De dónde salen los datos.</b> Eurostat: gasto de las administraciones públicas por funciones (clasificación COFOG, 1995–${GOV.years[GOV.years.length-1]}), cuentas públicas, deuda pública, PIB, gasto y beneficiarios de pensiones, población y proyecciones de población (EUROPOP2023). Las administraciones públicas incluyen Estado, comunidades autónomas, ayuntamientos y Seguridad Social, sin contar dos veces lo que se transfieren entre ellas.</p><p><b>Cómo leerlos.</b> «Jubilación» es la función de vejez de COFOG: sobre todo pensiones de jubilación, también servicios para mayores. El gasto total en pensiones (con viudedad, incapacidad y otras) es mayor: en el estudio de pensiones se usa esa cifra.</p></footer>`; }
+function govNote(){ return `<footer class="method"><details class="srcs"><summary>De dónde salen los datos</summary><p>Eurostat: gasto de las administraciones públicas por funciones (clasificación COFOG, 1995–${GOV.years[GOV.years.length-1]}), cuentas públicas, deuda pública, PIB, gasto y beneficiarios de pensiones, población y proyecciones de población (EUROPOP2023). Las administraciones públicas incluyen Estado, comunidades autónomas, ayuntamientos y Seguridad Social, sin contar dos veces lo que se transfieren entre ellas.</p></details><p><b>Cómo leerlos.</b> «Jubilación» es la función de vejez de COFOG: sobre todo pensiones de jubilación, también servicios para mayores. El gasto total en pensiones (con viudedad, incapacidad y otras) es mayor: en el estudio de pensiones se usa esa cifra.</p></footer>`; }
 
 // ---------- estudio: pensiones ----------
 let PSC={emp:0,ben:0,cov:0};
@@ -3345,7 +3345,7 @@ async function topicDecorate(id){
   // siguiente paso y cómo se mide
   const m=view.querySelector("footer.method");
   const ns=el("div","nextstep",`<span class="t"><b>Siguiente paso:</b> ${T.next[0]}</span><a class="gol" href="${T.next[1]()}">${T.next[1]().startsWith("/preguntasstudios")?"Leer el estudio":"Abrir en el laboratorio"} →</a>`);
-  if(m){ m.before(ns); const d=el("details","howm"); d.innerHTML="<summary>Cómo se mide: fuentes y notas</summary>"; m.before(d); d.appendChild(m); } else view.appendChild(ns);
+  if(m){ m.before(ns); const d=el("details","howm"); d.innerHTML="<summary>Cómo se mide: fuentes y notas</summary>"; m.before(d); d.appendChild(m); m.querySelectorAll("details.srcs").forEach(s=>{ s.open=true; }); } else view.appendChild(ns);
   try{ glossify(view); }catch(e){ console.error(e); }
   try{ const E=await essentials(id); const g=document.getElementById("essg"); if(g) g.innerHTML=E.map(([n,t,svg,s])=>`<div class="cardx qcard"><div class="n">${n}</div><div class="t">${esc(t)}</div>${svg||""}<div class="s">${s}</div></div>`).join(""); }catch(e){ console.error(e); }
 }
