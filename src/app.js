@@ -5625,14 +5625,14 @@ async function renderInicio(){
     <h1 class="qh-q">Los datos, <em>datos son.</em></h1>
     <p class="qh-a">El tope del alquiler, el salario mínimo, la rebaja del IVA de la comida. Leyes que te tocan el bolsillo y que casi nadie comprobó. Aquí sí, y tú también puedes.</p>
     <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
-    <div class="qcar" id="qcar"></div>
-    <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
+    <div class="qcar" id="qcar"></div></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que dicen los datos</h2><div class="qg" id="qg"><p class="loading">Cargando…</p></div>
     <p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
   <section class="ed-sec ed-two"><a class="ed-ill" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
     <div><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rowsAll().length)} municipios, si la relación aguanta entre municipios parecidos y qué pasó antes y después de una ley.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></div></section>
-  <section class="ed-sec ed-two"><div><div class="ed-k">O mira un lugar concreto</div><h2 class="ed-h2" style="font-size:clamp(24px,2.8vw,30px)">¿Cómo sale tu municipio en estas preguntas?</h2><div class="ed-ill sm" aria-hidden="true">${tIll("municipio")}</div></div>
-    <div>${bigSearchHTML("q2","Escribe un municipio…")}${exampleChips()}</div></section>
+  <section class="ed-sec"><div class="ed-two"><div><div class="ed-k">O mira un lugar concreto</div><h2 class="ed-h2" style="font-size:clamp(24px,2.8vw,30px)">¿Cómo sale tu municipio en estas preguntas?</h2></div>
+    <div>${bigSearchHTML("q2","Escribe un municipio…")}${exampleChips()}</div></div>
+    <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   bindBig("q2");
@@ -5644,10 +5644,25 @@ async function renderInicio(){
     ["quien-gobierna","¿Importa quién gobierna tu ayuntamiento?","No","Gane el PP o el PSOE por poco, pasa lo mismo."],
     ["ave","¿Cambia algo cuando llega el AVE?","Poco","Los pueblos con estación no se distinguen de sus gemelos."]];
   const car=document.getElementById("qcar");
-  if(car) CAR.forEach(([id,q,v,c])=>{ const a=add(car,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i";
-    a.insertAdjacentHTML("beforeend",`<div class="qcar-q">${esc(q)}</div>`);
-    const ic=illCard(id); if(ic) a.appendChild(ic);
-    a.insertAdjacentHTML("beforeend",`<div class="qcar-v">${esc(v)}</div><div class="qcar-c">${esc(c)}</div>`); });
+  if(car){
+    const stage=add(car,"div"); stage.className="qcar-stage";
+    const nav=add(car,"div"); nav.className="qcar-nav";
+    const items=CAR.map(([id,q,v,c],n)=>{ const a=add(stage,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i"+(n?"":" on"); a.setAttribute("aria-hidden",n?"true":"false");
+      const fig=add(a,"div"); fig.className="qcar-fig"; const ic=illCard(id); if(ic) fig.appendChild(ic);
+      a.insertAdjacentHTML("beforeend",`<div class="qcar-txt"><div class="qcar-q">${esc(q)}</div><div class="qcar-v">${esc(v)}</div><div class="qcar-c">${esc(c)}</div><div class="qcar-go">Ver la respuesta →</div></div>`);
+      return a; });
+    const dots=CAR.map((x,n)=>{ const b=add(nav,"button"); b.className="qcar-d"+(n?"":" on"); b.type="button";
+      b.setAttribute("aria-label","Análisis "+(n+1)+" de "+CAR.length+": "+x[1]); b.onclick=e=>{ e.preventDefault(); go(n); stop(); }; return b; });
+    let cur=0;
+    const go=n=>{ items[cur].classList.remove("on"); items[cur].setAttribute("aria-hidden","true"); dots[cur].classList.remove("on");
+      cur=(n+CAR.length)%CAR.length;
+      items[cur].classList.add("on"); items[cur].setAttribute("aria-hidden","false"); dots[cur].classList.add("on"); };
+    const stop=()=>{ if(QH_T){ clearInterval(QH_T); QH_T=null; } };
+    const start=()=>{ stop(); if(!matchMedia("(prefers-reduced-motion: reduce)").matches) QH_T=setInterval(()=>go(cur+1),6500); };
+    car.addEventListener("mouseenter",stop); car.addEventListener("focusin",stop);
+    car.addEventListener("mouseleave",start);
+    start();
+  }
   const L=qGet(), wide=view.clientWidth;
   // tarjetas: con imágenes estáticas no hace falta esperar al mapa
   const g=document.getElementById("qg"); g.innerHTML="";
