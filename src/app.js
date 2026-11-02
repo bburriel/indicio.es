@@ -1515,6 +1515,11 @@ function drawRel(){
   let mtxt="";
   if(mv&&(!S.minPop||(mv[F.pop]||0)>=S.minPop)&&!S.logX){ const pred=c.a+c.b*mv[F[x]], res=mv[F[y]]-pred;
     mtxt=`<div class="stat"><span class="k">${esc(mv[F.name])}, el último municipio que has visto</span><span class="v">Con su ${low(xl)} (${fx(mv[F[x]])}) le tocaría ${fy(pred)} de ${low(yl)}; tiene ${fy(mv[F[y]])}. <a href="#m${mv[F.code]}">Ver ficha</a></span></div>`; }
+  const compact=!!say.closest(".howm");   // dentro del panel del laboratorio, el veredicto, la escala y las cifras ya están arriba
+  if(compact){ say.innerHTML=`<div class="stat"><span class="k">Cuánto explica</span><span class="v">Las diferencias de ${low(xl)} explican el <b>${nf0.format(c.r*c.r*100)}${NB}%</b> de las diferencias de ${low(yl)} entre municipios. El resto depende de otras cosas.</span><div class="r2bar" aria-hidden="true"><span style="width:${(c.r*c.r*100).toFixed(1)}%"></span></div></div>
+    <div class="stat"><span class="k">¿Dependen de unos pocos casos extremos?</span><span class="v">${rho==null?"—":`Ordenando los municipios en vez de medir las cifras (ρ de Spearman) sale <b>${rFmt(rho)}</b>`} · ${rho!=null&&Math.abs(rho-c.r)>0.2?"bastante distinto de r: la relación depende mucho de unos pocos municipios grandes o extremos, o no es una línea recta.":"parecido a r: la relación no depende de unos pocos casos extremos."}</span></div>
+    ${mtxt}
+    <p class="muted" style="font-size:13.5px">${nf0.format(c.n)} municipios. ${S.weighted?"Cada municipio pesa según su población, así Madrid cuenta más que una aldea.":"Cada municipio cuenta igual, sea grande o pequeño."}</p>`; drawQuint(pts,x,y,xl,yl,fx,fy); drawOut(pts,c,x,y,xl,yl,fx,fy); return; }
   say.innerHTML=`<p class="big">${corrSentence(c.r,xl,yl)}</p>
     <div class="stat"><span class="k">Coeficiente de correlación (r)</span><span class="v"><b>${rFmt(c.r)}</b> · relación ${strength(a)}${c.r>=0.1?", en el mismo sentido":c.r<=-0.1?", en sentido contrario":""}</span>
       <div class="rscale" aria-hidden="true"><span class="ln"></span><span class="mk" style="left:${(c.r+1)/2*100}%"></span></div><div class="rscale-ends"><span>−1: opuestos</span><span>0: nada</span><span>+1: iguales</span></div></div>
@@ -1555,23 +1560,32 @@ function drawOut(pts,c,x,y,xl,yl,fx,fy){
   li(hi,`Más ${low(yl)} de lo esperado`); li(lo2,`Menos ${low(yl)} de lo esperado`);
 }
 
-function drawMatrix(){
+function drawMatrix(compact){
   const s=document.getElementById("cmat"); s.innerHTML="";
   const ks=MATRIX.filter(k=>F[k]!=null&&CATK[k]);
   const fk=JSON.stringify(EXF); if(MATC&&MATC._k!==fk) MATC=null;
   if(!MATC){ MATC={_k:fk}; for(let i=0;i<ks.length;i++) for(let j=i+1;j<ks.length;j++){ const c=wcorr(pairPts(ks[i],ks[j],{minPop:EXF.min>0||EXF.max<=1000?0:1000})); MATC[ks[i]+"|"+ks[j]]=MATC[ks[j]+"|"+ks[i]]=c?c.r:null; } }
-  add(s,"h2",null,"Todas las relaciones de un vistazo");
-  add(s,"div","txt",`<p>Cada casilla es la correlación entre dos datos en ${EXF.min>0||EXF.max<=1000?"los municipios de la selección":"los municipios de 1.000 habitantes o más"}. Ocre: van en el mismo sentido. Azul: en sentido contrario. Cuanto más intenso el color, más fuerte la relación. Pulsa una casilla para verla en el gráfico.</p>`);
+  let host=s;
+  if(compact){ const {x,y}=XS, cor=(k,o)=>{ const key=k+"|"+o; if(!(key in MATC)){ const c=F[k]!=null?wcorr(pairPts(k,o,{minPop:EXF.min>0||EXF.max<=1000?0:1000})):null; MATC[key]=MATC[o+"|"+k]=c?c.r:null; } return MATC[key]; },
+    near=k=>ks.filter(o=>o!==k&&o!==x&&o!==y&&!isTrivial(k,o)&&cor(k,o)!=null).map(o=>[o,MATC[k+"|"+o]]).sort((p,q)=>Math.abs(q[1])-Math.abs(p[1])).slice(0,5);
+    const col2=k=>`<div><h3>${esc(cap(low(labK(k))))}</h3><ul class="near">${near(k).map(([o,v])=>`<li><button type="button" data-a="${k}" data-b="${o}"><span class="nm">${esc(cap(low(labK(o))))}</span><span class="bar"><i class="${v>0?"pos":"neg"}" style="width:${(Math.abs(v)*100).toFixed(0)}%"></i></span><span class="v">${rFmt(v)}</span></button></li>`).join("")}</ul></div>`;
+    add(s,"h2",null,"Con qué más se relacionan estos dos datos");
+    add(s,"div","txt",`<p>Los cinco datos que más van con cada uno, en los municipios de 1.000 habitantes o más. Pulsa uno para ver ese cruce. Si alguno se parece mucho a lo que estás comparando, puede estar detrás de la relación.</p>`);
+    add(s,"div","nearg",col2(x)+col2(y));
+    const dd=add(s,"details","howm2"); dd.innerHTML="<summary>Tabla de todas las relaciones</summary>"; host=dd; }
+  else add(s,"h2",null,"Todas las relaciones de un vistazo");
+  add(host,"div","txt",`<p>Cada casilla es la correlación entre dos datos en ${EXF.min>0||EXF.max<=1000?"los municipios de la selección":"los municipios de 1.000 habitantes o más"}. Ocre: van en el mismo sentido. Azul: en sentido contrario. Cuanto más intenso el color, más fuerte la relación. Pulsa una casilla para verla en el gráfico.</p>`);
   const col=v=>{ if(v==null) return css("--nodata"); const t=Math.min(1,Math.abs(v)); return d3.interpolateRgb(css("--div-mid"),v>0?css("--rust"):css("--slate"))(Math.pow(t,0.8)); };
   const ink=v=>v!=null&&Math.abs(v)>0.55?css("--on-dark"):css("--ink");
   const sh=k=>({renta:"Renta",pobreza:"Pobreza",gini:"Desigualdad",pensiones:"Pensiones",paro:"Paro",paroReg:"Paro registrado",migExt:"Llegadas del extranjero",migInt:"Saldo con España",superiores:"Estudios superiores",alquiler:"Alquiler",noPrincipal:"Viviendas vacías o 2.ª",vt:"Pisos turísticos",varPob:"Crecimiento",edad:"Edad media",extr:"Extranjeros",solos:"Viven solos",part:"Participación",pp:"Voto PP",psoe:"Voto PSOE",vox:"Voto Vox",sumar:"Voto Sumar"}[k]||labK(k));
   const g=s;
-  const m=add(g,"div","matrix");
+  const m=add(host,"div","matrix");
   m.innerHTML=`<table><thead><tr><th></th>${ks.map(k=>`<th><span>${esc(sh(k))}</span></th>`).join("")}</tr></thead><tbody>${ks.map(a=>`<tr><th>${esc(sh(a))}</th>${ks.map(b=>{ if(a===b) return `<td class="self" style="background:var(--band)"></td>`; const v=MATC[a+"|"+b]; return `<td data-a="${a}" data-b="${b}" style="background:${col(v)};color:${ink(v)}" title="${esc(labK(a))} y ${esc(labK(b))}: r = ${v==null?"—":rFmt(v)}">${v==null?"":String(Math.round(v*10)).replace("-","−")}</td>`; }).join("")}</tr>`).join("")}</tbody></table>`;
   add(m,"figcaption",null,"Las cifras son la correlación multiplicada por 10 y redondeada: 9 es una relación casi perfecta y 0, ninguna. Pasa por encima de una casilla para ver el valor exacto.");
   m.querySelectorAll("td[data-a]").forEach(td=>td.addEventListener("click",()=>{ navTo("relaciones-"+td.dataset.a+"-"+td.dataset.b); window.scrollTo({top:0}); }));
   const pairs=[]; for(let i=0;i<ks.length;i++) for(let j=i+1;j<ks.length;j++){ const v=MATC[ks[i]+"|"+ks[j]]; if(v!=null&&!isTrivial(ks[i],ks[j])) pairs.push([ks[i],ks[j],v]); }
   pairs.sort((p,q)=>Math.abs(q[2])-Math.abs(p[2]));
+  if(compact) return;
   const L=add(g,"div","lista"); L.style.maxWidth="720px"; L.style.marginTop="18px"; L.innerHTML=`<h3>Las relaciones más fuertes</h3><ol class="pairs">${pairs.slice(0,10).map(([a,b,v])=>`<li><a href="#relaciones-${a}-${b}">${esc(labK(a))} ${v>0?"y":"frente a"} ${low(esc(labK(b)))}<small class="muted" style="display:block;font-size:13px">${v>0?"más de uno, más del otro":"más de uno, menos del otro"}</small></a><span class="v">${rFmt(v)}</span></li>`).join("")}</ol>`;
   add(L,"figcaption",null,"Se omiten pares que miden casi lo mismo, como la edad media y el porcentaje de mayores, o el voto a dos partidos, que se reparten el mismo total.");
 }
@@ -3878,7 +3892,7 @@ function exCruce(out){
   const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" aria-label="¿Aguanta la relación?">
     <div class="czv" id="czl"></div>
     <div class="czg">
-      <div class="czb czb-c"><h3>¿Aguanta?</h3><p class="czlead">Compara solo municipios iguales en…</p><div class="czchips" id="cztags"></div><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div></div>
+      <div class="czb czb-c"><h3>Compara solo municipios parecidos</h3><p class="czlead">Marca en qué deben parecerse para descontar su efecto en la relación.</p><div class="czchips" id="cztags"></div><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div></div>
       <div class="czb czb-e"><h3 id="czeh">En cifras</h3><div id="czeur"></div></div>
     </div>
     <div class="czgo"><button type="button" class="czcard" id="czmore" aria-expanded="false" aria-controls="lbcausal"><b class="t">Entender esta relación a fondo ↓</b><span>Las pruebas una a una, municipios gemelos y provincia a provincia</span></button><a class="czcard" href="/laboratorio/antes/"><b>Acercarse a una causa →</b><span>Que una relación aguante no la convierte en causa: hace falta un antes y un después</span></a></div>
@@ -3887,9 +3901,9 @@ function exCruce(out){
   document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.querySelector(".t").textContent=o?"Ocultar el detalle ↑":"Entender esta relación a fondo ↓"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
   const more=document.getElementById("lbmore");
   more.innerHTML=`<details class="howm"><summary>Más números de esta relación: por grupos, los que se salen de la norma y todas las relaciones</summary><div class="xsay" id="csay"></div><section class="finding" id="cquint"></section><section class="finding" id="cout"></section><section class="finding" id="cmat"></section><section class="finding" id="ccav"></section></details>`;
-  drawRel(); drawMatrix(); drawCaveats();
+  drawRel(); drawMatrix(true); drawCaveats();
   const cm=document.getElementById("cmat");
-  cm.querySelectorAll("td[data-a]").forEach(td=>{ const n=td.cloneNode(true); td.replaceWith(n); n.addEventListener("click",()=>{ EX.d=[n.dataset.a,n.dataset.b,...EX.d.filter(k=>k!==n.dataset.a&&k!==n.dataset.b)].slice(0,6); EX.c=[]; exUpdate(); window.scrollTo({top:0}); }); });
+  cm.querySelectorAll("[data-a]").forEach(td=>{ const n=td.cloneNode(true); td.replaceWith(n); n.addEventListener("click",()=>{ EX.d=[n.dataset.a,n.dataset.b,...EX.d.filter(k=>k!==n.dataset.a&&k!==n.dataset.b)].slice(0,6); EX.c=[]; exUpdate(); window.scrollTo({top:0}); }); });
   cm.querySelectorAll(".pairs a").forEach(a=>{ const m=a.getAttribute("href").match(/^#relaciones-(\w+)-(\w+)$/); if(m) a.setAttribute("href",exHash({v:"cruce",d:[m[1],m[2]],c:[]})); });
   exCausal(x,y);
   czRefresh(false);
@@ -3902,7 +3916,7 @@ const czPos=a=>a<.1?a/.1*25:a<.3?25+(a-.1)/.2*25:a<.5?50+(a-.3)/.2*25:Math.min(1
 function czVerdict(r,adj){
   const box=document.getElementById("czl"); if(!box||!CZ) return; const a=Math.abs(r), i=a<.1?0:a<.3?1:a<.5?2:3;
   const T=["Casi no hay relación","Relación débil","Relación moderada","Relación fuerte"], L=["Ninguna","Débil","Moderada","Fuerte"];
-  box.innerHTML=`<h3>¿Hay relación?</h3>
+  box.innerHTML=`<h3>La relación</h3>
     <div class="czvh"><em>${T[i]}</em><span class="czr">r = ${rFmt(r)}${adj?" <small>tras descontar</small>":""}</span></div>
     <div class="czscale" role="img" aria-label="${T[i]}, r = ${rFmt(r)}"><div class="seg"><i></i><i></i><i></i><i></i><span class="czmk" style="left:${czPos(a).toFixed(1)}%"></span></div><div class="labs">${L.map(l=>`<span>${l}</span>`).join("")}</div></div>
     ${CZ.lev!=null?`<p class="czpr">Pruebas a fondo: <b>${CZLEV[CZ.lev][0]}</b> <span class="muted">· supera ${CZ.passed} de ${CZ.total}</span></p>`:""}`;
@@ -3912,15 +3926,17 @@ function czSusNote(k){
   const move=p!=null?` Descontada sola, la relación pasa de r = ${rFmt(CZ.base.r)} a r = ${rFmt(p)}.`:"";
   const why=k==="prov"?`Comparar dentro de cada provincia quita lo que es común a cada zona (clima, leyes autonómicas, economía), así que puede cambiar mucho la relación. Si cae, buena parte era la diferencia entre unas zonas de España y otras.`
     :`Puede que ${cn} influya a la vez en ${xl} y en ${yl}, y entonces explicaría parte de lo que ves.`;
-  return `<div class="czn2 sus"><b>Principal sospechoso.</b> Es lo que más cambia la relación.${move} ${why} Es una pista, no un veredicto: la relación puede caer porque era falsa o porque descontar esto se lleva parte de lo real.</div>`;
+  return `<b>Principal sospechoso.</b> Es lo que más cambia la relación.${move} ${why} Es una pista, no un veredicto: la relación puede caer porque era falsa o porque descontar esto se lleva parte de lo real.`;
 }
+// texto del aviso según la «i» (clave «control|risk» o «control|sus»)
+function czTip(id){ const [k,t]=id.split("|"), rk=t==="risk"?ctrlRisk(CZ.x,CZ.y,k):null; return t==="risk"?(rk?`<b>Cuidado con descontar ${CNAME[k]}.</b> ${rk.m}`:""):czSusNote(k); }
 // avisos bajo los controles: salen solos al marcar la casilla o al pulsar la «i»
 function czNotes(){
   const box=document.getElementById("cznotes"), tg=document.getElementById("cztags"); if(!box||!tg||!CZ) return; const {x,y}=CZ, cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]);
   const ks=[...CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y),...cs.filter(k=>!CKNOWN[k])]; let h="";
   ks.forEach(k=>{ const on=cs.includes(k), rk=ctrlRisk(x,y,k);
     if(rk&&(on||CZI.has(k+"|risk"))) h+=`<div class="czn2 risk"><b>Cuidado con descontar ${CNAME[k]}.</b> ${rk.m}</div>`;
-    if(k===CZ.suspect&&(on||CZI.has(k+"|sus"))) h+=czSusNote(k); });
+    if(k===CZ.suspect&&(on||CZI.has(k+"|sus"))) h+=`<div class="czn2 sus">${czSusNote(k)}</div>`; });
   box.innerHTML=h;
   tg.querySelectorAll(".czi").forEach(b=>{ const k=b.dataset.i.split("|")[0]; b.setAttribute("aria-expanded",String(cs.includes(k)||CZI.has(b.dataset.i))); });
 }
@@ -3938,7 +3954,9 @@ function czRefresh(animate){
     +cs.filter(k=>!CKNOWN[k]).map(k=>chip(k,low(labK(k)),true)).join("")+` <button type="button" class="czadd" id="czadd">+ otra variable</button>`;
   document.getElementById("czadd").addEventListener("click",e=>openPicker(e.currentTarget,{current:null,excl:[x,y,...EX.c],onPick:v=>{ EX.c=[...EX.c.filter(c=>c!==v),v]; exSetHash(); czRefresh(true); }}));
   tg.querySelectorAll("button.czpick").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.k, on=b.getAttribute("aria-pressed")==="true"; EX.c=on?EX.c.filter(c=>c!==k):[...EX.c.filter(c=>c!==k),k]; exSetHash(); czRefresh(true); }));
-  tg.querySelectorAll("button.czi").forEach(b=>b.addEventListener("click",()=>{ const id=b.dataset.i; CZI.has(id)?CZI.delete(id):CZI.add(id); czNotes(); }));
+  tg.querySelectorAll("button.czi").forEach(b=>{ const show=()=>tipShow(b,czTip(b.dataset.i));
+    b.addEventListener("mouseenter",show); b.addEventListener("focus",show); b.addEventListener("mouseleave",tipHide); b.addEventListener("blur",tipHide);
+    b.addEventListener("click",e=>{ e.stopPropagation(); tipHide(); const id=b.dataset.i; CZI.has(id)?CZI.delete(id):CZI.add(id); czNotes(); }); });
   if(foc){ const f=tg.querySelector(`[data-k="${foc}"]`); if(f) f.focus(); }
   // gráfico
   const note=document.getElementById("ctlnote"), plot=document.getElementById("cplot");

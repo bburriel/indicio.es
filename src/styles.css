@@ -1286,3 +1286,15 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
   .czb-e{border-left:0; padding-left:0; border-top:1px solid var(--rule); padding-top:18px}
   .czbig{font-size:34px} .czvh em{font-size:23px}
 }
+
+/* «Más números» del laboratorio: lo que no repite el panel de arriba */
+.r2bar{height:8px; border-radius:4px; background:var(--band); margin-top:8px; max-width:320px; overflow:hidden} .r2bar span{display:block; height:100%; background:var(--brand); border-radius:4px}
+.nearg{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 36px; margin-top:12px}
+.nearg h3{font-family:"Newsreader",var(--serif,Georgia,serif); font-weight:500; font-size:18px; margin:0 0 6px}
+.near{list-style:none; margin:0; padding:0}
+.near button{display:grid; grid-template-columns:minmax(0,1fr) 90px 44px; align-items:center; gap:10px; width:100%; padding:7px 0; border:0; border-bottom:1px solid var(--rule); background:none; font:inherit; font-size:14.5px; color:var(--ink); text-align:left; cursor:pointer}
+.near button:hover .nm{color:var(--brand); text-decoration:underline}
+.near .bar{height:8px; border-radius:4px; background:var(--band); overflow:hidden} .near .bar i{display:block; height:100%; border-radius:4px} .near .bar i.pos{background:var(--rust)} .near .bar i.neg{background:var(--slate)}
+.near .v{text-align:right; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.howm2{margin-top:18px} .howm2 summary{cursor:pointer; font-size:14.5px; color:var(--ink-2)}
+@media (max-width:720px){ .nearg{grid-template-columns:1fr} }
