@@ -84,14 +84,6 @@ const proj=(W,H,pad)=>ctx.d3.geoConicConformalSpain().fitExtent([[pad[0],pad[1]]
 const outline=(P,stroke=LIGHT)=>{ const g=d3.geoPath(P); return `<path d="${g(topojson.mesh(TOPO,TOPO.objects.autonomous_regions,(a,b)=>a===b)).replace(/\d+\.\d+/g,m=>r1(+m))}" fill="none" stroke="${stroke}" stroke-width="1"/>`; };
 const mrows=f=>ROWS.filter(f);
 
-// 1. Cerca de la ciudad: una cúpula de puntos; el radio es la distancia a la ciudad y el color, si el pueblo gana o pierde vecinos
-{ const [W,H]=B, cx=W/2, cy=H+30, R=d3.scaleLinear().domain([0,180]).range([40,700]).clamp(true);
-  let s=svgOpen(W,H); [25,50,75,100,125,150].forEach(k=>{ s+=`<circle cx="${cx}" cy="${cy}" r="${r1(R(k))}" fill="none" stroke="${LIGHT}" stroke-width="1" stroke-dasharray="3 5"/>`; });
-  const col=v=>v>15?WINE:v>0?ROSE:v>-25?LINE:DARK;
-  mrows(r=>r[F.distCiudad]!=null&&r[F.var0525]!=null).sort((a,b)=>Math.abs(a[F.var0525])-Math.abs(b[F.var0525])).forEach(r=>{ const a=Math.PI*(1.04+0.92*hash(r[F.code])), d=R(r[F.distCiudad]+hash(r[F.code],7)*4);
-    const x=cx+Math.cos(a)*d, y=cy+Math.sin(a)*d; if(y>-4&&x>-4&&x<W+4) s+=circ(x,y,1.5,col(r[F.var0525])); });
-  add("cerca-ciudad","Cada punto es un municipio; cuanto más lejos del centro, más lejos de una ciudad. En granate, los que ganan vecinos; en gris, los que los pierden",s+"</svg>"); }
-
 // 2. Pisos turísticos: un horizonte de barras, una por municipio de cada provincia en orden; la altura es el porcentaje de viviendas que no son residencia habitual
 { const [W,H]=B, rs=d3.groups(mrows(r=>r[F.noPrincipal]!=null&&r[F.pop]>=500),r=>r[F.code].slice(0,2)).sort((a,b)=>a[0]<b[0]?-1:1).flatMap(([p,g])=>{ g.sort((a,b)=>a[F.noPrincipal]-b[F.noPrincipal]); const L=[],R=[]; g.forEach((r,i)=>(i%2?L:R).push(r)); return [...L,...R.reverse()]; }), n=rs.length, w=(W-40)/n, Y=d3.scaleLinear().domain([0,95]).range([0,H-70]);
   let s=svgOpen(W,H); rs.forEach((r,i)=>{ const v=r[F.noPrincipal], h=Y(v); s+=rect(20+i*w,H-24-h,w+.25,h,v>65?WINE:v>45?ROSE:LINE); });

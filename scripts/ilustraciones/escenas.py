@@ -9,21 +9,6 @@ def esc(id,label,focus=600):
     return deco
 def dash(svgpath,d="6 6"): return svgpath.replace('stroke-linecap','stroke-dasharray="'+d+'" stroke-linecap')
 
-@esc("cerca-ciudad","Un pueblo y una ciudad unidos por una carretera, con anillos de distancia",600)
-def _(p):
-    o=p.sun(120,64,34)+p.cloud(420,74,1.1)+p.cloud(760,50,.8)+p.birds(560,80)
-    o+=p.skyline(240,"blue2",7,hmin=70,hmax=150,o=.6)+p.hills(250,"sage2",16,seed=1)
-    o+="".join(dash(p.curve(f"M{980-r} 360a{r} {r*.55} 0 0 1 {2*r} 0",.9,.45),"5 8") for r in (180,300,420,540))
-    for i,(x,h,c) in enumerate([(820,190,"wine"),(905,260,"blue"),(985,210,"och2"),(1065,280,"rose"),(1150,180,"terra")]):
-        o+=p.building(x,320,84,h,c,max(2,h//52),2,"rect","cream" if c!="och2" else "sage","none",i+3,plants=.15,laundry=0)
-    o+=p.hills(300,"sage",12,seed=3)
-    o+=p.wash("M0 350 C240 334 430 306 610 296 C760 288 840 300 860 312 L860 322 C840 312 760 300 610 308 C430 318 240 352 0 362z","#5a554e",.85,0,0)
-    o+="".join(p.line([(70+i*95,346-i*7),(104+i*95,343-i*7)],1.8,.85,False,col=C["cream"]) for i in range(8))
-    for x,w,h in [(30,70,52),(108,58,44),(172,76,56),(256,62,46)]: o+=p.house(x,322,w,h,"cream","terra")
-    o+=p.church(330,322,40,130)+p.tree(400,322,.8,"cypress")+p.tree(14,326,.7)
-    o+=p.car(560,306,"wine",1.1)
-    return o
-
 @esc("pisos-turisticos","Bloques de pisos con maletas en los portales y cajetines de llaves",620)
 def _(p):
     o=p.cloud(1080,46,.8)
