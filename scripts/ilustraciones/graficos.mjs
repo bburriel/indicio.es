@@ -178,14 +178,6 @@ const mrows=f=>ROWS.filter(f);
 { const R=geoRows(30,150,r=>(r[F.pop]||0)*(r[F.paroReg]||0)/100); R.forEach((r,i)=>{ r.marks=undefined; r.hi=i===24||i===27; });
   add("paro-sur","España en franjas de norte a sur; cada pico es gente en paro: el sur sobresale",olas(...B,R,GEO)); }
 
-// 15. IVA de los alimentos: cuánto ha subido cada alimento desde 2019; en granate, los que tuvieron rebaja del IVA
-{ const [W,H]=B, Pd=ALI.subclases.periodos, i0=Pd.indexOf("2019M01"), IVA=/^(Pan y|Harina|Leche entera|Leche desnatada|Queso|Huevos|Frutas|Cítricos|Hortalizas|Legumbres|Patatas|Aceites vegetales|Macarrones)/;
-  const P=Object.entries(ALI.subclases.s).filter(([k,a])=>a[i0]&&a[last(a)]).map(([k,a])=>({d:a[last(a)]/a[i0]-1,hi:IVA.test(k)})).sort((a,b)=>a.d-b.d);
-  const w=(W-60)/P.length, Y=d3.scaleLinear().domain([0,d3.max(P,p=>p.d)]).range([0,H-70]);
-  let s=svgOpen(W,H); P.forEach((p,i)=>{ const x=30+(i+.5)*w, y=H-24-Y(Math.max(0,p.d)); s+=line(x,H-24,x,y,p.hi?WINE:LINE,p.hi?2:1.4)+circ(x,y,p.hi?5:4,p.hi?WINE:PAPER,p.hi?"":` stroke="${DARK}" stroke-width="1.3"`); });
-  s+=line(20,H-24,W-20,H-24,INK,1);
-  add("iva-alimentos","Cuánto ha subido cada alimento desde 2019, un alfiler por alimento; en granate, los que tuvieron rebaja del IVA",s+"</svg>"); }
-
 // 16. Vivienda protegida: viviendas que se empiezan cada año y, en granate, cuántas son protegidas
 { const [W,H]=B, V=J("vivienda.json").es, Y0=Object.keys(V.iniciadas).filter(y=>V.protegidas[y]!=null), w=(W-60)/Y0.length, Y=d3.scaleLinear().domain([0,d3.max(Y0,y=>V.iniciadas[y])]).range([0,H-60]);
   let s=svgOpen(W,H); Y0.forEach((y,i)=>{ const x=30+i*w; s+=rect(x+w*.1,H-24-Y(V.iniciadas[y]),w*.8,Y(V.iniciadas[y]),LIGHT)+rect(x+w*.1,H-24-Y(V.protegidas[y]),w*.8,Y(V.protegidas[y]),WINE); });

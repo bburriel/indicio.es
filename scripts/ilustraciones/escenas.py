@@ -234,13 +234,6 @@ def _(p):
     o+=p.arrow([(60,330),(200,330)],"wine",2)+f'<text x="60" y="352" font-family="Georgia,serif" font-style="italic" font-size="13" fill="{INK}">norte</text><text x="1140" y="352" text-anchor="end" font-family="Georgia,serif" font-style="italic" font-size="13" fill="{INK}">sur</text>'
     return o
 
-@esc("iva-alimentos","Una cesta de la compra con pan, leche y fruta junto a un ticket",600)
-def _(p):
-    o=p.cloud(200,60,.9)+p.sun(1080,60,30)+p.ground(320,c="sand")
-    o+=p.rwash(0,300,1200,20,"sand2",.6)+basket(p,430,320,240,100)+receipt(p,730,110,120,180,7)
-    o+=p.tree(200,322,1)+p.tree(1050,322,.9)
-    return o
-
 @esc("vivienda-protegida","Una grúa levanta un bloque de viviendas protegidas junto a la ciudad",600)
 def _(p):
     o=p.cloud(240,56,.9)+p.skyline(250,"blue2",17,hmin=60,hmax=140,o=.5)
