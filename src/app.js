@@ -3316,7 +3316,7 @@ function meStrip(id){
     <tr class="me"><td><a href="#m${r[F.code]}"><b>${esc(dispName(r[F.name]))}</b></a></td>${T.me.map(k=>`<td class="r num"><b>${val(r,k)}</b></td>`).join("")}</tr>
     ${r2?`<tr class="m2"><td><a href="#m${r2[F.code]}">${esc(dispName(r2[F.name]))}</a></td>${T.me.map(k=>`<td class="r num">${val(r2,k)}</td>`).join("")}</tr>`:""}
     <tr class="es"><td class="muted">España</td>${T.me.map(k=>`<td class="r num muted">${fmtK(k)(esRef(k))}</td>`).join("")}</tr></tbody></table></div>
-    ${r2?`<a class="gol" style="font-size:13.5px" href="#comparar-${r[F.code]}-${r2[F.code]}">⇄ Ver los dos lado a lado →</a>`:""}</div>`;
+    ${r2?`<a class="gol" style="font-size:13.5px" href="#comparar-${r[F.code]}-${r2[F.code]}">Comparar ${esc(dispName(r[F.name]))} y ${esc(dispName(r2[F.name]))} →</a>`:""}</div>`;
   document.getElementById("mschg").addEventListener("click",e=>{ e.stopPropagation(); myPop(); });
 }
 
@@ -5371,7 +5371,7 @@ function myPop(){
     <div class="mp-sep"><b>Compararlo con</b> <span class="muted">(opcional)</span></div>
     ${myOk(MUN2)?`<div class="mp-cur"><span class="dot2"></span><b>${esc(myName(MUN2))}</b><small>${esc(provShort(PROVS[BYCODE.get(MUN2)[F.prov]]))}</small><a class="gol" href="#m${MUN2}">Ficha</a><button type="button" data-rm="2">Quitar</button></div>`:""}
     ${myOk(lastMun)?sbox("mpq2",myOk(MUN2)?"Cambiar por otro…":"Otro municipio para comparar…"):`<p class="muted" style="font-size:13px;margin:4px 0 0">Elige primero el tuyo.</p>`}
-    ${myOk(lastMun)&&myOk(MUN2)?`<a class="mp-cmp" href="#comparar-${lastMun}-${MUN2}">⇄ Ver los dos lado a lado →</a>`:""}`;
+    ${myOk(lastMun)&&myOk(MUN2)?`<a class="mp-cmp" href="#comparar-${lastMun}-${MUN2}">Comparar ${esc(myName(lastMun))} y ${esc(myName(MUN2))} →</a>`:""}`;
     p.querySelector(".mp-x").addEventListener("click",()=>p.remove());
     p.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{ setMyMun(null,{which:+b.dataset.rm}); draw(); }));
     p.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>p.remove()));
