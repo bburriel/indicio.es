@@ -5647,20 +5647,54 @@ let QH_T=null;
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
   // cabecera: qué hacemos, en una frase, y un solo gráfico de análisis (la nube de municipios del campo)
-  view.innerHTML=`<section class="qh qh-claim"><div class="kk2">Datos públicos de los ${nf0.format(rowsAll().length)} municipios de España</div>
-    <h1 class="qh-q">Preguntas sobre cómo vivimos, <em>respondidas con datos</em></h1>
-    <p class="qh-a">Cogemos preguntas reales —¿se vacía el campo?, ¿encarecen el alquiler los pisos turísticos?— y las respondemos con datos públicos, municipio a municipio y con el método a la vista. Y si tienes otra, en el laboratorio compruebas tú si una relación aguanta y qué pasó antes y después de una ley.</p>
+  view.innerHTML=`<section class="qh qh-claim qh-short"><div class="kk2">Cifras públicas de los ${nf0.format(rowsAll().length)} municipios de España</div>
+    <h1 class="qh-q">Los datos, <em>datos son.</em></h1>
+    <p class="qh-a">El tope del alquiler, el salario mínimo, la rebaja del IVA de la comida. Leyes que te tocan el bolsillo y que casi nadie comprobó. Aquí sí, y tú también puedes.</p>
     <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
-    <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
+    <div class="qcar" id="qcar"></div></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que dicen los datos</h2><div class="qg" id="qg"><p class="loading">Cargando…</p></div>
     <p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
   <section class="ed-sec ed-two"><a class="ed-ill" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
     <div><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rowsAll().length)} municipios, si la relación aguanta entre municipios parecidos y qué pasó antes y después de una ley.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></div></section>
-  <section class="ed-sec ed-two"><div><div class="ed-k">O mira un lugar concreto</div><h2 class="ed-h2" style="font-size:clamp(24px,2.8vw,30px)">¿Cómo sale tu municipio en estas preguntas?</h2><div class="ed-ill sm" aria-hidden="true">${tIll("municipio")}</div></div>
-    <div>${bigSearchHTML("q2","Escribe un municipio…")}${exampleChips()}</div></section>
+  <section class="ed-sec"><div class="ed-two"><div><div class="ed-k">O mira un lugar concreto</div><h2 class="ed-h2" style="font-size:clamp(24px,2.8vw,30px)">¿Cómo sale tu municipio en estas preguntas?</h2></div>
+    <div>${bigSearchHTML("q2","Escribe un municipio…")}${exampleChips()}</div></div>
+    <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   bindBig("q2");
+  // carrusel de la cabecera: el gráfico de cada análisis con su conclusión en una línea
+  const CAR=[["tope-cataluna","¿Frenó el tope de Cataluña el precio del alquiler?","Frenó la subida, no el precio","Sin el tope habría subido un 3,7 %; subió un 3,1 %. Unos 7 € al mes en un piso de Barcelona."],
+    ["reforma-laboral","¿Costó empleo la reforma laboral?","La temporalidad se desplomó y el empleo aguantó","Cayó unos 30 puntos en toda España, y los municipios que más vivían del contrato temporal no perdieron más empleo que los demás."],
+    ["iva-alimentos","¿Llegó al ticket la rebaja del IVA de los alimentos?","Sí, y al revés también","En enero de 2023 más del 80 % de la rebaja acabó en el precio; cuando el IVA volvió, en 2025, los precios subieron en la misma medida."],
+    ["precio-alimentos","¿Cuánta comida compra hoy un sueldo?","Un 12 % menos que antes de la pandemia","Desde 2019 la comida ha subido un 38 % y el sueldo medio un 22 %: con el mismo dinero, la cesta da para menos."],
+    ["quien-gobierna","¿Importa quién gobierna tu ayuntamiento?","Menos de lo que se supone","Donde el PP ganó por poco y donde ganó el PSOE por poco, el paro, la renta y la población siguieron el mismo camino."],
+    ["ave","¿Cambia algo cuando llega el AVE?","Casi nada, por ahora","A dos y a cuatro años, los municipios con estación nueva apenas se distinguen de sus gemelos sin ella."]];
+  const car=document.getElementById("qcar");
+  if(car){
+    const stage=add(car,"div"); stage.className="qcar-stage";
+    const nav=add(car,"div"); nav.className="qcar-nav";
+    // ilustración propia del carrusel (c-<id>.svg, 1000×500): ni recortada como en las
+    // tarjetas ni desbordada como la banda de cabecera. La genera ILL_CAR=1 en graficos.mjs.
+    const illFull=id=>{ const d=el("div"); d.className="qill";
+      const im=el("img"); im.src="/art/il/c-"+id+".svg"; im.width=1000; im.height=500; im.alt=""; im.loading="lazy"; im.decoding="async"; im.className="il il-c";
+      d.appendChild(im); return d; };
+    const items=CAR.map(([id,q,v,c],n)=>{ const a=add(stage,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i"+(n?"":" on"); a.setAttribute("aria-hidden",n?"true":"false");
+      a.insertAdjacentHTML("beforeend",`<div class="qcar-q">${esc(q)}</div>`);
+      const fig=add(a,"div"); fig.className="qcar-fig"; const ic=illFull(id)||illCard(id); if(ic) fig.appendChild(ic);
+      a.insertAdjacentHTML("beforeend",`<div class="qcar-txt"><div class="qcar-v">${esc(v)}</div><div class="qcar-c">${esc(c)}</div><div class="qcar-go">Ver la respuesta →</div></div>`);
+      return a; });
+    const dots=CAR.map((x,n)=>{ const b=add(nav,"button"); b.className="qcar-d"+(n?"":" on"); b.type="button";
+      b.setAttribute("aria-label","Análisis "+(n+1)+" de "+CAR.length+": "+x[1]); b.onclick=e=>{ e.preventDefault(); go(n); stop(); }; return b; });
+    let cur=0;
+    const go=n=>{ items[cur].classList.remove("on"); items[cur].setAttribute("aria-hidden","true"); dots[cur].classList.remove("on");
+      cur=(n+CAR.length)%CAR.length;
+      items[cur].classList.add("on"); items[cur].setAttribute("aria-hidden","false"); dots[cur].classList.add("on"); };
+    const stop=()=>{ if(QH_T){ clearInterval(QH_T); QH_T=null; } };
+    const start=()=>{ stop(); if(!matchMedia("(prefers-reduced-motion: reduce)").matches) QH_T=setInterval(()=>go(cur+1),6500); };
+    car.addEventListener("mouseenter",stop); car.addEventListener("focusin",stop);
+    car.addEventListener("mouseleave",start);
+    start();
+  }
   const L=qGet(), wide=view.clientWidth;
   // tarjetas: con imágenes estáticas no hace falta esperar al mapa
   const g=document.getElementById("qg"); g.innerHTML="";
