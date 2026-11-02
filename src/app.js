@@ -3302,7 +3302,7 @@ async function essentials(id){
     return [[`×${nf1.format(t.renta/b.renta)}`,`${t.n} frente a ${b.n}`,miniBars(cc.map((c,i)=>[c.renta,i===0||i===cc.length-1?"--rust":"--rule-2"]),{h:44}),"renta neta por persona entre la comunidad más rica y la más pobre"],
       [eur(R.median),"La renta de la mitad","","la mitad de la población vive en barrios con menos renta que esto, por persona y año"],
       [pc(pov),"En riesgo de pobreza",miniTen(Math.round(pov/10)),"ingresos por debajo del 60 % de la mediana"],
-      [sgn(real),"Renta desde 2015, sin inflación",miniLines(deflate(ri),ri,{h:40}),`en euros de cada año, ${sgn(gr)}; la línea gruesa descuenta la subida de precios`]]; }
+      [sgn(real),"Renta desde 2015, en euros de 2024",miniLines(deflate(ri),ri,{h:40}),`la línea granate ya descuenta la subida de precios; la gris de puntos es la renta en euros de cada año: ${sgn(gr)}`]]; }
   if(id==="vivienda"){ const iy=REFS.ipvaYears, i15=iy.indexOf(2015);
     return [[`+${nf0.format(G.anuncios)}${NB}%`,"Anuncios de alquiler, 2015–2024",miniBars([[G.anuncios,"--rust"],[G.salMed,"--slate"],[G.ipc,"--stone"]],{h:40}),`frente a sueldo mediano ${sgn(G.salMed)} y precios ${sgn(G.ipc)}`],
       [`+${nf0.format(G.declarado)}${NB}%`,"Alquiler declarado, todos los contratos",miniLines(es.ipva.slice(i15),null,{h:40}),"quien ya tiene contrato lo nota menos que quien busca"],
