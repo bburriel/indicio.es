@@ -229,6 +229,23 @@ const fechaES=d=>{ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${+dd}
 const byline=S=>`<span class="by-who">Por <a href="/quien-soy/">${esc((window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author.name)||"Indicio")}</a></span> · <time datetime="${S.pub||""}">${fechaES(S.pub)}</time>${S.upd&&S.upd!==S.pub?` · <span class="by-upd">Revisado el ${fechaES(S.upd)}</span>`:""} · <span class="by-m">${esc(S.m)}</span>${S.ev&&window.__INDICIO&&window.__INDICIO.evidence?` · <a class="ev ev-${S.ev}" href="/laboratorio/metodo/#evidencia" title="${esc(window.__INDICIO.evidence[S.ev].d)}">${esc(window.__INDICIO.evidence[S.ev].l)}</a>`:""}`;
 function finding(parent,title,text){ const s=add(parent,"section","finding"); if(title) add(s,"h2",null,title); if(text) add(s,"div","txt",text); return s; }
 function fig(parent,{title,sub,source}={}){ const f=add(parent,"figure"); if(title) add(f,"div","ct",title); if(sub) add(f,"div","cs",sub); const body=add(f,"div"); if(source){ const c=add(f,"figcaption",null,source); f._cap=c; } f.body=body; return f; }
+// burbuja de ayuda: la comparten el glosario de los textos y los iconos «i» de las tablas de datos.
+// Se abre al pasar el ratón, al tabular y al pulsar (en el móvil no hay ratón), y se cierra al pulsar fuera.
+let TIP=null;
+const tipHide=()=>{ if(TIP){ TIP.remove(); TIP=null; } };
+function tipShow(anchor,html){ tipHide(); TIP=el("div","gtip",html); document.body.appendChild(TIP);
+  const r=anchor.getBoundingClientRect();
+  TIP.style.left=Math.max(8,Math.min(window.innerWidth-TIP.offsetWidth-8,r.left+window.scrollX))+"px";
+  TIP.style.top=(r.bottom+window.scrollY+6)+"px"; }
+// el clic siempre abre (si cerrara, al pulsar en el ordenador cerraría la que acaba de abrir el ratón);
+// se cierra al pulsar fuera, al salir con el ratón o con Escape
+function tipBind(nodes,html){ nodes.forEach(g=>{ const show=()=>tipShow(g,html(g));
+  g.addEventListener("mouseenter",show); g.addEventListener("focus",show);
+  g.addEventListener("mouseleave",tipHide); g.addEventListener("blur",tipHide);
+  g.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); show(); }); }); }
+document.addEventListener("click",tipHide);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") tipHide(); });
+
 // Fuentes: cada estudio lista solo las que usa (methodNote(["atlas","padron"])); sin argumento, todas
 const SRC={
   atlas:`INE: Atlas de Distribución de Renta de los Hogares 2015–2024 (los años 2015–2023 a través del proyecto abierto <a href="https://github.com/pablogguz/ineAtlas.data" target="_blank" rel="noopener">ineAtlas.data</a>)`,
@@ -984,6 +1001,36 @@ function summary(r,d){
   return t;
 }
 
+// ---------- qué mide cada dato: el texto del icono «i» de las tablas (ficha y comparación) ----------
+const QUEMIDE={
+  pop:"Las personas empadronadas en el municipio. No cuenta a quien vive allí sin empadronarse, ni a los turistas, así que en los pueblos de veraneo se queda corto en verano.",
+  varPob:"Cuántos vecinos ha ganado o perdido el municipio en diez años, en porcentaje sobre los que tenía en 2015. Un +10 % son diez vecinos más por cada cien.",
+  edad:"El promedio de edad de todos los vecinos, recién nacidos incluidos. Sube tanto porque hay muchos mayores como porque nacen pocos niños o se van los jóvenes.",
+  extr:"Vecinos con nacionalidad de otro país, por cada 100 habitantes. Quien se nacionaliza español deja de contar aquí, aunque haya nacido fuera.",
+  migExt:"Cuánta gente llega del extranjero menos cuánta se va, por cada 1.000 habitantes y año. Si es positivo, el municipio gana vecinos por esta vía.",
+  migInt:"Lo mismo con las mudanzas dentro de España: llegadas desde otros municipios menos salidas hacia ellos, por cada 1.000 habitantes y año.",
+  solos:"Hogares en los que vive una sola persona, por cada 100 hogares. Son muchos tanto donde hay viudas mayores como donde hay jóvenes que acaban de independizarse.",
+  renta:"Lo que entra en un hogar en un año después de pagar impuestos y cotizaciones, repartido entre todas las personas que viven en él, niños y jubilados incluidos. No es un sueldo: un hogar de cuatro personas con 60.000 € netos cuenta como 15.000 € por persona.",
+  rentaHog:"Lo mismo, pero sin repartir entre los miembros del hogar. Sale más alta donde los hogares son grandes o donde trabajan varias personas en cada uno.",
+  pobreza:"Vecinos que viven con menos del 60 % de la renta mediana de España, ajustada por el tamaño del hogar. Es pobreza relativa: depende de cómo esté el resto del país, no de una cesta de la compra.",
+  gini:"Cuánto se reparte la renta dentro del municipio, de 0 a 100: sería 0 si todos ingresaran lo mismo y 100 si una sola persona lo ingresara todo. En España ronda 30.",
+  pensiones:"Qué parte de lo que ingresan los hogares del municipio son pensiones. Sube donde hay muchos jubilados y, sobre todo, donde hay pocos sueldos con los que compararlas.",
+  paroReg:"Los apuntados como demandantes de empleo en las oficinas del SEPE por cada 100 vecinos de 16 a 64 años, busquen trabajo o no. Sale más bajo que la tasa de paro porque se reparte entre toda la población en edad de trabajar.",
+  paroCensal:"Los parados por cada 100 personas que trabajan o buscan trabajo. Es la tasa de paro de toda la vida, aunque el censo la da más alta que la Encuesta de Población Activa: sirve sobre todo para comparar unos lugares con otros.",
+  superiores:"Adultos que han terminado una carrera universitaria o una formación profesional de grado superior, por cada 100 adultos.",
+  alquiler:"Hogares que viven de alquiler, por cada 100 hogares. El resto son propietarios o tienen la vivienda cedida.",
+  noPrincipal:"Viviendas que no son la casa habitual de nadie: segundas residencias y pisos vacíos. En la costa y en la montaña llegan a ser la mitad del parque.",
+  vt:"Pisos anunciados para alquiler turístico, por cada 100 viviendas del municipio. El INE los cuenta a partir de los anuncios de las plataformas.",
+  alqVar:"Cuánto ha subido el alquiler que se declara a Hacienda entre 2015 y 2024. Incluye los contratos antiguos, así que sube menos que los precios de los anuncios, que son los que ve quien busca piso hoy.",
+  part:"Votantes por cada 100 personas con derecho a voto en las generales de julio de 2023.",
+  pp:"Votos al PP por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco).",
+  psoe:"Votos al PSOE por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco).",
+  vox:"Votos a Vox por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco).",
+  sumar:"Votos a Sumar y sus aliados por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco)."};
+// el icono que abre la explicación; sin texto para esa clave, no se pinta nada
+const iQue=(k,lab)=>QUEMIDE[k]?`<button type="button" class="iq" data-q="${k}" data-ql="${esc(lab||labK(k))}" aria-label="Qué mide ${esc(lab||labK(k))}">i</button>`:"";
+const bindQue=root=>tipBind(root.querySelectorAll(".iq"),b=>`<b>${esc(b.dataset.ql)}:</b> ${esc(QUEMIDE[b.dataset.q])}`);
+
 // ---------- de un vistazo ----------
 const GLANCE=[
   ["Población",[["pop","Habitantes","Padrón, 2025",false],["varPob","Crecimiento desde 2015","Padrón"],["edad","Edad media","2023"],["extr","Nacionalidad extranjera","2023"],["migExt","Llegadas netas del extranjero","por 1.000 hab. y año, 2021–2024"],["migInt","Saldo con el resto de España","por 1.000 hab. y año, 2021–2024"],["solos","Hogares de una persona","2023"]]],
@@ -998,11 +1045,12 @@ function glance(box,r,d){
     for(const [k,l,yr,showE] of rows){
       let v=r[F[k]]; if(k==="pop"&&d.pad) v=d.pad[d.pad.length-1];
       const f=fmtK(k), e=k==="pop"?null:esMean(k), p=pctl(k,v);
-      h+=`<tr><td class="lab">${l}<small>${yr}</small></td><td class="v r">${v==null?'<span class="muted" style="font-weight:400">sin dato</span>':f(v)}</td><td class="e r">${e==null?"":f(e)}</td><td class="pos">${p==null||k==="pop"?"":`<div class="strip" title="Por encima del ${nf0.format(p)} % de la población de España"><span class="mid"></span><span class="dot" style="left:${Math.max(2,Math.min(98,p))}%"></span></div>`}</td></tr>`;
+      h+=`<tr><td class="lab">${l}${iQue(k,l)}<small>${yr}</small></td><td class="v r">${v==null?'<span class="muted" style="font-weight:400">sin dato</span>':f(v)}</td><td class="e r">${e==null?"":f(e)}</td><td class="pos">${p==null||k==="pop"?"":`<div class="strip" title="Por encima del ${nf0.format(p)} % de la población de España"><span class="mid"></span><span class="dot" style="left:${Math.max(2,Math.min(98,p))}%"></span></div>`}</td></tr>`;
     }
   }
-  h+=`</tbody></table><p class="muted" style="font-size:13px;margin-top:8px">La media de España pondera cada municipio por su población. Los datos tienen años distintos porque cada estadística se publica a su ritmo. En los municipios pequeños el INE no publica algunos datos.</p>`;
+  h+=`</tbody></table><p class="muted" style="font-size:13px;margin-top:8px">Pulsa la <i>i</i> de cada fila para ver qué mide exactamente ese dato. La media de España pondera cada municipio por su población. Los datos tienen años distintos porque cada estadística se publica a su ritmo. En los municipios pequeños el INE no publica algunos datos.</p>`;
   box.innerHTML=h;
+  bindQue(box);
 }
 
 const lead=(s,html)=>add(s,"p","lead",html);
@@ -1533,9 +1581,9 @@ async function renderComparar(a,b){
   for(const [g,ks] of CMPROWS){ h+=`<tr class="grp"><td colspan="4">${g}</td></tr>`;
     for(const k of ks){ if(F[k]==null||!CATK[k]) continue; const f=fmtK(k), va=A[F[k]], vb=Bm[F[k]], e=k==="pop"?null:esMean(k);
       const big=va!=null&&vb!=null&&Math.abs(va-vb)>Math.max(Math.abs(e||0)*0.15,0.0001);
-      h+=`<tr><td class="lab">${esc(labK(k))}<small>${esc((CATK[k].src||"").replace(/^Atlas de Renta del INE, /,""))}</small></td><td class="a r ${big&&va>vb?"win":big?"dim":""}">${va==null?"—":f(va)}</td><td class="b r ${big&&vb>va?"win":big?"dim":""}">${vb==null?"—":f(vb)}</td><td class="e r">${e==null?"":f(e)}</td></tr>`; } }
-  h+=`</tbody></table><p class="muted" style="font-size:13px;margin-top:8px">En negrita oscura, el valor más alto cuando la diferencia es clara. Los datos tienen años distintos; la fuente aparece bajo cada nombre.</p>`;
-  const t=finding(B,"Dato a dato",""); add(t,"div",null,h);
+      h+=`<tr><td class="lab">${esc(labK(k))}${iQue(k)}<small>${esc((CATK[k].src||"").replace(/^Atlas de Renta del INE, /,""))}</small></td><td class="a r ${big&&va>vb?"win":big?"dim":""}">${va==null?"—":f(va)}</td><td class="b r ${big&&vb>va?"win":big?"dim":""}">${vb==null?"—":f(vb)}</td><td class="e r">${e==null?"":f(e)}</td></tr>`; } }
+  h+=`</tbody></table><p class="muted" style="font-size:13px;margin-top:8px">Pulsa la <i>i</i> de cada fila para ver qué mide exactamente ese dato. En negrita oscura, el valor más alto cuando la diferencia es clara. Los datos tienen años distintos; la fuente aparece bajo cada nombre.</p>`;
+  const t=finding(B,"Dato a dato",""); bindQue(add(t,"div",null,h));
   // gráficos
   let da,db; try{ [da,db]=await Promise.all([loadProv(a.slice(0,2)),loadProv(b.slice(0,2))]).then(([x,y])=>[x[a],y[b]]); }catch(e){ return; }
   if(!da||!db) return;
@@ -3281,10 +3329,7 @@ function glossify(root){
   for(const n of nodes){ for(const t of terms){ if(done.has(t)) continue; const i=n.nodeValue.toLowerCase().indexOf(t.toLowerCase()); if(i<0) continue;
       const b=(i===0||/[\s(«"]/.test(n.nodeValue[i-1])), e=!/[a-záéíóúñ]/i.test(n.nodeValue[i+t.length]||" "); if(!b||!e) continue;
       const after=n.splitText(i); after.splitText(t.length); const sp=el("span","gloss"); sp.tabIndex=0; sp.dataset.g=t; sp.textContent=after.nodeValue; after.replaceWith(sp); done.add(t); break; } }
-  let tip=null; const hide=()=>{ if(tip){ tip.remove(); tip=null; } };
-  root.querySelectorAll(".gloss").forEach(g=>{ const show=()=>{ hide(); tip=el("div","gtip",`<b>${esc(cap(g.dataset.g))}:</b> ${esc(GLOSS[g.dataset.g])}`); document.body.appendChild(tip); const r=g.getBoundingClientRect(); tip.style.left=Math.max(8,Math.min(window.innerWidth-tip.offsetWidth-8,r.left+window.scrollX))+"px"; tip.style.top=(r.bottom+window.scrollY+6)+"px"; };
-    g.addEventListener("mouseenter",show); g.addEventListener("focus",show); g.addEventListener("mouseleave",hide); g.addEventListener("blur",hide); g.addEventListener("click",e=>{ e.stopPropagation(); tip?hide():show(); }); });
-  document.addEventListener("click",hide,{once:true});
+  tipBind(root.querySelectorAll(".gloss"),g=>`<b>${esc(cap(g.dataset.g))}:</b> ${esc(GLOSS[g.dataset.g])}`);
 }
 async function topicDecorate(id){
   const T=TOPICS[id]; if(!T) return; const ph=view.querySelector(".phead"); if(!ph) return;
