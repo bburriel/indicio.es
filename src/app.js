@@ -5623,7 +5623,7 @@ async function renderInicio(){
   // cabecera: qué hacemos, en una frase, y un solo gráfico de análisis (la nube de municipios del campo)
   view.innerHTML=`<section class="qh qh-claim"><div class="kk2">Datos públicos de los ${nf0.format(rowsAll().length)} municipios de España</div>
     <h1 class="qh-q">Las leyes se anuncian. <em>Aquí se miden.</em></h1>
-    <p class="qh-a">Cogemos una ley, miramos qué pasó después y lo contamos en cifras que se entienden. Y si no te fías, compruébalo tú: en el laboratorio cruzas los datos de los ${nf0.format(rowsAll().length)} municipios y ves qué sale.</p>
+    <p class="qh-a">Qué prometía la ley y qué pasó después. Y si no te fías de la respuesta, compruébala tú.</p>
     <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
     <div class="qcar" id="qcar"></div>
     <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
@@ -5647,7 +5647,7 @@ async function renderInicio(){
   if(car) CAR.forEach(([id,q,leg,v,c])=>{ const a=add(car,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i";
     a.insertAdjacentHTML("beforeend",`<div class="qcar-q">${esc(q)}</div>`);
     const ic=illCard(id); if(ic) a.appendChild(ic);
-    a.insertAdjacentHTML("beforeend",`<div class="qcar-l">${esc(leg)}</div><div class="qcar-c"><b>${esc(v)}.</b> ${esc(c)}</div>`); });
+    a.insertAdjacentHTML("beforeend",`<div class="qcar-c">${esc(v)}</div>`); });
   const L=qGet(), wide=view.clientWidth;
   // tarjetas: con imágenes estáticas no hace falta esperar al mapa
   const g=document.getElementById("qg"); g.innerHTML="";
