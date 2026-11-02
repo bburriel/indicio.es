@@ -275,14 +275,6 @@ def _(p):
     o+=p.arrow([(780,300),(860,250),(920,272),(1000,190),(1080,150)],"wine",5)+p.line([(780,320),(1120,320)],1)+p.line([(780,320),(780,130)],1)
     return o
 
-@esc("deuda-quien-gobierna","El ayuntamiento entre dos montones de monedas",600)
-def _(p):
-    o=p.cloud(200,60,.9)+p.cloud(1000,54,.8)+p.hills(260,"sage2",12,seed=17,o=.6)+p.ground(320,c="sand")
-    o+=townhall(p,440,320,320,180)
-    o+=p.coin_stack(320,326,6,34)+p.coin_stack(250,326,9,34)+p.coin_stack(880,326,8,34)+p.coin_stack(950,326,5,34)
-    o+=p.tree(110,322,1)+p.tree(1110,322,1,"cypress")
-    return o
-
 @esc("precio-alimentos","Un carro de la compra y una balanza entre comida y sueldo",600)
 def _(p):
     o=p.cloud(300,56,.9)+p.sun(1090,60,30)+p.ground(320,c="sand")

@@ -207,15 +207,6 @@ ILLUS["smi-empleo-hogar"]=svg("smi-empleo-hogar","Una casa con una persona limpi
 FOCUS["smi-empleo-hogar"]=330;
 
 
-ILLUS["deuda-quien-gobierna"]=svg("deuda-quien-gobierna","Un ayuntamiento con dos banderas y unas monedas apiladas",
-  hills(258,"k8",20,1.7)+R(0,300,1200,60,"k9")+
-  G("translate(470 0)",R(0,150,260,150,"kc")+P("M-14 150 L130 92 L274 150 Z","k2")+R(110,60,40,60,"kc")+C(130,82,13,"k7")+L(130,82,130,74,"sk",` stroke-width="2"`)+L(130,82,137,86,"sk",` stroke-width="2"`)+
-    [24,84,150,210].map(x=>R(x,180,30,46,"k7")).join("")+R(108,240,44,60,"k1")+R(-10,296,280,8,"ki")+
-    L(40,150,40,40,"ki",` stroke-width="4"`)+P("M40 42 L96 52 L40 66 Z","k4")+L(220,150,220,40,"ki",` stroke-width="4"`)+P("M220 42 L276 52 L220 66 Z","k1"))+
-  stack(330,300,6,30,"k3","k8")+stack(390,300,3,30,"k3","k8")+stack(860,300,4,30,"k3","k8")+stack(920,300,8,30,"k3","k8")+
-  tree(170,300,1.2)+tree(1080,300,1.1)+C(140,70,26,"k3"));
-FOCUS["deuda-quien-gobierna"]=300;
-
 ILLUS["precio-alimentos"]=svg("precio-alimentos","Un carro de la compra con alimentos junto a una balanza con monedas",
   hills(255,"k8",22,0.2)+R(0,300,1200,60,"k9")+
   G("translate(330 120)",P("M0 30 L40 30 L70 140 L240 140 L270 50 L55 50","sk",` fill="none" stroke-width="7" stroke-linejoin="round"`)+C(95,168,14,"ki")+C(220,168,14,"ki")+
