@@ -988,7 +988,7 @@ function summary(r,d){
 const GLANCE=[
   ["Población",[["pop","Habitantes","Padrón, 2025",false],["varPob","Crecimiento desde 2015","Padrón"],["edad","Edad media","2023"],["extr","Nacionalidad extranjera","2023"],["migExt","Llegadas netas del extranjero","por 1.000 hab. y año, 2021–2024"],["migInt","Saldo con el resto de España","por 1.000 hab. y año, 2021–2024"],["solos","Hogares de una persona","2023"]]],
   ["Dinero",[["renta","Renta neta por persona","2024"],["pobreza","Riesgo de pobreza","2023"],["gini","Desigualdad (Gini)","2023"],["pensiones","Peso de las pensiones","en los ingresos, 2023"]]],
-  ["Trabajo y estudios",[["paroReg","Paro registrado","media de 2025, % de 16 a 64 años"],["paro","Tasa de paro","Censo de 2021"],["superiores","Estudios superiores","adultos, censo de 2021"]]],
+  ["Trabajo y estudios",[["paroReg","Paro registrado","apuntados al SEPE por cada 100 personas de 16 a 64 años, 2025"],["paro","Tasa de paro","por cada 100 que trabajan o buscan trabajo, censo de 2021"],["superiores","Estudios superiores","adultos, censo de 2021"]]],
   ["Vivienda",[["alquiler","Hogares de alquiler","Censo de 2021"],["noPrincipal","Viviendas vacías o secundarias","Censo de 2021"],["vt","Viviendas turísticas","mayo de 2026"]]],
   ["Voto",[["part","Participación","generales de 2023"]]]];
 function glance(box,r,d){
