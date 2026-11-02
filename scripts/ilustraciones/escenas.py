@@ -157,18 +157,6 @@ def train(p,x,y,cars=5):
     o+="".join(p.line([(x-40-i*30,y+10+i*10),(x-10-i*40,y+10+i*10)],1.2,.6,False) for i in range(3))
     return o
 
-@esc("renta-fuentes","Una casa a la que llegan corrientes de distintos colores: salarios, pensiones y ayudas",620)
-def _(p):
-    o=p.sun(130,60,30)+p.cloud(420,56,.9)+p.ground(320,c="sand")
-    for i,(c,y0,wd) in enumerate([("blue3",80,46),("och",130,34),("sage",172,24),("wine2",206,18)]):
-        y1=262+i*10
-        top=f"M-20 {y0} C300 {y0} 500 {y1-20} 760 {y1}"; bot=f"L760 {y1+wd*.45} C500 {y1+wd*.45-20} 300 {y0+wd} -20 {y0+wd}z"
-        o+=p.wash(top+bot,c,.85,0,0)+p.curve(top,1,.8)+p.curve(f"M-20 {y0+wd} C300 {y0+wd} 500 {y1+wd*.45-20} 760 {y1+wd*.45}",.8,.6)
-    o+=p.house(760,320,250,190,"cream","wine")
-    o+=p.coin_stack(1070,326,6,26)+p.coin_stack(1126,326,9,26)
-    o+=p.tree(40,322,.7,"cypress")
-    return o
-
 @esc("quien-gobierna","El ayuntamiento con dos banderas y una moneda que gira en el aire",560)
 def _(p):
     o=p.cloud(160,60,1)+p.cloud(1040,74,.8)+p.hills(260,"sage2",12,seed=9,o=.6)+p.ground(320,c="sand")

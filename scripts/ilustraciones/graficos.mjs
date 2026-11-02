@@ -133,13 +133,6 @@ const mrows=f=>ROWS.filter(f);
   let s=svgOpen(W,H); P.forEach((p,i)=>s+=rect(30+i*w+w*.15,40,w*.7,Y(Math.max(-90,p.d)),top.has(p)?WINE:LINE)); s+=line(20,40,W-20,40,INK,1.2);
   add("pandemia-turismo","Cuánto se hundieron las noches de hotel en 2020, una barra por provincia; en granate, las diez más turísticas",s+"</svg>"); }
 
-// 9. De dónde sale la renta: la mezcla de ingresos de cada provincia, ordenadas por el peso de las pensiones
-{ const [W,H]=B, K=[["wage",LIGHT],["other_income","#cfccc4"],["other_benefits",ROSE],["unemp_benefit",WINE2],["pension",WINE]];
-  const P=PROVS.filter(p=>REFS.prov[p].wage&&REFS.prov[p].pension&&REFS.prov[p].pension[last(REFS.prov[p].wage)]!=null).map(p=>{ const i=last(REFS.prov[p].wage); return K.map(([k])=>REFS.prov[p][k][i]||0); }).sort((a,b)=>a[4]/d3.sum(a)-b[4]/d3.sum(b));
-  const w=(W-40)/P.length; let s=svgOpen(W,H);
-  P.forEach((v,i)=>{ const t=d3.sum(v); let y=H-20; v.forEach((x,j)=>{ const h=x/t*(H-40); s+=rect(20+i*w+.8,y-h,w-1.6,h,K[j][1]); y-=h; }); });
-  add("renta-fuentes","La renta de cada provincia partida por su origen: en gris, el trabajo; en granate, las pensiones; en rosa, las demás prestaciones. De izquierda a derecha, pesan más las pensiones",s+"</svg>"); }
-
 // 10. Quién gobierna: un cuadradito por municipio, agrupados por el partido del alcalde
 { const [W,H]=B, order=["PSOE","Sumar","ERC","EH Bildu","Lista local","PNV","Junts","PRC","Cs","UPN","PP","Vox"], rank=p=>{ const i=order.indexOf(p); return i<0?order.length-1.5:i; };
   const rs=mrows(r=>r[F.mun23]).sort((a,b)=>rank(a[F.mun23])-rank(b[F.mun23])||b[F.pop]-a[F.pop]);
