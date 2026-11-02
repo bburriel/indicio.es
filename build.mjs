@@ -49,6 +49,30 @@ if(exists("og")) copyDir(path.join(ROOT,"og"),path.join(OUT,"og"));
 if(exists("art")) copyDir(path.join(ROOT,"art"),path.join(OUT,"art"));
 if(exists("illus")){ fs.mkdirSync(path.join(OUT,"illus"),{recursive:true}); for(const f of fs.readdirSync(path.join(ROOT,"illus")).filter(f=>f.endsWith(".svg"))) fs.copyFileSync(path.join(ROOT,"illus",f),path.join(OUT,"illus",f)); }
 copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
+// portada: las cifras y series de los gráficos de la cabecera, en un JSON de un par de KB, para no bajar
+// alimentos.json, causales.json y vivienda.json (más de 2 MB) solo para dibujarlos. Se recalcula en cada build,
+// con las mismas cuentas que los análisis (studyAlimentos, studyVivienda y studyReforma en src/app.js).
+{ const A=JSON.parse(rd("data/alimentos.json")), SU=JSON.parse(rd("data/sueldos.json")), VI=JSON.parse(rd("data/vivienda.json")).es, RF=JSON.parse(rd("data/causales.json")).reforma;
+  const r1=v=>Math.round(v*10)/10, r2=v=>Math.round(v*100)/100, mean=a=>a.reduce((s,x)=>s+x,0)/a.length;   // r2 donde la cifra se redondea luego en un texto
+  const yav=(vals,keys,y,n)=>{ const v=vals.filter((x,i)=>x!=null&&String(keys[i]).startsWith(String(y))); return v.length&&(!n||v.length===n)?mean(v):null; };
+  // la cesta: alimentos (IPC, media de cada año completo y de los últimos 12 meses) y sueldo mediano (Estructura Salarial), 2019 = 100
+  const P=A.meses, al=A.ipc.es.alimentos, f19=yav(al,P,2019,12), LY=+P[P.length-1].slice(0,4)-(P[P.length-1].endsWith("M12")?0:1);
+  const EY=SU.ees.años.map(Number), med=SU.ees.es.Mediana, eY=EY[EY.length-1], m19=med[EY.indexOf(2019)];
+  const fy=[]; for(let y=2019;y<=LY;y++) fy.push([y,r1(yav(al,P,y,12)/f19*100)]);
+  const l12=mean(al.slice(-12).filter(x=>x!=null)), [ly,lm]=P[P.length-1].split("M").map(Number);
+  const cesta={comida:fy,ult12:{x:r2(ly+(lm-6)/12),v:r2(l12/f19*100),hasta:P[P.length-1]},
+    sueldo:EY.filter(y=>y>=2019).map(y=>[y,r2(med[EY.indexOf(y)]/m19*100)]),añoSueldo:eY,
+    poder:r2((med[EY.indexOf(eY)]/m19/(yav(al,P,eY,12)/f19)-1)*100)};
+  // la casa: cuánto ha subido cada cosa desde 2015, cada una hasta su último año
+  const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>(o[b]/o[a]-1)*100, ees=Object.fromEntries(EY.map((y,i)=>[String(y),med[i]]));
+  const aY=lastK(VI.alqMes), vY=lastK(VI.ipv), sY=String(Math.min(+aY,eY)), ipcG=y=>yav(A.ipc.es.general,P,y,12);
+  const casa={compra:[r2(g(VI.ipv,"2015",vY)),+vY],alquiler:[r2(g(VI.alqMes,"2015",aY)),+aY],sueldo:[r2(g(ees,"2015",sY)),+sY],precios:[r2((ipcG(+aY)/ipcG(2015)-1)*100),+aY]};
+  // los contratos: parte de los contratos iniciales que son temporales, media móvil de tres meses
+  const tm=RF.periodos.map((p,i)=>{ let ind=0,tem=0; for(const gr of RF.grupos){ const m=gr.mes[i]; if(m){ ind+=m[0]; tem+=m[1]; } } return ind+tem?100*tem/(ind+tem):null; });
+  const tm3=tm.map((v,i)=>{ const w=tm.slice(Math.max(0,i-2),i+1).filter(x=>x!=null); return w.length?r1(mean(w)):null; });
+  const antes=tm.filter((v,i)=>/^20(19|20|21)-/.test(RF.periodos[i])&&v!=null);
+  fs.writeFileSync(path.join(OUT,"data","portada.json"),JSON.stringify({cesta,casa,contratos:{meses:RF.periodos,temporales:tm3,antes:r1(mean(antes))}}));
+}
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+CONTENT)).replace("__JS__",JS).replace("__CSS__",CSS));
 fs.writeFileSync(path.join(OUT,"manifest.webmanifest"),rd("manifest.webmanifest").replace(/"\.\/#?(\w*)"/g,(m,k)=>`"/${({inicio:"",preguntas:"preguntas/",municipio:"municipio/",explorar:"laboratorio/"})[k]??""}"`).replace('"scope": "./"','"scope": "/"'));
@@ -76,7 +100,7 @@ function page({route,title,desc,ogTitle,main,jsonld,ogImage,type="website",robot
     .replace(/\{\{OGTITLE\}\}/g,esc(stripTags(ogTitle||title))).replace("{{OGTYPE}}",type).replace(/\{\{OGIMG\}\}/g,SITE.url+(ogImage||"/og-image.png"))
     .replace("{{ROBOTS}}",robots?`<meta name="robots" content="${robots}">`:"").replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{CONTENT}}",CONTENT)
     .replace("{{JSONLD}}",jsonld?`<script type="application/ld+json">${JSON.stringify(jsonld)}</script>`:"")
-    .replace("{{PRELOAD}}",(route==="/"||route==="/preguntas/")?'<link rel="preload" href="/data/municipios.topo.json" as="fetch" crossorigin>':"").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
+    .replace("{{PRELOAD}}",route==="/"?'<link rel="preload" href="/data/portada.json" as="fetch" crossorigin>':route==="/preguntas/"?'<link rel="preload" href="/data/municipios.topo.json" as="fetch" crossorigin>':"").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
   const dir=path.join(OUT,route); fs.mkdirSync(dir,{recursive:true}); fs.writeFileSync(path.join(dir,"index.html"),html);
 }
 const breadcrumb=items=>({"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:items.map(([n,u],i)=>({"@type":"ListItem",position:i+1,name:n,item:SITE.url+u}))});

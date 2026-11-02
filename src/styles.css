@@ -1324,3 +1324,73 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .czr .iq,.czpr .iq,.czcap .iq,.czvd .iq,.czc h3 .iq{margin-left:2px; vertical-align:middle}
 .czvd{display:inline-flex; align-items:center; gap:2px}
 .czcard{display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start}
+/* Portada (noviembre 2026): lema, carrusel de cuatro preguntas con su gráfico, tira «Puesto a prueba» y «Por qué fiarte».
+   Todo con el prefijo pt- para no chocar con .vrow, .why o .bar, que ya existen. */
+.pt-lema{border-bottom:1px solid var(--rule); padding:10px 0 11px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.pt-lema b{color:var(--brand); font-weight:700}
+.pt-car{display:flex; flex-direction:column; padding:30px 0 6px}
+.pt-stack{display:grid}
+.pt-s{grid-area:1/1; display:grid; grid-template-columns:minmax(0,1.08fr) minmax(0,1fr); gap:44px; align-items:center; opacity:0; visibility:hidden; transition:opacity .5s ease, visibility 0s linear .5s}
+.pt-s.on{opacity:1; visibility:visible; transition:opacity .5s ease}
+.pt-st>*{transform:translateY(10px); transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.pt-s.on .pt-st>*{transform:none}
+.pt-s.on .pt-st>*:nth-child(2){transition-delay:.04s} .pt-s.on .pt-st>*:nth-child(3){transition-delay:.08s} .pt-s.on .pt-st>*:nth-child(4){transition-delay:.12s}
+.pt-s .kk2{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--brand); font-weight:700}
+.pt-q{font-family:var(--serif); font-weight:500; font-size:clamp(36px,4.9vw,58px); line-height:1.03; letter-spacing:-.02em; margin:10px 0 0; text-wrap:balance}
+.pt-q em{color:var(--brand)}
+.pt-v{font-family:var(--serif); font-weight:500; font-size:clamp(23px,2.6vw,31px); line-height:1.15; color:var(--brand); margin:14px 0 0}
+.pt-a{font-family:var(--serif); color:var(--ink-2); line-height:1.5; margin:12px 0 0; font-size:clamp(17px,1.65vw,19px); max-width:var(--medida)}
+.pt-cta{margin-top:20px}
+.pt-sc{margin:0}
+.pt-cap{font:italic 13.5px/1.45 var(--serif); color:var(--muted); margin-top:8px}
+.pt-g{display:block; width:100%; height:auto; overflow:visible}
+.pt-g-t{font:500 12.5px var(--font); fill:var(--muted)}
+.pt-g-l{font:600 14px var(--font); fill:var(--ink)}
+.pt-g-n{font:500 25px var(--serif); fill:var(--ink)}
+.pt-g-g{font:italic 15px var(--serif); fill:var(--brand)}
+.pt-g-big{font:500 44px var(--serif); fill:var(--brand)}
+.pt-g-l.br,.pt-g-n.br{fill:var(--brand)}
+.pt-g-n.on{fill:var(--bg)}
+.pt-g-gr{stroke:var(--rule); stroke-width:1}
+.pt-g-base{stroke:var(--ink-2); stroke-width:1; stroke-dasharray:2 3}
+.pt-g-tick{stroke:var(--ink-2); stroke-width:1} .pt-g-tick.dash{stroke-dasharray:2 3}
+.pt-g-area{fill:var(--brand); fill-opacity:.09}
+.pt-g-ln{fill:none; stroke-linejoin:round; stroke-linecap:round} .pt-g-ln.ink{stroke:var(--ink); stroke-width:2.2} .pt-g-ln.br{stroke:var(--brand); stroke-width:3}
+.pt-g-ghost{fill:none; stroke:var(--ink-2); stroke-width:1.2; stroke-dasharray:3 3}
+.pt-f-br{fill:var(--brand)} .pt-f-ink{fill:var(--ink)}
+.pt-tabs{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; margin-top:34px; align-items:start}
+.pt-tabs button{all:unset; box-sizing:border-box; cursor:pointer; display:block; padding-top:12px; position:relative}
+.pt-bar{position:absolute; left:0; right:0; top:0; height:2px; background:var(--rule-2); overflow:hidden}
+.pt-bar span{position:absolute; inset:0; background:var(--brand); transform:scaleX(0); transform-origin:left}
+.pt-tabs button.on .pt-bar span{animation:pt-bar 9s linear forwards}
+.pt-car:hover .pt-tabs button.on .pt-bar span,.pt-car:focus-within .pt-tabs button.on .pt-bar span{animation-play-state:paused}
+.pt-car.still .pt-tabs button.on .pt-bar span{animation:none; transform:none}
+@keyframes pt-bar{to{transform:none}}
+.pt-tabs b{display:block; font:700 13px var(--font); letter-spacing:.04em; text-transform:uppercase; color:var(--muted)}
+.pt-tabs small{display:block; font:15px/1.35 var(--serif); color:var(--muted); margin-top:4px}
+.pt-tabs button.on b{color:var(--brand)} .pt-tabs button.on small,.pt-tabs button:hover small{color:var(--ink)}
+.pt-tabs button:focus-visible{outline:2px solid var(--brand); outline-offset:4px}
+.pt-lead{max-width:var(--medida); color:var(--ink-2); font:17px/1.5 var(--serif); margin:8px 0 18px}
+.pt-tira{border-top:1px solid var(--rule-2)}
+.pt-row{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:8px 36px; align-items:baseline; padding:14px 0; border-bottom:1px solid var(--rule); text-decoration:none; color:inherit}
+.pt-row:hover .pt-rq{color:var(--brand)}
+.pt-rq{font-family:var(--serif); font-size:clamp(17.5px,1.7vw,20.5px); line-height:1.25; color:var(--ink)}
+.pt-ra{font-size:15px; line-height:1.45; color:var(--ink-2)}
+.pt-ra b{color:var(--brand); font-weight:600}
+.pt-ra .ev{display:inline-block; margin:6px 0 0}
+.pt-why{background:var(--band); border-radius:16px; padding:28px 30px; margin-top:40px}
+.pt-why h2{font-family:var(--serif); font-weight:500; font-size:clamp(24px,2.6vw,30px); margin:0 0 6px}
+.pt-who{font:17px/1.5 var(--serif); color:var(--ink-2); max-width:var(--medida); margin:0 0 22px}
+.pt-who a{color:var(--brand); font-weight:600; text-decoration:none; font-family:var(--font); font-size:15px; white-space:nowrap}
+@media (max-width:860px){
+  .pt-car{padding-top:18px}
+  .pt-s{grid-template-columns:minmax(0,1fr); gap:16px; align-content:start}
+  .pt-tabs{order:-1; gap:10px; margin:0 0 20px}
+  .pt-tabs small{display:none}
+  .pt-tabs b{font-size:11.5px; letter-spacing:.02em}
+}
+@media (max-width:720px){ .pt-row{grid-template-columns:minmax(0,1fr); gap:4px; padding:12px 0} .pt-ra{font-size:14.5px} .pt-lema{font-size:11px; letter-spacing:.03em} .pt-why{padding:22px 18px} }
+@media (prefers-reduced-motion:reduce){ .pt-s,.pt-st>*{transition:none} }
+/* en el tema oscuro --brand es casi negro; en la portada el granate se aclara para que se lea (como --rust) */
+:root[data-theme="dark"] .pt-lema,:root[data-theme="dark"] .pt-car,:root[data-theme="dark"] .pt-tira,:root[data-theme="dark"] .pt-why{--brand:#d0505f}
+.pt-f-mu{fill:var(--rule-2)}
