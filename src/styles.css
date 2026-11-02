@@ -933,14 +933,7 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .acts.ico #lbsave[aria-pressed="true"]{color:var(--acc-ink)} .acts.ico #lbsave[aria-pressed="true"] svg{fill:currentColor}
 .labnav .lbsaved{margin-left:auto; border:0; background:none; font:inherit; font-size:14px; color:var(--muted); cursor:pointer; padding:2px 0}
 .labnav .lbsaved:hover{color:var(--ink)}
-.czc{display:grid; grid-template-columns:200px minmax(0,1fr); gap:24px; border-top:1px solid var(--ink); margin-top:20px; padding-top:16px}
-.czc-l h3{font-size:22px; margin:0 0 8px; line-height:1.15}
-.czc-l .dots{display:flex; gap:5px; margin-bottom:6px} .czc-l .dots i{width:14px; height:14px; border-radius:50%; border:1.5px solid var(--rule-2); background:none}
-.czc-l .dots i.on{background:var(--ok); border-color:var(--ok)} .czc-l .dots.l0 i.on{background:var(--stone); border-color:var(--stone)} .czc-l .dots.l1 i.on{background:var(--mustard); border-color:var(--mustard)}
-.czc-l em{display:block; font-family:var(--serif,inherit); font-size:17px} .czc-l small{color:var(--muted); font-size:13.5px}
-.czc-q{font-size:17px; line-height:1.9; margin:0}
-.czk{white-space:nowrap; font-weight:700; margin-right:10px; cursor:pointer} .czk input{accent-color:var(--ink); width:15px; height:15px; vertical-align:-2px}
-.czk small{font-weight:400; color:var(--mustard); font-size:13px}
+.czc{border-top:1px solid var(--ink); margin-top:20px; padding-top:18px}
 .czc .czbar{display:flex; align-items:center; gap:10px; margin:10px 0 4px; font-size:14px; background:none; border:0; padding:0}
 .czbar .q{color:var(--ink-2)} .czbar .trk{flex:0 1 220px; height:8px; border-radius:4px; background:repeating-linear-gradient(90deg,var(--rule-2) 0 3px,transparent 3px 5px)}
 .czbar .kp{display:block; height:100%; border-radius:4px; background:var(--ink); transition:width .5s}
@@ -950,7 +943,6 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .lnk{border:0; background:none; padding:0; font:inherit; font-size:15px; font-weight:700; color:var(--acc-ink); cursor:pointer}
 .lnk:hover{text-decoration:underline}
 .czact{margin-top:12px; font-size:14px; color:var(--ink-2); display:flex; gap:6px; flex-wrap:wrap; align-items:center}
-@media (max-width:720px){ .czc{grid-template-columns:1fr; gap:12px} .czc-q{font-size:16px} }
 .czbar .pc{white-space:nowrap}
 
 /* Ficha: dónde queda entre todos los municipios */
@@ -1092,9 +1084,6 @@ svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg 
 .ev-desc{color:var(--muted)} .ev-igual{color:var(--mustard)} .ev-natural{color:var(--ok)}
 a.ev:hover{background:color-mix(in srgb, currentColor 10%, transparent)}
 .defs li > .ev:first-child{margin:0 6px 0 0}
-.czk.risk{color:var(--ink-2)} .czk .rk{color:var(--ko); font-weight:700}
-.czwarn{display:block; margin-top:8px; padding:8px 10px; border-left:3px solid var(--mustard); background:color-mix(in srgb, var(--mustard) 9%, var(--card)); font-size:14px; line-height:1.45}
-.czcause{display:block; margin-top:8px; font-size:13.5px; color:var(--muted)}
 .mustbe{margin-top:14px; padding:12px 14px; border:1px solid var(--rule-2); border-radius:8px; background:var(--card)}
 .mustbe h4{font-size:15px; margin:0 0 6px}
 .mustbe ol{margin:0 0 8px 18px; padding:0; font-size:14px; line-height:1.5} .mustbe li+li{margin-top:4px}
@@ -1240,3 +1229,60 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 
 /* barra con cuatro entradas: en pantallas estrechas caben sin desplazarse */
 @media (max-width:480px){ .nav a:not(.navdd a),.nav .ddb{padding-left:7px; padding-right:7px} .nav{font-size:14px} .nav a,.nav .ddb{font-size:14px} .navdd a{padding-left:8px!important} .navdd .ddb{padding-right:6px!important} }
+
+/* PANEL «¿AGUANTA LA RELACIÓN?» (noviembre de 2026): veredicto arriba, controles a la izquierda y cifras a la derecha */
+.czc h3{font-family:"Newsreader",var(--serif,Georgia,serif); font-weight:500; font-size:22px; line-height:1.15; margin:0 0 10px}
+.czv{margin-bottom:22px; max-width:var(--medida)}
+.czvh{display:flex; align-items:baseline; justify-content:space-between; gap:4px 16px; flex-wrap:wrap}
+.czvh em{font-family:"Newsreader",var(--serif,Georgia,serif); font-size:26px; line-height:1.2}
+.czr{font-size:15px; color:var(--ink-2); font-variant-numeric:tabular-nums} .czr small{color:var(--muted); font-size:13px}
+.czscale{margin-top:22px}
+.czscale .seg{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:3px; height:10px}
+.czscale .seg i{display:block; background:var(--rule-2)}
+.czscale .seg i:nth-child(1){border-radius:5px 0 0 5px} .czscale .seg i:nth-child(4){border-radius:0 5px 5px 0}
+.czscale .seg i:nth-child(2){background:color-mix(in srgb,var(--brand) 28%,var(--rule))} .czscale .seg i:nth-child(3){background:color-mix(in srgb,var(--brand) 60%,var(--rule))} .czscale .seg i:nth-child(4){background:var(--brand)}
+.czmk{position:absolute; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%; background:var(--bg); border:3px solid var(--ink); box-sizing:border-box; transition:left .35s ease}
+.czscale .labs{display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:9px; font-size:12.5px; color:var(--muted); text-align:center}
+.czpr{margin:14px 0 0; font-size:14px; color:var(--ink-2)}
+.czg{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); border-top:1px solid var(--rule); padding-top:18px}
+.czb-c{padding-right:36px} .czb-e{border-left:1px solid var(--rule); padding-left:36px}
+.czlead{margin:0 0 10px; font-size:15px; color:var(--ink-2)}
+.czchips{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.czchip{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--rule-2); border-radius:999px; background:var(--bg); transition:border-color .12s, background .12s}
+.czchip:hover{background:var(--band)} .czchip.on{border-color:var(--brand); background:var(--mark)}
+.czpick{display:inline-flex; align-items:center; gap:8px; border:0; background:none; font:inherit; font-size:14.5px; color:var(--ink); padding:7px 14px 7px 12px; border-radius:999px; cursor:pointer}
+.czpick::before{content:""; width:9px; height:9px; box-sizing:border-box; border-radius:50%; border:1.5px solid var(--rule-2); flex:none}
+.czpick[aria-pressed="true"]{font-weight:600} .czpick[aria-pressed="true"]::before{background:var(--brand); border-color:var(--brand)}
+.czchip.risk .czpick,.czchip.sus .czpick{padding-right:2px}
+.czw{font-size:12px; font-weight:400; font-variant-numeric:tabular-nums; color:var(--muted)} .czw.dn{color:var(--brand)} .czw.up{color:var(--ok)}
+.czt{font-size:11.5px; line-height:1.4; padding:1px 7px; border-radius:4px}
+.czt.cu{color:var(--ko); background:color-mix(in srgb,var(--ko) 12%,transparent)} .czt.su{color:var(--mustard); background:color-mix(in srgb,var(--mustard) 15%,transparent)}
+.czchip .czi{margin:0 8px 0 -3px; cursor:pointer}
+.czchip .czi:last-child{margin-right:8px}
+.czc .czbar{margin:16px 0 6px}
+.czc .czbar{flex-wrap:wrap}
+.czbar .trk{height:10px; border-radius:5px; background:var(--band); flex:1 1 120px; min-width:120px; max-width:220px}
+.czbar .pc{white-space:normal}
+.czbar .kp{background:var(--brand); border-radius:5px}
+.czn2{margin-top:10px; padding:10px 14px; border-left:3px solid var(--mustard); font-size:14px; line-height:1.5; background:color-mix(in srgb,var(--mustard) 9%,var(--card))}
+.czn2.risk{border-left-color:var(--ko); background:color-mix(in srgb,var(--ko) 7%,var(--card))}
+.czbigrow{display:flex; align-items:baseline; gap:6px 14px; flex-wrap:wrap}
+.czbig{font-family:"Newsreader",var(--serif,Georgia,serif); font-size:40px; line-height:1; color:var(--brand); font-variant-numeric:tabular-nums}
+.czsent{flex:1; min-width:200px; font-size:15px; line-height:1.45; color:var(--ink-2)}
+.czb-e svg{display:block; margin-top:14px; max-width:100%; overflow:visible}
+.cze-t{stroke:var(--rule); stroke-width:1} .cze-0{stroke:var(--ink); stroke-width:1.5; stroke-dasharray:3 3}
+.cze-x{font-size:11.5px; fill:var(--muted)}
+.cze-l{font-size:12.5px; fill:var(--ink-2); paint-order:stroke; stroke:var(--bg); stroke-width:5px; stroke-linejoin:round} .cze-l tspan{font-weight:700; fill:var(--ink)} .cze-l.g,.cze-l.g tspan{fill:var(--muted)}
+.cze-b.g{fill:var(--rule-2)} .cze-d.g{fill:var(--stone)} .cze-b.b{fill:var(--brand); fill-opacity:.25} .cze-d.b{fill:var(--brand)}
+.czcap{margin:4px 0 0; font-size:12.5px; color:var(--muted)}
+.czvd{display:inline-block; margin:12px 0 0; padding:3px 11px; border-radius:999px; font-size:13.5px}
+.czvd.ok{color:var(--ok); background:color-mix(in srgb,var(--ok) 13%,transparent)} .czvd.nz{color:var(--ink-2); background:var(--band)}
+.czm{margin:8px 0 0; font-size:13.5px; line-height:1.5; color:var(--muted); max-width:var(--medida)}
+.czgo{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:22px; border-top:1px solid var(--rule); padding-top:18px}
+.czcard{display:block; text-align:left; font:inherit; color:var(--ink); border:1px solid var(--rule-2); border-radius:8px; background:var(--card); padding:12px 16px; cursor:pointer; text-decoration:none}
+.czcard:hover{border-color:var(--brand)} .czcard b{display:block; font-size:15px; color:var(--brand)} .czcard span{display:block; margin-top:3px; font-size:13.5px; line-height:1.4; color:var(--muted)}
+@media (max-width:720px){
+  .czg{grid-template-columns:1fr} .czb-c{padding-right:0; padding-bottom:20px}
+  .czb-e{border-left:0; padding-left:0; border-top:1px solid var(--rule); padding-top:18px}
+  .czbig{font-size:34px} .czvh em{font-size:23px}
+}
