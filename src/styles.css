@@ -1309,3 +1309,6 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 /* «Ver por» en una sola fila */
 .lbseg{display:flex; flex-wrap:nowrap; width:100%}
 .lbseg button{flex:1 1 0; min-width:0; padding-left:2px; padding-right:2px; white-space:nowrap; font-size:12.5px}
+
+/* Menú del laboratorio: iconos de ayuda en títulos y casillas */
+.lb-step h4 .iq, label.chk .iq{margin-left:6px; vertical-align:middle}
