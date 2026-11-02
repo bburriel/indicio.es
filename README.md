@@ -33,6 +33,26 @@ npm run build      # genera dist/ (segundos, sin dependencias)
 npm run serve      # prueba en http://localhost:8787
 ```
 
+### Cada cambio, una rama y una PR
+
+En `main` no se trabaja directamente: cada cambio va en su rama y se fusiona con una pull request, aunque sea de una línea. Así cada cosa que se publica queda como un commit único en `main` y se puede deshacer sola con `git revert`, sin arrastrar lo demás.
+
+```
+git switch -c <rama>                       # nombre corto: que-cambia (paro-censo-2024, iconos-ayuda)
+# cambiar, npm run build, comprobar en local
+git -c user.name="Borja Burriel" -c user.email="bburriel@gmail.com" commit -am "Área: qué cambia para el lector"
+git push -u origin <rama>
+gh pr create                               # rellena .github/pull_request_template.md
+gh pr merge --squash --delete-branch       # un commit por PR en main
+```
+
+Reglas de la casa:
+
+- **Una PR, un cambio.** Si dos cosas se pueden deshacer por separado, son dos PR.
+- **La descripción se escribe para el futuro,** no para el revisor: qué cambia para el lector, qué se tocó, cómo se comprobó y cómo volver atrás. La plantilla lo pide.
+- **Nada se fusiona sin comprobar:** `npm run build` y las páginas abiertas en local.
+- Cloudflare Pages levanta un despliegue de vista previa de cada rama, con su propia URL, antes de tocar indicio.es.
+
 Para desplegar (Cloudflare Pages, proyecto `indicio`):
 
 ```
