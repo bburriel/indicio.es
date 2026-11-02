@@ -12,7 +12,7 @@ export const SITE={
   description:"Indicio: preguntas reales sobre cómo vivimos, respondidas con datos públicos de los 8.139 municipios de España. Y un laboratorio para que compruebes tú si una relación aguanta y qué pasó antes y después de una ley.",
   dataUpdated:"2026-10-24",
   author:{name:"Borja Burriel",url:"https://indicio.es/quien-soy/",
-    bio:"Analista de datos especializado en experimentación: medir si un cambio funciona o solo lo parece. Indicio aplica ese método a los datos públicos de España.",
+    bio:"Mi trabajo es medir si un cambio funciona o solo lo parece. Lo he hecho en Domestika, Wallapop y Northius, y en Indicio lo hago con los datos públicos de España.",
     linkedin:"", web:"", foto:""},
   oldHost:"cifrarios.netlify.app"
 };

@@ -5433,24 +5433,24 @@ function renderSobre(sec){
   const first=(A.nombre||"Borja").split(" ")[0];
   view.innerHTML=`<section class="ab-hero">
       <div><span class="kk">Quién hay detrás</span><h1>${esc(A.name||"Borja Burriel")}</h1>
-      <p class="dek">${A.frase?esc(A.frase):"Analista de datos especializado en experimentación: mido si un cambio funciona o solo lo parece. Lo hice durante años en productos digitales y en Indicio lo aplico a los datos públicos de España."}</p>
+      <p class="dek">${A.frase?esc(A.frase):"Mi trabajo es medir si un cambio funciona o solo lo parece. Lo he hecho en Domestika, Wallapop y Northius, y en Indicio lo hago con los datos públicos de España."}</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
     </section>
     <section class="ab-cv" aria-label="Trayectoria">
-      <div class="ab-row"><span class="ab-n">Formación</span><div><h3>Máster en Estadística</h3><p>Me quedó una costumbre que aplico a todo: antes de creerme un número, preguntarme cuánto se puede equivocar.</p></div></div>
-      <div class="ab-row"><span class="ab-n">Experiencia</span><div><h3>Experimentación en producto <small>Domestika · Wallapop · Northius</small></h3><p>Cuando se cambia algo en una web o en una app, una parte de los usuarios ve la novedad y otra no, como en un ensayo clínico. Mi trabajo es decir si la diferencia es real o simple ruido.</p></div></div>
-      <div class="ab-row"><span class="ab-n">Origen</span><div><h3>Análisis de datos deportivos</h3><p>Empecé investigando en deporte: usar datos para explicar por qué un jugador o un equipo rinde más que otro, más allá de la intuición y de la última jugada que todo el mundo recuerda.</p></div></div>
+      <div class="ab-row"><span class="ab-n">Estadística</span><div><h3>Desconfiar de las cifras</h3><p>Estudié un máster en Estadística y me quedé con una manía: antes de creerme un número, calculo cuánto puede fallar.</p></div></div>
+      <div class="ab-row"><span class="ab-n">Experimentación</span><div><h3>Probar antes de creer <small>Domestika · Wallapop · Northius</small></h3><p>Cuando una web o una app cambia, solo una parte de los usuarios ve la novedad, igual que en un ensayo clínico solo una parte toma el fármaco. Mi trabajo era comprobar si la diferencia entre unos y otros era real o casualidad.</p></div></div>
+      <div class="ab-row"><span class="ab-n">Deporte</span><div><h3>Donde empecé</h3><p>Empecé investigando en deporte: por qué un jugador o un equipo rinde más que otro, más allá de la intuición y de la última jugada que todo el mundo recuerda.</p></div></div>
     </section>
     <section class="ab-why"><h2>Por qué Indicio</h2>
-      <p>En España se publican muchísimos datos y casi nadie tiene tiempo de leerlos. Cuando se usan, es fácil caer en la trampa de siempre: ver que dos cosas van juntas y dar por hecho que una causa la otra. ¿Suben los alquileres <i>por</i> los pisos turísticos, o las dos cosas pasan en los mismos sitios por otra razón?</p>
-      <p>Con un municipio no se puede hacer un experimento como en una app, pero sí se puede trabajar con cuidado: comparar cada lugar con otros parecidos, mirar qué cambió antes y después de una ley y decir con claridad <b>hasta dónde llegan los datos</b>. El <a href="/laboratorio/">laboratorio</a> está para que cualquiera pueda hacer lo mismo con sus propias preguntas, sin saber estadística.</p>
-      <p>Es un proyecto personal e independiente: sin publicidad, sin financiación de partidos y con las fuentes y el método a la vista en cada página.</p>
+      <p>España publica más datos de los que nadie puede leer, y casi siempre se cae en el mismo error: dos cosas aparecen juntas y se da por hecho que una causa la otra. Los alquileres suben donde hay pisos turísticos, pero también donde hay más turistas, más trabajo y más demanda de vivienda. Separar unas cosas de otras es lo difícil.</p>
+      <p>A un municipio no se le puede hacer un experimento como a una app, pero se puede hacer lo más parecido: compararlo con otros que se le parecen, mirar qué pasó antes y después de una ley y decir hasta dónde llegan los datos. El <a href="/laboratorio/">laboratorio</a> te deja hacerlo con tus propias preguntas, sin saber estadística.</p>
+      <p>Indicio es un proyecto personal e independiente. No lleva publicidad ni dinero de partidos, y cada página enseña sus fuentes y su método.</p>
     </section>
     <section class="ab-how"><h2>Cómo trabaja Indicio</h2><div class="ci-steps" style="padding:0">
-      <div><i>1</i><span><b>Solo datos oficiales</b>INE, SEPE, Ministerio del Interior y Eurostat. Cada gráfico dice de dónde sale.</span></div>
-      <div><i>2</i><span><b>Lo que se sabe y lo que no</b>Cada análisis dice qué muestran los datos y dónde dejan de servir. Las conclusiones son tuyas.</span></div>
-      <div><i>3</i><span><b>Método a la vista</b>Si algo parece una causa, se pone a prueba delante de ti, en el laboratorio y en los estudios.</span></div></div></section>
-    <section class="ab-sec"><h2>En qué te puedo ayudar</h2><p class="lead" style="max-width:var(--medida)">Además de Indicio, hago trabajos a medida con datos públicos. Si tienes una pregunta sobre tu territorio, tu sector o una política concreta, hablemos.</p>
+      <div><i>1</i><span><b>Solo datos oficiales</b>INE, SEPE, Seguridad Social, Interior o Eurostat. Cada gráfico dice de dónde sale.</span></div>
+      <div><i>2</i><span><b>Lo que se sabe y lo que no</b>Cada análisis separa lo que muestran los datos de lo que no se puede afirmar. La última palabra es tuya.</span></div>
+      <div><i>3</i><span><b>Método a la vista</b>Si algo parece una causa, se pone a prueba delante de ti, en el laboratorio y en cada análisis.</span></div></div></section>
+    <section class="ab-sec"><h2>En qué te puedo ayudar</h2><p class="lead" style="max-width:var(--medida)">Además de Indicio, hago trabajos a medida con datos públicos. Si tienes una pregunta sobre tu territorio, tu sector o una política concreta, cuéntamela.</p>
       <div class="g4">${SERVICIOS.map(([e,t,d])=>`<a class="cardx qcard ab-srv" href="/quien-soy/contacto/" data-t="${esc(t)}"><div class="ab-e">${e}</div><div class="t">${t}</div><p>${d}</p><div class="s">Pedir información →</div></a>`).join("")}</div></section>
     <section class="ab-sec" id="contacto"><h2>Escríbeme</h2>
       <div class="ab-form"><form id="abform" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
