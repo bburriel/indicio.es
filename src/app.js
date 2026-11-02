@@ -232,7 +232,7 @@ function fig(parent,{title,sub,source}={}){ const f=add(parent,"figure"); if(tit
 // Fuentes: cada estudio lista solo las que usa (methodNote(["atlas","padron"])); sin argumento, todas
 const SRC={
   atlas:`INE: Atlas de Distribución de Renta de los Hogares 2015–2024 (los años 2015–2023 a través del proyecto abierto <a href="https://github.com/pablogguz/ineAtlas.data" target="_blank" rel="noopener">ineAtlas.data</a>)`,
-  padron:"INE: padrón municipal 1996–2025", censo:"INE: Censo de Población y Viviendas 2021", mig:"INE: Estadística de Migraciones y Cambios de Residencia 2021–2024",
+  padron:"INE: padrón municipal 1996–2025", censo:"INE: Censo de Población y Viviendas 2021 y censos anuales de población 2021–2025", mig:"INE: Estadística de Migraciones y Cambios de Residencia 2021–2024",
   ipva:"INE: Índice de Precios de Vivienda en Alquiler (alquileres declarados a Hacienda), por municipio y, por antigüedad del contrato, por provincia", vt:"INE: medición de viviendas turísticas (agosto de 2020 a mayo de 2026)",
   salarios:"INE: Encuesta de Estructura Salarial", ipc:"INE: IPC", sepe:"SEPE: paro registrado por municipio, 2015–septiembre de 2026", interior:"Ministerio del Interior: generales de 2019 y 2023, municipales de 2019 y 2023 y europeas de 2024",
   idealista:"idealista: precio medio de los anuncios de alquiler", eurostat:"Eurostat: cuentas públicas, pensiones y proyecciones de población", hicp:"Eurostat: índice de precios de consumo armonizado mensual por grupos de alimentos (prc_hicp_midx), 2021–2025, España, Portugal, Francia, Italia y Alemania",
@@ -988,7 +988,7 @@ function summary(r,d){
 const GLANCE=[
   ["Población",[["pop","Habitantes","Padrón, 2025",false],["varPob","Crecimiento desde 2015","Padrón"],["edad","Edad media","2023"],["extr","Nacionalidad extranjera","2023"],["migExt","Llegadas netas del extranjero","por 1.000 hab. y año, 2021–2024"],["migInt","Saldo con el resto de España","por 1.000 hab. y año, 2021–2024"],["solos","Hogares de una persona","2023"]]],
   ["Dinero",[["renta","Renta neta por persona","2024"],["pobreza","Riesgo de pobreza","2023"],["gini","Desigualdad (Gini)","2023"],["pensiones","Peso de las pensiones","en los ingresos, 2023"]]],
-  ["Trabajo y estudios",[["paroReg","Paro registrado","apuntados al SEPE por cada 100 personas de 16 a 64 años, 2025"],["paro","Tasa de paro","por cada 100 que trabajan o buscan trabajo, censo de 2021"],["superiores","Estudios superiores","adultos, censo de 2021"]]],
+  ["Trabajo y estudios",[["paroReg","Paro registrado","apuntados al SEPE por cada 100 personas de 16 a 64 años, 2025"],["paroCensal","Tasa de paro","por cada 100 que trabajan o buscan trabajo, censo de 2024"],["superiores","Estudios superiores","adultos, censo de 2021"]]],
   ["Vivienda",[["alquiler","Hogares de alquiler","Censo de 2021"],["noPrincipal","Viviendas vacías o secundarias","Censo de 2021"],["vt","Viviendas turísticas","mayo de 2026"]]],
   ["Voto",[["part","Participación","generales de 2023"]]]];
 function glance(box,r,d){
@@ -1084,8 +1084,8 @@ function secVive(s,r,d){
       cats:[{k:"ser",l:"Servicios",c:"--slate"},{k:"ind",l:"Industria",c:"--plum"},{k:"con",l:"Construcción",c:"--mustard"},{k:"agr",l:"Agricultura",c:"--olive"},{k:"sin",l:"Sin empleo anterior",c:"--stone"}],note:`% de las personas en paro según el sector de su último empleo (${REFS.paroLast}). En los municipios pequeños el SEPE no da cifras de menos de 5.`});
   }
   const b3=block(s,"Paro y estudios");
-  cmpRows(b3,r[F.name],[["unemp","Tasa de paro","% de quien trabaja o busca empleo"],["activity","Tasa de actividad","% de adultos que trabaja o busca empleo"],["higherEd","Estudios superiores","% de adultos"]],cenSrc(r,d));
-  add(b3,"figcaption",null,"Censo de 2021. El censo da tasas de paro más altas que la Encuesta de Población Activa: sirve para comparar lugares.");
+  cmpRows(b3,r[F.name],[["unemp","Tasa de paro en 2021","% de quien trabaja o busca empleo"],["activity","Tasa de actividad","% de adultos que trabaja o busca empleo"],["higherEd","Estudios superiores","% de adultos"]],cenSrc(r,d));
+  add(b3,"figcaption",null,"Censo de 2021, el que permite comparar con la provincia y con España; la tasa de paro de 2024 está en «Todos los datos en una tabla». El censo da tasas de paro más altas que la Encuesta de Población Activa: sirve para comparar lugares.");
 }
 
 // ---------- desigualdad ----------
@@ -1516,7 +1516,7 @@ function drawCaveats(){
 // =====================================================================
 // COMPARAR DOS MUNICIPIOS
 // =====================================================================
-const CMPROWS=[["Población",["pop","varPob","edad","extr","migExt","migInt","solos"]],["Dinero",["renta","rentaHog","pobreza","gini","pensiones"]],["Trabajo",["paroReg","paro","superiores"]],["Vivienda",["alquiler","noPrincipal","vt","alqVar"]],["Voto",["part","pp","psoe","vox","sumar"]]];
+const CMPROWS=[["Población",["pop","varPob","edad","extr","migExt","migInt","solos"]],["Dinero",["renta","rentaHog","pobreza","gini","pensiones"]],["Trabajo",["paroReg","paroCensal","superiores"]],["Vivienda",["alquiler","noPrincipal","vt","alqVar"]],["Voto",["part","pp","psoe","vox","sumar"]]];
 async function renderComparar(a,b){
   document.title="Comparar · Indicio";
   if(!a||!BYCODE.has(a)) a=lastMun&&BYCODE.has(lastMun)?lastMun:"28079";

@@ -139,7 +139,7 @@ INDICADORES = [
  ("empleoMujeres", "Tasa de empleo de las mujeres (16 a 64 años)", "Trabajo", "pct", "INE, Censo anual de población, 2024"),
  ("brechaEmpleo", "Brecha de empleo entre hombres y mujeres", "Trabajo", "pts", "INE, Censo anual de población, 2024 (puntos de diferencia entre las tasas de empleo de 16 a 64 años)"),
  ("empleoVar", "Cambio de la tasa de empleo desde 2021", "Trabajo", "pts", "INE, Censo anual de población, 2021–2024"),
- ("paroCensal", "Tasa de paro (según el censo)", "Trabajo", "pct", "INE, Censo anual de población, 2024"),
+ ("paroCensal", "Tasa de paro", "Trabajo", "pct", "INE, Censo anual de población, 2024: parados por cada 100 personas que trabajan o buscan trabajo"),
  ("temporales", "Asalariados con contrato temporal", "Trabajo", "pct", "INE, Censo anual de población, 2023"),
  ("autonomos", "Trabajadores por cuenta propia", "Trabajo", "pct", "INE, Censo anual de población, 2023"),
  ("directivos", "Directivos y profesionales científicos", "Trabajo", "pct", "INE, Censo anual de población, 2023 (% de ocupados)"),

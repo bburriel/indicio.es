@@ -5,6 +5,9 @@ Uso: python3 construir.py [fuente …]   (sin argumentos, todas las de cache/out
 import json, os, sys, glob
 HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..", "..", "data")
 ORIGINALES = {"code", "name", "prov", "pop"}  # además de los 44 indicadores que ya traía el laboratorio (no se sobrescriben)
+# claves añadidas que, aun viniendo de otra fuente, van en index.json porque las enseñan la ficha y la comparación,
+# que no cargan extra.json (son 8.139 valores más en el índice que carga toda la web: añade solo lo que se vea fuera del laboratorio)
+AL_INDICE = ["paroCensal"]
 FORMATOS = {"int", "pct", "pct_chg", "pts", "eur", "years", "num1", "km", "dens"}
 ix = json.load(open(os.path.join(DATA, "index.json"), encoding="utf-8")); cat = json.load(open(os.path.join(DATA, "indicadores.json"), encoding="utf-8"))
 # los indicadores añadidos viven en data/extra.json (columnas alineadas fila a fila con index.json) para no engordar el índice que carga toda la web;
@@ -58,9 +61,11 @@ assert not sin, f"indicadores sin tema en construir.py: {sin}"
 # el catálogo conserva el orden original y agrupa lo nuevo al final por grupo
 orden = {k: i for i, k in enumerate(orig["cat"])}
 cat.sort(key=lambda c: (orden.get(c["k"], 10**6),))
-nb = len(orig["fields"])
-json.dump({"fields": ix["fields"][:nb], "rows": [r[:nb] for r in ix["rows"]], **{k: v for k, v in ix.items() if k not in ("fields", "rows")}}, open(os.path.join(DATA, "index.json"), "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
-json.dump({"fields": ix["fields"][nb:], "rows": [r[nb:] for r in ix["rows"]]}, open(EXTRA, "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
+# el índice lleva las claves de origen y las promovidas en AL_INDICE; el resto se queda en extra.json
+en_indice = orig["fields"] + [k for k in AL_INDICE if k in F and k not in orig["fields"]]
+ci = [F[k] for k in en_indice]; ce_ = [i for i, f in enumerate(ix["fields"]) if f not in set(en_indice)]
+json.dump({"fields": en_indice, "rows": [[r[i] for i in ci] for r in ix["rows"]], **{k: v for k, v in ix.items() if k not in ("fields", "rows")}}, open(os.path.join(DATA, "index.json"), "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
+json.dump({"fields": [ix["fields"][i] for i in ce_], "rows": [[r[i] for i in ce_] for r in ix["rows"]]}, open(EXTRA, "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
 json.dump(cat, open(os.path.join(DATA, "indicadores.json"), "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
 total = len(ix["rows"])
 for fuente, k, n in nuevos: print(f"{fuente:10s} {k:18s} {n:5d} municipios ({n/total*100:.0f} %)")
