@@ -12,11 +12,15 @@ const out={}; let codes=null;
 for(const [key,W,H] of [["d",1120,380],["m",720,520]]){
   const mid=H/2+6, mob=W<800;
   const X0=d3.scaleLinear().domain([-70,100]).range([16,W-(mob?60:110)]), X=v=>v<=100?X0(Math.max(-70,v)):X0(100)+Math.log(v/100)*(mob?20:38);
+  // (las posiciones se normalizan después de la simulación, igual que en QART.swarm)
   const R=d3.scaleSqrt().domain([0,3.4e6]).range([mob?1.3:1.1,mob?16:20]);
   const nodes=ix.rows.filter(r=>r[F.var0525]!=null&&r[F.edad]!=null).map(r=>({c:r[F.code],v:r[F.var0525],e:r[F.edad],r:Math.max(mob?1.3:1.15,R(r[F.pop]||0))}));
   nodes.forEach((d,i)=>{ d.x=X(d.v)+((i*7919)%10)/10-.5; d.y=mid+(((i*104729)%100)/100-.5)*40; });
   const sim=d3.forceSimulation(nodes).force("x",d3.forceX(d=>X(d.v)).strength(.9)).force("y",d3.forceY(mid).strength(mob?.03:.05)).force("c",d3.forceCollide(d=>d.r+.35).iterations(1)).stop();
   for(let i=0;i<90;i++) sim.tick();
+  // cuadrar la tinta con los márgenes del texto: el primer y el último punto tocan los bordes
+  const x0=d3.min(nodes,d=>d.x-d.r), x1=d3.max(nodes,d=>d.x+d.r), kf=W/(x1-x0);
+  nodes.forEach(d=>{ d.x=(d.x-x0)*kf; });
   if(!codes){ codes=nodes.map(d=>d.c); out.c=codes; }
   out[key]={W,H,x:nodes.map(d=>Math.round(d.x*10)),y:nodes.map(d=>Math.round(d.y*10)),r:nodes.map(d=>Math.round(d.r*10))};
 }
