@@ -24,18 +24,6 @@ const coin=(x,y,rx,c="k3",e="k8")=>E(x,y+4,rx,rx*0.32,e)+E(x,y,rx,rx*0.32,c);
 const stack=(x,base,n,rx,c,e)=>{ let s=""; for(let i=0;i<n;i++) s+=coin(x,base-i*9,rx,c,e); return s; };
 
 export const ILLUS={
-  "cerca-ciudad":svg("cerca-ciudad","Un pueblo y una ciudad unidos por una carretera, con anillos de distancia",
-    [1,2,3,4].map(i=>C(1000,300,i*160,"sr",` fill="none" stroke-dasharray="6 9" stroke-width="2"`)).join("")+
-    hills(282,"k8",22,0.6)+
-    [[860,170,"k2"],[920,240,"k1"],[990,200,"k4"],[1050,265,"k1"],[1110,150,"k2"],[1160,215,"k4"]].map(([x,h,c],i)=>bldg(x-30,300,62,h,c,"k7",2,[i*3%5])).join("")+
-    P("M120 318 C 330 318, 380 250, 560 262 S 800 300, 900 300","sk",` fill="none" stroke-width="16" stroke-linecap="round"`)+
-    P("M120 318 C 330 318, 380 250, 560 262 S 800 300, 900 300","sc",` fill="none" stroke-width="2" stroke-dasharray="12 12"`)+
-    R(0,300,1200,60,"k9")+
-    house(70,300,52,40,"kc","k2")+house(140,300,44,34,"k7","k1")+house(200,300,56,44,"kc","k2")+
-    R(270,214,26,86,"k7")+P("M266 214 L283 180 L300 214 Z","k3")+R(278,230,10,14,"ki")+
-    house(312,300,40,30,"k7","k1")+tree(40,300,1)+tree(380,300,1.1)+tree(440,300,0.8)+
-    C(160,70,26,"k3")),
-
   "pisos-turisticos":svg("pisos-turisticos","Una calle de edificios con maletas en la acera y cajetines de llaves",
     C(1080,74,30,"k3")+
     [[40,230,"k8"],[250,270,"k2"],[470,210,"k9"],[680,290,"k1"],[900,240,"k8"]].map(([x,h,c],i)=>bldg(x,312,200,h,c,"k7",4,[1,6,9,14,17,22].map(v=>(v+i*3)%(4*Math.floor((h-30)/34))),"k3")).join("")+
@@ -177,7 +165,7 @@ export const TILL={
 };
 
 // Encuadre de cada escena en las tarjetas (ventana de 720 px de ancho sobre 1200)
-export const FOCUS={"cerca-ciudad":330,"pisos-turisticos":240,"convergencia":240,"votar-pueblos":360,"crecer":380,"tope-cataluna":300,"pensiones":340,"pandemia-turismo":330,"renta-fuentes":480,"quien-gobierna":350,"ave":360,"prohibir-pisos-turisticos":240,"estudiar":300,"paro-sur":300};
+export const FOCUS={"pisos-turisticos":240,"convergencia":240,"votar-pueblos":360,"crecer":380,"tope-cataluna":300,"pensiones":340,"pandemia-turismo":330,"renta-fuentes":480,"quien-gobierna":350,"ave":360,"prohibir-pisos-turisticos":240,"estudiar":300,"paro-sur":300};
 
 ILLUS["vivienda-protegida"]=svg("vivienda-protegida","Un bloque de vivienda protegida con un escudo, una grúa parada y edificios altos al fondo",
   hills(250,"k8",24,1.3)+R(0,300,1200,60,"k9")+
