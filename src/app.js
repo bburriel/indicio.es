@@ -5637,19 +5637,22 @@ async function renderInicio(){
   ${methodNote()}`;
   bindBig("q2");
   // carrusel de la cabecera: el gráfico de cada análisis con su conclusión en una línea
-  const CAR=[["tope-cataluna","¿Frenó el tope de Cataluña el precio del alquiler?","Un poco","Sin tope habría subido un 3,7 %; subió un 3,1 %."],
-    ["reforma-laboral","¿Costó empleo la reforma laboral?","No se ve","La temporalidad cayó 30 puntos; el empleo no."],
-    ["iva-alimentos","¿Llegó al ticket la rebaja del IVA de los alimentos?","Sí","Más del 80 % de la rebaja acabó en el precio."],
-    ["precio-alimentos","¿Cuánta comida compra hoy un sueldo?","Un 12 % menos","La comida sube un 38 %; el sueldo, un 22 %."],
-    ["quien-gobierna","¿Importa quién gobierna tu ayuntamiento?","No","Gane el PP o el PSOE por poco, pasa lo mismo."],
-    ["ave","¿Cambia algo cuando llega el AVE?","Poco","Los pueblos con estación no se distinguen de sus gemelos."]];
+  const CAR=[["tope-cataluna","¿Frenó el tope de Cataluña el precio del alquiler?","Frenó la subida, no el precio","Sin el tope habría subido un 3,7 %; subió un 3,1 %. Unos 7 € al mes en un piso de Barcelona."],
+    ["reforma-laboral","¿Costó empleo la reforma laboral?","La temporalidad se desplomó y el empleo aguantó","Cayó unos 30 puntos en toda España, y los municipios que más vivían del contrato temporal no perdieron más empleo que los demás."],
+    ["iva-alimentos","¿Llegó al ticket la rebaja del IVA de los alimentos?","Sí, y al revés también","En enero de 2023 más del 80 % de la rebaja acabó en el precio; cuando el IVA volvió, en 2025, los precios subieron en la misma medida."],
+    ["precio-alimentos","¿Cuánta comida compra hoy un sueldo?","Un 12 % menos que antes de la pandemia","Desde 2019 la comida ha subido un 38 % y el sueldo medio un 22 %: con el mismo dinero, la cesta da para menos."],
+    ["quien-gobierna","¿Importa quién gobierna tu ayuntamiento?","Menos de lo que se supone","Donde el PP ganó por poco y donde ganó el PSOE por poco, el paro, la renta y la población siguieron el mismo camino."],
+    ["ave","¿Cambia algo cuando llega el AVE?","Casi nada, por ahora","A dos y a cuatro años, los municipios con estación nueva apenas se distinguen de sus gemelos sin ella."]];
   const car=document.getElementById("qcar");
   if(car){
     const stage=add(car,"div"); stage.className="qcar-stage";
     const nav=add(car,"div"); nav.className="qcar-nav";
+    // la ilustración entera (1200×360), sin el recorte de las tarjetas
+    const illFull=id=>{ const sv=((window.__INDICIO||{}).illus||{})[id]; if(!sv) return null; const d=el("div"); d.className="qill"; d.innerHTML=sv; return d; };
     const items=CAR.map(([id,q,v,c],n)=>{ const a=add(stage,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i"+(n?"":" on"); a.setAttribute("aria-hidden",n?"true":"false");
-      const fig=add(a,"div"); fig.className="qcar-fig"; const ic=illCard(id); if(ic) fig.appendChild(ic);
-      a.insertAdjacentHTML("beforeend",`<div class="qcar-txt"><div class="qcar-q">${esc(q)}</div><div class="qcar-v">${esc(v)}</div><div class="qcar-c">${esc(c)}</div><div class="qcar-go">Ver la respuesta →</div></div>`);
+      a.insertAdjacentHTML("beforeend",`<div class="qcar-q">${esc(q)}</div>`);
+      const fig=add(a,"div"); fig.className="qcar-fig"; const ic=illFull(id)||illCard(id); if(ic) fig.appendChild(ic);
+      a.insertAdjacentHTML("beforeend",`<div class="qcar-txt"><div class="qcar-v">${esc(v)}</div><div class="qcar-c">${esc(c)}</div><div class="qcar-go">Ver la respuesta →</div></div>`);
       return a; });
     const dots=CAR.map((x,n)=>{ const b=add(nav,"button"); b.className="qcar-d"+(n?"":" on"); b.type="button";
       b.setAttribute("aria-label","Análisis "+(n+1)+" de "+CAR.length+": "+x[1]); b.onclick=e=>{ e.preventDefault(); go(n); stop(); }; return b; });
