@@ -79,12 +79,6 @@ export const ILLUS={
     [430,710].map(x=>P(`M${x} 300 L${x+80} 300 L${x+100} 280`,"sk",` fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"`)+L(x+8,300,x+8,318,"sk",` stroke-width="5"`)+L(x+72,300,x+72,318,"sk",` stroke-width="5"`)).join("")+
     G("translate(1040 150) rotate(-8)",P("M0 0 L90 0 Q104 0 104 8 Q104 16 90 16 L0 16 Z","kr")+P("M40 2 L22 -26 L36 -26 L62 2 Z","kr")+P("M40 14 L22 40 L36 40 L62 14 Z","kr")+P("M2 2 L-6 -16 L4 -16 L14 2 Z","kr"))),
 
-  "renta-fuentes":svg("renta-fuentes","Corrientes de distintos colores que confluyen en una casa",
-    [["k4",60,16],["k3",130,12],["k5",200,8],["k2",270,7]].map(([c,y,w],i)=>P(`M0 ${y} C 380 ${y}, 520 ${236+i*10-15}, 840 ${236+i*10-15}`,c.replace("k","s"),` fill="none" stroke-width="${w*3}" stroke-linecap="round" opacity=".92"`)).join("")+
-    R(0,306,1200,54,"k9")+
-    house(860,306,220,150,"kc","k1","k2")+windows(884,186,3,1,46,34,22,0,"k7")+
-    stack(1140,300,6,26,"k3","k8")),
-
   "quien-gobierna":svg("quien-gobierna","Un ayuntamiento con dos banderas y una moneda en el aire",
     R(0,310,1200,50,"k9")+R(370,300,460,10,"kr")+
     R(400,130,400,170,"kc")+P("M380 130 L600 64 L820 130 Z","k1")+C(600,108,20,"k7")+L(600,108,600,96,"sk",` stroke-width="3"`)+L(600,108,610,112,"sk",` stroke-width="3"`)+
@@ -165,7 +159,7 @@ export const TILL={
 };
 
 // Encuadre de cada escena en las tarjetas (ventana de 720 px de ancho sobre 1200)
-export const FOCUS={"pisos-turisticos":240,"convergencia":240,"votar-pueblos":360,"crecer":380,"tope-cataluna":300,"pensiones":340,"pandemia-turismo":330,"renta-fuentes":480,"quien-gobierna":350,"ave":360,"prohibir-pisos-turisticos":240,"estudiar":300,"paro-sur":300};
+export const FOCUS={"pisos-turisticos":240,"convergencia":240,"votar-pueblos":360,"crecer":380,"tope-cataluna":300,"pensiones":340,"pandemia-turismo":330,"quien-gobierna":350,"ave":360,"prohibir-pisos-turisticos":240,"estudiar":300,"paro-sur":300};
 
 ILLUS["vivienda-protegida"]=svg("vivienda-protegida","Un bloque de vivienda protegida con un escudo, una grúa parada y edificios altos al fondo",
   hills(250,"k8",24,1.3)+R(0,300,1200,60,"k9")+
