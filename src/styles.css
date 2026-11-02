@@ -1298,3 +1298,14 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .near .v{text-align:right; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .howm2{margin-top:18px} .howm2 summary{cursor:pointer; font-size:14.5px; color:var(--ink-2)}
 @media (max-width:720px){ .nearg{grid-template-columns:1fr} }
+
+/* Laboratorio, paso 1: opciones nombradas por pregunta y agrupadas en familias */
+.types .tfam{grid-column:1/-1; margin:8px 0 0; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.types .tfam:first-child{margin-top:0}
+.types button b{display:block; font-size:12.5px; font-weight:700; color:var(--ink); line-height:1.2}
+.types button small{display:block; margin-top:2px; font-size:11px; color:var(--muted); font-weight:400}
+.types button[aria-pressed="true"] b{color:var(--brand)}
+.hint .ex{display:block; margin-top:3px; color:var(--ink-2); font-style:italic}
+/* «Ver por» en una sola fila */
+.lbseg{display:flex; flex-wrap:nowrap; width:100%}
+.lbseg button{flex:1 1 0; min-width:0; padding-left:2px; padding-right:2px; white-space:nowrap; font-size:12.5px}
