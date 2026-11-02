@@ -5622,8 +5622,8 @@ async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
   // cabecera: qué hacemos, en una frase, y un solo gráfico de análisis (la nube de municipios del campo)
   view.innerHTML=`<section class="qh qh-claim qh-short"><div class="kk2">Cifras públicas de los ${nf0.format(rowsAll().length)} municipios de España</div>
-    <h1 class="qh-q">${new URLSearchParams(location.search).get("claim")==="2"?"Érase una vez <em>España.</em>":"Los datos, <em>datos son.</em>"}</h1>
-    <p class="qh-a">Las leyes se anuncian; aquí se miden, municipio a municipio. Y si no te fías de la respuesta, compruébala tú.</p>
+    <h1 class="qh-q">Los datos, <em>datos son.</em></h1>
+    <p class="qh-a">El tope del alquiler, el salario mínimo, la rebaja del IVA de la comida. Leyes que te tocan el bolsillo y que casi nadie comprobó. Aquí sí, y tú también puedes.</p>
     <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
     <div class="qcar" id="qcar"></div>
     <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
@@ -5637,17 +5637,17 @@ async function renderInicio(){
   ${methodNote()}`;
   bindBig("q2");
   // carrusel de la cabecera: el gráfico de cada análisis con su conclusión en una línea
-  const CAR=[["tope-cataluna","¿Frenó el tope de Cataluña el precio del alquiler?","El alquiler de cada provincia; en granate, las catalanas.","Un poco","Sin tope habría subido un 3,7 %; subió un 3,1 %."],
-    ["reforma-laboral","¿Costó empleo la reforma laboral?","Contratos temporales por comunidad, año a año.","No se ve","La temporalidad cayó unos 30 puntos. El empleo, no."],
-    ["iva-alimentos","¿Llegó al ticket la rebaja del IVA de los alimentos?","El precio de cada alimento, antes y después.","Sí","Más del 80 % de la rebaja acabó en el precio."],
-    ["precio-alimentos","¿Cuánta comida compra hoy un sueldo?","La comida frente a los sueldos desde 2019.","Un 12 % menos","La comida ha subido un 38 %; el sueldo, un 22 %."],
-    ["quien-gobierna","¿Importa quién gobierna tu ayuntamiento?","Cada cuadro, un municipio, por partido del alcalde.","No","Gane quien gane por poco, pasa lo mismo."],
-    ["ave","¿Cambia algo cuando llega el AVE?","Cada punto, un municipio; en anillo, los que tienen estación.","Poco","No se distinguen de sus pueblos gemelos."]];
+  const CAR=[["tope-cataluna","¿Frenó el tope de Cataluña el precio del alquiler?","Un poco","Sin tope habría subido un 3,7 %; subió un 3,1 %."],
+    ["reforma-laboral","¿Costó empleo la reforma laboral?","No se ve","La temporalidad cayó 30 puntos; el empleo no."],
+    ["iva-alimentos","¿Llegó al ticket la rebaja del IVA de los alimentos?","Sí","Más del 80 % de la rebaja acabó en el precio."],
+    ["precio-alimentos","¿Cuánta comida compra hoy un sueldo?","Un 12 % menos","La comida sube un 38 %; el sueldo, un 22 %."],
+    ["quien-gobierna","¿Importa quién gobierna tu ayuntamiento?","No","Gane el PP o el PSOE por poco, pasa lo mismo."],
+    ["ave","¿Cambia algo cuando llega el AVE?","Poco","Los pueblos con estación no se distinguen de sus gemelos."]];
   const car=document.getElementById("qcar");
-  if(car) CAR.forEach(([id,q,leg,v,c])=>{ const a=add(car,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i";
+  if(car) CAR.forEach(([id,q,v,c])=>{ const a=add(car,"a"); a.href="/preguntas/"+id+"/"; a.className="qcar-i";
     a.insertAdjacentHTML("beforeend",`<div class="qcar-q">${esc(q)}</div>`);
     const ic=illCard(id); if(ic) a.appendChild(ic);
-    a.insertAdjacentHTML("beforeend",`<div class="qcar-c">${esc(v)}</div>`); });
+    a.insertAdjacentHTML("beforeend",`<div class="qcar-v">${esc(v)}</div><div class="qcar-c">${esc(c)}</div>`); });
   const L=qGet(), wide=view.clientWidth;
   // tarjetas: con imágenes estáticas no hace falta esperar al mapa
   const g=document.getElementById("qg"); g.innerHTML="";

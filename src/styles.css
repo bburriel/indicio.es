@@ -1236,12 +1236,13 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .phead img.il{aspect-ratio:1200/330}
 
 /* carrusel de la cabecera (borrador) */
+.qh-short .qh-q{min-height:0}
 .qcar{display:flex; gap:26px; overflow-x:auto; scroll-snap-type:x mandatory; margin:34px 0 0; padding-bottom:10px}
 .qcar-i{flex:0 0 300px; scroll-snap-align:start; text-decoration:none; color:inherit}
 .qcar-q{font-family:var(--serif); font-size:17px; line-height:1.3; color:var(--ink-2); min-height:2.6em}
 .qcar-i .qill{margin:10px 0 0}
 .qcar-i .qill svg{display:block; width:100%; height:auto}
-.qcar-c{font-family:var(--serif); font-size:26px; line-height:1.1; color:var(--brand); margin-top:12px; letter-spacing:-.015em}
-.qcar-i:hover .qcar-c{text-decoration:underline; text-underline-offset:3px}
-@media(max-width:700px){.qcar{gap:20px; margin-top:24px} .qcar-i{flex-basis:260px} .qcar-c{font-size:23px}}
-.qh-short .qh-q{min-height:0}
+.qcar-v{font-family:var(--serif); font-size:25px; line-height:1.1; color:var(--brand); margin-top:12px; letter-spacing:-.015em}
+.qcar-c{font-size:13.5px; line-height:1.45; color:var(--ink-2); margin-top:5px}
+.qcar-i:hover .qcar-v{text-decoration:underline; text-underline-offset:3px}
+@media(max-width:700px){.qcar{gap:20px; margin-top:24px} .qcar-i{flex-basis:260px} .qcar-v{font-size:22px}}
