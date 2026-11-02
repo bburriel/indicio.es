@@ -202,13 +202,6 @@ const mrows=f=>ROWS.filter(f);
   s+=line(40,H-24,W-40,H-24,INK,1);
   add("smi-empleo-hogar","La escalera del salario mínimo desde 2008; en granate, el salto de 2019, cuando subió un 22 %",s+"</svg>"); }
 
-// 20. Deuda municipal: deuda por habitante de los ayuntamientos de cada provincia en 2015 (círculo vacío) y ahora (granate)
-{ const [W,H]=B, D=CAU.deuda, n=D.years.length; const P=PROVS.map(p=>{ const S=Object.entries(D.s).filter(([c])=>c.slice(0,2)===p); const pop=d3.sum(S,([c])=>BY.get(c)?.[F.pop]||0)||1; return {a:d3.sum(S,([c,v])=>v[0]||0)/pop,b:d3.sum(S,([c,v])=>v[n-1]||0)/pop}; }).filter(p=>p.a>0).sort((x,y)=>y.a-x.a);
-  const w=(W-60)/P.length, Y=d3.scaleSqrt().domain([0,d3.max(P,p=>Math.max(p.a,p.b))]).range([H-24,24]);
-  let s=svgOpen(W,H); P.forEach((p,i)=>{ const x=30+(i+.5)*w; s+=line(x,Y(p.a),x,Y(p.b),LINE,2)+circ(x,Y(p.b),4,WINE)+circ(x,Y(p.a),4,PAPER,` stroke="${DARK}" stroke-width="1.3"`); });
-  s+=line(20,H-24,W-20,H-24,INK,1);
-  add("deuda-quien-gobierna","La deuda por habitante de los ayuntamientos de cada provincia en 2015 (círculo vacío) y ahora (granate): casi todas bajan",s+"</svg>"); }
-
 // 21. Precio de los alimentos: alimentos y sueldos desde 2008; en granate, lo que los alimentos se adelantan
 { const [W,H]=B, M=ALI.meses, Sp=ALI.salario.periodos, sal=ALI.salario.es;
   const s4=sal.map((v,i)=>i<3?null:d3.mean(sal.slice(i-3,i+1))), q0=3, base=s4[q0];
