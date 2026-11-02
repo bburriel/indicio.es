@@ -2264,7 +2264,7 @@ function psBar(bar){
   const cur=esMode?SE[PS.s[0]]:null, scoped=esMode&&PS.s.some(k=>SE[k]&&SE[k].ev&&!SE[k].ev.nat), sc=psScope(), hasE=esMode&&PS.s.some(k=>SE[k]&&SE[k].u==="€");
   const yrs=psYears(), yOpt=(sel)=>yrs.map(y=>`<option ${y===sel?"selected":""}>${y}</option>`).join("");
   bar.innerHTML=`
-    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.paises}.</p></div>
+    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML("paises")}</div>
     ${esMode?`<div class="lb-step"><h4><i>2</i>Qué series</h4>`:`<div class="lb-step"><h4><i>2</i>Qué dato</h4><div class="slot full"><span class="nm" style="flex:1"><small>Dato</small><button type="button" class="pick" id="pspick" aria-haspopup="dialog"><span class="pv">${esc(PSIND[PS.k].l)}</span><span class="pg">Países</span></button></span></div><p class="hint">${esc(PSIND[PS.k].d)}</p></div>
     <div class="lb-step"><h4><i>3</i>Qué países</h4>`}
       ${esMode?`${PS.s.map((k,i)=>`<div class="slot full"><span class="nm" style="flex:1"><small>Serie ${i+1}</small><button type="button" class="pick" ${i===0?'id="pspick"':`data-sw="${k}"`} aria-haspopup="dialog"><span class="pv">${esc((SE[k]||{}).l||k)}</span><span class="pg">${esc(((SE[k]||{}).g||"").replace(/ \(.*\)$/,""))}</span></button></span>${PS.s.length>1?`<button type="button" data-rs="${k}" aria-label="Quitar">×</button>`:""}</div>`).join("")}
@@ -2661,7 +2661,7 @@ function exComposicion(out){
 }
 
 // ---------- barras laterales de las vistas nuevas ----------
-const typesStep=()=>`<div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC[EX.v]}.</p></div>`;
+const typesStep=()=>`<div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML(EX.v)}</div>`;
 function wireTypes(bar){ bar.querySelectorAll(".types button").forEach(b=>b.addEventListener("click",()=>{ EX.v=b.dataset.v; viewDefaults(); navTo(exHash()); })); }
 function viewDefaults(){
   if(EX.v==="cruce"&&EX.d.length<2) EX.d.push(EX.d[0]==="renta"?"paroReg":"renta");
@@ -3460,6 +3460,12 @@ const LBTYPES=[["mapa","Mapa",`<path d="M6 4h12l4 6 10 1 3 10H8z"/>`],["tabla","
   ["piramide","Pirámide",`<rect x="15" y="1" width="10" height="5"/><rect x="11" y="7" width="18" height="5"/><rect x="7" y="13" width="26" height="5"/><rect x="5" y="19" width="30" height="5"/>`],
   ["composicion","Composición",`<rect x="4" y="2" width="13" height="6"/><rect x="18" y="2" width="9" height="6"/><rect x="28" y="2" width="8" height="6" style="opacity:.5"/><rect x="4" y="10" width="7" height="6"/><rect x="12" y="10" width="16" height="6"/><rect x="29" y="10" width="7" height="6" style="opacity:.5"/><rect x="4" y="18" width="18" height="6"/><rect x="23" y="18" width="7" height="6"/><rect x="31" y="18" width="5" height="6" style="opacity:.5"/>`]];
 const LBDESC={matriz:"¿Qué datos van juntos? Todas las parejas de datos a la vez, municipio a municipio",pendientes:"¿Quién ha mejorado y quién se ha quedado atrás? Cada provincia o comunidad, entre dos años",piramide:"¿Cómo es la población? Hombres y mujeres por edad, en España, una comunidad o una provincia",composicion:"¿De qué se compone? Sectores, voto o edades en cada comunidad, provincia, tamaño o nivel de renta",paises:"¿Cómo ha cambiado? Las series que quieras, año a año, con un año de referencia si quieres: precios, sueldos, vivienda, empleo… de España, tu provincia o tu municipio, o España frente a otros países",mapa:"¿Dónde es más alto o más bajo? Un dato, municipio a municipio",tabla:"¿Quiénes encabezan la lista? Ordena y filtra por varios datos",cruce:"¿Van juntos dos datos? Mira si la relación aguanta al comparar entre iguales",antes:"¿Cambió algo tras una ley o un suceso? Afectados frente a gemelos, año a año",evolucion:"¿Cómo ha cambiado? Cuánto ha crecido cada dato desde un año",grupos:"¿Qué zona destaca? Medias por comunidad, provincia, tamaño o nivel",distribucion:"¿Cómo se reparte? Un dato entre toda la población",burbujas:"¿Cómo se mueven las provincias? Dos datos y el tamaño, año a año"};
+// Paso 1 del laboratorio: cada gráfico se nombra por la pregunta que responde, con el nombre del gráfico debajo
+const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Qué va con qué",grupos:"Qué zona destaca",distribucion:"Cómo se reparte",matriz:"Todo con todo",paises:"Cómo ha cambiado",pendientes:"Quién mejoró",burbujas:"Cómo se mueven",piramide:"Por edades",composicion:"De qué se compone"};
+const LBFAM=[["Ver dónde",["mapa","tabla"]],["Comparar",["cruce","grupos","distribucion","matriz"]],["Ver el cambio",["paises","pendientes","burbujas"]],["Ver la estructura",["piramide","composicion"]]];
+const LBEJ={mapa:"dónde hay más paro registrado",tabla:"los municipios con la renta más alta",cruce:"si donde se estudia más se gana más",grupos:"la renta media por comunidad",distribucion:"cuántos municipios tienen mucho paro y cuántos poco",matriz:"qué datos se mueven juntos en los municipios",paises:"cómo han subido los alquileres en tu provincia",pendientes:"qué provincias han mejorado su renta desde 2015",burbujas:"cómo se mueven las provincias en renta y paro",piramide:"cómo de envejecida está una provincia",composicion:"qué sectores dan trabajo en cada comunidad"};
+const typesHTML=cur=>`<div class="types">${LBFAM.map(([f,ks])=>`<p class="tfam">${f}</p>${ks.map(k=>{ const t=LBTYPES.find(x=>x[0]===k); return `<button type="button" data-v="${k}" aria-pressed="${k===cur}" title="${LBDESC[k]}">${typeIcon(t[2])}<b>${LBQ[k]}</b><small>${t[1]}</small></button>`; }).join("")}`).join("")}</div>`;
+const hintHTML=v=>`<p class="hint">${LBDESC[v]}.${LBEJ[v]?` <span class="ex">Ejemplo: ${LBEJ[v]}.</span>`:""}</p>`;
 const typeIcon=(svg,on)=>`<svg width="40" height="26" viewBox="0 0 40 26" aria-hidden="true" style="fill:var(--rule-2);stroke:var(--rule-2)">${svg}</svg>`;
 const QUICK=["renta","paroReg","edad","alquiler","part","superiores","varPob","vt"];
 const NBKEY="cifrario.cuaderno";
@@ -3588,7 +3594,7 @@ function exBar(){
   if(EX.v==="mapa") slots=`<label class="lbl">Ver por</label>${scaleSeg("exmu",EX.u)}<div style="height:10px"></div>`+slots;
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
-    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC[EX.v]}.</p></div>
+    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML(EX.v)}</div>
     <div class="lb-step"><h4><i>2</i>Qué datos</h4>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
     ${isEvo||isB||isMapAgg?"":`<div class="lb-step"><h4><i>3</i>Qué municipios</h4>
       <select class="sel" id="exprov" aria-label="Provincia">${`<option value="">Toda España</option>`+Object.keys(PROVS).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")).map(p=>`<option value="${p}" ${p===EX.p?"selected":""}>${esc(provShort(PROVS[p]))}</option>`).join("")}</select>
@@ -4091,7 +4097,7 @@ function adSet(ev){ const E=ADEV[ev]; if(!E) return; AD={...AD,ev,y:E.y,mc:E.mc|
 function adBar(bar){
   const E=ADEV[AD.ev], yrs=d3.range(2017,2026);
   bar.innerHTML=`
-    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4><div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===EX.v}" title="${LBDESC[k]}">${typeIcon(svg)}${l}</button>`).join("")}</div><p class="hint">${LBDESC.antes}.</p></div>
+    <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML("antes")}</div>
     <div class="lb-step ad-ctl"><h4><i>2</i>Qué pasó y dónde</h4>
       <select class="sel" id="adev" aria-label="Qué pasó">${Object.entries(ADEV).map(([k,v])=>`<option value="${k}" ${k===AD.ev?"selected":""}>${esc(v.l)}</option>`).join("")}</select>
       ${AD.ev==="ccaa"?`<label class="blk" for="adcc">Comunidad</label><select class="sel" id="adcc">${CCAAS().map(c=>`<option ${c===AD.cc?"selected":""}>${esc(c)}</option>`).join("")}</select>`:""}
