@@ -2274,7 +2274,7 @@ function psBar(bar){
           <div class="search" id="ps-s" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="margin:8px 0 0;flex:none;min-width:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="ps-q" type="search" placeholder="${sc.code?"Otro municipio":"Elige un municipio"}" autocomplete="off" aria-label="Elegir municipio"><ul id="ps-r" class="results" role="listbox" hidden></ul></div>
           <p class="hint">Los precios, los sueldos y el gasto público son de toda España.</p></div>`:""}`
         :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
-    <div class="lb-step"><h4><i>${esMode?3:4}</i>Comprobar</h4>
+    <div class="lb-step"><h4><i>${esMode?3:4}</i>Ajustes</h4>
       <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
       <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
       ${esMode?`<label class="chk"><input type="checkbox" id="psidx" ${PS.idx?"checked":""}> Como índice, con un año de referencia = 100</label>
@@ -3513,7 +3513,36 @@ const LBTIPS=[
   ["#vogb button[data-v=size]","Por tamaño","Una barra por tamaño de municipio, de pueblos a grandes ciudades."],
   ["#vogb button[data-v=q]","Por nivel del dato","Divide los municipios en tramos, de los que tienen menos a los que tienen más de este dato."],
   ["#slu button[data-v=prov]","Provincias","Compara provincias."],
-  ["#slu button[data-v=ccaa]","Comunidades","Compara comunidades autónomas."]
+  ["#slu button[data-v=ccaa]","Comunidades","Compara comunidades autónomas."],
+  // series
+  ["#pspick","Cambiar el dato","Pulsa para elegir otro dato. Puedes buscar por nombre o por tema."],
+  ["#psadd","Añadir una serie","Suma otra serie al gráfico (hasta siete) para compararlas. Si miden cosas distintas, usa el índice."],
+  ["button[data-sw]","Cambiar la serie","Pulsa para sustituir esta serie por otra."],
+  ["button[data-rs]","Quitar la serie","La quita del gráfico."],
+  ["#psipc","Añadir el IPC general","Suma la subida media de precios, para ver si este dato sube más o menos que la vida en general."],
+  [".seg[aria-label='Ámbito'] button","Dónde mirar","Cambia entre toda España, tu provincia o tu municipio, si el dato existe a esa escala."],
+  ["#ps-q","Buscar un municipio","Escribe un municipio para ver sus datos en lugar de los de España."],
+  ["#psd","Desde","Primer año que se dibuja."],
+  ["#psh","Hasta","Último año que se dibuja."],
+  ["label.chk:has(#psgob)","Quién gobernaba","Sombrea el fondo según el partido que gobernaba en España en cada año."],
+  ["label.chk:has(#psidx)","Como índice","Pone todas las series en 100 en el año de referencia: una línea en 130 ha crecido un 30 % desde entonces. Permite comparar euros, precios y personas."],
+  [".psb",'Año de referencia',"El año en que todas las series valen 100."],
+  ["label.chk:has(#psreal)","Descontar la inflación","Convierte los euros de cada año a euros de hoy, para ver cuánto compra de verdad el dato."],
+  ["#psref","País de referencia","Se compara España con este país."],
+  ["label.chk:has(#psrel)","Ver como diferencia","Dibuja cada país como la distancia a la referencia: por encima o por debajo."],
+  [".pschips label.chk","Países","Marca o desmarca este país en el gráfico. España siempre aparece."],
+  // pirámide y composición
+  ["#pyz","Dónde","Elige España, una comunidad o una provincia."],
+  ["#pyc button[data-v=es]","Comparar con España","Superpone la pirámide de España, para ver en qué se diferencia."],
+  ["#pyc button[data-v=past]","Comparar con el pasado","Superpone la pirámide de hace unos años, para ver cómo ha envejecido."],
+  ["#pyc button[data-v=none]","Sin comparar","Solo la pirámide del lugar elegido."],
+  ["label.chk:has(#pyp)","En porcentaje","Cada barra es el porcentaje del total, no el número de personas: permite comparar lugares de distinto tamaño."],
+  ["#cof","Qué reparto","Elige qué quieres ver repartido: sectores, voto, edades…"],
+  ["#cog button[data-v=ccaa]","Por comunidad","Una barra por comunidad autónoma."],
+  ["#cog button[data-v=prov]","Por provincia","Una barra por provincia."],
+  ["#cog button[data-v=size]","Por tamaño","Una barra por tamaño de municipio, de pueblos a grandes ciudades."],
+  ["#cog button[data-v=q]","Por nivel de renta","Una barra por tramo de renta, de los municipios más pobres a los más ricos."],
+  ["#coo","Ordenar por","Ordena las barras según el tamaño de esta parte."]
 ];
 function lbTips(root){ if(!root) return;
   LBTIPS.forEach(([sel,t,d])=>{ let ns; try{ ns=root.querySelectorAll(sel); }catch(e){ return; }
