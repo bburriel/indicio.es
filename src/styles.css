@@ -670,7 +670,7 @@ details.howm .method{margin-top:0; border-top:0; padding-top:0}
    3 Botones: rectángulo redondeado con borde.   4 Pastillas: chips y filtros; pulsadas = verde.
    5 Tarjetas pulsables: se elevan al pasar y llevan «→». Las tarjetas que no se pulsan no reaccionan. */
 :root{ --hit:color-mix(in srgb, var(--mark) 55%, var(--card)); --ring:0 0 0 3px color-mix(in srgb, var(--acc-ink) 35%, transparent) }
-input[type=checkbox],input[type=radio]{accent-color:var(--acc-ink); width:16px; height:16px; cursor:pointer}
+input[type=checkbox],input[type=radio]{accent-color:var(--acc-ink); width:16px; height:16px; flex:none; cursor:pointer}
 label.chk{cursor:pointer}
 .lista li a,.glance td a,.twins a:not(.gol),.vrow a{text-decoration:underline; text-decoration-color:var(--rule-2); text-decoration-thickness:1.5px; text-underline-offset:3px}
 .lista li a:hover,.glance td a:hover,.twins a:not(.gol):hover{text-decoration-color:var(--acc-ink); color:var(--brand-2)}
