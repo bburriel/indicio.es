@@ -5640,6 +5640,29 @@ function heroHover(ar,key){
     if(!h){ hide(); return; }
     if(e.pointerType==="mouse"||matchMedia("(hover:hover)").matches){ navTo("m"+P.c[h.i]); window.scrollTo(0,0); } else show(h); }); });
   tip.addEventListener("click",e=>{ if(cur){ e.preventDefault(); navTo("m"+cur); window.scrollTo(0,0); } });
+  heroMine(ar,key,load,()=>P);
+}
+// tu municipio, señalado sobre la nube igual que Madrid y Barcelona (solo si lo has guardado)
+function heroMine(ar,key,load,getP){
+  if(!myOk(lastMun)) return;
+  load().then(()=>{ const P=getP(), m=ar.querySelector("svg:not(.hv-mine),img"); if(!P||!m||!document.body.contains(ar)) return;
+    const i=P.c.indexOf(lastMun); if(i<0) return;
+    const mob=key==="m", W=P.W, H=mob?520:380, x=P.x[i], y=P.y[i], r=P.r[i], fs=mob?22:14, off=mob?90:150;
+    const at=c=>{ const j=P.c.indexOf(c); return j<0?null:[P.x[j],P.y[j]]; }, md=at("28079"), bc=at("08019");
+    const taken=[md?[md[0]+off,mob?66:40]:null,bc?[bc[0]-off,H-40]:null].filter(Boolean);
+    const name=myName(lastMun), tw=name.length*fs*.5;
+    const T0=mob?66:40, cand=[[x+off*.8,T0],[x-off*.8,T0],[x+off*.8,H-40],[x-off*.8,H-40]].map(([lx,ly])=>[Math.max(tw/2+6,Math.min(W-tw/2-6,lx)),ly]);
+    const score=([lx,ly])=>Math.min(...taken.map(([tx,ty])=>Math.abs(tx-lx)/(tw+60)+(ty===ly?0:3)),9)-Math.abs(lx-x)/W;
+    const [lx,ly]=cand.sort((a,b)=>score(b)-score(a))[0], up=ly<y;
+    const C=QC(), ns="http://www.w3.org/2000/svg", sv=document.createElementNS(ns,"svg"); sv.setAttribute("viewBox",`0 0 ${W} ${H}`); sv.setAttribute("class","hv-mine"); sv.setAttribute("aria-hidden","true");
+    const brd=css("--brand")||"#8a2232";
+    sv.innerHTML=`<circle cx="${x}" cy="${y}" r="${r+(mob?6:4)}" fill="none" stroke="${brd}" stroke-width="${mob?3:2}"/>`+
+      `<line x1="${x}" y1="${y+(up?-(r+4):r+4)}" x2="${lx}" y2="${ly+(up?4:-fs)}" stroke="${brd}" stroke-width="${mob?1.4:.9}"/>`+
+      `<text x="${lx}" y="${ly}" text-anchor="middle" font-family="var(--serif)" font-style="italic" font-size="${fs}" fill="${brd}" paint-order="stroke" stroke="${C.bg}" stroke-width="4">${esc(name)}</text>`;
+    const place=()=>{ const b=m.getBoundingClientRect(), a=ar.getBoundingClientRect(); Object.assign(sv.style,{left:(b.left-a.left)+"px",top:(b.top-a.top)+"px",width:b.width+"px",height:b.height+"px"}); };
+    ar.querySelectorAll(".hv-mine").forEach(e=>e.remove()); ar.appendChild(sv); place();
+    if(window.ResizeObserver) new ResizeObserver(place).observe(m); else addEventListener("resize",place);
+  });
 }
 
 // un pueblo al azar, señalado sobre el dibujo
