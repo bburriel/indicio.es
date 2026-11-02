@@ -5432,21 +5432,21 @@ function renderSobre(sec){
   const A=ABOUT, nm=A.nombre?esc(A.nombre):"";
   const first=(A.nombre||"Borja").split(" ")[0];
   view.innerHTML=`<section class="ab-hero">
-      <div><span class="kk">Quién hay detrás</span><h1>Soy ${esc(A.name||("Borja Burriel"))}</h1>
-      <p class="dek">${A.frase?esc(A.frase):"Analista de datos. Mi trabajo consiste en medir si un cambio funciona o solo lo parece, en productos digitales como Domestika, Wallapop o Northius. Indicio aplica ese mismo método a los datos públicos de España."}</p>
+      <div><span class="kk">Quién hay detrás</span><h1>${esc(A.name||"Borja Burriel")}</h1>
+      <p class="dek">${A.frase?esc(A.frase):"Analista de datos especializado en experimentación: mido si un cambio funciona o solo lo parece. Lo hice durante años en productos digitales y en Indicio lo aplico a los datos públicos de España."}</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
     </section>
-    <section class="ab-story">
-      <div class="ab-st"><span class="ab-n">Formación</span><h3>Estadística, para empezar</h3><p>Hice un máster en Estadística. De ahí me quedó una costumbre que aplico a todo: antes de creerme un número, preguntarme cuánto se puede equivocar.</p></div>
-      <div class="ab-st"><span class="ab-n">Trabajo</span><h3>Experimentos en producto</h3><p>En <b>Domestika</b>, <b>Wallapop</b> y <b>Northius</b> me he dedicado a la experimentación. Cuando se cambia algo en una web o en una app, una parte de los usuarios ve la novedad y otra no, como en un ensayo clínico. Mi trabajo es decir si la diferencia es real o simple ruido.</p></div>
-      <div class="ab-st"><span class="ab-n">Antes</span><h3>Datos y deporte</h3><p>Empecé investigando en <b>deporte</b>: usar datos para explicar por qué un jugador o un equipo rinde más que otro, más allá de la intuición y de la última jugada que todo el mundo recuerda.</p></div>
+    <section class="ab-cv" aria-label="Trayectoria">
+      <div class="ab-row"><span class="ab-n">Formación</span><div><h3>Máster en Estadística</h3><p>Me quedó una costumbre que aplico a todo: antes de creerme un número, preguntarme cuánto se puede equivocar.</p></div></div>
+      <div class="ab-row"><span class="ab-n">Experiencia</span><div><h3>Experimentación en producto <small>Domestika · Wallapop · Northius</small></h3><p>Cuando se cambia algo en una web o en una app, una parte de los usuarios ve la novedad y otra no, como en un ensayo clínico. Mi trabajo es decir si la diferencia es real o simple ruido.</p></div></div>
+      <div class="ab-row"><span class="ab-n">Origen</span><div><h3>Análisis de datos deportivos</h3><p>Empecé investigando en deporte: usar datos para explicar por qué un jugador o un equipo rinde más que otro, más allá de la intuición y de la última jugada que todo el mundo recuerda.</p></div></div>
     </section>
     <section class="ab-why"><h2>Por qué Indicio</h2>
       <p>En España se publican muchísimos datos y casi nadie tiene tiempo de leerlos. Cuando se usan, es fácil caer en la trampa de siempre: ver que dos cosas van juntas y dar por hecho que una causa la otra. ¿Suben los alquileres <i>por</i> los pisos turísticos, o las dos cosas pasan en los mismos sitios por otra razón?</p>
       <p>Con un municipio no se puede hacer un experimento como en una app, pero sí se puede trabajar con cuidado: comparar cada lugar con otros parecidos, mirar qué cambió antes y después de una ley y decir con claridad <b>hasta dónde llegan los datos</b>. El <a href="/laboratorio/">laboratorio</a> está para que cualquiera pueda hacer lo mismo con sus propias preguntas, sin saber estadística.</p>
       <p>Es un proyecto personal e independiente: sin publicidad, sin financiación de partidos y con las fuentes y el método a la vista en cada página.</p>
     </section>
-    <section class="ci-band"><h2>Cómo trabaja Indicio</h2><div class="ci-steps" style="padding:0">
+    <section class="ab-how"><h2>Cómo trabaja Indicio</h2><div class="ci-steps" style="padding:0">
       <div><i>1</i><span><b>Solo datos oficiales</b>INE, SEPE, Ministerio del Interior y Eurostat. Cada gráfico dice de dónde sale.</span></div>
       <div><i>2</i><span><b>Lo que se sabe y lo que no</b>Cada análisis dice qué muestran los datos y dónde dejan de servir. Las conclusiones son tuyas.</span></div>
       <div><i>3</i><span><b>Método a la vista</b>Si algo parece una causa, se pone a prueba delante de ti, en el laboratorio y en los estudios.</span></div></div></section>

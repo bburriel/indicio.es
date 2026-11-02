@@ -1286,3 +1286,17 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
   .czb-e{border-left:0; padding-left:0; border-top:1px solid var(--rule); padding-top:18px}
   .czbig{font-size:34px} .czvh em{font-size:23px}
 }
+
+/* quién soy: sin cajas (2 de noviembre de 2026) */
+.ab-cv{max-width:var(--medida); padding:6px 0 30px}
+.ab-row{display:grid; grid-template-columns:130px minmax(0,1fr); gap:24px; padding:20px 0; border-top:1px solid var(--rule-2)}
+.ab-row:last-child{border-bottom:1px solid var(--rule-2)}
+.ab-row .ab-n{padding-top:6px}
+.ab-row h3{font-family:var(--serif); font-size:22px; line-height:1.2; margin:0 0 6px; font-weight:500}
+.ab-row h3 small{display:block; font-family:inherit; font-size:14px; font-weight:400; color:var(--muted); letter-spacing:.01em; margin-top:3px}
+.ab-row p{margin:0; color:var(--ink-2); font-size:16.5px; line-height:1.6}
+.ab-how{padding:6px 0 10px} .ab-how h2{font-size:26px; margin-bottom:6px}
+.ab-how .ci-steps{border-top:1px solid var(--rule-2); margin-top:12px}
+.ab-how .ci-steps i{background:none; width:auto; height:auto; border-radius:0; color:var(--brand); font-family:var(--serif); font-size:20px; font-weight:500; display:block}
+.ab-how .ci-steps div{grid-template-columns:22px 1fr}
+@media (max-width:640px){ .ab-row{grid-template-columns:minmax(0,1fr); gap:4px} .ab-row .ab-n{padding-top:0} }
