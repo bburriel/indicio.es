@@ -5621,9 +5621,9 @@ let QH_T=null;
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
   // cabecera: qué hacemos, en una frase, y un solo gráfico de análisis (la nube de municipios del campo)
-  view.innerHTML=`<section class="qh qh-claim"><div class="kk2">Datos públicos de los ${nf0.format(rowsAll().length)} municipios de España</div>
-    <h1 class="qh-q">Las leyes se anuncian. <em>Aquí se miden.</em></h1>
-    <p class="qh-a">Qué prometía la ley y qué pasó después. Y si no te fías de la respuesta, compruébala tú.</p>
+  view.innerHTML=`<section class="qh qh-claim qh-short"><div class="kk2">Cifras públicas de los ${nf0.format(rowsAll().length)} municipios de España</div>
+    <h1 class="qh-q">${new URLSearchParams(location.search).get("claim")==="2"?"Érase una vez <em>España.</em>":"Los datos, <em>datos son.</em>"}</h1>
+    <p class="qh-a">Las leyes se anuncian; aquí se miden, municipio a municipio. Y si no te fías de la respuesta, compruébala tú.</p>
     <p class="qh-cta"><a class="btn" href="/preguntas/">Ver los análisis →</a><a class="btn alt" href="/laboratorio/">Abrir el laboratorio</a></p>
     <div class="qcar" id="qcar"></div>
     <div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. Pasa por encima de un punto para ver qué municipio es."></div><p class="qh-cap" id="qhc"></p></section>
