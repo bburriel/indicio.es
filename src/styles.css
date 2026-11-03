@@ -1615,3 +1615,7 @@ details.chk > section{margin-top:18px}
 .czb-e .czsent{margin:2px 0 0; font-size:15.5px; color:var(--muted)}
 .czb-e .czbig{margin:8px 0 0; font-size:44px}
 .czmorebtn{border-style:solid}
+/* «Tu municipio»: botón discreto en la cabecera (sin borde ni fondo hasta pasar el ratón) */
+.mymun{border-color:transparent!important; background:none!important; color:var(--muted)!important; font-size:13.5px}
+.mymun:hover,.mymun:focus-visible{border-color:var(--rule-2)!important; background:var(--card)!important; color:var(--ink)!important}
+.mymun .c{opacity:.6}
