@@ -967,42 +967,18 @@ function kpis(box,r,d){
     ["paroReg","Paro registrado · 2025",r[F.paroReg],esOff("paroReg"),"pp","% de 16 a 64 años",["menos","más"]],
     ["alquiler","Hogares de alquiler · 2021",r[F.alquiler],ce.rented,"pp","",["menos","más"]],
     ["part",`Participación · ${k.slice(2,6)}`,r[F.part],VREFS.es[k].turnout,"pp","",["menos","más"]]];
-  // la misma comparación en todas las filas: «España X · ▲/▼ diferencia». Flechas neutras: más no es ni bueno ni malo
-  const cmp=(v,e,mode)=>{ if(v==null||e==null) return null; let a,t;
-    if(mode==="rel"){ a=(v/e-1)*100; t=nf0.format(Math.abs(a))+NB+"%"; if(Math.abs(a)<.5) a=0; }
-    else{ a=v-e; t=nf1.format(Math.abs(a))+NB+(mode==="años"?"años":"puntos"); if(Math.abs(a)<.05) a=0; }
-    return a===0?{a:0,t:"igual",ar:"=",sr:"igual que España"}:{a,t,ar:a>0?"▲":"▼",sr:`${t} ${a>0?(mode==="rel"?"por encima":"más"):(mode==="rel"?"por debajo":"menos")} que España`}; };
-  // «dónde queda entre todos»: cada fila pinta los 8.000 municipios como puntos y marca el tuyo y España
-  box.className="strips"; const n=rowsAll().length, nm=esc(dispName(r[F.name]));
-  box.innerHTML=`<div class="st-h">Dónde queda entre los ${nf0.format(n)} municipios</div>`+K.map(([kk,l,v,e,mode,nota,lr],i)=>{ const c=cmp(v,e,mode), fe=e==null?"":fmtK(kk)(e);
-    const cl=e==null?"":`<small class="st-cmp"${c?` aria-label="España ${fe}; ${c.sr}"`:""}>España ${fe}${c?` · <span class="st-ar" aria-hidden="true">${c.ar==="="?"":c.ar}</span>${c.ar==="="?"":" "}${c.t}`:""}</small>`;
-    return `<div class="st-r"><div class="st-l">${l}${nota?`<small>${nota}</small>`:""}</div>
-    <div class="st-c"><div class="st-a"><span class="st-ln">${nm}</span></div>
-      <div class="st-s"><canvas data-i="${i}" aria-hidden="true"></canvas><i class="st-band" hidden></i><i class="st-m es"></i><i class="st-m me"></i>${c&&c.a?`<b class="st-d" hidden aria-hidden="true">${c.ar} ${c.t}</b>`:""}</div>
-      <div class="st-x"><span class="st-e0">${lr[0]}</span><span class="st-le">España</span><span class="st-e1">${lr[1]}</span></div></div>
-    <div class="st-v"><span class="st-n">${v==null?'<span class="muted">sin dato</span>':fmtK(kk)(v)}</span>${cl}</div></div>`; }).join("");
-  const draw=()=>{ if(!box.isConnected) return; box.querySelectorAll(".st-r").forEach(row=>{ const cv=row.querySelector("canvas"), [kk,,v,e]=K[+cv.dataset.i];
-    const W=cv.clientWidth||600, H=38; cv.width=W*2; cv.height=H*2; const x=cv.getContext("2d"); x.scale(2,2);
-    const vals=rowsAll().map(q=>q[F[kk]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length) return;
-    const lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99), X=z=>4+(W-8)*Math.max(0,Math.min(1,(z-lo)/((hi-lo)||1)));
-    let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
-    x.fillStyle=css("--ink"); x.globalAlpha=.16; for(const z of vals){ x.fillRect(X(z),4+rnd()*(H-8),1.3,1.3); } x.globalAlpha=1;
-    x.fillStyle=css("--rule-2"); x.fillRect(3,2,1,H-4); x.fillRect(W-4,2,1,H-4);
-    // marcas y etiquetas: HTML encima del canvas
-    const $=s=>row.querySelector(s), put=(el,px)=>{ const w=el.offsetWidth; el.style.left=Math.max(0,Math.min(W-w,px-w/2))+"px"; };
-    const xv=v==null?null:X(v), xe=e==null?null:X(e), mv=$(".st-m.me"), me_=$(".st-m.es"), band=$(".st-band"), pill=$(".st-d"), ln=$(".st-ln"), le=$(".st-le");
-    mv.hidden=ln.hidden=xv==null; me_.hidden=le.hidden=xe==null; band.hidden=true; if(pill) pill.hidden=true; mv.classList.remove("mix");
-    if(xv!=null) mv.style.left=(xv-1.5)+"px";
-    if(xe!=null) me_.style.left=(xe-.75)+"px";
-    if(xv!=null&&xe!=null){ if(Math.abs(xv-xe)<4){ mv.classList.add("mix"); me_.hidden=true; }
-      else{ const a=Math.min(xv,xe), bw=Math.abs(xv-xe); band.hidden=false; band.style.left=a+"px"; band.style.width=bw+"px";
-        if(pill){ pill.hidden=false; const pw=pill.offsetWidth; if(bw>=pw+10) pill.style.left=(a+bw/2-pw/2)+"px"; else pill.hidden=true; } } }
-    if(xv!=null) put(ln,xv); if(xe!=null) put(le,xe);
-    row.querySelectorAll(".st-e0,.st-e1").forEach(el=>{ el.style.visibility="visible"; if(le.hidden) return; const A=le.getBoundingClientRect(), B=el.getBoundingClientRect(); if(B.left<A.right+6&&B.right>A.left-6) el.style.visibility="hidden"; }); }); };
-  requestAnimationFrame(draw);
-  try{ new ResizeObserver(draw).observe(box); }catch(e){}
-  try{ document.fonts.ready.then(draw); }catch(e){}
-  box.insertAdjacentHTML("beforeend",`<div class="st-k"><span>Cada punto gris es un municipio</span><span>La franja entre las dos marcas es la diferencia con España</span></div>`);
+  // cada cifra: una frase, dos barras desde cero (el municipio y España) y dónde queda entre todos los municipios
+  box.className="cp-kpis"; const n=rowsAll().length, nm=dispName(r[F.name]), en=esc(nm), W={renta:"renta",varPob:"crecimiento",edad:"edad media",paroReg:"paro",alquiler:"hogares de alquiler",part:"participación"};
+  const sent=(k,v,e)=>{ const f=fmtK(k), d=v-e, vs=`: ${f(v)} frente a ${f(e)}.`, mas=d>0?"más":"menos";
+    if(k==="renta"){ const p=(v/e-1)*100; return Math.abs(p)<2?["","Casi la misma renta que la media de España","."]:[`${nm} tiene `,`un ${nf0.format(Math.abs(p))}${NB}% ${mas} de renta`,` que la media de España${vs}`]; }
+    if(k==="varPob"){ if(v<0) return [`${nm} `,"ha perdido vecinos",` desde 2015: ${f(v)}, frente a ${f(e)} en España.`]; return Math.abs(d)<.5?["","Ha crecido casi igual que España",vs]:[`${nm} `,`ha crecido ${mas}`,` que España${vs}`]; }
+    if(k==="edad") return Math.abs(d)<.3?["","Prácticamente la misma edad media que España","."]:[`En ${nm} la población es `,`${nf1.format(Math.abs(d))} años ${d>0?"mayor":"más joven"}`,` que la media de España${vs}`];
+    if(k==="paroReg") return Math.abs(d)<.3?["","Casi el mismo paro que España",vs]:[`${nm} tiene `,`${mas} paro`,` que España${vs}`];
+    if(k==="alquiler") return Math.abs(d)<1?["","Casi los mismos hogares de alquiler que España",vs]:[`En ${nm} hay `,`${mas} hogares de alquiler`,` que en España${vs}`];
+    return Math.abs(d)<1?["","Se vota casi igual que en España",vs]:[`En ${nm} se vota `,mas,` que en España${vs}`]; };
+  box.innerHTML=`<div class="cp-key"><span><i class="me"></i>${en}</span><span><i class="es"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span></div>`+K.map(([kk,l,v,e,mode,nota])=>{
+    const ph=v==null?["","No hay dato de "+nm,"."]:e==null?[`${nm}: `,fmtK(kk)(v),"."]:sent(kk,v,e), f=fmtK(kk);
+    return `<div class="cp-r cp-k"><div class="cp-t"><div class="cp-l">${esc(l)}</div>${nota?`<div class="cp-s">${esc(nota)}</div>`:""}<p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${cpTrk(kk,[["a",v]],e)}<div class="cp-vv"><b>${v==null?"sin dato":f(v)}</b>${e==null?"":`<small>España ${f(e)}</small>`}</div></div>`; }).join("");
 }
 // ---------- minigráficos de cambio ----------
 function smalls(box,r,d){
@@ -1714,13 +1690,10 @@ function cpBig(k,A,Bm,va,vb){
   if(r>=2) return [z,"Más del doble",`de ${c.n} en ${H}.`,det];
   return [z,`+${nf0.format((r-1)*100)}${NB}%`,`de ${c.n} en ${H}.`,det];
 }
-// barras desde cero; si algún valor es negativo, el cero queda dentro y las negativas van a su izquierda
-function cpBars(k,items){
-  const f=fmtK(k), vs=items.map(x=>x[2]).filter(v=>v!=null), mn=Math.min(0,...vs), mx=Math.max(0,...vs), rg=(mx-mn)||1, S=66, x0=-mn/rg*S;
-  return items.map(([nm,cl,v])=>{ if(v==null) return `<div class="cp-bar ${cl}"><span class="n">${nm}</span><div class="t"><em style="left:0">sin dato</em></div></div>`;
-    const w=Math.max(Math.abs(v)/rg*S,.8), l=v<0?x0-w:x0, p=v<0?x0:x0+w;
-    return `<div class="cp-bar ${cl}"><span class="n">${nm}</span><div class="t">${mn<0?`<i class="z" style="left:${x0}%"></i>`:""}<i class="f" style="left:${l}%;width:${w}%"></i><em style="left:${p}%">${f(v)}</em></div></div>`; }).join("");
-}
+// pista de un dato: de menos a más entre los municipios de España (del 1 % al 99 %), con la franja donde está el 80 % de ellos
+function cpTrk(k,pts,e){ const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length||pts.every(p=>p[1]==null)) return "<div></div>";
+  const lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99), X=z=>Math.max(0,Math.min(1,(z-lo)/((hi-lo)||1)))*100, b0=X(d3.quantile(vals,.1)), b1=X(d3.quantile(vals,.9));
+  return `<div class="cp-trk" aria-hidden="true"><i class="bd" style="left:${b0}%;width:${b1-b0}%"></i>${e==null?"":`<i class="es" style="left:${X(e)}%"></i>`}${pts.map(([c,v])=>v==null?"":`<i class="me ${c}" style="left:${X(v)}%"></i>`).join("")}</div>`; }
 
 async function renderComparar(a,b){
   document.title="Comparar · Indicio";
@@ -1743,11 +1716,11 @@ async function renderComparar(a,b){
   if(big.length) top+=`<section class="finding"><h2>Lo que más llama la atención</h2><div class="cp-big">${big.map(([,n,t,d])=>`<div><div class="n">${n}</div><div class="t">${esc(t)}</div><div class="d">${d}</div></div>`).join("")}</div>${alike.length?`<p class="cp-like"><b>En esto se parecen:</b> ${esc(join(alike))}.</p>`:""}</section>`;
   else top+=`<section class="finding"><h2>Lo que más llama la atención</h2><p class="cp-like">Estos dos municipios se parecen mucho: ninguno de los datos principales los separa de forma clara.${alike.length?" En concreto, "+esc(join(alike))+".":""}</p></section>`;
   // dato a dato: una frase y tres barras desde cero
-  let h=`<p class="cp-intro">Las barras empiezan en cero: cuanto más larga, más grande es el dato. La barra gris es la media de España.</p>`;
+  let h=`<div class="cp-key"><span><i class="me"></i>${eA}</span><span><i class="me b"></i>${eB}</span><span><i class="es"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span></div>`;
   for(const [q,rows] of CP_SECS){ h+=`<div class="cp-g">${q}</div>`;
     for(const [k,l,sub] of rows){ if(F[k]==null||!CATK[k]) continue; const va=val(A,k), vb=val(Bm,k), e=esMean(k), f=fmtK(k);
       let ph; if(va==null||vb==null){ ph=["",va==null&&vb==null?"No hay dato de ninguno de los dos":"No hay dato de "+(va==null?nmA:nmB),"."]; } else ph=cpSentence(k,nmA,nmB,va,vb);
-      h+=`<div class="cp-r"><div class="cp-t"><div class="cp-l">${esc(l)}</div><div class="cp-s">${esc(sub)}</div><p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div><div class="cp-bars">${cpBars(k,[[eA,"a",va],[eB,"b",vb],["España","e",e]])}</div></div>`; } }
+      h+=`<div class="cp-r cp-k2"><div class="cp-t"><div class="cp-l">${esc(l)}</div><div class="cp-s">${esc(sub)}</div><p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${cpTrk(k,[["a",va],["b",vb]],e)}<div class="cp-vv2"><span><i class="me"></i>${eA} <b>${va==null?"sin dato":f(va)}</b></span><span><i class="me b"></i>${eB} <b>${vb==null?"sin dato":f(vb)}</b></span>${e==null?"":`<span class="e"><i class="es"></i>España <b>${f(e)}</b></span>`}</div></div>`; } }
   const t=finding(B,"Dato a dato",""); add(t,"div","cp",h);
   // la tabla completa, plegada: los 24 datos con su fuente
   let tb=`<table class="glance cmptab"><thead><tr><th>Dato</th><th class="r">${eA}</th><th class="r">${eB}</th><th class="r">España</th></tr></thead><tbody>`;

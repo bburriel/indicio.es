@@ -943,28 +943,6 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .czbar .pc{white-space:nowrap}
 
 /* Ficha: dónde queda entre todos los municipios */
-.strips{border-top:1px solid var(--ink); padding-top:12px}
-.st-h{font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
-.st-r{display:grid; grid-template-columns:200px minmax(0,1fr) 200px; gap:18px; align-items:center; padding:10px 0; border-bottom:1px solid var(--rule)}
-.st-l{font-size:16px} .st-l small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
-.st-c{min-width:0}
-.st-a,.st-x{position:relative; height:16px; font-size:11.5px; color:var(--muted)}
-.st-s{position:relative; height:38px}
-.st-s canvas{display:block; width:100%; height:38px}
-.strips [hidden]{display:none!important}
-.st-ln,.st-le,.st-e0,.st-e1,.st-d{position:absolute; white-space:nowrap}
-.st-ln{bottom:1px; font-size:12px; font-weight:700; color:var(--rust)}
-.st-le{top:1px; font-size:12px; font-weight:700; color:var(--ink)}
-.st-e0{top:1px; left:0} .st-e1{top:1px; right:0}
-.st-m{position:absolute; top:0; height:38px; pointer-events:none}
-.st-m.me{width:3px; background:var(--rust)} .st-m.me.mix{background:linear-gradient(90deg,var(--ink) 50%,var(--rust) 50%)}
-.st-m.es{width:1.5px; background:var(--ink)}
-.st-band{position:absolute; top:0; height:38px; background:var(--rust); opacity:.12; pointer-events:none}
-.st-d{top:11px; padding:1px 6px; border-radius:3px; background:var(--bg); font-size:11.5px; font-weight:600; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:16px; pointer-events:none}
-.st-v{text-align:right} .st-n{display:block; font-size:21px; color:var(--rust); font-variant-numeric:tabular-nums; font-family:var(--serif,inherit)}
-.st-cmp{display:block; margin-top:2px; font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums} .st-ar{color:var(--ink-2); font-size:10.5px}
-.st-k{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); margin-top:8px}
-@media (max-width:720px){ .st-r{grid-template-columns:minmax(0,1fr) auto; gap:4px 12px} .st-c{grid-column:1/-1; grid-row:2} }
 
 /* Ilustraciones (illus/*.svg) */
 .tcard .img:has(img){height:auto; padding:0; aspect-ratio:16/10} .tcard .img img,.an-pan .img img,.ed-ill img{display:block; width:100%; height:100%; object-fit:cover}
@@ -1852,8 +1830,8 @@ details.chk > section{margin-top:18px}
 @media (max-width:860px){ .ab-row + .ab-sec{margin-top:48px; padding-top:40px} }
 
 /* Comparar dos municipios: frases y barras desde cero */
-.cp-head{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:10px 28px; align-items:start; padding:20px 0 6px; border-top:1px solid var(--ink)}
-.cp-vs{font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:22px; color:var(--muted); padding-top:12px}
+.cp-head{display:grid; grid-template-columns:minmax(0,1fr) 120px minmax(0,1fr); gap:10px 0; align-items:start; padding:20px 0 6px; border-top:1px solid var(--ink)}
+.cp-vs{font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:22px; color:var(--muted); text-align:center; line-height:clamp(34px,4.6vw,48px)}
 .cp-nm{display:flex; align-items:center; gap:12px; font-family:'Newsreader',Georgia,serif; font-size:clamp(32px,4.4vw,46px); line-height:1.05}
 .cp-nm i{width:16px; height:16px; border-radius:50%; flex:none}
 .cp-nm a{color:var(--ink); text-decoration:none} .cp-nm a:hover{text-decoration:underline}
@@ -1867,24 +1845,30 @@ details.chk > section{margin-top:18px}
 .cp-big .d{font-size:13px; color:var(--muted); margin-top:6px; font-variant-numeric:tabular-nums}
 @media (max-width:760px){ .cp-big{grid-template-columns:repeat(2,minmax(0,1fr))} .cp-big .t{font-size:14px} }
 .cp-like{margin:20px 0 0; font-size:15.5px; line-height:1.5; color:var(--ink-2)} .cp-like b{color:var(--ink)}
-.cp-intro{font-size:14.5px; line-height:1.5; color:var(--ink-2); margin:0}
 .cp-g{margin-top:30px; padding-bottom:8px; border-bottom:1px solid var(--ink); font-family:'Newsreader',Georgia,serif; font-size:23px; font-weight:500}
 .cp-r{display:grid; grid-template-columns:minmax(0,330px) minmax(0,1fr); gap:10px 36px; align-items:center; padding:20px 0; border-bottom:1px solid var(--rule)}
 .cp-l{font-size:16.5px; font-weight:600} .cp-s{font-size:13px; color:var(--muted); margin-top:1px}
 .cp-t p{font-size:15.5px; line-height:1.4; margin:8px 0 0} .cp-t p b{font-weight:700}
-.cp-bars{display:flex; flex-direction:column; gap:8px}
-.cp-bar{display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:center}
-.cp-bar .n{font-size:14px; overflow-wrap:anywhere}
-.cp-bar .t{position:relative; height:16px}
-.cp-bar .t .f{position:absolute; top:0; height:16px; background:var(--rust)}
-.cp-bar.b .t .f{background:var(--s-b)} .cp-bar.e .t .f{background:var(--rule-2)}
-.cp-bar .t .z{position:absolute; top:-3px; height:22px; width:1px; background:var(--muted)}
-.cp-bar .t em{position:absolute; top:50%; transform:translateY(-50%); margin-left:8px; font-style:normal; font-size:14.5px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap}
-.cp-bar.e .n,.cp-bar.e .t em{color:var(--muted); font-weight:400}
-@media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-bar{grid-template-columns:74px minmax(0,1fr)} .cp-bar .n{font-size:13.5px} .cp-bar .t em{font-size:14px} }
 .cp-all{margin-top:28px; border:1px solid var(--rule-2); border-radius:10px; padding:0 18px}
 .cp-all summary{cursor:pointer; padding:15px 0; font-size:15px; list-style:none; display:flex; justify-content:space-between; gap:12px}
 .cp-all summary::-webkit-details-marker{display:none}
 .cp-all summary::after{content:"Desplegar ▾"; font-weight:600; white-space:nowrap}
 .cp-all[open] summary::after{content:"Plegar ▴"}
 .cp-all[open]{padding-bottom:16px}
+
+.cp-kpis{border-top:1px solid var(--ink); padding-top:14px}
+.cp-key{display:flex; flex-wrap:wrap; gap:6px 18px; font-size:12.5px; color:var(--muted); align-items:center}
+.cp-key i{display:inline-block; vertical-align:-2px; margin-right:6px} .cp-key i.me{width:11px; height:11px; border-radius:50%; background:var(--rust)} .cp-key i.es{width:2px; height:13px; background:var(--ink)} .cp-key i.bd{width:18px; height:9px; background:var(--band); border:1px solid var(--rule-2)}
+.cp-k{grid-template-columns:minmax(0,300px) minmax(0,1fr) 120px}
+.cp-trk{position:relative; height:30px; margin:0 8px}
+.cp-trk::before{content:""; position:absolute; left:-8px; right:-8px; top:14px; height:1px; background:var(--rule-2)}
+.cp-trk .bd{position:absolute; top:7px; height:16px; background:var(--band); border:1px solid var(--rule-2); box-sizing:border-box}
+.cp-trk .es{position:absolute; top:3px; height:24px; width:2px; margin-left:-1px; background:var(--ink)}
+.cp-trk .me{position:absolute; top:7px; width:16px; height:16px; margin-left:-8px; border-radius:50%; background:var(--rust); border:2px solid var(--bg); box-sizing:border-box}
+.cp-vv{text-align:right; font-variant-numeric:tabular-nums} .cp-vv b{display:block; font-size:18px; color:var(--rust)} .cp-vv small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
+@media (max-width:760px){ .cp-k{grid-template-columns:minmax(0,1fr) auto; gap:8px 12px} .cp-k .cp-t{grid-column:1/-1} .cp-k .cp-trk{grid-row:2; grid-column:1} .cp-k .cp-vv{grid-row:2; grid-column:2} }
+
+.cp-trk .me.b,.cp-key i.me.b{background:var(--s-b)}
+.cp-k2{grid-template-columns:minmax(0,300px) minmax(0,1fr) 190px}
+.cp-vv2{display:flex; flex-direction:column; gap:3px; font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums} .cp-vv2 b{color:var(--ink); font-weight:600; float:right; margin-left:10px} .cp-vv2 span{display:block} .cp-vv2 i{display:inline-block; vertical-align:-1px; margin-right:7px} .cp-vv2 i.me{width:10px; height:10px; border-radius:50%; background:var(--rust)} .cp-vv2 i.me.b{background:var(--s-b)} .cp-vv2 i.es{width:2px; height:11px; background:var(--ink); margin:0 8px 0 4px}
+@media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-k2 .cp-trk{margin:0 8px} }
