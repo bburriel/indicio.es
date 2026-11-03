@@ -5506,6 +5506,13 @@ async function studyAlimentos(B){
       table(f.body,["Comunidad","Comida","Sueldo mediano","Comida que compra"],CC.map(x=>[x.n,sg(x.f),sg(x.w),sg(x.b)])); }
   };
   const IV=ivaCalc(); Object.assign(V,IV.V); Object.assign(G,IV.G);
+  G.tuCesta=d=>{ const ali=((1+V.med19/100)/(1+V.poderMed/100)-1)*100, gen=((1+V.med19/100)/(1+V.poderMedIPC/100)-1)*100, w0=20;
+    playBox(d,{defs:[["s","Cuánto ha subido tu sueldo desde 2019",0,60,1,"El sueldo mediano subió un "+nf0.format(V.med19)+" % hasta "+V.añoSueldo+".",x=>"+"+x+NB+"%"],["w","Parte de tu gasto que es comida",10,45,1,"En el IPC, la comida pesa en torno a un "+w0+" %; los hogares con menos ingresos gastan más.",x=>x+NB+"%"]],
+      pre:[["Sueldo mediano",{s:Math.round(V.med19),w:20}],["Sueldo mínimo",{s:Math.round(V.smiSubida),w:35}],["Sueldo que ha seguido al IPC",{s:Math.round(gen),w:20}]],
+      render:st=>{ const propia=gen+(st.w-w0)/100*(ali-gen), pc_=((1+st.s/100)/(1+ali/100)-1)*100, pg=((1+st.s/100)/(1+propia/100)-1)*100;
+        return `<div class="big">${pc_>=0?"+":"−"}${nf0.format(Math.abs(pc_))}${NB}% <span class="muted" style="font-size:16px;font-weight:400">de comida que compras con tu sueldo</span></div>
+          <p>Hasta ${V.añoSueldo}, la comida ha subido un ${nf0.format(ali)}${NB}% y el conjunto de precios, un ${nf0.format(gen)}${NB}%. Con tu mezcla de gasto, tus precios han subido en torno a un ${nf0.format(propia)}${NB}%, así que para toda tu cesta tu poder de compra ha cambiado un <b>${pg>=0?"+":"−"}${nf0.format(Math.abs(pg))}${NB}%</b>.</p>
+          <p class="muted" style="font-size:14px">Cálculo aproximado: el resto de tu gasto sube como el resto de precios. Tu cesta real puede ser distinta.</p>`; }}); };
   mdRender(B,"precio-alimentos",V,G);
 }
 

@@ -57,6 +57,12 @@ Hay un grupo que sí ha seguido a la comida: los que menos cobran. El salario m�
 
 Aun así, la comida pesa mucho más en el presupuesto de los hogares con menos ingresos. Para ellos, un 10 % menos de poder de compra en el súper no es una molestia: es elegir qué se deja de comprar.
 
+## Tu cesta, no la media
+
+El IPC mide el hogar medio. Tú comes más o menos aceite, gastas más o menos en comida y tu sueldo ha ido por su lado. Pon tus números y mira cuánta comida compras hoy, y cómo ha cambiado tu poder de compra con tu mezcla de gasto. La respuesta casi nunca es «todos pierden» ni «todos aguantan»: depende de lo que cobras y de en qué gastas.
+
+[[grafico:tuCesta]]
+
 ## Precios que ya no suben, pero no bajan
 
 Durante veinte años la comida se encareció algo más que el resto de cosas, pero muy poco a poco. El salto de 2022 y 2023 cambió de escala, y no se ha deshecho: la comida es hoy un **{{rel02|pct0}} más cara en relación con el resto de precios que en 2002**.
