@@ -1,7 +1,7 @@
 ---
 titulo: ¿Por qué cuesta tanto pagar una casa?
 entradilla: El alquiler y el precio de compra han subido mucho más que los sueldos. Contamos qué ha pasado, a quién le golpea y por qué, y medimos cuánto pueden aportar las dos ideas que se discuten: construir más o que cada casa sea para vivir.
-respuesta: Porque se forman muchos más hogares de los que se construyen viviendas, y parte de las que hay no se usan para vivir. Las dos cosas pesan, pero no igual. Movilizar viviendas vacías y turísticas donde hay demanda puede aportar entre 200.000 y 300.000 de una vez; construir es lo único que sigue sumando cada año. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
+respuesta: Porque se forman muchos más hogares de los que se construyen viviendas, y parte de las que hay no se usan para vivir. Las dos cosas pesan, pero no igual. Movilizar viviendas vacías y turísticas donde hay demanda puede aportar entre 200.000 y 300.000 de una vez; construir es lo único que sigue sumando cada año. El alquiler ha subido sobre todo donde llega gente: es lo que más separa a unos municipios de otros. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
 tema: vivienda
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
@@ -84,6 +84,22 @@ Donde sí hay demanda, en los {{nZ}} municipios de 20.000 habitantes o más que 
 
 Aquí está el matiz. Una vivienda acumulada que se alquila sigue alojando a un hogar: no resta casas. Las resta cuando se queda vacía, se usa unas semanas al año o se alquila a turistas, y eso ya está en las dos piezas anteriores. Lo que sí puede hacer la acumulación es empujar los precios: quien compra para invertir compite con quien compra para vivir, y concentrar la propiedad puede dar más poder para fijar el alquiler. Es un efecto plausible, pero con los datos públicos no se puede medir bien, y por eso no entra en la cuenta de abajo.
 
+### Qué ha separado a los sitios donde más ha subido el alquiler
+
+Antes de hacer cuentas hacia delante, conviene mirar atrás. Lo que ya ha pasado dice otra cosa útil: qué distingue a los municipios donde más ha subido el alquiler de los demás. Comparamos los {{mN|n0}} municipios de 5.000 habitantes o más con todos los datos, donde vive el {{mPob|pct0}} de la población, y repartimos entre cinco grupos de factores lo que explican de la subida entre 2020 y 2024.
+
+[[grafico:pesos]]
+
+**La demanda se lleva la mayor parte: en torno al {{pDem|pct0}}**, con un margen de entre el {{pDemLo|pct0}} y el {{pDemHi|pct0}}. El alquiler subió más donde más creció la población y el empleo. Los pisos turísticos explican en torno al {{pTur|pct0}}; las viviendas vacías o secundarias, el {{pVac|pct0}}; las compraventas por habitante, el {{pCom|pct0}}; y la construcción nueva, apenas el {{pCon|pct0}}.
+
+Tres avisos para leerlo bien:
+
+- **Explica una parte, no todo.** Estos cinco factores explican en torno al {{r2m|pct0}} de las diferencias entre municipios. El resto depende de cosas que estos datos no miden, como el tipo de vivienda, el barrio o la oferta de alquiler en cada momento.
+- **Que la construcción pese poco no quiere decir que construir no sirva.** Se construye poco en casi todas partes, así que no es lo que ha separado a unos municipios de otros. Por provincias, con las viviendas terminadas de verdad y no solo las compraventas de obra nueva, la construcción tampoco pesa más del {{pConPr|pct0}}, y la demanda se lleva el {{pDemPr|pct0}}.
+- **Es una comparación entre lugares, no un experimento.** Si se comparan solo municipios de la misma provincia, la demanda sigue en cabeza, con el {{pDemP|pct0}}, aunque ahí los cinco factores explican muy poco: casi todo lo que separa a unos municipios de otros es la provincia en la que están.
+
+Las dos miradas apuntan a lo mismo: el alquiler sube sobre todo donde llega gente. Lo que se construye y las viviendas sin habitar han pesado poco en las diferencias entre unos sitios y otros, porque en casi ninguno han ido al ritmo de esa llegada.
+
 ### Entre el blanco y el negro: ¿cuánto puede aportar cada idea?
 
 Mueve los mandos. Lo que faltaría es lo que falta hoy más los hogares nuevos que no cubre el ritmo actual de obra. Los porcentajes de vacías y turísticas que vuelven a ser vivienda no salen de los datos: son supuestos, y por eso puedes cambiarlos.
@@ -121,6 +137,7 @@ La conclusión de los datos es incómoda para casi todo el mundo: las medidas so
 - **Hogares y viviendas:** hogares de la Encuesta de Población Activa (Eurostat), proyección de hogares del INE, viviendas libres terminadas y viviendas protegidas con calificación definitiva (Ministerio de Vivienda).
 - **Viviendas vacías y municipios con demanda:** Censo de 2021 (INE): 3.837.328 viviendas vacías y 2.514.511 de uso esporádico, según el consumo de electricidad. Por municipio solo se publica el % que no es residencia habitual; las viviendas de cada municipio se estiman como hogares / (1 − ese %), con los hogares sacados de la población y del tamaño medio del hogar en España, y la parte vacía con el reparto de España (47 %). «Con demanda» son los municipios de 20.000 habitantes o más que han ganado población desde 2015. Las viviendas turísticas son las de la estadística experimental del INE.
 - **Propiedad:** Catastro, propietarios por número de inmuebles, 2015 y 2024 (citado por La Marea); viviendas alquiladas según cuántas tiene su dueño, Panel de Hogares de la Agencia Tributaria de 2023 (estudio del Ministerio de Derechos Sociales y el CSIC). Déficit del Banco de España: Informe Anual 2025.
+- **Qué ha separado a los municipios:** regresión ponderada por población de la subida del alquiler 2020–2024 (IPVA del INE) sobre cinco grupos: demanda (crecimiento de la población 2020–2025 y de los afiliados desde 2019), construcción nueva (% de compraventas de vivienda nueva, 2021–2025), viviendas no principales (Censo 2021), pisos turísticos (peso en 2024 y cambio desde 2020) y compraventas por habitante, con la renta y el tamaño como controles. El R² se reparte entre los grupos con el método de Shapley y el margen es el intervalo del 90 % de 300 remuestreos. Por provincias, la subida del IPVA 2019–2024 con la población, las viviendas terminadas por habitante, las no principales y las turísticas. Código: `scripts/datos/vivienda_pesos.py`.
 - **Lo que faltaría:** viviendas que faltan hoy (mando) más, cada año, los hogares nuevos de la proyección del INE (2026–2036) menos las viviendas que se terminan ahora (media de 2021 a {{añoHog21}}). Construir más empieza a sumar a los dos años.
 - **Europa:** Eurostat (índice de precios de la vivienda, sobrecarga del gasto en vivienda, jóvenes que viven con sus padres, edad de emancipación, inversión en vivienda).
 - **Estudios citados:** Pinto (Fedea, 2026), sobre la Ley de Vivienda; Diamond, McQuade y Qian (2019), sobre San Francisco; García-López, Jofre-Monseny, Martínez-Mazza y Segú (2020), sobre Airbnb en Barcelona; Fack (2006), sobre las ayudas en Francia; Segú (2020), sobre el impuesto a las viviendas vacías en Francia; Asquith, Mast y Reed, sobre edificios nuevos en Estados Unidos.
