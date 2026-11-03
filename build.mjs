@@ -15,6 +15,7 @@ import {STUDIES,ALL,HIDDEN,MDBODY} from "./src/analisis.mjs";
 import {ILLUS,TILL,FOCUS} from "./src/illus.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
+const tHref=id=>id==="vivienda"?"/preguntas/vivienda/":"/temas/"+id+"/";
 const OUT=path.join(ROOT,"dist");
 const rd=p=>fs.readFileSync(path.join(ROOT,p),"utf8");
 const exists=p=>fs.existsSync(path.join(ROOT,p));
@@ -121,7 +122,7 @@ const urls=[]; const addUrl=(loc,pri,mod)=>urls.push({loc:SITE.url+loc,pri,mod:m
   const main=snapshot("/")||`<section class="qh"><div class="kk2">Preguntas reales. Respuestas con datos públicos.</div><h1 class="qh-q">${esc(lead.t)}</h1><p class="qh-a"><b>${esc(lead.a.split(". ")[0])}.</b> ${esc(lead.a.split(". ").slice(1).join(". "))} <a href="/preguntas/${lead.id}/">Ver la respuesta →</a></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que dicen los datos</h2><div class="qg">${cards}</div><p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
   <section class="ed-sec"><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rows.length)} municipios, si la relación aguanta entre municipios parecidos y qué pasó antes y después de una ley.</p><p><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></section>
-  <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPICS.map(T=>`<a href="/temas/${T.id}/">${T.l}</a>`).join("")}</div></section>${sources}`;
+  <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPICS.map(T=>`<a href="${tHref(T.id)}">${T.l}</a>`).join("")}</div></section>${sources}`;
   page({route:"/",title:PAGES["/"].t,desc:PAGES["/"].d,ogTitle:SITE.name+" · "+SITE.tagline,main,
     jsonld:{"@context":"https://schema.org","@type":"WebSite",name:SITE.name,url:SITE.url,description:SITE.description,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},potentialAction:{"@type":"SearchAction",target:SITE.url+"/municipio/?q={search_term_string}","query-input":"required name=search_term_string"}}});
   addUrl("/",1.0);
@@ -150,10 +151,11 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
 
 // ---------- temas ----------
 {
-  const main=snapshot("/temas/")||`<header class="phead"><h1>Temas</h1><p class="dek">${esc(PAGES["/temas/"].d)}</p></header><div class="studies">${TOPICS.map(T=>`<a class="study" href="/temas/${T.id}/"><span>${esc(T.l)}</span><b>${esc(T.q)}</b><p>${esc(T.d)}</p></a>`).join("")}</div>${sources}`;
+  const main=snapshot("/temas/")||`<header class="phead"><h1>Temas</h1><p class="dek">${esc(PAGES["/temas/"].d)}</p></header><div class="studies">${TOPICS.map(T=>`<a class="study" href="${tHref(T.id)}"><span>${esc(T.l)}</span><b>${esc(T.q)}</b><p>${esc(T.d)}</p></a>`).join("")}</div>${sources}`;
   page({route:"/temas/",title:PAGES["/temas/"].t,desc:PAGES["/temas/"].d,main});
   addUrl("/temas/",0.7);
   for(const T of TOPICS){
+    if(T.id==="vivienda") continue; // fusionada con su análisis: /temas/vivienda/ redirige
     const route="/temas/"+T.id+"/", qs=STUDIES.filter(S=>S.tema===T.id);
     const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(T.l)}</nav><header class="phead"><h1>${esc(T.q)}</h1><p class="dek">${esc(T.d)}</p></header>
       ${qs.length?`<section class="finding"><h2>Preguntas sobre ${esc(T.l.toLowerCase())}</h2><div class="studies">${qs.map(S=>`<a class="study" href="/preguntas/${S.id}/"><span>${esc(S.m)}</span><b>${esc(S.t)}</b><p>${esc(S.a)}</p></a>`).join("")}</div></section>`:""}
@@ -374,7 +376,7 @@ ${STUDIES.map(S=>`- [${S.t}](${SITE.url}/preguntas/${S.id}/): ${S.a}`).join("\n"
 - [Laboratorio](${SITE.url}/laboratorio/): mapas, rankings y cruces de cualquier par de datos, con pruebas para distinguir correlación de causa.
 
 ## Temas
-${TOPICS.map(T=>`- [${T.q}](${SITE.url}/temas/${T.id}/): ${T.d}`).join("\n")}
+${TOPICS.map(T=>`- [${T.q}](${SITE.url}${tHref(T.id)}): ${T.d}`).join("\n")}
 
 ## Datos en bruto
 - ${SITE.url}/data/index.json: todos los municipios con sus indicadores principales (campos en «fields»).
@@ -385,7 +387,7 @@ fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"
 // Netlify: el dominio antiguo redirige al nuevo; las rutas dinámicas que no tienen HTML propio caen en la app
 // Cloudflare Pages: las reglas de _redirects se aplican aunque exista el fichero, así que solo se reescriben rutas que no existen
 // (apartados de la ficha y comparaciones). La redirección de www y del dominio antiguo se hace en Cloudflare (reglas de redirección).
-fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/crecer/ 301","/preguntas/renta-fuentes/ /preguntas/convergencia/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301"].join("\n")+"\n");
+fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/crecer/ 301","/preguntas/renta-fuentes/ /preguntas/convergencia/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301"].join("\n")+"\n");
 fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));

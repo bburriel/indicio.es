@@ -1,6 +1,6 @@
 ---
 titulo: ¿Por qué cuesta tanto pagar una casa?
-entradilla: El alquiler y el precio de compra han subido mucho más que los sueldos. Contamos qué ha pasado, a quién le golpea y por qué, y medimos cuánto pueden aportar las dos ideas que se discuten: construir más o que cada casa sea para vivir.
+entradilla: El alquiler y el precio de compra han subido mucho más que los sueldos, y más aún para quien busca piso hoy. Contamos qué ha pasado, a quién le golpea y por qué, y medimos cuánto pueden aportar las dos ideas que se discuten: construir más o que cada casa sea para vivir.
 respuesta: Porque hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual. Movilizar viviendas vacías y turísticas donde hay demanda puede aportar entre 200.000 y 300.000 de una vez; construir es lo único que sigue sumando cada año. El alquiler ha subido sobre todo donde llega gente: es lo que más separa a unos municipios de otros. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
 tema: vivienda
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
@@ -24,7 +24,21 @@ La subida no es igual en todas partes. Donde más ha subido el alquiler es en la
 
 [[grafico:ciudades]]
 
-> El alquiler medio de estos datos es el de todos los contratos declarados a Hacienda, también los antiguos. Quien busca piso hoy paga bastante más: los precios de los anuncios han subido mucho más que los de los contratos en vigor. Lo contamos en [¿Por qué cuesta tanto encontrar casa?](/temas/vivienda/).
+## Alquilar: quien busca piso paga mucho más que quien ya tiene contrato
+
+Hay dos formas de medir el alquiler y no cuentan lo mismo. El **alquiler declarado** es lo que pagan todos los inquilinos según Hacienda (INE): incluye contratos de hace años, con subidas limitadas, y deja fuera los no declarados. Ha subido un {{r_decl|pct0}} desde 2015. Los **anuncios** (idealista, euros por metro cuadrado) son lo que piden los pisos que salen al mercado, es decir, lo que paga quien busca casa hoy: han subido un {{r_anun|pct0}}, más de tres veces lo que el sueldo mediano ({{r_sal|pct0}}).
+
+[[grafico:subidas]]
+
+El INE solo separa los contratos nuevos de los antiguos desde 2021. Desde entonces, el alquiler de los contratos nuevos ha subido un {{r_nuevos|pct0}} y el sueldo mediano, un {{r_sal21|pct0}}.
+
+[[grafico:contratosNuevos]]
+
+No pasa igual en todas partes: entre 2021 y 2024, los contratos nuevos subieron más que la renta por persona en {{r_nOver|n0}} provincias. La mayor distancia está en {{r_p1}} ({{r_p1d|n1}} puntos más que la renta) y en {{r_p2}} ({{r_p2d|n1}}).
+
+[[grafico:provinciasNuevos]]
+
+Los datos de alquiler por municipio que usa el resto del análisis son los del alquiler declarado: sirven para ver **dónde** sube más, no cuánto le cuesta a quien busca piso.
 
 ## Comprar: caro, pero no como en 2008
 
@@ -39,6 +53,10 @@ Y en {{añoVt}} el precio de tasación subió otro {{vt25|pct0}}, más deprisa q
 España ha sido siempre un país de propietarios, y lo sigue siendo, pero cada vez menos. En 2008, el {{prop08|pct0}} de los hogares vivía en una casa propia; en {{añoTen}}, el {{propUlt|pct0}}. Los que alquilan a precio de mercado han pasado del {{alq08|pct0}} al {{alqUlt|pct0}}.
 
 [[grafico:tenencia]]
+
+El alquiler pesa muy distinto según dónde se viva. Según el censo de 2021, el {{alqEs|pct0}} de los hogares españoles vive de alquiler, pero es casi uno de cada cuatro en Girona, Barcelona y Baleares, y menos de uno de cada diez en Jaén, Zamora, Badajoz o Córdoba. Es una de las razones por las que la misma subida se nota tan distinto de un sitio a otro.
+
+[[grafico:alquilerProv]]
 
 Y a los inquilinos les cuesta mucho más que en el resto de Europa. En {{añoEU}}, el **{{sobreES|pct0}} de los que alquilan a precio de mercado dedica más del 40 % de su renta a la vivienda**, frente al {{sobreEU|pct0}} en la Unión Europea. Es menos que en 2014 ({{sobreES14|pct0}}), porque desde entonces han subido el empleo y las rentas, pero sigue de los más altos de Europa.
 
@@ -80,6 +98,10 @@ Busca tu ciudad (cada nombre abre su ficha):
 
 [[grafico:fichaCiudades]]
 
+Y si vives en un municipio que no sale en la lista, o en un pueblo, búscalo aquí y compara sus cifras de vivienda con las de España:
+
+[[grafico:miMunicipio]]
+
 ## Dos ideas: construir más o que cada casa sea para vivir
 
 Con los tres tipos de sitio en la cabeza, vuelve la pregunta de qué hacer. Cuando se discute, aparecen dos ideas. Una dice que faltan casas y que hay que construir más. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas y cada vez más se acumulan en manos de quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál de las dos, sino cuánto puede aportar cada una.
@@ -101,6 +123,10 @@ Esta idea tiene tres piezas, y no pesan lo mismo.
 Donde sí hay demanda, en los {{nZ}} municipios de 20.000 habitantes o más que ganan población (el {{pobZ|pct0}} de los españoles), el censo cuenta **{{npZ|r1000|n0}} viviendas que no son residencia habitual**. De ellas, {{vacZ|r1000|n0}} están vacías (el {{vacZP|pct0}} de todas las viviendas de esos municipios) y {{espZ|r1000|n0}} se usan solo de forma esporádica; el resto son otras segundas residencias, sobre todo en la costa. No todas las vacías se pueden ocupar mañana: en cualquier momento hay pisos en venta, en obras, pendientes de una herencia o en mal estado. En Francia, gravar las viviendas vacías redujo su número un 13 %. Aquí serían unas {{vac13|r1000|n0}}.
 
 **Las turísticas.** En el conjunto de España son en torno al {{vtES|pct1}} de las viviendas; en esos mismos municipios con demanda, unas {{vtZ|r1000|n0}}. En algunos barrios del centro y en la costa pesan mucho: el estudio más citado, en Barcelona, encontró que el alquiler subía un 1,9 % por los pisos de Airbnb en el barrio medio y un 7 % en los de más actividad. Fuera de esos barrios, nuestro análisis por municipios ve poco efecto: lo contamos en [¿Los pisos turísticos encarecen el alquiler?](/preguntas/pisos-turisticos/).
+
+Los pisos turísticos tocaron techo en {{t_maxMes}} de {{t_maxAño}}, con {{t_max|n0}} anuncios, y desde entonces han bajado un {{t_drop|pct0}}. Coinciden varias cosas: las prohibiciones municipales, el registro único estatal obligatorio desde julio de 2025 (cada anuncio necesita un número de registro) y la retirada de anuncios ilegales por parte de las plataformas.
+
+[[grafico:turisticas]]
 
 **Las que se acumulan.** Cada vez hay menos propietarios de un solo inmueble y más de varios. Según el Catastro, entre 2015 y {{añoCat}} los titulares de un solo bien urbano bajaron en unos {{t1d|abs|r1000|n0}}, los de dos subieron en unos {{t2d|r1000|n0}}, los de tres crecieron un {{t3p|pct0}} y los de seis a diez, un {{t6p|pct0}}. Son bienes de todo tipo, no solo viviendas: el Catastro solo separa el uso residencial desde 2024. Con ese detalle, en {{añoRes}} había {{pfMulti|r1000|n0}} personas con dos o más inmuebles residenciales (el {{pfMultiP|pct0}} de las que tienen alguno) que reunían el {{pfMultiInmP|pct0}} de los {{resInm|r1000|n0}} que hay; las personas jurídicas tenían el {{pjInmP|pct0}}. Según el Banco de España, en 2022 el 46,8 % de los hogares tenía algún inmueble además de su vivienda habitual, contando solares, garajes y locales. Y el 61 % de las viviendas alquiladas pertenece a alguien que alquila más de una o a una empresa o administración, según un estudio del Ministerio de Derechos Sociales y el CSIC con datos de Hacienda de 2023.
 
@@ -153,9 +179,16 @@ No hay una medida que lo arregle todo. Esto es lo que dicen los datos de las que
 
 La conclusión de los datos es incómoda para casi todo el mundo: las medidas sobre el precio alivian; movilizar lo que hay da un empujón de una vez; y sin construir más en los sitios donde la gente quiere vivir, el problema vuelve.
 
+## Para ir más allá
+
+Cada uno de estos análisis responde a una pregunta concreta, con el método a la vista: qué se compara, con quién y cuánto aguanta el resultado.
+
+[[grafico:relacionados]]
+
 ## Cómo está hecho
 
 - **Precio de compra:** Índice de Precios de Vivienda (INE) y valor tasado medio de la vivienda libre (Ministerio de Vivienda), en €/m², media de los cuatro trimestres de cada año.
+- **Anuncios de alquiler:** precio medio de los anuncios de idealista, euros por metro cuadrado, diciembre de 2015 y de 2024. **Contratos nuevos y en vigor:** INE, Índice de Precios de Vivienda en Alquiler por antigüedad del contrato (desde 2021). **Renta por persona:** INE, Atlas de Distribución de Renta. **Hogares de alquiler por provincia:** Censo de 2021. **Viviendas turísticas:** INE, estadística experimental, mayo de 2026.
 - **Alquiler:** alquiler mensual medio de los contratos declarados a Hacienda (Índice de Precios de Vivienda en Alquiler e indicadores urbanos del INE), 2011–{{añoAlq}}.
 - **Sueldo:** sueldo mediano bruto anual (Encuesta Anual de Estructura Salarial).
 - **Ciudad por ciudad:** años de sueldo = valor tasado medio del año (Ministerio de Vivienda) × 80 m² entre el sueldo mediano bruto de la comunidad (INE, Encuesta Anual de Estructura Salarial; no hay sueldo mediano por municipio). Hogares nuevos: cambio del padrón entre 2019 y 2025 entre las personas por hogar del Censo de 2021, repartido en seis años. Viviendas no habituales: vacías y segundas residencias del Censo de 2021. Hogares en alquiler: Censo de 2021. Compraventas: media de 2023 a 2025 (Ministerio de Vivienda). Compras de extranjeros: media 2023–2025 de la provincia (Ministerio de Vivienda). Viviendas iniciadas: media 2019–2024 de la provincia. Código: `scripts/datos/vivienda_esfuerzo.py`.
