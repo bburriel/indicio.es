@@ -89,6 +89,7 @@ function keyToPath(h){
   if((m=h.match(/^explorar(?:\/([a-z]+))?(\?.*)?$/))) return "/laboratorio/"+(m[1]?m[1]+"/":"")+(m[2]||"");
   if(h==="estudios"||h==="preguntas") return "/preguntas/";
   if(h==="estudios-metodo"||h==="metodo") return "/laboratorio/metodo/";
+  if(h==="laboratorio-datos") return "/laboratorio/datos/";
   if((m=h.match(/^estudios?-([\w-]+)$/))) return "/preguntas/"+m[1]+"/";
   if(h==="temas") return "/temas/";
   if((m=h.match(/^(?:riqueza|renta)(?:-(\d{5}))?$/))) return "/temas/riqueza/"+(m[1]?"?m="+m[1]:"");
@@ -110,6 +111,7 @@ function pathToKey(){
   if((m=p.match(/^\/temas\/([a-z]+)$/))){ if(m[1]==="riqueza"){ const c=new URLSearchParams(q).get("m"); return "riqueza"+(c&&/^\d{5}$/.test(c)?"-"+c:""); } return m[1]; }
   if(p==="/laboratorio") return "explorar";
   if(p==="/laboratorio/metodo") return "estudios-metodo";
+  if(p==="/laboratorio/datos") return "laboratorio-datos";
   if((m=p.match(/^\/laboratorio\/([a-z]+)$/))) return "explorar/"+m[1]+q;
   if(p==="/municipio") return "municipio";
   if((m=p.match(/^\/municipio\/(\d{5})(?:-[^/]*)?(?:\/([a-z]+))?$/))) return "m"+m[1]+(m[2]?"-"+m[2]:"");
@@ -172,6 +174,7 @@ function route(){
   else if(h==="municipio"){ cur("municipio"); renderMunLanding(); }
   else if(/^sobre/.test(h)){ cur("sobre"); renderSobre(h==="sobre-contacto"?"contacto":null); }
   else if(cr){ navTo(exHash({v:"cruce",d:cr[1]&&cr[2]?[cr[1],cr[2]]:EX.d}),{replace:true}); return; }
+  else if(h==="laboratorio-datos"){ cur("lab"); renderGlosario(); }
   else if(/^estudios?/.test(h)){ cur(h==="estudios-metodo"?"lab":"preguntas"); renderEstudios((h.match(/^estudios?-([\w-]+)$/)||[])[1]); }
   else if(/^evolucion/.test(h)){ navTo(exHash({v:"evolucion"}),{replace:true}); return; }
   else if(/^comparar/.test(h)){ cur("municipio"); const c=h.match(/^comparar(?:-(\d{5}))?(?:-(\d{5}))?$/)||[]; renderComparar(c[1],c[2]); }
@@ -228,7 +231,7 @@ const rewind=f=>{ const g=f.geometry; if(g&&d3.geoArea(f)>2*Math.PI){ if(g.type=
 function prepGeo(){ FEATS=topojson.feature(TOPO,TOPO.objects.municipalities).features.map(rewind); }
 
 // ---------- piezas de página ----------
-const LABNAV=cur=>cur==="metodo"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Guía: de la relación a la causa</nav>`:"";
+const LABNAV=cur=>cur==="datos"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Los datos</nav>`:cur==="metodo"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Guía: de la relación a la causa</nav>`:"";
 function pageHead(title,dek,extra,after){ return `<header class="phead">${extra||""}<h1>${title}</h1>${dek?`<p class="dek">${dek}</p>`:""}${after||""}</header>`; }
 const TOPICL=id=>({riqueza:"Riqueza",vivienda:"Vivienda",poblacion:"Población",trabajo:"Trabajo",gasto:"Dinero público",voto:"Voto"})[id]||"";
 const fechaES=d=>{ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${+dd} de ${MES[+m]} de ${y}`; };
@@ -2760,6 +2763,76 @@ const VOPT={
   matriz:{html:()=>`<label class="chk"><input type="checkbox" id="vomw" ${EX.w?"checked":""}> Contar según la población</label><p class="hint">Pulsa una casilla para abrir esa pareja en «Relación» y comprobar si aguanta entre iguales.</p>`, wire:bar=>{ const c=bar.querySelector("#vomw"); if(c) c.addEventListener("change",e=>{ EX.w=e.target.checked?1:0; exUpdate(); }); }},
   burbujas:{html:()=>`<p class="hint" style="margin:0">Pulsa «Reproducir» o mueve el año. Pasa el ratón por una burbuja para ver su provincia.</p>`}
 };
+
+// =====================================================================
+// GLOSARIO: qué mide cada dato, de dónde sale y qué matices tiene
+// =====================================================================
+// matices escritos a mano para los datos que más se usan (el resto muestra su descripción y su fuente)
+const MATICES={
+  renta:"Es renta neta, después de impuestos y cotizaciones, y sale de datos tributarios: no recoge la economía sumergida. Es una media, así que unos pocos vecinos muy ricos suben la cifra de un municipio pequeño por encima de lo que cobra el vecino típico (para eso, mira la mediana).",
+  rentaHog:"Depende del tamaño del hogar: uno de cuatro personas ingresa más que uno de una, aunque cada persona viva igual. Para comparar lugares, la renta por persona es más justa.",
+  rentaMediana:"Es la renta del hogar «típico»: la mitad de los hogares ingresa más y la mitad menos. Resiste mejor que la media a unos pocos ricos.",
+  pobreza:"Es pobreza relativa: se mide contra la renta mediana de España, no contra un mínimo fijo. Si un lugar entero es pobre, el dato no lo refleja bien, porque ahí «pobre» es quien está por debajo de la mediana de todo el país.",
+  gini:"Mide el reparto dentro del municipio, no su riqueza: un pueblo pobre pero igualitario sale bajo, y uno rico con grandes diferencias sale alto.",
+  paro:"Tasa de paro del censo de 2021: parados entre quienes trabajan o buscan trabajo. No es comparable con el paro registrado, que usa otro denominador y otra fecha.",
+  paroCensal:"Tasa de paro del censo anual: parados entre quienes trabajan o buscan trabajo. No es lo mismo que el paro registrado.",
+  paroReg:"No es una tasa de paro: divide a los apuntados en el SEPE entre toda la población de 16 a 64 años, trabaje o no. Y solo cuenta a quien se ha apuntado.",
+  afilHab:"Cuenta los empleos situados en el municipio, no a sus vecinos: un polígono industrial o una ciudad que recibe a trabajadores de fuera puede pasar de 100.",
+  alquiler:"Es el porcentaje de hogares que vive de alquiler, según el censo de 2021. No dice cuánto pagan.",
+  noPrincipal:"Suma segundas residencias y viviendas vacías: no distingue cuáles son cuáles.",
+  vt:"Es estadística experimental del INE: sus cifras pueden revisarse y no deben leerse como un recuento exacto.",
+  alqVar:"Sale de un índice de precios de alquiler: mide cómo cambia el conjunto de alquileres, no el precio de un piso concreto ni lo que paga quien firma hoy.",
+  distCiudad:"Se mide en línea recta entre centros de términos municipales, no en tiempo de viaje: una montaña o una mala carretera no cuentan.",
+  distCosta:"Se mide en línea recta desde el centro del término municipal; vale 0 si el municipio tiene costa.",
+  densidad:"Divide entre todo el término municipal, también el monte y el campo: un municipio con un núcleo pequeño y mucho terreno sale con densidad baja aunque se viva muy junto.",
+  valorTasado:"Es el valor que estima una tasadora, normalmente para una hipoteca, no el precio al que se vende un piso. Solo existe para municipios de más de 25.000 habitantes.",
+  compHab:"Cuenta operaciones registradas ante notario, no precios: un año de muchas ventas no significa que suban los precios.",
+  deudaHab:"Es solo la deuda del ayuntamiento: no incluye la de la comunidad autónoma ni la del Estado.",
+  irpfBruta:"Solo cuenta a quien presenta declaración, y no incluye el País Vasco ni Navarra, que tienen su propia hacienda.",
+  irpfCarga:"Suma la cuota del impuesto y las cotizaciones, en % de la renta bruta. No incluye otros impuestos, como el IVA.",
+  contrTemp:"Se cuenta en el municipio del centro de trabajo, no donde vive el trabajador. Con pocos contratos, un solo empleador mueve mucho el porcentaje.",
+  contrTemp25:"Se cuenta en el municipio del centro de trabajo. Con pocos contratos, un solo empleador mueve mucho el porcentaje.",
+  temporales:"Es el porcentaje sobre asalariados, no sobre todos los ocupados.",
+  empleo:"Se mide sobre la población de 16 a 64 años, no sobre toda la población: un municipio con muchos jubilados no sale penalizado por ellos.",
+  superiores:"Mide quién tiene la titulación, no si trabaja en algo que la requiere ni dónde la consiguió.",
+  salf24:"Partido nuevo que solo concurrió a las europeas de 2024: no hay dato comparable de las generales de 2023.",
+  varPob:"Compara dos fotos del padrón: no dice si la gente llegó o se fue, ni cuándo."
+};
+// cómo se escribe la unidad de cada dato
+const GLUNIT={eur:"euros",pct:"%",pct_chg:"% de cambio",pts:"puntos",num1:"número",int:"cifra",years:"años",km:"km",dens:"hab./km²"};
+const GLORD=["Riqueza","Trabajo","Vivienda","Población","Hogares","Educación","Sectores","Voto","Territorio","Ayuntamiento","Provincias y comunidades"];
+async function renderGlosario(){
+  document.title="Los datos del laboratorio · Indicio";
+  view.innerHTML=LABNAV("datos")+pageHead("Los datos del laboratorio","Qué mide cada dato, de dónde sale y qué conviene tener en cuenta antes de sacar conclusiones.")
+    +`<div class="gl"><div class="gl-bar"><input type="search" id="glq" class="sel" placeholder="Buscar un dato: renta, paro, alquiler…" aria-label="Buscar un dato" autocomplete="off"><div class="chipsq" id="glg" role="group" aria-label="Tema"></div></div><p class="muted gl-c" id="glc" aria-live="polite"></p><div id="gll"><p class="loading">Cargando…</p></div></div>`;
+  try{ await loadRegional(); }catch(e){}
+  const box=document.getElementById("gll"); if(!box) return;
+  const items=CAT.filter(c=>c&&c.l&&!c.eu&&c.g&&!/^E_/.test(c.k)).map(c=>{
+    const reg=!!c.reg, g=reg?"Provincias y comunidades":c.g, unit=reg?"":(GLUNIT[c.f]||"");
+    const scales=reg?[c.np>=40?"provincias":"",c.nc>=10?"comunidades":""].filter(Boolean):[];
+    const link=reg?exHash({v:"mapa",d:[c.k],u:c.np>=40?"prov":"ccaa",c:[],p:"",t:""}):exHash({v:"mapa",d:[c.k],u:"",c:[],p:"",t:""});
+    return {k:c.k,l:c.l,g,unit,desc:QUEMIDE[c.k]||"",matiz:MATICES[c.k]||"",src:c.src||"",scales,link,rel:reg?"":exHash({v:"cruce",d:[c.k,c.k==="renta"?"paroReg":"renta"],c:[],p:"",t:""}),text:norm([c.l,g,c.src,QUEMIDE[c.k]||""].join(" "))};
+  });
+  const seen=new Set(); const all=items.filter(i=>!seen.has(i.k)&&seen.add(i.k)).sort((a,b)=>{ const ga=GLORD.indexOf(a.g), gb=GLORD.indexOf(b.g); return (ga<0?99:ga)-(gb<0?99:gb)||a.l.localeCompare(b.l,"es"); });
+  const gs=[...new Set(all.map(i=>i.g))].sort((a,b)=>{ const ga=GLORD.indexOf(a), gb=GLORD.indexOf(b); return (ga<0?99:ga)-(gb<0?99:gb); });
+  let G="";
+  const card=i=>`<details class="gl-i" id="d-${esc(i.k)}"><summary><span class="gl-n">${esc(i.l)}</span>${i.unit?`<span class="gl-u">${esc(i.unit)}</span>`:""}</summary><div class="gl-b">`
+    +(i.desc?`<p><b>Qué mide.</b> ${esc(i.desc)}</p>`:"")
+    +(i.matiz?`<p><b>Matices.</b> ${esc(i.matiz)}</p>`:"")
+    +(i.src?`<p class="muted"><b>${i.desc?"Fuente y año":"Fuente, año y definición"}.</b> ${esc(i.src)}</p>`:"")
+    +(i.scales.length?`<p class="muted"><b>Escalas.</b> Solo por ${i.scales.join(" y ")}: son datos oficiales, no de cada municipio.</p>`:`<p class="muted"><b>Escala.</b> Cada municipio.</p>`)
+    +`<p class="gl-a"><a href="${i.link}">Verlo en el mapa</a>${i.rel?` · <a href="${i.rel}">Cruzarlo con otro dato</a>`:""}</p></div></details>`;
+  const draw=()=>{ const q=norm(document.getElementById("glq").value.trim()), g=G;
+    const rows=all.filter(i=>(!g||i.g===g)&&(!q||q.split(/\s+/).every(w=>i.text.includes(w))));
+    document.getElementById("glc").textContent=`${nf0.format(rows.length)} dato${rows.length===1?"":"s"}${q||g?" que coinciden":""}`;
+    box.innerHTML=rows.length?gs.filter(x=>rows.some(i=>i.g===x)).map(x=>`<section class="gl-g"><h2>${esc(x)}</h2>${rows.filter(i=>i.g===x).map(card).join("")}</section>`).join(""):'<p class="loading">Ningún dato coincide. Prueba con otra palabra.</p>';
+    if(location.hash.startsWith("#d-")){ const t=document.getElementById(decodeURIComponent(location.hash.slice(1))); if(t&&t.tagName==="DETAILS"){ t.open=true; if(!draw._s){ draw._s=1; setTimeout(()=>t.scrollIntoView({block:"start"}),60); } } } };
+  const chips=document.getElementById("glg");
+  chips.innerHTML=`<button type="button" data-g="" aria-pressed="true">Todos</button>`+gs.map(x=>`<button type="button" data-g="${esc(x)}" aria-pressed="false">${esc(x)}</button>`).join("");
+  chips.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ G=b.dataset.g; chips.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); draw(); }));
+  document.getElementById("glq").addEventListener("input",draw);
+  draw();
+}
 // =====================================================================
 // ESTUDIOS: preguntas causales, contadas paso a paso
 // =====================================================================
@@ -3735,7 +3808,7 @@ function exBar(){
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML(EX.v)}</div>
-    <div class="lb-step"><h4><i>2</i>Qué datos${lbh("Son indicadores oficiales (paro, renta, población, alquiler…). Pulsa en cada uno para cambiarlo por otro.","Qué son los datos")}</h4>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
+    <div class="lb-step"><h4><i>2</i>Qué datos${lbh("Son indicadores oficiales (paro, renta, población, alquiler…). Pulsa en cada uno para cambiarlo por otro.","Qué son los datos")}</h4>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}<p class="hint"><a href="/laboratorio/datos/">Qué significa cada dato →</a></p></div>
     ${isEvo||isB||isMapAgg?"":`<div class="lb-step"><h4><i>3</i>Qué municipios${lbh("Puedes limitar el gráfico a una provincia o quitar los municipios más pequeños, cuyas cifras suelen ser poco fiables porque salen de pocos vecinos.","Para qué sirve esto")}</h4>
       <select class="sel" id="exprov" aria-label="Provincia">${`<option value="">Toda España</option>`+Object.keys(PROVS).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")).map(p=>`<option value="${p}" ${p===EX.p?"selected":""}>${esc(provShort(PROVS[p]))}</option>`).join("")}</select>
       <select class="sel" id="exsize" aria-label="Tamaño">${EXSIZES.map(([k,l])=>`<option value="${k}" ${k===EX.t?"selected":""}>${l}</option>`).join("")}</select>

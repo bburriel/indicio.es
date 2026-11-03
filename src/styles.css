@@ -1417,3 +1417,23 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .czpar{border-top:1px solid var(--rule); margin-top:22px; padding-top:18px}
 .czpar .czlead{margin:0 0 8px; color:var(--ink-2)}
 .czb-e h3 .iq,.czb-c h3 .iq{margin-left:2px; vertical-align:middle}
+
+/* Glosario de datos */
+.gl-bar{display:flex; flex-direction:column; gap:8px; margin:6px 0 10px}
+.gl-bar .sel{max-width:420px}
+.gl-bar .chipsq{margin-top:0}
+.chipsq button[aria-pressed="true"]{background:var(--acc); border-color:var(--acc-ink); color:var(--brand); font-weight:700}
+.gl-g{max-width:var(--medida,760px); margin:22px 0 0}
+.gl-g h2{font-size:18px; margin:0 0 6px}
+.gl-i{border-top:1px solid var(--rule)}
+.gl-i:last-child{border-bottom:1px solid var(--rule)}
+.gl-i summary{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:10px 2px; cursor:pointer; list-style:none}
+.gl-i summary::-webkit-details-marker{display:none}
+.gl-i summary::before{content:"▸"; color:var(--muted); margin-right:8px; flex:none}
+.gl-i[open] summary::before{content:"▾"}
+.gl-n{flex:1; font-weight:600}
+.gl-u{font-size:12.5px; color:var(--muted); white-space:nowrap}
+.gl-b{padding:0 2px 12px 22px; font-size:15px; line-height:1.55}
+.gl-b p{margin:6px 0}
+.gl-a{font-size:14px}
+.gl-c{margin:4px 0 0; font-size:13.5px}

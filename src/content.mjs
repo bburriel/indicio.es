@@ -71,6 +71,7 @@ export const PAGES={
   "/temas/":{t:"Temas · Indicio",d:"Riqueza, vivienda, población, trabajo, dinero público y voto: los datos públicos de España, tema a tema."},
   "/laboratorio/":{t:"Laboratorio · Indicio",d:"Tu lienzo para los datos de España: elige un gráfico, cruza dos datos en los 8.139 municipios, comprueba si la relación aguanta entre iguales y mide qué pasó antes y después de una ley o un suceso."},
   "/laboratorio/metodo/":{t:"De la relación a la causa · Indicio",d:"Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede."},
+  "/laboratorio/datos/":{t:"Los datos del laboratorio · Indicio",d:"Qué mide cada dato del laboratorio, de dónde sale, de qué año es y qué matices conviene tener en cuenta antes de sacar conclusiones."},
   "/municipio/":{t:"Municipios · Indicio",d:"Busca tu municipio y mira cómo sale en renta, población, paro, vivienda y voto, comparado con España."},
   "/quien-soy/":{t:"Quién soy · Indicio",d:"Borja Burriel, data scientist especializado en experimentación e inferencia causal. Análisis independientes con datos públicos de España."},
   "/quien-soy/contacto/":{t:"Escríbeme · Indicio",d:"Una pregunta sobre los datos, un error, una idea o un trabajo a medida: escríbeme."},
