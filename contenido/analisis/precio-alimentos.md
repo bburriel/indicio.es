@@ -1,7 +1,7 @@
 ---
 titulo: ¿Cuánto cuesta llenar el carro y qué parte del sueldo se lleva?
 entradilla: Desde 2019 la comida ha subido bastante más que el sueldo. Calculamos cuánto cuesta hoy llenar el carro, cómo ha cambiado el esfuerzo de pagarlo y a quién le pesa más.
-respuesta: Mucho más que en 2019, y el sueldo no ha seguido ese ritmo: la comida ha subido un 35 % y el sueldo mediano un 20 %, así que la misma compra de una persona ha pasado del 8,5 % al 9,5 % de un sueldo mediano, unos cuatro días más de sueldo al año. Solo los sueldos más bajos, empujados por el salario mínimo, han aguantado. La rebaja del IVA llegó al ticket, pero no cambia la foto.
+respuesta: La comida ha subido un 35 % y el sueldo un 20 %: pagar la misma compra cuesta cuatro días más de sueldo al año.
 tema: riqueza
 metodo: Presupuestos Familiares, IPC, Estructura Salarial y triple diferencia del IVA, 2002–2026
 evidencia: natural
