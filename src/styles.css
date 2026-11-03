@@ -1607,3 +1607,11 @@ details.chk > section{margin-top:18px}
 .navdd:has(a[aria-current="page"]),.navdd:has(a[aria-current="page"]):hover{background:var(--acc); box-shadow:inset 0 -2px 0 var(--brand)}
 .navdd:has(a[aria-current="page"]) a,.navdd:has(a[aria-current="page"]) .ddb{color:var(--ink)!important}
 .navdd:has(a[aria-current="page"]):hover a,.navdd:has(a[aria-current="page"]):hover .ddb{color:var(--brand)!important}
+
+/* euros: etiqueta arriba a la derecha, frase y cifra juntas */
+.czeh-row{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
+.czeh-row h3{margin:0 0 6px}
+.czeh-row .czvd{margin:0; white-space:nowrap}
+.czb-e .czsent{margin:2px 0 0; font-size:15.5px; color:var(--muted)}
+.czb-e .czbig{margin:8px 0 0; font-size:44px}
+.czmorebtn{border-style:solid}
