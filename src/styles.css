@@ -809,7 +809,7 @@ body::before{background:var(--bg)}
 .logo .lg-i i{display:block; width:2.5px; background:#fff}
 .nav a,.nav .ddb{color:var(--ink-2); border-radius:0; padding:6px 11px}
 .nav a:hover,.nav .ddb:hover{background:none; color:var(--brand)}
-.nav a[aria-current="page"],.nav .ddb[aria-current="page"]{background:none; color:var(--ink); font-weight:600; box-shadow:inset 0 -2px 0 var(--brand)}
+.nav a[aria-current="page"],.nav .ddb[aria-current="page"]{background:none; color:var(--ink); font-weight:600}
 .top .search input{background:transparent; border:0; border-bottom:1px solid var(--rule-2); border-radius:0; color:var(--ink)}
 .top .search input::placeholder{color:var(--muted)}
 .top .search svg{color:var(--muted)}
@@ -1662,7 +1662,7 @@ details.chk > section{margin-top:18px}
 .navdd .ddb,.navdd .ddb:hover{color:var(--ink-2)!important}
 .navdd:hover a,.navdd:hover .ddb{color:var(--brand)!important}
 .navdd a[aria-current="page"]{background:none; box-shadow:none; border-radius:20px 0 0 20px}
-.navdd:has(a[aria-current="page"]),.navdd:has(a[aria-current="page"]):hover{background:var(--acc); box-shadow:inset 0 -2px 0 var(--brand)}
+.navdd:has(a[aria-current="page"]),.navdd:has(a[aria-current="page"]):hover{background:var(--acc); box-shadow:none}
 .navdd:has(a[aria-current="page"]) a,.navdd:has(a[aria-current="page"]) .ddb{color:var(--ink)!important}
 .navdd:has(a[aria-current="page"]):hover a,.navdd:has(a[aria-current="page"]):hover .ddb{color:var(--brand)!important}
 
