@@ -1444,3 +1444,6 @@ details.chk > summary::-webkit-details-marker{display:none}
 details.chk > summary::after{content:""; width:6px; height:6px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:translateY(-2px) rotate(45deg); transition:transform .15s}
 details.chk[open] > summary::after{transform:translateY(2px) rotate(-135deg)}
 details.chk > section{margin-top:18px}
+
+.lbq-g{flex:none; margin-left:auto; white-space:nowrap; font-size:13px; font-weight:600; color:var(--ink); text-decoration:none; border:1px solid var(--acc-ink); background:var(--acc); border-radius:3px; padding:4px 11px}
+.lbq-g:hover{background:var(--hit)}
