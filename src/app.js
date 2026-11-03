@@ -6013,14 +6013,14 @@ let QH_T=null;
 // con las mismas cuentas que sus análisis. Las del tope (3,1 % y 3,7 %, unos 7 € al mes en Barcelona) son resultados
 // de studyTope, y los 4.100 empleos de la reforma laboral, de studyReforma: si cambian allí, hay que cambiarlas aquí.
 const HEROQ=[
-  {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"la cesta de la compra?",chart:"cesta",cta:"Ver qué ha subido más →",
-    v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
-    a:N=>`Desde 2019 la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
-    cap:N=>`Precio de los alimentos (media de cada año y de los últimos doce meses) y sueldo mediano hasta ${N.añoSueldo}, el último publicado, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
   {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver qué funcionaría →",
     v:()=>`Porque se forman más hogares de los que se construyen casas.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Desde 2019 se forman muchos más hogares de los que se construyen viviendas, sobre todo en las ciudades que crean empleo. Ninguna de las medidas que se discuten compensa por sí sola que falten casas.`,
     cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados, sueldo mediano y resto de precios hasta ${N.alquilerY}. Fuente: INE.`},
+  {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"la cesta de la compra?",chart:"cesta",cta:"Ver qué ha subido más →",
+    v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
+    a:N=>`Desde 2019 la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
+    cap:N=>`Precio de los alimentos (media de cada año y de los últimos doce meses) y sueldo mediano hasta ${N.añoSueldo}, el último publicado, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
   {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver dónde cambió más →",
     v:()=>`No se ve.`,
     a:N=>`Antes de 2022, ${N.antes>=90?"más de nueve":"unos "+N.antesD} de cada diez contratos nuevos eran temporales. Hoy son ${N.hoyD}. Se temía que un cambio así se llevara empleo por delante, pero los sitios que más tiraban del contrato temporal no han perdido más empleo que los demás. Si hubo una pérdida pequeña, de hasta unos 4.100 empleos, los datos no la distinguirían.`,
@@ -6030,14 +6030,14 @@ const HEROQ=[
     a:()=>`En 2024 el alquiler siguió subiendo donde hay tope: un 3,1${NB}%. Sin él habría subido en torno a un 3,7${NB}%, así que en un piso de Barcelona la diferencia son unos 7${NB}€ al mes. A la vez se vendieron más pisos de lo esperable, y los datos no dicen si salieron del alquiler.`,
     cap:()=>`Subida del alquiler en 2024 en los municipios con tope, frente a la estimada sin él a partir de municipios parecidos. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
 ];
-// la tira «Puesto a prueba»: preguntas que no están en el carrusel, con el veredicto en una frase
+// «Puesto a prueba»: preguntas que no están en el carrusel, con el veredicto y un párrafo corto que lo explica (en el móvil, solo el veredicto)
 const PTIRA=[
-  ["pisos-turisticos","Menos de lo que se dice.","Donde más han crecido no es donde más ha subido el alquiler. Si hay efecto, está en barrios concretos."],
-  ["pensiones","Depende de cuántos se jubilen, cuánto cobren y cuánto crezca la economía.",`Con palancas como las de las reformas aprobadas, nuestro escenario deja el gasto en torno al 16–17${NB}% del PIB en 2050.`],
-  ["quien-gobierna","Menos de lo que crees.","Donde el PP ganó por poco y donde ganó el PSOE por poco, la población, el paro, la renta y la deuda siguieron el mismo camino."],
-  ["pandemia-turismo","Sí, y se recuperaron.","En 2020 el paro subió más y la renta bajó más en las provincias más turísticas que en el resto."],
-  ["ave","Poco, por ahora.","Dos o cuatro años después, los sitios con estación nueva apenas se distinguen de otros parecidos que no la tienen."],
-  ["convergencia","Sí, poco a poco, y sobre todo por el trabajo.","La distancia entre los sitios más ricos y los más pobres se ha estrechado desde 2015, y los salarios explican la mayor parte."],
+  ["pisos-turisticos","Menos de lo que se dice.","Es la explicación que más se oye cada vez que sube el alquiler. Pero donde más han crecido los pisos turísticos no es, en general, donde más ha subido; si hay efecto, está en barrios concretos."],
+  ["pensiones","Depende de lo que se decida.",`Ahora se jubilan las generaciones más numerosas. Si nada cambia, el gasto pasa del 13,2${NB}% al 24,9${NB}% del PIB en 2050; de siete futuros simulados, solo uno cabe en el 16,2${NB}% al que apunta la AIReF.`],
+  ["quien-gobierna","Menos de lo que crees.","Miramos solo las elecciones que se decidieron por un puñado de votos, donde ganar fue casi cuestión de suerte. Donde ganó el PP por poco y donde ganó el PSOE por poco, la población, el paro, la renta y la deuda siguieron el mismo camino."],
+  ["pandemia-turismo","Sí, y se recuperaron.","En la primavera de 2020 cerraron los hoteles y los aviones se quedaron en tierra. Ese año el paro subió más y la renta bajó más en las provincias más turísticas que en el resto, y después se recuperaron."],
+  ["ave","Poco, por ahora.","Entre 2021 y 2023 la alta velocidad llegó a Galicia, Extremadura, Burgos, Murcia, Elche y Asturias. Dos o cuatro años después, los pueblos con estación nueva apenas se distinguen de otros casi idénticos que se quedaron sin ella."],
+  ["convergencia","Sí, poco a poco, y sobre todo por el trabajo.","Entre 2015 y 2024 la renta subió en casi toda España, pero no igual para todos. Los sitios que partían de abajo han recortado distancia, y lo que más lo explica son los salarios; las pensiones y prestaciones ayudan, pero menos."],
 ];
 let PORTADA_P=null; const loadPortada=()=>PORTADA_P||(PORTADA_P=getJSON("/data/portada.json").catch(()=>{ PORTADA_P=null; return null; }));
 
@@ -6056,7 +6056,7 @@ const ptCharts={
     return ptSvg([120,140].filter(g=>g<hi).map(g=>`<line x1="${x0}" x2="${x1}" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="${x0-8}" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">+${g-100}${NB}%</text>`).join("")
       +`<line x1="${x0}" x2="${x1}" y1="${Yv(100).toFixed(1)}" y2="${Yv(100).toFixed(1)}" class="pt-g-base"/><text x="${x0-8}" y="${(Yv(100)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">2019</text>`
       +C.comida.filter(([y])=>y%2).map(([y])=>`<text x="${X(y+.5).toFixed(1)}" y="${y0+24}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
-      +`<path d="${area}" class="pt-g-area"/><polyline points="${sa.map(pt).join(" ")}" class="pt-g-ln ink"/><polyline points="${fo.map(pt).join(" ")}" class="pt-g-ln br"/>${dots(sa,"pt-f-ink")}${dots(fo,"pt-f-br")}`
+      +`<path d="${area}" class="pt-g-area"/><path d="M${sa.map(pt).join(" L")}" pathLength="1" class="pt-g-ln ink"/><path d="M${fo.map(pt).join(" L")}" pathLength="1" class="pt-g-ln br"/>${dots(sa,"pt-f-ink")}${dots(fo,"pt-f-br")}`
       +lab(F,yF,"La comida"," br")+lab(Sl,yS,"El sueldo",""),
       `Desde 2019 el precio de la comida ha subido un ${nf0.format(F[1]-100)} % y el sueldo mediano un ${nf0.format(Sl[1]-100)} %.`); },
   // la casa: cuatro barras desde 2015
@@ -6079,7 +6079,7 @@ const ptCharts={
     return ptSvg([50,75,100].map(g=>`<line x1="40" x2="330" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="32" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">${g}${NB}%</text>`).join("")
       +M.map((m,i)=>/-01$/.test(m)&&+m.slice(0,4)%2?`<text x="${X(i).toFixed(1)}" y="286" text-anchor="middle" class="pt-g-t">${m.slice(0,4)}</text>`:"").join("")
       +(ir>=0?`<line x1="${X(ir).toFixed(1)}" x2="${X(ir).toFixed(1)}" y1="30" y2="262" class="pt-g-tick dash"/><text x="${(X(ir)+8).toFixed(1)}" y="44" class="pt-g-g">Abril de 2022:</text><text x="${(X(ir)+8).toFixed(1)}" y="62" class="pt-g-g">entra la reforma</text>`:"")
-      +`<polyline points="${idx.map(i=>`${X(i).toFixed(1)},${Yv(T[i]).toFixed(1)}`).join(" ")}" class="pt-g-ln br"/>`
+      +`<path d="M${idx.map(i=>`${X(i).toFixed(1)},${Yv(T[i]).toFixed(1)}`).join(" L")}" pathLength="1" class="pt-g-ln br"/>`
       +`<text x="${X(0).toFixed(1)}" y="${(Yv(antes)-12).toFixed(1)}" class="pt-g-n">${nf0.format(antes)}${NB}%</text>`
       +`<circle cx="${X(last).toFixed(1)}" cy="${Yv(T[last]).toFixed(1)}" r="4.5" class="pt-f-br"/><text x="${(X(last)+12).toFixed(1)}" y="${(Yv(T[last])-4).toFixed(1)}" class="pt-g-l br">Hoy</text><text x="${(X(last)+12).toFixed(1)}" y="${(Yv(T[last])+21).toFixed(1)}" class="pt-g-n br">${nf0.format(T[last])}${NB}%</text>`,
       `Antes de 2022, el ${nf0.format(antes)} % de los contratos nuevos eran temporales; hoy, el ${nf0.format(T[last])} %.`); },
@@ -6106,23 +6106,34 @@ function heroCarHTML(D){
   const tabs=L.map((h,i)=>`<button type="button" role="tab" class="${i?"":"on"}" aria-selected="${i?"false":"true"}" aria-controls="pts${i}"><span class="pt-bar"><span></span></span><b>${esc(h.tab)}</b><small>${esc(byId[h.id].t)}</small></button>`).join("");
   return `<section class="pt-car" aria-roledescription="carrusel" aria-label="Preguntas destacadas"><div class="pt-stack">${slides}</div><div class="pt-tabs" role="tablist" aria-label="Elige una pregunta">${tabs}</div></section>`;
 }
-// pasa sola cada 9 s (lo marca la animación de la barrita de la pestaña); se para al pasar el ratón o tabular dentro,
-// y deja de pasar sola en cuanto el lector elige una pestaña o desliza. Con «reducir movimiento» no pasa sola.
+// Pasa sola cada 7 s; la barrita de la pestaña marca el tiempo. Se pausa con el ratón encima, con el foco de teclado dentro,
+// fuera de pantalla o con la pestaña del navegador oculta. Elegir una pestaña o deslizar solo reinicia la cuenta.
+// Con «reducir movimiento» también pasa, pero sin animaciones (las quita la regla general de styles.css).
+const PT_MS=7000;
 function heroCarBind(C){
   if(!C) return; const S=[...C.querySelectorAll(".pt-s")], T=[...C.querySelectorAll(".pt-tabs button")]; if(S.length<2) return;
-  let i=0, auto=!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches); if(!auto) C.classList.add("still");
-  const go=(n,user)=>{ if(user){ auto=false; C.classList.add("still"); }
-    S[i].classList.remove("on"); S[i].setAttribute("aria-hidden","true"); S[i].querySelectorAll("a").forEach(a=>a.tabIndex=-1);
-    T[i].classList.remove("on"); T[i].setAttribute("aria-selected","false");
-    i=(n+S.length)%S.length;
-    S[i].classList.add("on"); S[i].removeAttribute("aria-hidden"); S[i].querySelectorAll("a").forEach(a=>a.removeAttribute("tabindex"));
-    T[i].setAttribute("aria-selected","true"); void T[i].offsetWidth; T[i].classList.add("on"); };
-  T.forEach((b,k)=>{ b.addEventListener("click",()=>go(k,true));
-    b.querySelector(".pt-bar span").addEventListener("animationend",()=>{ if(auto&&document.body.contains(C)) go(i+1); });
-    b.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ e.preventDefault(); go(i+(e.key==="ArrowRight"?1:-1),true); T[i].focus(); } }); });
+  const bar=k=>T[k].querySelector(".pt-bar span");
+  let i=0, el=0, last=performance.now(), hov=false, vis=true;
+  const go=(n,dir)=>{ const prev=i; i=(n+S.length)%S.length; el=0; bar(prev).style.transform=""; if(i===prev) return;
+    C.dataset.dir=dir<0?"back":"fwd";
+    S[prev].classList.remove("on"); S[prev].classList.add("out"); S[prev].setAttribute("aria-hidden","true"); S[prev].querySelectorAll("a").forEach(a=>a.tabIndex=-1);
+    T[prev].classList.remove("on"); T[prev].setAttribute("aria-selected","false");
+    setTimeout(()=>S[prev].classList.remove("out"),700);
+    S[i].classList.remove("out"); S[i].classList.add("on"); S[i].removeAttribute("aria-hidden"); S[i].querySelectorAll("a").forEach(a=>a.removeAttribute("tabindex"));
+    T[i].classList.add("on"); T[i].setAttribute("aria-selected","true"); };
+  const tick=now=>{ if(!document.body.contains(C)){ io&&io.disconnect(); return; }
+    const dt=Math.min(now-last,100); last=now;
+    if(!hov&&vis&&!C.querySelector(":focus-visible")){ el+=dt; if(el>=PT_MS) go(i+1,1); }
+    bar(i).style.transform=`scaleX(${Math.min(1,el/PT_MS).toFixed(4)})`;
+    requestAnimationFrame(tick); };
+  const io="IntersectionObserver" in window?new IntersectionObserver(es=>{ vis=es[0].isIntersecting; },{threshold:.35}):null; if(io) io.observe(C);
+  C.addEventListener("pointerenter",e=>{ if(e.pointerType==="mouse") hov=true; }); C.addEventListener("pointerleave",()=>{ hov=false; });
+  T.forEach((b,k)=>{ b.addEventListener("click",()=>go(k,k<i?-1:1));
+    b.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ e.preventDefault(); const d=e.key==="ArrowRight"?1:-1; go(i+d,d); T[i].focus(); } }); });
   const st=C.querySelector(".pt-stack"); let sx=null;
   st.addEventListener("touchstart",e=>{ sx=e.touches[0].clientX; },{passive:true});
-  st.addEventListener("touchend",e=>{ if(sx==null) return; const dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>50) go(i+(dx<0?1:-1),true); });
+  st.addEventListener("touchend",e=>{ if(sx==null) return; const dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>50){ const d=dx<0?1:-1; go(i+d,d); } });
+  requestAnimationFrame(tick);
 }
 
 async function renderInicio(){
@@ -6130,20 +6141,26 @@ async function renderInicio(){
   // mientras llega portada.json (unos cientos de bytes) sigue a la vista la portada pre-renderizada
   const D=await loadPortada(); if(location.pathname!=="/") return;
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
+  // «Puesto a prueba»: una pieza por fila, imagen y texto, alternando el lado de la imagen; en el móvil, lista con miniatura
   const tira=PTIRA.filter(([id])=>byId[id]).map(([id,b,t])=>{ const S=byId[id];
-    return `<a class="pt-row" href="/preguntas/${id}/"><div class="pt-rq">${esc(S.t)}</div><div class="pt-ra"><b>${esc(b)}</b> ${esc(t)}<br>${evSpan(S.ev).trim()}</div></a>`; }).join("");
-  const usados=new Set([...HEROQ.map(h=>h.id),...PTIRA.map(x=>x[0])]);
-  const recientes=STUDIES.filter(S=>S.pub&&!usados.has(S.id)).sort((a,b)=>b.pub.localeCompare(a.pub)).slice(0,3);
+    return `<a class="pt-n" href="/preguntas/${id}/"><div class="pt-im">${ptIll(S)}</div><div class="pt-tx"><div class="pt-k">${esc(TOPICL(S.tema))}</div><h3>${esc(S.t)}</h3><p class="pt-vd">${esc(b)}</p><p class="pt-sm">${esc(t)}</p><span class="pt-go">Ver la respuesta →</span></div></a>`; }).join("");
   const autor=(window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author&&window.__INDICIO.site.author.name)||"";
+  const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<div class="pt-lema"><b>Indicio</b> · Preguntas reales. Respuestas con datos públicos.</div>
   ${heroCarHTML(D)}
-  <section class="ed-sec"><div class="ed-k">Puesto a prueba</div><h2 class="ed-h2">Lo que todo el mundo da por hecho, con los datos delante</h2>
-    <p class="pt-lead">Preguntas que salen en el telediario o en la comida del domingo. Algunas respuestas confirman lo que pensabas y otras no. Todas te dicen hasta dónde llegan.</p>
-    <div class="pt-tira">${tira}</div>
-    <p style="margin-top:18px"><a class="ed-go" href="/preguntas/">Ver las ${STUDIES.length} preguntas →</a></p></section>
-  <section class="ed-sec"><div class="ed-k">Recién publicado</div><h2 class="ed-h2">Lo último</h2><div class="qg" id="qg"></div></section>
-  <section class="ed-sec ed-two"><a class="ed-ill" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
-    <div><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes tu propia teoría? Ponla a prueba.</h2><p class="ed-lead">Elige dos datos, como el paro y la edad o la renta y el voto, y mira si van juntos de verdad o solo lo parecen. También puedes ver qué pasó antes y después de una ley.</p><p style="margin-top:14px"><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></div></section>
+  <section class="ed-sec pt-pap"><div class="ed-k">Puesto a prueba</div><h2 class="ed-h2">Lo que se da por hecho, con los datos delante</h2>
+    <p class="pt-lead">Algunas confirman lo que pensabas. Otras, no.</p>
+    <div class="pt-grid">${tira}</div>
+    <p class="pt-more"><a class="ed-go" href="/preguntas/">Ver las ${STUDIES.length} preguntas →</a></p></section>
+  <section class="pt-land pt-lab"><a class="pt-land-im" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
+    <div class="pt-land-tx"><div class="ed-k">Laboratorio</div><h2>¿Tienes tu propia teoría? <em>Ponla a prueba.</em></h2>
+      <p class="pt-land-lead">Elige dos datos y mira si de verdad van juntos o solo lo parecen.</p>
+      <p class="pt-land-go"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a><span class="pt-tools"><a href="/laboratorio/mapa/">Mapa</a><a href="/laboratorio/cruce/">Cruce</a><a href="/laboratorio/evolucion/">Evolución</a><a href="/laboratorio/tabla/">Tabla</a></span></p></div></section>
+  <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>¿Y dónde vives tú? <em>Míralo de un vistazo.</em></h2>
+      <p class="pt-land-lead">Los ${nMun} municipios de España tienen su ficha: quién vive, cuánto se gana y cómo vota.</p></div>
+    <div class="pt-mun-q">${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Comparar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Rankings</a></p></div>
+    <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
+      <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
     <p class="pt-who">${autor?`Indicio lo hace ${esc(autor)}, data scientist especializado en experimentación. Su trabajo es saber si un cambio ha funcionado de verdad o solo lo parece, y aquí lo aplica a lo que se discute en España.`:`Indicio mide si un cambio funciona o solo lo parece, y lo aplica a lo que se discute en España.`} <a href="/quien-soy/">Quién soy →</a></p>
     <div class="ci-steps" style="padding:0">
@@ -6153,13 +6170,17 @@ async function renderInicio(){
   <section class="ed-sec"><div class="ed-k">Por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   heroCarBind(view.querySelector(".pt-car"));
-  // «Lo último»: los tres análisis más recientes que no salen arriba, con su ilustración y su respuesta corta
-  const g=document.getElementById("qg");
-  recientes.forEach(S=>{ const a=add(g,"a"); a.href="/preguntas/"+S.id+"/"; const ic=illCard(S.id); if(ic) a.appendChild(ic);
-    // la respuesta corta, con la primera frase en negrita y solo la siguiente (algunas pasan de cuatro frases)
-    const fr=String(S.a||S.d).split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ¿¡])/), c=fr[0].indexOf(":"), cut=c>0&&c<60?c+1:fr[0].length;
-    a.insertAdjacentHTML("beforeend",`<div class="k">${esc(TOPICL(S.tema))}${evSpan(S.ev)}</div><div class="q">${esc(S.t)}</div><div class="a"><b>${esc(fr[0].slice(0,cut))}</b>${esc(fr[0].slice(cut))} ${esc(fr[1]||"")}</div><div class="go">Ver la respuesta →<time datetime="${S.pub}">${fechaES(S.pub)}</time></div>`); });
+  bindBig("q2");
+  // la nube de municipios: imagen fija y, encima, qué municipio es cada punto
+  const ar=document.getElementById("qhart");
+  if(ar&&ARTS.has("hero-campo")){ const mob=view.clientWidth<700, im=el("img"); im.src="/art/hero-campo"+(mob?"-m":"")+".jpg"; im.width=mob?720:1120; im.height=mob?520:380; im.alt=""; im.decoding="async"; im.loading="lazy"; im.className="qimg"; ar.appendChild(im); heroHover(ar,mob?"m":"d"); }
+  else if(ar) ar.closest("figure").remove();
 }
+// ilustración de una pieza de la portada: la del análisis, recortada a 16:9 por su punto de interés, o la de su tema
+const ptIll=S=>{ const I=window.__INDICIO||{}, sv=(I.illus||{})[S.id];
+  if(!sv) return tIll(S.tema);
+  const f=(I.focus||{})[S.id]??240, x=Math.max(0,Math.min(100,f/(1200-640)*100)).toFixed(0);
+  return sv.startsWith("<img")?sv.replace("<img ",`<img style="object-position:${x}% 50%" `):sv.replace('viewBox="0 0 1200 360"',`viewBox="${f} 0 640 360"`).replace('xMidYMax slice','xMidYMid slice'); };
 
 // la nube de la portada responde al ratón: qué municipio es cada punto y, al pulsar, su ficha.
 // Las posiciones salen de art/hero-campo.json (scripts/hero-swarm.mjs), las mismas del dibujo.

@@ -1331,11 +1331,26 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .pt-lema b{color:var(--brand); font-weight:700}
 .pt-car{display:flex; flex-direction:column; padding:30px 0 6px}
 .pt-stack{display:grid}
-.pt-s{grid-area:1/1; display:grid; grid-template-columns:minmax(0,1.08fr) minmax(0,1fr); gap:44px; align-items:center; opacity:0; visibility:hidden; transition:opacity .5s ease, visibility 0s linear .5s}
-.pt-s.on{opacity:1; visibility:visible; transition:opacity .5s ease}
-.pt-st>*{transform:translateY(10px); transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.pt-s.on .pt-st>*{transform:none}
-.pt-s.on .pt-st>*:nth-child(2){transition-delay:.04s} .pt-s.on .pt-st>*:nth-child(3){transition-delay:.08s} .pt-s.on .pt-st>*:nth-child(4){transition-delay:.12s}
+.pt-s{grid-area:1/1; display:grid; grid-template-columns:minmax(0,1.08fr) minmax(0,1fr); gap:44px; align-items:center; opacity:0; visibility:hidden; transition:opacity .45s ease, visibility 0s linear .6s}
+.pt-s.on{opacity:1; visibility:visible; transition:opacity .45s ease .12s}
+.pt-s.out{visibility:visible}
+/* el texto entra por la derecha y sale por la izquierda (al revés si se va hacia atrás), escalonado */
+.pt-st>*{opacity:0; transform:translateX(44px); transition:transform .75s cubic-bezier(.2,.7,.2,1), opacity .5s ease}
+.pt-car[data-dir="back"] .pt-st>*{transform:translateX(-44px)}
+.pt-s.on .pt-st>*{opacity:1; transform:none}
+.pt-s.out .pt-st>*{opacity:0; transform:translateX(-44px); transition-duration:.45s,.35s; transition-delay:0s!important}
+.pt-car[data-dir="back"] .pt-s.out .pt-st>*{transform:translateX(44px)}
+.pt-s.on .pt-st>*:nth-child(1){transition-delay:.1s} .pt-s.on .pt-st>*:nth-child(2){transition-delay:.16s} .pt-s.on .pt-st>*:nth-child(3){transition-delay:.24s} .pt-s.on .pt-st>*:nth-child(4){transition-delay:.32s} .pt-s.on .pt-st>*:nth-child(5){transition-delay:.4s}
+/* el gráfico se dibuja al entrar: las líneas se trazan, las barras crecen y las cifras aparecen al final */
+.pt-g .pt-g-ln{stroke-dasharray:1}
+.pt-s.on .pt-g .pt-g-ln{animation:pt-draw 1.4s cubic-bezier(.45,0,.2,1) .25s both}
+.pt-g rect{transform-box:fill-box; transform-origin:left center}
+.pt-s.on .pt-g rect{animation:pt-grow .9s cubic-bezier(.2,.7,.2,1) .2s both}
+.pt-s.on .pt-g rect:nth-of-type(2){animation-delay:.32s} .pt-s.on .pt-g rect:nth-of-type(3){animation-delay:.44s} .pt-s.on .pt-g rect:nth-of-type(4){animation-delay:.56s}
+.pt-s.on .pt-g :is(circle,.pt-g-area,.pt-g-n,.pt-g-g,.pt-g-l.br,.pt-g-tick){animation:pt-fade .6s ease 1.05s both}
+@keyframes pt-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pt-grow{from{transform:scaleX(0)}to{transform:none}}
+@keyframes pt-fade{from{opacity:0}to{opacity:1}}
 .pt-s .kk2{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--brand); font-weight:700}
 .pt-q{font-family:var(--serif); font-weight:500; font-size:clamp(36px,4.9vw,58px); line-height:1.03; letter-spacing:-.02em; margin:10px 0 0; text-wrap:balance}
 .pt-q em{color:var(--brand)}
@@ -1363,22 +1378,11 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .pt-tabs button{all:unset; box-sizing:border-box; cursor:pointer; display:block; padding-top:12px; position:relative}
 .pt-bar{position:absolute; left:0; right:0; top:0; height:2px; background:var(--rule-2); overflow:hidden}
 .pt-bar span{position:absolute; inset:0; background:var(--brand); transform:scaleX(0); transform-origin:left}
-.pt-tabs button.on .pt-bar span{animation:pt-bar 9s linear forwards}
-.pt-car:hover .pt-tabs button.on .pt-bar span,.pt-car:focus-within .pt-tabs button.on .pt-bar span{animation-play-state:paused}
-.pt-car.still .pt-tabs button.on .pt-bar span{animation:none; transform:none}
-@keyframes pt-bar{to{transform:none}}
 .pt-tabs b{display:block; font:700 13px var(--font); letter-spacing:.04em; text-transform:uppercase; color:var(--muted)}
 .pt-tabs small{display:block; font:15px/1.35 var(--serif); color:var(--muted); margin-top:4px}
 .pt-tabs button.on b{color:var(--brand)} .pt-tabs button.on small,.pt-tabs button:hover small{color:var(--ink)}
 .pt-tabs button:focus-visible{outline:2px solid var(--brand); outline-offset:4px}
 .pt-lead{max-width:var(--medida); color:var(--ink-2); font:17px/1.5 var(--serif); margin:8px 0 18px}
-.pt-tira{border-top:1px solid var(--rule-2)}
-.pt-row{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:8px 36px; align-items:baseline; padding:14px 0; border-bottom:1px solid var(--rule); text-decoration:none; color:inherit}
-.pt-row:hover .pt-rq{color:var(--brand)}
-.pt-rq{font-family:var(--serif); font-size:clamp(17.5px,1.7vw,20.5px); line-height:1.25; color:var(--ink)}
-.pt-ra{font-size:15px; line-height:1.45; color:var(--ink-2)}
-.pt-ra b{color:var(--brand); font-weight:600}
-.pt-ra .ev{display:inline-block; margin:6px 0 0}
 .pt-why{background:var(--band); border-radius:16px; padding:28px 30px; margin-top:40px}
 .pt-why h2{font-family:var(--serif); font-weight:500; font-size:clamp(24px,2.6vw,30px); margin:0 0 6px}
 .pt-who{font:17px/1.5 var(--serif); color:var(--ink-2); max-width:var(--medida); margin:0 0 22px}
@@ -1390,11 +1394,60 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
   .pt-tabs small{display:none}
   .pt-tabs b{font-size:11.5px; letter-spacing:.02em}
 }
-@media (max-width:720px){ .pt-row{grid-template-columns:minmax(0,1fr); gap:4px; padding:12px 0} .pt-ra{font-size:14.5px} .pt-lema{font-size:11px; letter-spacing:.03em} .pt-why{padding:22px 18px} }
-@media (prefers-reduced-motion:reduce){ .pt-s,.pt-st>*{transition:none} }
+@media (max-width:720px){ .pt-lema{font-size:11px; letter-spacing:.03em} .pt-why{padding:22px 18px} }
+@media (prefers-reduced-motion:reduce){ .pt-s,.pt-st>*{transition:none} .pt-st>*,.pt-car[data-dir] .pt-st>*{opacity:1; transform:none} }
 /* en el tema oscuro --brand es casi negro; en la portada el granate se aclara para que se lea (como --rust) */
-:root[data-theme="dark"] .pt-lema,:root[data-theme="dark"] .pt-car,:root[data-theme="dark"] .pt-tira,:root[data-theme="dark"] .pt-why{--brand:#d0505f}
+:root[data-theme="dark"] .pt-lema,:root[data-theme="dark"] .pt-car,:root[data-theme="dark"] .pt-pap,:root[data-theme="dark"] .pt-land,:root[data-theme="dark"] .pt-why{--brand:#d0505f}
 .pt-f-mu{fill:var(--rule-2)}
+/* «Puesto a prueba»: una pieza por fila, imagen y texto, y la imagen cambia de lado en cada fila */
+.pt-pap .pt-lead{font:italic clamp(18px,1.9vw,21px)/1.4 var(--serif); color:var(--ink-2); margin:2px 0 12px}
+.pt-grid{display:grid; grid-template-columns:minmax(0,1fr)}
+.pt-n{display:grid; grid-template-columns:minmax(0,5fr) minmax(0,6fr); gap:0 clamp(28px,5vw,64px); align-items:center; padding:30px 0; border-top:1px solid var(--rule); text-decoration:none; color:inherit}
+.pt-n:first-child{border-top:0}
+.pt-n:nth-child(even){grid-template-columns:minmax(0,6fr) minmax(0,5fr)}
+.pt-n:nth-child(even) .pt-im{order:2}
+.pt-im{aspect-ratio:16/9; overflow:hidden; border-radius:4px; background:var(--band)}
+.pt-im>*{display:block; width:100%!important; height:100%!important; margin:0!important; max-width:none!important; aspect-ratio:auto!important; border-radius:0!important; object-fit:cover; transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.pt-n:hover .pt-im>*{transform:scale(1.035)}
+.pt-k{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700}
+.pt-n h3{font-family:var(--serif); font-weight:500; font-size:clamp(26px,2.7vw,34px); line-height:1.1; letter-spacing:-.015em; color:var(--ink); margin:8px 0 0; text-wrap:balance; transition:color .2s}
+.pt-n:hover h3{color:var(--brand)}
+.pt-vd{font:500 clamp(18px,1.8vw,21px)/1.35 var(--serif); color:var(--brand); margin:12px 0 0; max-width:30em}
+.pt-sm{font:17px/1.55 var(--serif); color:var(--ink-2); margin:10px 0 0; max-width:34em}
+.pt-go{display:inline-block; margin-top:14px; font-size:14.5px; font-weight:600; color:var(--brand)}
+.pt-more{margin-top:20px}
+/* el laboratorio y los municipios, como bloques de una landing */
+.pt-land{border-top:1px solid var(--ink); margin-top:clamp(48px,7vw,80px); padding-top:clamp(28px,4vw,44px); display:grid; gap:28px 56px; align-items:center}
+.pt-land h2{font-family:var(--serif); font-weight:500; font-size:clamp(32px,4vw,50px); line-height:1.04; letter-spacing:-.02em; margin:8px 0 0; text-wrap:balance}
+.pt-land h2 em{color:var(--brand)}
+.pt-land-lead{font:clamp(18px,1.9vw,21px)/1.5 var(--serif); color:var(--ink-2); margin:16px 0 0; max-width:34em}
+.pt-lab{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}
+.pt-land-im{display:block; border-radius:14px; overflow:hidden; background:var(--band); aspect-ratio:8/7}
+.pt-land-im>*{display:block; width:100%!important; height:100%!important; margin:0!important; object-fit:cover; aspect-ratio:auto!important; border-radius:0!important; transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.pt-land-im:hover>*{transform:scale(1.03)}
+.pt-land-go{margin-top:26px; display:flex; flex-wrap:wrap; gap:14px 22px; align-items:center}
+.pt-tools{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:14.5px}
+.pt-tools a{color:var(--brand); font-weight:600; text-decoration:none}
+.pt-tools a:hover{text-decoration:underline}
+.pt-mun{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); align-items:end}
+.pt-mun-q .bigsearch{margin-top:0}
+.pt-mun-q .pt-tools{margin-top:16px}
+.pt-mun-art{grid-column:1/-1; margin:8px 0 0}
+.pt-mun-art .qh-art{margin:0}
+.pt-hint{color:var(--ink-2)}
+@media (hover:none){ .pt-hint{display:none} }
+@media (max-width:900px){ .pt-lab,.pt-mun{grid-template-columns:minmax(0,1fr)} .pt-land-im{aspect-ratio:16/10} }
+@media (max-width:600px){
+  /* en el móvil, una lista: miniatura a la izquierda y la pregunta a la derecha */
+  .pt-n,.pt-n:nth-child(even){grid-template-columns:104px minmax(0,1fr); gap:0 16px; align-items:start; padding:18px 0}
+  .pt-n:first-child{padding-top:4px}
+  .pt-n:nth-child(even) .pt-im{order:0}
+  .pt-im{aspect-ratio:1; border-radius:6px}
+  .pt-k{font-size:10.5px}
+  .pt-n h3{font-size:19px; margin-top:3px}
+  .pt-vd{font:600 14.5px/1.4 var(--font); margin-top:6px}
+  .pt-go,.pt-sm{display:none}
+}
 
 @media (max-width:600px){ svg text.quadt{font-size:10.5px; stroke-width:3px} }
 
