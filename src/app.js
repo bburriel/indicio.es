@@ -1056,7 +1056,8 @@ const QUEMIDE={
   vox:"Votos a Vox por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco).",
   sumar:"Votos a Sumar y sus aliados por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco)."};
 // el icono que abre la explicación; sin texto para esa clave, no se pinta nada
-const iQue=(k,lab)=>QUEMIDE[k]?`<button type="button" class="iq" data-q="${k}" data-ql="${esc(lab||labK(k))}" aria-label="Qué mide ${esc(lab||labK(k))}"><i>ı</i></button>`:"";
+const IQ_SVG='<svg class="iqs" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><circle class="iqc" cx="10" cy="10" r="9.25"/><path class="iqg" d="M7.3 8.9 10.4 7.7H11.7V14.5H13.3V15.6H6.7V14.5H8.4V8.9Z"/><circle class="iqd" cx="10" cy="5" r="1.35"/></svg>';
+const iQue=(k,lab)=>QUEMIDE[k]?`<button type="button" class="iq" data-q="${k}" data-ql="${esc(lab||labK(k))}" aria-label="Qué mide ${esc(lab||labK(k))}">${IQ_SVG}</button>`:"";
 const bindQue=root=>tipBind(root.querySelectorAll(".iq"),b=>`<b>${esc(b.dataset.ql)}:</b> ${esc(QUEMIDE[b.dataset.q])}`);
 
 // ---------- de un vistazo ----------
@@ -3621,7 +3622,7 @@ const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Si van juntos",grupos:
 const LBEJ={mapa:"dónde hay más paro registrado",tabla:"los municipios con la renta más alta",cruce:"si donde se estudia más se gana más",grupos:"la renta media por comunidad",distribucion:"cuántos municipios tienen mucho paro y cuántos poco",matriz:"qué datos se mueven juntos en los municipios",paises:"cómo han subido los alquileres en tu provincia",pendientes:"qué provincias han mejorado su renta desde 2015",burbujas:"cómo se mueven las provincias en renta y paro",piramide:"cómo de envejecida está una provincia",composicion:"qué sectores dan trabajo en cada comunidad"};
 const typesHTML=cur=>`<div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===cur}">${typeIcon(svg)}<b>${LBQ[k]}</b><small>${l}</small></button>`).join("")}</div>`;
 const typesTips=root=>tipBind(root.querySelectorAll(".types button"),b=>{ const k=b.dataset.v; return `<b>${LBQ[k]}</b> <span style="opacity:.7">· ${LBTYPES.find(t=>t[0]===k)[1]}</span><br>${LBDESC[k]}.${LBEJ[k]?`<br><i>Ejemplo: ${LBEJ[k]}.</i>`:""}`; });
-const lbh=(t,l)=>`<button type="button" class="iq lbh" data-h="${esc(t)}" aria-label="${esc(l||"Más información")}"><i>ı</i></button>`;
+const lbh=(t,l)=>`<button type="button" class="iq lbh" data-h="${esc(t)}" aria-label="${esc(l||"Más información")}">${IQ_SVG}</button>`;
 const lbBind=root=>{ const ns=root.querySelectorAll(".lbh"); tipBind(ns,b=>esc(b.dataset.h)); ns.forEach(b=>b.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); }));};
 
 // Ayudas del menú del laboratorio: cada botón, casilla y selector explica qué hace al pasar el ratón o al tabular
@@ -4156,7 +4157,7 @@ let CZMORE=false;
 const CZI=new Set();   // avisos abiertos con la «i» (clave: «control|risk» o «control|sus»)
 // escala del veredicto: cuatro tramos de |r|; devuelve la posición del marcador (0-100)
 const czPos=a=>a<.1?a/.1*25:a<.3?25+(a-.1)/.2*25:a<.5?50+(a-.3)/.2*25:Math.min(100,75+(a-.5)/.5*25);
-const czIt=(t,l)=>`<button type="button" class="iq czit" data-t="${esc(t)}" aria-label="${esc(l||"Más información")}"><i>ı</i></button>`;
+const czIt=(t,l)=>`<button type="button" class="iq czit" data-t="${esc(t)}" aria-label="${esc(l||"Más información")}">${IQ_SVG}</button>`;
 const czTipBind=root=>tipBind(root.querySelectorAll(".czit"),b=>b.dataset.t);
 function czVerdict(r,adj){
   const box=document.getElementById("czl"); if(!box||!CZ) return; const a=Math.abs(r), i=a<.1?0:a<.3?1:a<.5?2:3, xl=low(labK(CZ.x)), yl=low(labK(CZ.y));
@@ -4201,7 +4202,7 @@ function czRefresh(animate){
   const wt=k=>{ const p=solo[k]; if(p==null||a0<0.1) return ""; if(Math.sign(p)!==sgn&&Math.abs(p)>=0.1) return "invierte";
     const d=((Math.sign(p)===sgn?Math.abs(p):0)-a0)/a0*100; return Math.abs(d)<5?"":(d<0?"−":"+")+nf0.format(Math.min(100,Math.abs(d)))+NB+"%"; };
   const chip=(k,lab,on)=>{ const rk=ctrlRisk(x,y,k), sus=k===CZ.suspect, t=wt(k);
-    const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Qué significa «${txt}» en ${esc(lab)}"><i>ı</i></button>`;
+    const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Qué significa «${txt}» en ${esc(lab)}">${IQ_SVG}</button>`;
     return `<span class="czchip${on?" on":""}${sus?" sus":""}${rk?" risk":""}"><button type="button" class="czpick" data-k="${k}" aria-pressed="${on}"${t?` title="${esc(`Si igualas solo esto, la relación cambia un ${t.replace(/^[+−]/,"").replace(NB," ")}${t[0]==="+"?" más":" menos"} (r pasa de ${rFmt(base.r)} a ${rFmt(solo[k])})`)}"`:""}>${esc(cap(lab))}</button>${rk?`<button type="button" class="czwarn2 czi" data-i="${k}|risk" aria-expanded="false" aria-label="Cuidado con igualar ${esc(lab)}">!</button>`:""}${sus?tag("su","la que más pesa","sus"):""}</span>`; };
   const allK=CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y), lossOf=k=>{ const p=solo[k]; return p==null?0:a0-(Math.sign(p)===sgn?Math.abs(p):0); },
     ranked=[...allK].sort((a,b)=>(b===CZ.suspect)-(a===CZ.suspect)||lossOf(b)-lossOf(a)), topK=new Set(ranked.slice(0,3)),
