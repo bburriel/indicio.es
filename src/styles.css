@@ -1606,3 +1606,4 @@ details.chk > section{margin-top:18px}
 .navdd a[aria-current="page"]{background:none; box-shadow:none; border-radius:20px 0 0 20px}
 .navdd:has(a[aria-current="page"]),.navdd:has(a[aria-current="page"]):hover{background:var(--acc); box-shadow:inset 0 -2px 0 var(--brand)}
 .navdd:has(a[aria-current="page"]) a,.navdd:has(a[aria-current="page"]) .ddb{color:var(--ink)!important}
+.navdd:has(a[aria-current="page"]):hover a,.navdd:has(a[aria-current="page"]):hover .ddb{color:var(--brand)!important}
