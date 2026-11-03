@@ -1803,3 +1803,7 @@ details.chk > section{margin-top:18px}
 .mk-nm{grid-template-columns:1fr 190px} @media (max-width:900px){ .mk-nm{grid-template-columns:1fr} }
 .mk-lead{margin:0 0 12px; font-size:14.5px; color:var(--ink-2); line-height:1.5}
 .dmake .mk-h{padding-bottom:4px}
+
+/* Datos propios: el segundo dato sale en la misma unidad que el primero (nota bajo el selector) */
+.mk-sn{margin:-4px 0 10px; padding:7px 11px; border-left:3px solid var(--rule-2); background:color-mix(in srgb,var(--ink) 4%,var(--card)); font-size:13px; line-height:1.5; color:var(--ink-2)}
+.mk-f select:disabled{opacity:.6; cursor:not-allowed; background:color-mix(in srgb,var(--ink) 5%,var(--bg))}
