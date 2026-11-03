@@ -5149,6 +5149,14 @@ const mesLab=p=>{ const [y,m]=p.split("-"); return MES[+m].slice(0,3)+". "+y; };
 const listY=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+" y "+a[a.length-1];
 
 // Reforma laboral de 2022: ¿cayó la temporalidad, y perdieron empleo los municipios que más dependían del contrato temporal?
+// Caja para jugar: mandos + lecturas predefinidas + resultado. defs:[[k,etiqueta,min,max,paso,nota,fmt]], pre:[[nombre,{k:v}]], render(st)->html
+function playBox(d,{defs,pre,render}){ const w=add(d,"div","calc pn-sim"), ctl=add(w,"div","ctl"), out=add(w,"div","res"), st=Object.assign({},pre[0][1]);
+  ctl.innerHTML=defs.map(([k,l,a,b,step,n])=>`<label>${l} <output data-k="${k}"></output><input type="range" min="${a}" max="${b}" step="${step}" value="${st[k]}" data-k="${k}"><small>${n||""}</small></label>`).join("")
+    +`<p class="muted" style="font-size:13.5px">Probar una lectura: ${pre.map(([l],i)=>`<button type="button" class="lnk" data-p="${i}">${esc(l)}</button>`).join(" · ")}</p>`;
+  const upd=()=>{ ctl.querySelectorAll("output").forEach(o=>{ const df=defs.find(x=>x[0]===o.dataset.k); o.textContent=df[6]?df[6](st[df[0]]):nf1.format(st[df[0]]); }); out.innerHTML=render(st); };
+  ctl.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{ st[i.dataset.k]=+i.value; upd(); }));
+  ctl.querySelectorAll("button[data-p]").forEach(b=>b.addEventListener("click",()=>{ Object.assign(st,pre[+b.dataset.p][1]); ctl.querySelectorAll("input").forEach(i=>i.value=st[i.dataset.k]); upd(); }));
+  upd(); return w; }
 async function studyReforma(B){
   const AB=abstract(B), R=(await loadCausales()).reforma, per=R.periodos, G=R.grupos, n=G.length;
   const GN=["Menos temporalidad","Algo menos","Algo más","Más temporalidad"], GC=["--slate","--s-prov","--mustard","--rust"];
@@ -5193,6 +5201,17 @@ async function studyReforma(B){
   const s4=res(B,`El margen: los datos no distinguirían una pérdida de menos de unos ${nf0.format(roundJ(margJobs))} empleos`,`<p>Con solo cuatro grupos no se puede calcular un intervalo de confianza como en otros análisis: haría falta el empleo de cada municipio. Lo que sí se puede medir es el ruido: una diferencia de hasta <b>${f1(marg)} puntos</b> entre el grupo más y el menos temporal aparece también con una reforma que no existió.</p>`);
   add(s4,"p",null,`En el grupo más temporal había ${nf0.format(roundJ(G[n-1].afil[2019]))} afiliados en 2019. ${f1(marg)} puntos de ese total son unos <b>${nf0.format(roundJ(margJobs))} empleos</b>. Una pérdida mucho mayor que esa difícilmente habría pasado inadvertida; una menor, los datos no permiten ni afirmarla ni descartarla. Es una cota orientativa, porque sale de una sola reforma falsa.`);
 
+  // los grises: cuánto empleo podría haber costado sin que se viera, y cuánta temporalidad bajó de verdad
+  const s5=res(B,"Entre el blanco y el negro: ¿y si costó algo que no vemos?",`<p>Los datos no dicen «cero». Dicen que no ven pérdidas por encima de cierto ruido, y que no se pueden separar los fijos discontinuos de los indefinidos de siempre. Mueve los dos mandos y mira cómo cambia la lectura.</p>`);
+  playBox(s5,{defs:[["p","Empleo perdido en los municipios más expuestos",0,3,0.1,"En los demás grupos, la pérdida es proporcional a su exposición. En porcentaje de sus afiliados.",v=>nf1.format(v)+NB+"%"],
+      ["e","De la caída de la temporalidad, parte que es cambio de etiqueta",0,60,5,"Trabajos de temporada que pasan de temporales a fijos discontinuos. Con estos datos no se puede medir; es un supuesto.",v=>v+NB+"%"]],
+    pre:[["No costó empleo",{p:0,e:30}],["Costó algo donde más se usaba",{p:1,e:30}],["Costó mucho y la etiqueta lo esconde",{p:2.5,e:50}]],
+    render:st=>{ const jobs=d3.sum(G,(g,j)=>g.afil[2019]*st.p/100*(j/(n-1))), vis=st.p>=marg, caida=shAll19-shAll25, real=caida*(1-st.e/100);
+      return `<div class="big">${nf0.format(roundJ(jobs))} <span class="muted" style="font-size:16px;font-weight:400">empleos menos en estos municipios</span></div>
+        <p>${st.p===0?"Es la lectura de «no pasó nada».":vis?`Es más de lo que los datos distinguen (${f1(marg)}${NB}% en el grupo más expuesto): <b>se vería</b> en las comparaciones, y los datos no lo muestran.`:`Es menos del ruido que muestran los datos (${f1(marg)}${NB}%): <b>no se vería</b>, aunque hubiera pasado.`}</p>
+        <div class="big" style="margin-top:14px">${f0(real)} <span class="muted" style="font-size:16px;font-weight:400">puntos de bajada real de la temporalidad</span></div>
+        <p>De los ${f0(caida)} puntos que bajó la temporalidad (del ${pc(shAll19)} al ${pc(shAll25)}), ${f0(caida*st.e/100)} serían solo etiqueta: el trabajo es el mismo y cambia el nombre del contrato.</p>`; }});
+  lect(s5,`<p>Con los datos disponibles, la lectura de que no costó empleo donde más se usaba y la de que costó algo pequeño conviven sin contradicción. Lo que sí se descarta es una pérdida grande. Y la temporalidad bajó de verdad en la parte que no es etiqueta, cuya proporción no sabemos.</p>`);
   sec(B,"con",`<p><b>La reforma laboral cambió el tipo de contrato en toda España y no se ve que costara empleo donde más se usaba el temporal.</b> La temporalidad de los contratos nuevos bajó unos 30 puntos casi de un mes para otro, en todos los grupos de municipios; y los que más dependían del contrato temporal no perdieron más empleo que los demás, una vez descontada la tendencia que ya traían. «No se ve» no es «no pasó»: los datos no distinguen una pérdida de hasta unos ${nf0.format(roundJ(margJobs))} empleos en el grupo más temporal (${f1(marg)} puntos); una mucho mayor sí se habría notado.</p>
     <ul class="defs"><li><b>No mide el efecto total.</b> Como la reforma llegó a la vez a todo el país, este diseño solo ve diferencias entre municipios más y menos expuestos. Si la reforma hubiera subido o bajado el empleo en todas partes por igual, no se vería aquí.</li>
     <li><b>Fijos discontinuos.</b> Parte de la caída de la temporalidad es un cambio de etiqueta: trabajos de temporada que antes eran temporales ahora son fijos discontinuos. Con los datos del SEPE por municipio no se pueden separar.</li>
