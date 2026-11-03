@@ -6393,10 +6393,10 @@ const HEROQ=[
     a:N=>`Desde 2019 la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
     cap:N=>`Precio de los alimentos (media de cada año y de los últimos doce meses) y sueldo mediano hasta ${N.añoSueldo}, el último publicado, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
   {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver dónde cambió más →",
-    v:()=>`No se ve.`,
-    a:N=>`Antes de 2022, ${N.antes>=90?"más de nueve":"unos "+N.antesD} de cada diez contratos nuevos eran temporales. Hoy son ${N.hoyD}. Se temía que un cambio así se llevara empleo por delante, pero los sitios que más tiraban del contrato temporal no han perdido más empleo que los demás. Si hubo una pérdida pequeña, de hasta unos 4.100 empleos, los datos no la distinguirían.`,
+    v:N=>`Cambió los contratos. En el empleo, no se ve.`,
+    a:N=>`Antes de la reforma, ${N.antes>=90?"más de nueve":"unos "+N.antesD} de cada diez contratos nuevos eran temporales; hoy son ${N.hoyD}, como enseña el gráfico. Se temía que un cambio así costara empleo, pero los sitios que más tiraban del contrato temporal no han perdido más que los demás. Si hubo una pérdida pequeña, de hasta unos 4.100 empleos, los datos no la distinguirían.`,
     cap:()=>`Parte de los contratos nuevos que son temporales, media de tres meses. Fuente: SEPE, contratos iniciales por municipio.`},
-  {id:"tope-cataluna",tab:"Tope",kk:"Alquiler",em:"en Cataluña?",chart:"tope",cta:"Ver qué pasó con las ventas de pisos →",
+  {id:"tope-cataluna",tab:"Tope al alquiler",kk:"Alquiler",em:"en Cataluña?",chart:"tope",cta:"Ver qué pasó con las ventas de pisos →",
     v:()=>`Frenó la subida, pero no bajó el alquiler.`,
     a:()=>`En 2024 el alquiler siguió subiendo donde hay tope: un 3,1${NB}%. Sin él habría subido en torno a un 3,7${NB}%, así que en un piso de Barcelona la diferencia son unos 7${NB}€ al mes. A la vez se vendieron más pisos de lo esperable, y los datos no dicen si salieron del alquiler.`,
     cap:()=>`Subida del alquiler en 2024 en los municipios con tope, frente a la estimada sin él a partir de municipios parecidos. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
@@ -6515,7 +6515,6 @@ async function renderInicio(){
   // «Puesto a prueba»: una pieza por fila, gráfico y texto, alternando el lado del gráfico; en el móvil, el gráfico debajo del texto
   const tira=PTIRA.filter(([id])=>byId[id]).map(([id,b,t])=>{ const S=byId[id];
     return `<a class="pt-n" href="/preguntas/${id}/"><figure class="pt-fig" data-cv="${id}"></figure><div class="pt-tx"><div class="pt-k">${esc(TOPICL(S.tema))}</div><h3>${esc(S.t)}</h3><p class="pt-vd">${esc(b)}</p><p class="pt-sm">${esc(t)}</p><span class="pt-go">Ver la respuesta →</span></div></a>`; }).join("");
-  const autor=(window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author&&window.__INDICIO.site.author.name)||"";
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<div class="pt-lema"><b>Indicio</b> · Preguntas reales. Respuestas con datos públicos.</div>
   ${heroCarHTML(D)}
@@ -6526,14 +6525,13 @@ async function renderInicio(){
   <section class="pt-land pt-lab"><a class="pt-land-im" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
     <div class="pt-land-tx"><div class="ed-k">Laboratorio</div><h2>¿Tienes tu propia teoría? <em>Ponla a prueba.</em></h2>
       <p class="pt-land-lead">Elige dos datos y mira si de verdad van juntos o solo lo parecen.</p>
-      <p class="pt-land-go"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a><span class="pt-tools"><a href="/laboratorio/mapa/">Mapa</a><a href="/laboratorio/cruce/">Cruce</a><a href="/laboratorio/evolucion/">Evolución</a><a href="/laboratorio/tabla/">Tabla</a></span></p></div></section>
+      <p class="pt-land-go"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a></p></div></section>
   <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>¿Y dónde vives tú? <em>Míralo de un vistazo.</em></h2>
       <p class="pt-land-lead">Los ${nMun} municipios de España tienen su ficha: quién vive, cuánto se gana y cómo vota.</p></div>
     <div class="pt-mun-q">${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Comparar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Rankings</a></p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
-    <p class="pt-who">${autor?`Indicio lo hace ${esc(autor)}, data scientist especializado en experimentación. Su trabajo es saber si un cambio ha funcionado de verdad o solo lo parece, y aquí lo aplica a lo que se discute en España.`:`Indicio mide si un cambio funciona o solo lo parece, y lo aplica a lo que se discute en España.`} <a href="/quien-soy/">Quién soy →</a></p>
     <div class="ci-steps" style="padding:0">
       <div><i>1</i><span><b>Datos que puedes comprobar</b>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></div>
       <div><i>2</i><span><b>Cada respuesta dice cuánto aguanta</b>Una etiqueta te avisa si los datos solo describen, si comparan casos parecidos o si una ley hizo de experimento.</span></div>

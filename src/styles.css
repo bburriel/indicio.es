@@ -1385,7 +1385,7 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .pt-tabs button:focus-visible{outline:2px solid var(--brand); outline-offset:4px}
 .pt-lead{max-width:var(--medida); color:var(--ink-2); font:17px/1.5 var(--serif); margin:8px 0 18px}
 .pt-why{background:var(--band); border-radius:16px; padding:28px 30px; margin-top:40px}
-.pt-why h2{font-family:var(--serif); font-weight:500; font-size:clamp(24px,2.6vw,30px); margin:0 0 6px}
+.pt-why h2{font-family:var(--serif); font-weight:500; font-size:clamp(24px,2.6vw,30px); margin:0 0 22px}
 .pt-who{font:17px/1.5 var(--serif); color:var(--ink-2); max-width:var(--medida); margin:0 0 22px}
 .pt-who a{color:var(--brand); font-weight:600; text-decoration:none; font-family:var(--font); font-size:15px; white-space:nowrap}
 @media (max-width:860px){
