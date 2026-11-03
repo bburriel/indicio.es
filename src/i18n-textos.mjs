@@ -1263,5 +1263,15 @@ export const ROWS=[
  ["Una idea para la web", "Una idea per a la web", "Unha idea para a web", "Webgunerako ideia bat", "An idea for the website"],
  ["Otra cosa", "Una altra cosa", "Outra cousa", "Beste zerbait", "Something else"],
  ["El", "El", "O", "", "The"],
- ["laboratorio", "laboratori", "laboratorio", "Laborategiak", "lab"]
+ ["laboratorio", "laboratori", "laboratorio", "Laborategiak", "lab"],
+ // ---- añadidas por otra sesión (temas de la portada) ----
+ ["Renta y desigualdad", "Renda i desigualtat", "Renda e desigualdade", "Errenta eta desberdintasuna", "Income and inequality"],
+ ["Empleo y estudios", "Ocupació i estudis", "Emprego e estudos", "Enplegua eta ikasketak", "Employment and education"],
+ ["Desde {#}", "Des del {#}", "Desde {#}", "{#}tik", "Since {#}"],
+ // ---- formulario de contacto editorial (#103) ----
+ ["Cuéntame una pregunta sobre los datos, un error, una idea o un trabajo a medida. Te contesto yo.", "Explica'm una pregunta sobre les dades, un error, una idea o una feina a mida. Et responc jo.", "Cóntame unha pregunta sobre os datos, un erro, unha idea ou un traballo a medida. Respóndoche eu.", "Kontatu iezadazu datuei buruzko galdera bat, akats bat, ideia bat edo neurrira egindako lan bat. Nik neuk erantzungo dizut.", "Tell me about a question on the data, a mistake, an idea or a bespoke job. I answer myself."],
+ ["Enviar mensaje", "Envia el missatge", "Enviar mensaxe", "Bidali mezua", "Send message"],
+ ["Dime en qué página y qué dato. Lo arreglo y lo cuento en la web.", "Digues-me en quina pàgina i quina dada. Ho arreglo i ho explico a la web.", "Dime en que páxina e que dato. Arránxoo e cóntoo na web.", "Esaidazu zein orritan eta zein datu. Konpondu egingo dut eta webgunean kontatuko dut.", "Tell me which page and which figure. I fix it and say so on the site."],
+ ["Tu correo", "El teu correu", "O teu correo", "Zure posta elektronikoa", "Your email"],
+ ["Lo uso solo para responderte.", "Només el faig servir per respondre't.", "Úsoo só para respondirte.", "Zuri erantzuteko bakarrik erabiltzen dut.", "I use it only to reply to you."]
 ];
