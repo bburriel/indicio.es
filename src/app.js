@@ -348,10 +348,10 @@ function realChart(parent,opts){
 const S3=(r,d,key)=>[{n:r[F.name],v:d.s[key],c:"--s-mun",main:true},{n:"Provincia",v:REFS.prov[r[F.prov]][key],c:"--s-prov"},{n:"España",v:REFS.es[key],c:"--s-es"}];
 
 // barras horizontales: [{l, v, me}] con línea de referencia opcional
-function hbars(parent,rows,{fmt,ref,refLabel,color,scroll,max,min,wide}={}){
+function hbars(parent,rows,{fmt,ref,refLabel,color,scroll,max,min,wide,wrap}={}){
   const f=fmt||(v=>nf1.format(v)); const vals=rows.map(r=>r.v).filter(v=>v!=null);
   const lo=min!=null?min:Math.min(0,d3.min(vals)), hi=max!=null?max:Math.max(0,d3.max(vals.concat(ref!=null?[ref]:[])));
-  const w=add(parent,"div","hbars"+(scroll?" scroll":"")+(wide?" wide":""));
+  const w=add(parent,"div","hbars"+(scroll?" scroll":"")+(wide?" wide":"")+(wrap?" wrapl":""));
   w.innerHTML=rows.map(r=>{ const z=(0-lo)/(hi-lo)*100, p=(r.v-lo)/(hi-lo)*100;
     const left=Math.min(z,p), width=Math.max(0.6,Math.abs(p-z));
     return `<div class="hb${r.me?" me":""}"><span title="${esc(r.l)}">${esc(r.l)}</span><span class="t"><i style="left:${left}%;width:${width}%;background:${r.c?`var(${r.c})`:(color?`var(${color})`:(r.v<0?"var(--neg)":"var(--stone)"))}"></i>${ref!=null?`<b class="ref" style="left:${(ref-lo)/(hi-lo)*100}%" title="${esc(refLabel||"")}"></b>`:""}</span><em>${f(r.v)}</em></div>`; }).join("");
@@ -3313,7 +3313,7 @@ async function studyPens(B){
     const rows=gr.map((g,i)=>({l:g,v:T[i]/1e6,c:i>=13?"--rust":(i>=10?"--mustard":"--stone")})); const f=fig(d,{title:"Población de España por edad, 1 de enero de 2025 (millones de personas, tramos de cinco años)",source:"En granate, 65 años o más; en ocre, 50 a 64, los que se jubilarán en los próximos quince años. Fuente: INE, Estadística Continua de Población."});
     hbars(f.body,rows,{fmt:v=>nf1.format(v)+" M",max:Math.max(...rows.map(r=>r.v))}); };
   G.pasado=d=>{ const f=fig(d,{title:`Qué ha movido el gasto en pensiones entre ${y13} y ${Y} (puntos de PIB)`,source:`Del ${pc(sPast)} al ${pc(ex(Y))} del PIB. Se aplican los cambios uno tras otro: primero los pensionistas por ocupado, luego el peso de cada pensión. Fuente: Eurostat; cálculo de Indicio.`});
-    hbars(f.body,[{l:"Pensionistas por cada ocupado",v:dR,c:"--olive"},{l:"Peso de cada pensión frente a lo que produce un ocupado",v:dG,c:"--rust"},{l:"Total",v:ex(Y)-sPast,c:"--ink"}],{fmt:v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" pts",min:-2,max:2.5});
+    hbars(f.body,[{l:"Pensionistas por cada ocupado",v:dR,c:"--olive"},{l:"Peso de cada pensión frente a lo que produce un ocupado",v:dG,c:"--rust"},{l:"Total",v:ex(Y)-sPast,c:"--ink"}],{fmt:v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" pts",min:-2,max:2.5,wrap:true});
     const g2=add(d,"div","cols2"), ys=yrs.filter(y=>y>=y13&&ben(y)&&emp(y)), xt=[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]];
     lineChart(g2,{title:"Pensionistas por cada ocupado",source:"Ocupados de 20 a 64 años. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>Dn(y).r),c:"--olive",main:true}],years:ys,xticks:xt,fmt:v=>nf2.format(v),tickFmt:v=>nf2.format(v)});
     lineChart(g2,{title:"Peso de cada pensión frente al PIB por ocupado",source:"Gasto por pensionista dividido entre el PIB por ocupado. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>Dn(y).g*100),c:"--rust",main:true}],years:ys,xticks:xt,fmt:pc,tickFmt:v=>nf0.format(v)+"%"}); };
@@ -3335,17 +3335,17 @@ async function studyPens(B){
     hbars(f.body,rows,{fmt:pc,min:0,ref:LIM,refLabel:"Límite"}); };
   // mapa: con los otros mandos del simulador, qué combinaciones de empleo (columnas) y peso de cada pensión (filas) caben
   const EX=d3.range(0,21,2), GY=d3.range(1.5,-2.01,-0.25);
-  G.mapa=d=>{ const f=fig(d,{title:"¿Cabe? Combinaciones de empleo y peso de cada pensión, gasto en 2050",source:"Verde: cabe dentro del límite; rojo: se pasa. El resto de mandos, los del simulador de abajo. Pasa el ratón para ver el gasto de cada casilla."});
+  G.mapa=d=>{ const f=fig(d,{title:"Gasto en 2050 según el empleo y el peso de cada pensión",source:"Verde: dentro del límite; rojo: lo supera. El resto de mandos, los del simulador de abajo. Pasa el ratón para ver el gasto de cada casilla."});
     const box=add(f.body,"div","pn-map"); const note=add(f,"p","pn-note");
     const draw=()=>{ const cw=44, ch=22, ml=84, mt=8, W=ml+EX.length*cw+8, Hh=mt+GY.length*ch+40, L=lim(); let ok=0;
       const cells=[]; GY.forEach((g,j)=>EX.forEach((e,i)=>{ const v=model({...ST,E:e,G:g},2050), good=v<=L; if(good) ok++; cells.push({x:ml+i*cw,y:mt+j*ch,v,good,e,g}); }));
       const mx=Math.max(...cells.map(c=>c.v)), op=c=>c.good?0.25+0.6*Math.min(1,(L-c.v)/6):0.2+0.65*Math.min(1,(c.v-L)/(mx-L||1));
-      box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Mapa de combinaciones que caben">`+cells.map(c=>`<rect x="${c.x}" y="${c.y}" width="${cw-1}" height="${ch-1}" rx="2" style="fill:${c.good?"var(--ok,#3f7a4a)":"var(--ko,#b0303f)"};fill-opacity:${op(c).toFixed(2)}"><title>Empleo +${c.e}${NB}%, peso de cada pensión ${c.g>0?"+":""}${nf2.format(c.g)}${NB}% al año: ${nf1.format(c.v)}${NB}% del PIB</title></rect>`).join("")
+      box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Mapa de combinaciones de empleo y peso de cada pensión">`+cells.map(c=>`<rect x="${c.x}" y="${c.y}" width="${cw-1}" height="${ch-1}" rx="2" style="fill:${c.good?"var(--ok,#3f7a4a)":"var(--ko,#b0303f)"};fill-opacity:${op(c).toFixed(2)}"><title>Empleo +${c.e}${NB}%, peso de cada pensión ${c.g>0?"+":""}${nf2.format(c.g)}${NB}% al año: ${nf1.format(c.v)}${NB}% del PIB</title></rect>`).join("")
         +GY.map((g,j)=>(Math.abs(g*2-Math.round(g*2))<1e-9)?`<text x="${ml-8}" y="${mt+j*ch+ch/2+4}" text-anchor="end" class="lab">${g>0?"+":g<0?"−":""}${nf1.format(Math.abs(g))}${NB}%</text>`:"").join("")
         +EX.map((e,i)=>i%2===0?`<text x="${ml+i*cw+cw/2}" y="${mt+GY.length*ch+14}" text-anchor="middle" class="lab">+${e}${NB}%</text>`:"").join("")
         +`<text x="${ml+EX.length*cw/2}" y="${Hh-4}" text-anchor="middle" class="lab">Más gente con empleo, en 2050</text><text x="10" y="${mt+GY.length*ch/2}" class="lab" transform="rotate(-90 10 ${mt+GY.length*ch/2})" text-anchor="middle">Peso de cada pensión, % al año</text>`
         +`<rect x="${ml+Math.min(EX.length-1,Math.round(ST.E/2))*cw}" y="${mt+Math.max(0,Math.min(GY.length-1,Math.round((1.5-ST.G)/0.25)))*ch}" width="${cw-1}" height="${ch-1}" rx="2" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>`;
-      note.innerHTML=`Con los demás mandos como están (población activa +${ST.M}${NB}%, jubilación +${nf1.format(ST.D)} años, límite ${pc(L)}), caben <b>${ok} de ${cells.length}</b> combinaciones. El recuadro marca tu combinación actual.`; };
+      note.innerHTML=`Con los demás mandos como están (población activa +${ST.M}${NB}%, jubilación +${nf1.format(ST.D)} años, límite ${pc(L)}), <b>${ok} de ${cells.length}</b> combinaciones quedan dentro del límite. El recuadro marca tu combinación actual.`; };
     SUB.push(draw); draw(); };
   G.simulador=d=>{ const w=add(d,"div","calc pn-sim"), ctl=add(w,"div","ctl"), out=add(w,"div","res");
     const defs=[["E","Más gente con empleo","+%",0,20,1,"Hoy tienen empleo 72 de cada 100 personas de 20 a 64 años; en los Países Bajos, 83 (Eurostat, 2025). Un +10 % llevaría a España a unos 80."],
@@ -3377,7 +3377,7 @@ async function studyPens(B){
     sNada70:sc.nada.s70,sIpcPeso:Math.abs(sc.ipc.peso50),sIpcReal:sc.ipc.real50,sEqReal:sc.equilibrio.real50,sEqPeso:Math.abs(sc.equilibrio.peso50),sTrabajoReal:sc.trabajo.real50,
     sIpc70:sc.ipc.s70,sRefEx:Math.abs(sc.reformas.s50-LIM),mm1:eurMM(1),soloE:solo.E,soloM:solo.M,soloD:solo.D,nOk:SC.filter(s=>s.ok).length,
     sNadaEx:sc.nada.s50-LIM,sNadaMM:eurMM(sc.nada.s50-LIM),sDerivaEx:sc.deriva.s50-LIM,
-    aireF:16.1,fedea:17.1,empEs:72.4,empNl:83.4,empUe:76.1};
+    aireF:16.1,fedea:17.1,lim6:S0+6,empEs:72.4,empNl:83.4,empUe:76.1};
   const MAPOK=(()=>{ let n=0,t=0; GY.forEach(g=>EX.forEach(e=>{ t++; if(model({E:e,M:0,D:0,G:g,p:1},2050)<=LIM) n++; })); return {n,t}; })();
   V.mapaN=MAPOK.n; V.mapaT=MAPOK.t;
   { const eur=y=>ex(y)/100*gdpY(y);
