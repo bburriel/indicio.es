@@ -2904,7 +2904,7 @@ function renderEstudios(id){
   if(id==="metodo"){ document.title="De la relación a la causa · Indicio"; view.innerHTML=LABNAV("metodo")+pageHead("De la relación a la causa","Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede.")+METODO+methodNote(); if(/^#[\w-]+$/.test(location.hash)){ const t=document.querySelector(location.hash); if(t) setTimeout(()=>t.scrollIntoView({block:"start"}),60); } return; }
   if(!S){ renderPreguntas(); return; }
   document.title=S.t+" · Indicio";
-  view.innerHTML=studyHead(S)+`<div id="shtoc"></div><div id="sbody"></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
+  view.innerHTML=studyHead(S)+`<div class="sx"><div id="shtoc"></div><div id="sbody"></div></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   studyCover(S);
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"votar-pueblos":studyVotar,
     "quien-gobierna":studyGobierna,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"precio-alimentos":studyAlimentos,"sueldos":studySueldos,"vivienda":studyVivienda,"gobiernos":studyGobiernos})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
@@ -2939,7 +2939,17 @@ function studyToc(){ const B=document.getElementById("sbody"), T=document.getEle
     else if(c.classList.contains("pres")&&items.length){ const h=c.querySelector("h3"); if(!h) return; c.id="s"+(++n); items[items.length-1].sub.push({id:c.id,t:h.textContent}); } });
   if(items.length<3) return;
   T.innerHTML=`<nav class="sh-toc" aria-label="En este análisis"><b>En este análisis</b><ol>${items.map(i=>`<li><a href="#${i.id}">${esc(i.t)}</a>${i.sub.length?`<ul>${i.sub.map(x=>`<li><a href="#${x.id}">${esc(x.t)}</a></li>`).join("")}</ul>`:""}</li>`).join("")}</ol></nav>`;
-  T.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); const t=document.getElementById(a.getAttribute("href").slice(1)); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); })); }
+  T.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); const t=document.getElementById(a.getAttribute("href").slice(1)); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
+  // índice lateral: marca dónde estás y se actualiza al hacer scroll
+  const secs=[...T.querySelectorAll("a")].map(a=>({a,li:a.closest("li"),el:document.getElementById(a.getAttribute("href").slice(1))})).filter(o=>o.el);
+  let tick=false;
+  const upd=()=>{ tick=false; if(!document.body.contains(T)){ removeEventListener("scroll",onS); removeEventListener("resize",onS); return; }
+    const y=innerHeight*0.28; let cur=null; secs.forEach(o=>{ if(o.el.getBoundingClientRect().top<=y) cur=o; }); if(!cur) cur=null;
+    const top=cur&&(cur.li.parentElement.tagName==="UL"?cur.li.parentElement.closest("li"):cur.li);
+    T.querySelectorAll("li.on,a.on").forEach(x=>x.classList.remove("on"));
+    if(cur){ cur.a.classList.add("on"); if(top) top.classList.add("on"); } };
+  const onS=()=>{ if(!tick){ tick=true; requestAnimationFrame(upd); } };
+  addEventListener("scroll",onS,{passive:true}); addEventListener("resize",onS); upd(); }
 
 // helpers de series para los estudios
 const SY=k=>SER[k]; // años de cada serie
