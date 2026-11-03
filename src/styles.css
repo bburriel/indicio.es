@@ -1445,5 +1445,8 @@ details.chk > summary::after{content:""; width:6px; height:6px; border-right:1.5
 details.chk[open] > summary::after{transform:translateY(2px) rotate(-135deg)}
 details.chk > section{margin-top:18px}
 
-.lbq-g{flex:none; margin-left:auto; white-space:nowrap; font-size:13px; font-weight:600; color:var(--ink); text-decoration:none; border:1px solid var(--acc-ink); background:var(--acc); border-radius:3px; padding:4px 11px}
-.lbq-g:hover{background:var(--hit)}
+.lb-glos{display:flex; align-items:center; gap:10px; margin-top:12px; padding:9px 12px; border:1px solid var(--acc-ink); background:var(--acc); border-radius:3px; text-decoration:none; color:var(--ink)}
+.lb-glos:hover{background:var(--hit)}
+.lb-glos b{display:block; font-size:14px}
+.lb-glos small{display:block; font-size:12.5px; color:var(--ink-2); line-height:1.3}
+.lb-glos-a{margin-left:auto; font-size:18px; color:var(--brand)}

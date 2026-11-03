@@ -3689,7 +3689,7 @@ async function renderExplorar(h){
   if(blank) EX={...EX,v:"cruce",d:["paroReg","renta"],t:"g1",p:"",c:[],o:null};
   exParse(h); if(!/[?&]m=/.test(h)&&myOk(lastMun)) EX.m=lastMun; exSync();
   document.title="Laboratorio · Indicio";
-  view.innerHTML=LABNAV("explorar")+`<div class="lbq" role="group" aria-label="Ideas para empezar"><span class="lbq-l">Prueba con</span><div class="lbq-c">${EXQ.map(([l],i)=>`<button type="button" data-gq="${i}">${l}</button>`).join("")}</div><a class="lbq-g" href="/laboratorio/datos/" title="Qué mide cada dato, de dónde sale y qué matices tiene">📖 Los datos</a></div><div class="lb">
+  view.innerHTML=LABNAV("explorar")+`<div class="lbq" role="group" aria-label="Ideas para empezar"><span class="lbq-l">Prueba con</span><div class="lbq-c">${EXQ.map(([l],i)=>`<button type="button" data-gq="${i}">${l}</button>`).join("")}</div></div><div class="lb">
     <aside class="lb-side" id="exbar" aria-label="Elige qué dibujar"></aside>
     <div class="lb-canvas">
       <div class="lb-bar"><div style="min-width:0"><h2 id="lbtitle"></h2><div class="sub" id="lbsub"></div></div>
@@ -3797,7 +3797,7 @@ function exBar(){
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML(EX.v)}</div>
-    <div class="lb-step"><h4><i>2</i>Qué datos${lbh("Son indicadores oficiales (paro, renta, población, alquiler…). Pulsa en cada uno para cambiarlo por otro.","Qué son los datos")}</h4>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}<p class="hint"><a href="/laboratorio/datos/">Qué significa cada dato →</a></p></div>
+    <div class="lb-step"><h4><i>2</i>Qué datos${lbh("Son indicadores oficiales (paro, renta, población, alquiler…). Pulsa en cada uno para cambiarlo por otro.","Qué son los datos")}</h4><a class="lb-glos" style="margin:0 0 10px" href="/laboratorio/datos/"><span><b>Qué significa cada dato</b><small>Qué mide, de dónde sale y qué matices tiene</small></span><span class="lb-glos-a" aria-hidden="true">→</span></a>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
     ${isEvo||isB||isMapAgg?"":`<div class="lb-step"><h4><i>3</i>Qué municipios${lbh("Puedes limitar el gráfico a una provincia o quitar los municipios más pequeños, cuyas cifras suelen ser poco fiables porque salen de pocos vecinos.","Para qué sirve esto")}</h4>
       <select class="sel" id="exprov" aria-label="Provincia">${`<option value="">Toda España</option>`+Object.keys(PROVS).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")).map(p=>`<option value="${p}" ${p===EX.p?"selected":""}>${esc(provShort(PROVS[p]))}</option>`).join("")}</select>
       <select class="sel" id="exsize" aria-label="Tamaño">${EXSIZES.map(([k,l])=>`<option value="${k}" ${k===EX.t?"selected":""}>${l}</option>`).join("")}</select>
