@@ -1553,3 +1553,25 @@ details.chk > section{margin-top:18px}
 .czpar .czbar{margin:20px 0 0}
 .czpar .czc-s:empty{display:none}
 .czpar .czlink{margin-top:18px}
+
+/* análisis: índice lateral fijo, con la sección actual marcada */
+.sx{display:block}
+.sx #shtoc .sh-toc{margin:22px 0 6px}
+@media (min-width:1100px){
+  .sx{display:grid; grid-template-columns:200px minmax(0,1fr); column-gap:44px; align-items:start}
+  .sx #shtoc{position:sticky; top:calc(env(safe-area-inset-top,0px) + var(--toph,58px) + 22px); max-height:calc(100vh - var(--toph,58px) - 44px); overflow:auto; align-self:start; padding-top:0}
+  .sx .sh-toc{margin:30px 0 0; max-width:none}
+  .sx .sh-toc>b{display:block; margin-bottom:12px}
+  .sx .sh-toc ol{margin:0; border-top:0; border-left:1px solid var(--rule)}
+  .sx .sh-toc>ol>li{border-bottom:0; padding:0; margin:0}
+  .sx .sh-toc>ol>li>a{display:block; font:500 14.5px/1.35 var(--font); padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent; color:var(--ink-2)}
+  .sx .sh-toc>ol>li>a::before{display:none}
+  .sx .sh-toc>ol>li>a:hover{color:var(--brand)}
+  .sx .sh-toc>ol>li.on>a{border-left-color:var(--brand); color:var(--ink); font-weight:700}
+  .sx .sh-toc ul{display:none; margin:0 0 6px 15px; gap:0}
+  .sx .sh-toc>ol>li.on>ul{display:grid}
+  .sx .sh-toc ul a{display:block; font:13.5px/1.35 var(--font); padding:4px 0 4px 10px; color:var(--muted)}
+  .sx .sh-toc ul a::before{display:none}
+  .sx .sh-toc ul a.on{color:var(--brand); font-weight:600}
+}
+#sbody>section{scroll-margin-top:calc(var(--toph,58px) + 18px)}
