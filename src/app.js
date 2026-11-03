@@ -3689,7 +3689,7 @@ async function renderExplorar(h){
   if(blank) EX={...EX,v:"cruce",d:["paroReg","renta"],t:"g1",p:"",c:[],o:null};
   exParse(h); if(!/[?&]m=/.test(h)&&myOk(lastMun)) EX.m=lastMun; exSync();
   document.title="Laboratorio · Indicio";
-  view.innerHTML=LABNAV("explorar")+`<div class="lbq" role="group" aria-label="Ideas para empezar"><span class="lbq-l">Prueba con</span><div class="lbq-c">${EXQ.map(([l],i)=>`<button type="button" data-gq="${i}">${l}</button>`).join("")}</div></div><div class="lb">
+  view.innerHTML=LABNAV("explorar")+`<div class="lbq" role="group" aria-label="Ideas para empezar"><span class="lbq-l">Prueba con</span><div class="lbq-c">${EXQ.map(([l],i)=>`<button type="button" data-gq="${i}">${l}</button>`).join("")}</div><a class="lbq-g" href="/laboratorio/datos/" title="Qué mide cada dato, de dónde sale y qué matices tiene">📖 Los datos</a></div><div class="lb">
     <aside class="lb-side" id="exbar" aria-label="Elige qué dibujar"></aside>
     <div class="lb-canvas">
       <div class="lb-bar"><div style="min-width:0"><h2 id="lbtitle"></h2><div class="sub" id="lbsub"></div></div>
