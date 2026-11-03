@@ -5825,7 +5825,7 @@ async function studySueldos(B){
 // ---------- vivienda: por qué cuesta tanto pagar una casa ----------
 // El texto está en contenido/analisis/vivienda.md; aquí las cifras (V) y los gráficos (G).
 async function studyVivienda(B){
-  const [D,S,A]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json")]);
+  const [D,S,A,PW]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null)]);
   const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
   const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
@@ -5871,6 +5871,10 @@ async function studyVivienda(B){
     prot0009:avg(E.protegidas,2000,2009), prot1925:avg(E.protegidas,2019,2025),
     npPeq:BANDS[0].np, npGr:BANDS[4].np, vpPeq:BANDS[0].vp, vpGr:BANDS[4].vp, vtES,
     nZ:zon.length, pobZ, npZ, vacZ:npZ*vacSh, vtZ, vac13:npZ*vacSh*.13, hog21, term21, def21:hog21-term21, termAño5, proy10, añoHog21:hY,
+    // qué ha separado a los municipios donde más subió el alquiler (scripts/datos/vivienda_pesos.py)
+    ...(PW?(()=>{ const m=PW.municipios, T=m.todos, pe=(o,g)=>o.pesos.find(x=>x.g===g)||{}, dem=pe(T,"Demanda"), P=PW.provincias;
+      return {mN:m.n, mPob:m.pob/m.pobTotal*100, r2m:T.añaden*100, pDem:dem.v, pDemLo:dem.lo, pDemHi:dem.hi, pTur:pe(T,"Pisos turísticos").v, pVac:pe(T,"Vacías o secundarias").v,
+        pCom:pe(T,"Compraventas").v, pCon:pe(T,"Construcción nueva").v, pConHi:pe(T,"Construcción nueva").hi, pDemP:pe(m.provincia,"Demanda").v, pDemPr:pe(P,"Demanda").v, pConPr:pe(P,"Construcción nueva").v, nPr:P.n}; })():{}),
     ...(()=>{ const d0=Math.round((hog21-term21)/50000)*50000, need=d0+Math.max(0,proy10-termAño5)*10, bu=60000*8, mv=npZ*vacSh*.13+vtZ*.25; return {cenNeed:need,cenB:bu,cenM:mv,cenCov:(bu+mv)/need*100,cenRat:bu/mv}; })(),
     hpiES:hpi("ES"), hpiEU:hpi("EU27_2020"), hpiNL:hpi("NL"), hpiPT:hpi("PT"),
     inv06:(EU.ES.inversionVivienda||{})["2006"], invES:euL("ES","inversionVivienda").v, invEU:euL("EU27_2020","inversionVivienda").v,
@@ -5898,6 +5902,16 @@ async function studyVivienda(B){
       lineChart(el,{title:"Precio de la vivienda en Europa (2015 = 100)",sub:"Índice de precios de la vivienda, medias anuales",source:"Fuente: Eurostat (prc_hpi_a).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
         series:C.map(([k,n,c,main])=>({n,c,main,v:Y.map(y=>{ const o=(EU[k]||{}).hpi||{}; return o[y]&&o["2015"]?o[y]/o["2015"]*100:null; })}))}); }
   };
+  // qué ha separado a los municipios donde más subió el alquiler: reparto con intervalo
+  G.pesos=el=>{ if(!PW){ el.remove(); return; } const T=PW.municipios.todos, f=fig(el,{title:"Qué ha separado a los municipios donde más subió el alquiler, 2020–2024",
+      sub:`Parte de lo que explican cinco grupos de factores; la raya, el margen del 90 %. ${nf0.format(PW.municipios.n)} municipios de 5.000 habitantes o más.`,
+      source:"Fuente: elaboración propia con INE (alquiler, padrón, viviendas turísticas, Censo 2021), Seguridad Social y Ministerio de Vivienda (compraventas)."});
+    const L={"Demanda":"Demanda: más gente y más empleo","Pisos turísticos":"Pisos turísticos","Vacías o secundarias":"Viviendas vacías o secundarias","Compraventas":"Compraventas por habitante","Construcción nueva":"Construcción nueva"};
+    const R=[...T.pesos].sort((a,b)=>b.v-a.v), W=360, x0=0, X=v=>x0+W*v/100;
+    f.body.innerHTML=`<div style="display:grid;gap:12px;margin-top:10px">${R.map(p=>`<div><div style="display:flex;justify-content:space-between;gap:10px;font-size:14.5px"><span${p.g==="Demanda"?' style="color:var(--brand);font-weight:600"':""}>${L[p.g]||p.g}</span><b>${nf0.format(p.v)}${NB}%</b></div>`
+      +`<svg viewBox="0 0 ${W} 16" preserveAspectRatio="none" style="display:block;width:100%;max-width:none;height:16px;margin:3px 0 0" aria-hidden="true"><rect x="0" y="4" width="${W}" height="8" rx="2" fill="var(--rule)"/><rect x="0" y="4" width="${X(p.v).toFixed(1)}" height="8" rx="2" fill="${p.g==="Demanda"?"var(--brand)":"var(--ink-2)"}"/>`
+      +`<line x1="${X(p.lo).toFixed(1)}" x2="${X(p.hi).toFixed(1)}" y1="8" y2="8" stroke="var(--ink)" stroke-width="1.5"/><line x1="${X(p.lo).toFixed(1)}" x2="${X(p.lo).toFixed(1)}" y1="3" y2="13" stroke="var(--ink)"/><line x1="${X(p.hi).toFixed(1)}" x2="${X(p.hi).toFixed(1)}" y1="3" y2="13" stroke="var(--ink)"/></svg>`
+      +`<small class="muted">entre ${nf0.format(p.lo)} y ${nf0.format(p.hi)}${NB}%</small></div>`).join("")}</div>`; };
   // los grises: cuánto puede aportar cada idea en los próximos años
   G.grises=d=>{ const k0=Math.round(V.def21/50000)*50, mil=v=>nf0.format(Math.round(v/1000)*1000);
     playBox(d,{defs:[
