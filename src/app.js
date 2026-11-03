@@ -3169,64 +3169,111 @@ function govNote(){ return `<footer class="method"><details class="srcs"><summar
 let PSC={emp:0,ben:0,cov:0};
 async function studyPens(B){
   const AB=abstract(B);
-  await loadGov();
+  const [,PI]=await Promise.all([loadGov(),getJSON("/data/piramide.json").catch(()=>null)]);
   const P=GOV.pen, yrs=Object.keys(P.exp).map(Number).sort(), Y=yrs[yrs.length-1];
-  const ex=y=>P.exp[y], dep=y=>P.olddep[y]??P.proj[y], ben=y=>P.ben[y], emp=y=>P.emp[y]*1000;
-  const gdpY=y=>GOV.gdp[gy(y)];
-  // descomposición: gasto/PIB = (pensionistas/ocupados) × (pensión media / PIB por ocupado)
-  const y0=Math.max(2009,yrs.find(y=>ben(y)&&emp(y))), D=y=>({r:ben(y)/emp(y), g:(ex(y)/100*gdpY(y)*1e6/ben(y))/(gdpY(y)*1e6/emp(y))});
-  const a=D(y0), b=D(Y), m=D(2019);
-  // 2009 es el año en que se hunde el empleo: arrancar ahí infla el primer factor. Se separan dos tramos: crisis (2009–2019) y después (2019–hoy)
-  const share=(p,q)=>{ const lr=Math.log(q.r/p.r), lg=Math.log(q.g/p.g); return {r:lr/(lr+lg)*100,g:lg/(lr+lg)*100,tot:(q.r*q.g)/(p.r*p.g)-1}; };
-  const sh1=share(a,m), sh2=share(m,b), shT=share(a,b);
-  sec(B,"ctx",`<p>El gasto en pensiones ha pasado del ${pc(ex(yrs[0]))} del PIB en ${yrs[0]} al ${pc(ex(Y))} en ${Y}. Es la mayor partida del gasto público y la que más ha crecido en el siglo XXI. Y lo más intenso está por llegar: en estos años se jubilan las generaciones del baby boom, las más numerosas de la historia de España, nacidas entre finales de los cincuenta y mediados de los setenta.</p>
-    <p>El debate sobre su sostenibilidad suele plantearse en términos apocalípticos o tranquilizadores, según quién hable. Aquí intentamos algo más modesto: separar <b>por qué</b> ha crecido el gasto y medir <b>cuánto pesa</b> cada una de las palancas que discuten todas las reformas.</p>`);
-  sec(B,"int",`<p>No se evalúa una medida concreta, sino el peso de las palancas que discuten todas las reformas: <b>cuánta gente trabaja</b>, <b>cuánto pesa cada pensión</b> respecto a la productividad y <b>cuándo se jubila la gente</b>. Las reformas de 2021–2023 (revalorización con el IPC, mecanismo de equidad intergeneracional, incentivos a retrasar la jubilación) actúan sobre ellas.</p>`,{title:"Las palancas"});  sec(B,"ana",`<p>El gasto en pensiones sobre el PIB se puede escribir como la multiplicación de dos cosas:</p>
-    <ul class="defs"><li><b>Pensionistas por cada persona ocupada.</b> Cuántas pensiones sostiene cada trabajador. Depende de la demografía y de cuánta gente trabaja.</li>
-    <li><b>Pensión media frente a lo que produce cada ocupado</b> (PIB por ocupado). Mide cuánto «pesa» cada pensión. Depende de las carreras de cotización y de las reglas.</li></ul>
-    <p>Separarlas permite ver qué parte del aumento viene de que hay más pensionistas y qué parte de que cada pensión es relativamente más alta.</p>`);
-  const s3=res(B,"El gasto ha crecido sobre todo porque cada pensión pesa más",`<p>Entre ${y0} y ${Y}, los pensionistas por cada ocupado pasaron de ${nf2.format(a.r)} a ${nf2.format(b.r)}, y el peso de cada pensión frente al PIB por ocupado pasó de ${pc(a.g*100)} a ${pc(b.g*100)}. ${Math.abs(b.g/a.g-1)>Math.abs(b.r/a.r-1)?"El peso de cada pensión ha empujado más que el número de pensionistas: quienes se jubilan ahora tienen carreras más largas y salarios más altos que quienes fallecen.":"El número de pensionistas por trabajador ha empujado más que el peso de cada pensión."}</p>
-    <p><b>Pero el año de partida engaña.</b> ${y0} es el año en que se hundió el empleo, así que los pensionistas por ocupado arrancan ya hinchados por la crisis, y eso hace parecer que la demografía ha importado poco. Separando en dos tramos: ${[[y0,2019,sh1,a,m],[2019,Y,sh2,m,b]].map(([p0,p1,sh,A,Bq])=>`entre ${p0} y ${p1} ${sh.r<0?`los pensionistas por ocupado <i>bajaron</i> (de ${nf2.format(A.r)} a ${nf2.format(Bq.r)}: el empleo creció más que las pensiones) y todo el aumento vino del peso de cada pensión`:sh.g<0?`el peso de cada pensión <i>bajó</i> y todo el aumento vino de los pensionistas por ocupado`:sh.g>50?`el ${nf0.format(sh.g)}${NB}% del aumento vino del peso de cada pensión`:`el ${nf0.format(sh.r)}${NB}% del aumento vino de los pensionistas por ocupado`}`).join("; ")}. Desde ahora, con el baby boom jubilándose, el primer factor es el que manda.</p>`);
-  const ys=yrs.filter(y=>y>=y0&&ben(y)&&emp(y)), g2=add(s3,"div","cols2");
-  lineChart(g2,{title:"Pensionistas por cada ocupado",source:"Pensionistas: personas que cobran alguna pensión. Ocupados de 20 a 64 años (EPA). Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>D(y).r),c:"--rust",main:true}],years:ys,xticks:[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]],fmt:v=>nf2.format(v),tickFmt:v=>nf2.format(v)});
-  lineChart(g2,{title:"Pensión media frente al PIB por ocupado",source:"Gasto en pensiones por pensionista, dividido entre el PIB por ocupado. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>D(y).g*100),c:"--slate",main:true}],years:ys,xticks:[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]],fmt:pc,tickFmt:v=>nf0.format(v)+"%"});
-  // demografía
-  const dy=[...new Set([...Object.keys(P.olddep),...Object.keys(P.proj)])].map(Number).sort().filter(y=>y>=1995&&y<=2070);
-  const s4=res(B,`Por cada 100 personas en edad de trabajar habrá ${nf0.format(P.proj[2050])} mayores de 65 en 2050, frente a ${nf0.format(P.olddep[2025]??P.olddep[2024])} hoy`,
-    `<p>Es la tasa de dependencia: mayores de 65 por cada 100 personas de 15 a 64 años. Según las proyecciones de Eurostat, en España subirá más deprisa que en la media de la UE y la superará hacia 2040. Las proyecciones suponen una llegada de inmigrantes y una natalidad concretas: si cambian, cambia la cifra.</p>`);
-  lineChart(s4,{title:"Mayores de 65 por cada 100 personas de 15 a 64",source:"Hasta 2025, datos; después, proyección base de Eurostat (EUROPOP2023).",series:[{n:"España",v:dy.map(y=>dep(y)),c:"--rust",main:true},{n:"UE-27",v:dy.map(y=>P.olddepEU[y]??P.projEU[y]),c:"--slate"}],years:dy,xticks:[1995,2025,2050,2070],fmt:v=>nf1.format(v),height:280});
-  // calculadora
-  const s5=res(B,"Calcula tú: ¿cuánto gastaríamos en 2050?",`<p>Una cuenta sencilla: si todo lo demás se quedara igual, el gasto crecería en la misma proporción que la tasa de dependencia, del ${nf0.format(P.olddep[2025]??P.olddep[2024])} al ${nf0.format(P.proj[2050])}. Eso es el escenario «sin cambios», y no es lo que prevé nadie: las reformas de 2021–2023 ya aprobadas (revalorización con el IPC mientras los salarios suben más, retraso de la edad de jubilación, incentivos a seguir trabajando) mueven estas mismas palancas. La AIReF y la Comisión Europea, con modelos completos, sitúan el gasto de 2050 entre el 16 y el 17,5${NB}% del PIB. Mueve los mandos para ver qué palancas acercan a esa cifra. No es una previsión: sirve para ver qué palancas importan y cuánto.</p>`);
-  const calc=add(s5,"div","calc");
-  const d0=P.olddep[2025]??P.olddep[2024], d1=P.proj[2050];
-  lect(s4,`<p>Este es el motor del problema. Hoy hay unos ${nf0.format(d0)} mayores de 65 años por cada 100 personas en edad de trabajar; en 2050 habrá ${nf0.format(d1)}. Casi el doble. Si nada más cambiara, el gasto en pensiones crecería en la misma proporción. Pero muchas otras cosas pueden cambiar, y eso es lo que permite explorar la calculadora.</p>`);
-  const draw=()=>{ const base=ex(Y)*d1/d0, e=1+PSC.emp/100, bb=1+PSC.ben/100, c=1-PSC.cov/100, g=ex(Y)*(d1/d0)*c*bb/e;
-    calc.querySelector("#cres").innerHTML=`<div class="big">${pc(g)} <span class="muted" style="font-size:16px;font-weight:400">del PIB en 2050</span></div><p>Hoy: ${pc(ex(Y))}. Sin cambios en nada más que la demografía: ${pc(base)}.</p><p class="muted" style="font-size:13.5px">${g>ex(Y)+1?`Haría falta encontrar ${nf1.format(g-ex(Y))} puntos de PIB más que hoy: con más ingresos, menos gasto en otras cosas o más deuda.`:"El gasto quedaría parecido al de hoy."}</p>`;
-    calc.querySelectorAll("output").forEach(o=>o.textContent=(PSC[o.dataset.k]>0?"+":"")+PSC[o.dataset.k]+NB+"%"); };
-  calc.innerHTML=`<div class="ctl">
-    <label>Más gente trabajando (ocupados por cada persona en edad de trabajar) <output data-k="emp"></output><input type="range" min="0" max="30" step="1" value="${PSC.emp}" data-k="emp"><small>España tiene una tasa de empleo de las más bajas de la UE: acercarse a la media supondría más de un +10 %.</small></label>
-    <label>Pensión media frente a lo que produce cada ocupado <output data-k="ben"></output><input type="range" min="-30" max="10" step="1" value="${PSC.ben}" data-k="ben"><small>Negativo: las pensiones crecen menos que la productividad (por ejemplo, si se revalorizan solo con el IPC y los salarios crecen más).</small></label>
-    <label>Menos pensionistas por cada mayor (jubilación más tardía) <output data-k="cov"></output><input type="range" min="0" max="20" step="1" value="${PSC.cov}" data-k="cov"><small>Retrasar la jubilación efectiva unos dos años reduce aproximadamente un 10 % los pensionistas.</small></label>
-  </div><div id="cres" class="res"></div><p class="muted" style="font-size:13.5px;margin-top:8px">Atajos: <button type="button" class="lnk" data-pre="0,0,0">sin cambios</button> · <button type="button" class="lnk" data-pre="10,-20,10">parecido a las reformas aprobadas (empleo +10, pensión −20, jubilación +10)</button></p>`;
-  calc.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{ PSC[i.dataset.k]=+i.value; draw(); }));
-  calc.querySelectorAll("button[data-pre]").forEach(b=>b.addEventListener("click",()=>{ const [e,bb,c]=b.dataset.pre.split(",").map(Number); PSC={emp:e,ben:bb,cov:c}; calc.querySelectorAll("input").forEach(i=>i.value=PSC[i.dataset.k]); draw(); })); draw();
-  // cotizaciones
-  const cot=GOV.main.D61REC.pib[gy(Y)];
-  // sensibilidad: gasto en 2050 según empleo y peso de la pensión (jubilación +10 % fija como en las reformas)
-  const g50=(e,bb,c)=>ex(Y)*(d1/d0)*(1-c/100)*(1+bb/100)/(1+e/100);
-  const sS=res(B,"Análisis de sensibilidad: qué combinación de palancas lleva a cada cifra",`<p>Gasto en 2050 en % del PIB según el aumento del empleo (filas) y el peso de cada pensión respecto a la productividad (columnas), con una jubilación efectiva más tardía que reduce un 10${NB}% los pensionistas. Hoy: ${pc(ex(Y))}. Las previsiones oficiales (16–17,5${NB}%) corresponden a combinaciones de la zona media.</p>`);
-  table(sS,["Empleo \\ pensión","−30 %","−20 %","−10 %","Igual"],[0,10,20].map(e=>[`+${e} %`,...[-30,-20,-10,0].map(bb=>{ const v_=g50(e,bb,10); return `<b>${pc(v_)}</b>`; })]));
-  lect(sS,`<p>La tabla enseña que no hay una palanca mágica, sino combinaciones. Con más empleo, pensiones que crezcan algo menos que la productividad y una jubilación algo más tardía, que es lo que han hecho las reformas de 2021–2023, el gasto en 2050 queda en la zona del 16–17${NB}% del PIB que estiman la AIReF y la Comisión Europea. Sin tocar nada, se iría al ${pc(ex(Y)*d1/d0)}. La distancia entre esas dos cifras es exactamente lo que se discute en cada reforma.</p>`);
-  sec(B,"con",`<p>Las pensiones son sostenibles o no según lo que se decida hacer, no por una ley de la naturaleza. Lo que sí está escrito en la demografía es que el gasto va a subir: la proporción de mayores casi se duplica. Lo que está abierto es cuánto, y quién paga la diferencia: más cotizaciones, más impuestos, más deuda o pensiones que crezcan menos.</p>
-    <ul class="defs">
-    <li><b>El gasto ha crecido sobre todo porque cada pensión pesa más,</b> no solo porque haya más pensionistas: las nuevas pensiones son más altas que las que desaparecen.</li>
-    <li><b>Lo más difícil está por venir:</b> la proporción de mayores casi se duplicará hasta 2050. Sin ningún cambio, el gasto subiría a niveles nunca vistos en España; con las reformas ya aprobadas, las previsiones oficiales lo dejan en torno al 16–17${NB}% del PIB, que sigue siendo bastante más que hoy.</li>
-    <li><b>Hay palancas que compensan:</b> más empleo, jubilación más tardía, inmigración y la forma de actualizar las pensiones. Cada una tiene costes y la calculadora solo muestra su tamaño.</li>
-    <li><b>Las cotizaciones sociales no son solo para pensiones:</b> en ${Y} supusieron el ${pc(cot)} del PIB, pero también financian paro, bajas y otras prestaciones. La parte que no cubren sale de los impuestos o de la deuda.</li>
-    <li><b>Es una cuenta simplificada.</b> Las previsiones oficiales (Comisión Europea, AIReF) usan modelos mucho más completos y llegan a cifras distintas según sus supuestos.</li></ul>
-    <p style="margin-top:10px"><a class="exlink" href="/temas/gasto/">Ver en qué se gasta todo el dinero público →</a></p>`);
-  AB.fill({ctx:"El gasto en pensiones no para de crecer y se jubila el baby boom.",intT:"Las palancas",int:"Empleo, peso de cada pensión respecto a la productividad y edad efectiva de jubilación.",ana:"Descomposición contable del gasto en dos factores (con un año base que no distorsione), proyección demográfica de Eurostat y escenarios con análisis de sensibilidad.",res:`Sin ningún cambio, el gasto pasaría del ${pc(ex(Y))} al ${pc(ex(Y)*d1/d0)} del PIB en 2050; con palancas como las de las reformas aprobadas, a la zona del 16–17 %.`,con:"El gasto seguirá subiendo; cuánto depende sobre todo del empleo y de cómo se actualicen las pensiones."});
-  methods(B,[["Qué se hace","Se separa el crecimiento del gasto en pensiones en dos partes, cuántos pensionistas hay por trabajador y cuánto pesa cada pensión, y se proyecta a 2050 con la demografía de Eurostat bajo distintas combinaciones de empleo, pensiones y edad de jubilación."],["Unidad","España, cuentas nacionales (Eurostat)"],["Descomposición",`Gasto en pensiones / PIB = (pensionistas / ocupados de 20 a 64) × (gasto por pensionista / PIB por ocupado). Tramos ${y0}–2019 y 2019–${Y}; el reparto entre factores se hace con logaritmos (exacto para un producto)`],["Calculadora",`Gasto en 2050 = gasto de ${Y} × (dependencia 2050 / dependencia actual) × (1 + pensión) × (1 − jubilación tardía) / (1 + empleo). Es un modelo de una línea: no modela carreras de cotización, inmigración ni productividad`],["Referencias","AIReF (escenario de políticas constantes) y Comisión Europea (Ageing Report 2024): gasto en pensiones de España en 2050 entre el 16 y el 17,5 % del PIB"]]);
+  const ex=y=>P.exp[y], ben=y=>P.ben[y], emp=y=>P.emp[y]*1000, gdpY=y=>GOV.gdp[gy(y)];
+  const Dn=y=>({r:ben(y)/emp(y), g:(ex(y)/100*gdpY(y)*1e6/ben(y))/(gdpY(y)*1e6/emp(y))});
+  const S0=ex(Y), DEP=y=>P.proj[Math.min(2100,y)], H=26, LIM_PTS=3, LIM=S0+LIM_PTS, GDPM=gdpY(Y); // GDPM: millones de euros
+  // ---------- el modelo: gasto/PIB = pensionistas por ocupado × peso de cada pensión frente a lo que produce un ocupado ----------
+  // dependencia (Eurostat) × (1 − 5 % por cada año de jubilación más tardía) ÷ empleo ÷ población activa extra, y el peso de cada pensión cambia un G % al año.
+  // Los mandos (empleo, población activa, jubilación) actúan de forma lineal hasta 2050 (H años) y se quedan ahí.
+  const model=(q,y)=>{ const t=y-Y, f=Math.min(1,t/H);
+    return S0*(DEP(y)/DEP(Y))*(1-0.05*q.D*f)/((1+q.E/100*f)*(1+q.M/100*f))*Math.pow(1+q.G/100,t); };
+  const years=d3.range(Y,2071), path=q=>years.map(y=>model(q,y));
+  const real0=ex(Y)/100*GDPM*1e6/ben(Y)/14;   // pensión media mensual, 14 pagas, euros de ese año
+  const realAt=(q,y)=>real0*Math.pow((1+q.p/100)*(1+q.G/100),y-Y);
+  // ---------- lo que ha pasado: 2013–último año ----------
+  const y13=2013, a13=Dn(y13), bY=Dn(Y);
+  const Ghist=(Math.pow(bY.g/a13.g,1/(Y-y13))-1)*100;
+  const sPast=ex(y13), sAfterR=sPast*bY.r/a13.r, dR=sAfterR-sPast, dG=ex(Y)-sAfterR;   // puntos de PIB (secuencial)
+  const cfG=ex(Y)*a13.g/bY.g, ahorroG=ex(Y)-cfG;                                       // «si cada pensión pesara como en 2013»
+  const eurMM=pts=>pts/100*GDPM/1000;                                                  // puntos de PIB → miles de millones de euros
+  // ---------- escenarios ----------
+  const SC=[
+    {k:"nada",n:"Nada cambia",q:{E:0,M:0,D:0,G:0,p:1},d:"Solo demografía"},
+    {k:"deriva",n:"La deriva de estos años sigue",q:{E:0,M:0,D:0,G:Ghist,p:1},d:"Cada pensión sigue ganando peso"},
+    {k:"ipc",n:"Las pensiones suben con el IPC",q:{E:0,M:0,D:0,G:-1,p:1},d:"Cada pensión pierde peso"},
+    {k:"reformas",n:"Lo previsto tras las reformas",q:{E:5,M:5,D:1,G:-1,p:1},d:"IPC, un año más de trabajo, más empleo y más población activa"},
+    {k:"trabajo",n:"Más empleo e inmigración, sin tocar las pensiones",q:{E:10,M:10,D:0,G:0,p:1},d:"Trabaja más gente, pero cada pensión pesa igual"},
+    {k:"tarde",n:"Jubilarse tres años más tarde",q:{E:0,M:0,D:3,G:0,p:1},d:"Solo la edad efectiva de jubilación"},
+    {k:"equilibrio",n:"Un futuro que cabe",q:{E:10,M:10,D:2,G:-0.7,p:1},d:"Un poco de todo"}];
+  SC.forEach(s=>{ s.s50=model(s.q,2050); s.s70=model(s.q,2070); s.ok=s.s50<=LIM; s.real50=realAt(s.q,2050); s.peso50=(Math.pow(1+s.q.G/100,2050-Y)-1)*100; });
+  const sc=Object.fromEntries(SC.map(s=>[s.k,s]));
+  // palancas sueltas (cada una con un valor ambicioso, el resto sin cambios)
+  const solo={E:model({E:10,M:0,D:0,G:0,p:1},2050),M:model({E:0,M:10,D:0,G:0,p:1},2050),D:model({E:0,M:0,D:3,G:0,p:1},2050)};
+  // ---------- gráficos ----------
+  const G={}, SUB=[]; const ST={E:5,M:5,D:1,G:-1,p:1,tau:LIM_PTS};
+  const lim=()=>S0+ST.tau;
+  G.demografia=d=>{ const dy=[...new Set([...Object.keys(P.olddep),...Object.keys(P.proj)])].map(Number).sort().filter(y=>y>=1995&&y<=2070);
+    lineChart(d,{title:"Mayores de 65 por cada 100 personas de 15 a 64",source:"Hasta 2025, datos; después, proyección base de Eurostat (EUROPOP2023).",series:[{n:"España",v:dy.map(y=>P.olddep[y]??P.proj[y]),c:"--rust",main:true},{n:"UE-27",v:dy.map(y=>P.olddepEU[y]??P.projEU[y]),c:"--slate"}],years:dy,xticks:[1995,2025,2050,2070],fmt:v=>nf1.format(v),height:280}); };
+  G.piramide=d=>{ if(!PI||!PI.es) return; const T=PI.es.H.map((h,i)=>h+PI.es.M[i]), gr=PI.grupos;
+    const rows=gr.map((g,i)=>({l:g,v:T[i]/1e6,c:i>=13?"--rust":(i>=10?"--mustard":"--stone")})); const f=fig(d,{title:"Población de España por edad, 1 de enero de 2025 (millones de personas, tramos de cinco años)",source:"En granate, 65 años o más; en ocre, 50 a 64, los que se jubilarán en los próximos quince años. Fuente: INE, Estadística Continua de Población."});
+    hbars(f.body,rows,{fmt:v=>nf1.format(v)+" M",max:Math.max(...rows.map(r=>r.v))}); };
+  G.pasado=d=>{ const f=fig(d,{title:`Qué ha movido el gasto en pensiones entre ${y13} y ${Y} (puntos de PIB)`,source:`Del ${pc(sPast)} al ${pc(ex(Y))} del PIB. Se aplican los cambios uno tras otro: primero los pensionistas por ocupado, luego el peso de cada pensión. Fuente: Eurostat; cálculo de Indicio.`});
+    hbars(f.body,[{l:"Pensionistas por cada ocupado",v:dR,c:"--olive"},{l:"Peso de cada pensión frente a lo que produce un ocupado",v:dG,c:"--rust"},{l:"Total",v:ex(Y)-sPast,c:"--ink"}],{fmt:v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" pts",min:-2,max:2.5});
+    const g2=add(d,"div","cols2"), ys=yrs.filter(y=>y>=y13&&ben(y)&&emp(y)), xt=[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]];
+    lineChart(g2,{title:"Pensionistas por cada ocupado",source:"Ocupados de 20 a 64 años. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>Dn(y).r),c:"--olive",main:true}],years:ys,xticks:xt,fmt:v=>nf2.format(v),tickFmt:v=>nf2.format(v)});
+    lineChart(g2,{title:"Peso de cada pensión frente al PIB por ocupado",source:"Gasto por pensionista dividido entre el PIB por ocupado. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>Dn(y).g*100),c:"--rust",main:true}],years:ys,xticks:xt,fmt:pc,tickFmt:v=>nf0.format(v)+"%"}); };
+  const pathChart=(d,s,opt={})=>lineChart(d,{title:opt.title,source:opt.source,series:[{n:"Gasto en pensiones",v:path(s.q),c:s.ok?"--ok":"--rust",main:true},{n:"Límite",v:years.map(()=>LIM),c:"--stone",dash:true}],years,xticks:[Y,2050,2070],fmt:pc,tickFmt:v=>nf0.format(v)+"%",height:opt.h||200});
+  const card=(d,s)=>{ const c=add(d,"div","pn-card"+(s.ok?" ok":" ko")); c.innerHTML=`<div class="pn-h"><b>${esc(s.d)}</b><span class="pn-v">${pc(s.s50)}<small> del PIB en 2050</small></span></div><div class="pn-c ${s.ok?"ok":"ko"}">${s.ok?`Cabe: ${nf1.format(LIM-s.s50)} puntos por debajo del límite`:`No cabe: se pasa ${nf1.format(s.s50-LIM)} puntos (unos ${nf0.format(eurMM(s.s50-LIM))} mil millones de euros al año de hoy)`}</div>`;
+    const ch=add(c,"div","pn-ch"); pathChart(ch,s,{h:190,title:"Gasto en pensiones, % del PIB"});
+    const m=add(c,"p","pn-m"); m.innerHTML=`Pensión media en 2050, en euros de hoy: <b>${nf0.format(s.real50)}${NB}€ al mes</b> (hoy, ${nf0.format(real0)}${NB}€). ${Math.abs(s.peso50)<0.5?"Cada pensión pesaría lo mismo que hoy frente a lo que produce un ocupado.":`Frente a lo que produce un ocupado, cada pensión pesaría un ${nf0.format(Math.abs(s.peso50))}${NB}% ${s.peso50<0?"menos":"más"}.`}`; };
+  SC.forEach(s=>{ G["esc_"+s.k]=d=>card(d,s); });
+  G.todos=d=>{ const cols=["--rust","--mustard","--slate","--olive","--plum","--stone","--ok"];
+    lineChart(d,{title:"Los siete futuros: gasto en pensiones, % del PIB",sub:`Línea discontinua: límite de hoy más ${LIM_PTS} puntos`,source:"Simulación de Indicio con la proyección demográfica de Eurostat; no es una previsión.",series:[...SC.map((s,i)=>({n:s.n,v:path(s.q),c:cols[i]})),{n:"Límite",v:years.map(()=>LIM),c:"--ink",dash:true}],years,xticks:[Y,2050,2070],fmt:pc,tickFmt:v=>nf0.format(v)+"%",height:340}); };
+  // mapa: con los otros mandos del simulador, qué combinaciones de empleo (columnas) y peso de cada pensión (filas) caben
+  const EX=d3.range(0,21,2), GY=d3.range(1.5,-2.01,-0.25);
+  G.mapa=d=>{ const f=fig(d,{title:"¿Cabe? Combinaciones de empleo y peso de cada pensión, gasto en 2050",source:"Verde: cabe dentro del límite; rojo: se pasa. El resto de mandos, los del simulador de abajo. Pasa el ratón para ver el gasto de cada casilla."});
+    const box=add(f.body,"div","pn-map"); const note=add(f,"p","pn-note");
+    const draw=()=>{ const cw=44, ch=22, ml=84, mt=8, W=ml+EX.length*cw+8, Hh=mt+GY.length*ch+40, L=lim(); let ok=0;
+      const cells=[]; GY.forEach((g,j)=>EX.forEach((e,i)=>{ const v=model({...ST,E:e,G:g},2050), good=v<=L; if(good) ok++; cells.push({x:ml+i*cw,y:mt+j*ch,v,good,e,g}); }));
+      const mx=Math.max(...cells.map(c=>c.v)), op=c=>c.good?0.25+0.6*Math.min(1,(L-c.v)/6):0.2+0.65*Math.min(1,(c.v-L)/(mx-L||1));
+      box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Mapa de combinaciones que caben">`+cells.map(c=>`<rect x="${c.x}" y="${c.y}" width="${cw-1}" height="${ch-1}" rx="2" style="fill:${c.good?"var(--ok,#3f7a4a)":"var(--ko,#b0303f)"};fill-opacity:${op(c).toFixed(2)}"><title>Empleo +${c.e}${NB}%, peso de cada pensión ${c.g>0?"+":""}${nf2.format(c.g)}${NB}% al año: ${nf1.format(c.v)}${NB}% del PIB</title></rect>`).join("")
+        +GY.map((g,j)=>(Math.abs(g*2-Math.round(g*2))<1e-9)?`<text x="${ml-8}" y="${mt+j*ch+ch/2+4}" text-anchor="end" class="lab">${g>0?"+":g<0?"−":""}${nf1.format(Math.abs(g))}${NB}%</text>`:"").join("")
+        +EX.map((e,i)=>i%2===0?`<text x="${ml+i*cw+cw/2}" y="${mt+GY.length*ch+14}" text-anchor="middle" class="lab">+${e}${NB}%</text>`:"").join("")
+        +`<text x="${ml+EX.length*cw/2}" y="${Hh-4}" text-anchor="middle" class="lab">Más gente con empleo, en 2050</text><text x="10" y="${mt+GY.length*ch/2}" class="lab" transform="rotate(-90 10 ${mt+GY.length*ch/2})" text-anchor="middle">Peso de cada pensión, % al año</text>`
+        +`<rect x="${ml+Math.min(EX.length-1,Math.round(ST.E/2))*cw}" y="${mt+Math.max(0,Math.min(GY.length-1,Math.round((1.5-ST.G)/0.25)))*ch}" width="${cw-1}" height="${ch-1}" rx="2" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>`;
+      note.innerHTML=`Con los demás mandos como están (población activa +${ST.M}${NB}%, jubilación +${nf1.format(ST.D)} años, límite ${pc(L)}), caben <b>${ok} de ${cells.length}</b> combinaciones. El recuadro marca tu combinación actual.`; };
+    SUB.push(draw); draw(); };
+  G.simulador=d=>{ const w=add(d,"div","calc pn-sim"), ctl=add(w,"div","ctl"), out=add(w,"div","res");
+    const defs=[["E","Más gente con empleo","+%",0,20,1,"Hoy tienen empleo 72 de cada 100 personas de 20 a 64 años; en los Países Bajos, 83 (Eurostat, 2025). Un +10 % llevaría a España a unos 80."],
+      ["M","Más población en edad de trabajar (inmigración)","+%",0,15,1,"Cada 100.000 personas netas extra al año entre 2025 y 2050 son unos 2,5 millones: un +7,7 % sobre los 32,6 millones de 15 a 64 años de hoy. Se supone que trabajan como el resto."],
+      ["D","Jubilación efectiva más tardía","años",0,3,0.5,"Cada año de retraso reduce en torno a un 5 % los pensionistas. Es una aproximación."],
+      ["G","Peso de cada pensión frente a lo que produce un ocupado","% al año",-2,1.5,0.1,`Desde ${y13} ha subido un ${nf1.format(Ghist)}${NB}% al año. Con 0, la pensión media crece como la productividad; por debajo, menos.`],
+      ["tau","Lo que aceptamos pagar de más","puntos de PIB",0,6,0.5,`Hoy, ${pc(S0)} del PIB. Cada punto son unos ${nf0.format(eurMM(1))} mil millones de euros al año.`],
+      ["p","Productividad (crecimiento real del PIB por ocupado)","% al año",0,2,0.1,"Un supuesto, no un dato. Solo afecta a la pensión en euros de hoy."]];
+    ctl.innerHTML=defs.map(([k,l,u,a,b,st,n])=>`<label>${l} <output data-k="${k}"></output><input type="range" min="${a}" max="${b}" step="${st}" value="${ST[k]}" data-k="${k}"><small>${n}</small></label>`).join("")
+      +`<p class="muted" style="font-size:13.5px">Probar un escenario: ${SC.map(s=>`<button type="button" class="lnk" data-sc="${s.k}">${esc(s.n)}</button>`).join(" · ")}</p>`;
+    out.innerHTML='<div id="pnres"></div><div id="pnch"></div><p id="pneu" class="muted" style="font-size:14px"></p>';
+    const fmtO=(k,v)=>k==="D"?`+${nf1.format(v)} años`:k==="tau"?`${nf1.format(v)} puntos`:k==="G"||k==="p"?`${v>0&&k==="G"?"+":""}${nf1.format(v)}${NB}%`:`+${v}${NB}%`;
+    const upd=()=>{ const q={...ST}, L=lim(), s50=model(q,2050), s70=model(q,2070), ok=s50<=L;
+      ctl.querySelectorAll("output").forEach(o=>o.textContent=fmtO(o.dataset.k,ST[o.dataset.k]));
+      out.querySelector("#pnres").innerHTML=`<div class="big">${pc(s50)} <span class="muted" style="font-size:16px;font-weight:400">del PIB en 2050</span></div><p><b style="color:var(--${ok?"ok":"ko"})">${ok?`Cabe: ${nf1.format(L-s50)} puntos por debajo del límite (${pc(L)}).`:`No cabe: se pasa ${nf1.format(s50-L)} puntos del límite (${pc(L)}), unos ${nf0.format(eurMM(s50-L))} mil millones de euros al año de hoy.`}</b> En 2070, ${pc(s70)}.</p>`;
+      const ch=out.querySelector("#pnch"); ch.innerHTML=""; lineChart(ch,{title:"Gasto en pensiones, % del PIB",series:[{n:"Gasto",v:path(q),c:ok?"--ok":"--rust",main:true},{n:"Límite",v:years.map(()=>L),c:"--stone",dash:true}],years,xticks:[Y,2050,2070],fmt:pc,tickFmt:v=>nf0.format(v)+"%",height:200});
+      const r50=realAt(q,2050); out.querySelector("#pneu").innerHTML=`Pensión media en 2050, en euros de hoy: <b>${nf0.format(r50)}${NB}€ al mes</b> (hoy, ${nf0.format(real0)}${NB}€). De cada 100${NB}€ que produce un ocupado, ${nf0.format(s50)} irían a pensiones.`;
+      SUB.forEach(f=>f()); };
+    ctl.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{ ST[i.dataset.k]=+i.value; upd(); }));
+    ctl.querySelectorAll("button[data-sc]").forEach(b=>b.addEventListener("click",()=>{ const s=sc[b.dataset.sc]; Object.assign(ST,{E:s.q.E,M:s.q.M,D:s.q.D,G:Math.round(s.q.G*10)/10,p:s.q.p}); ctl.querySelectorAll("input").forEach(i=>i.value=ST[i.dataset.k]); upd(); }));
+    upd(); };
+  // ---------- variables del texto ----------
+  const popM=(a,b)=>PI&&PI.es?[...PI.es.H.slice(a,b),...PI.es.M.slice(a,b)].reduce((x,y)=>x+y,0):0;
+  const pens=ben(Y), cot=GOV.main.D61REC.pib[gy(Y)];
+  const V={gasto0:S0,gastoMM:ex(Y)/100*GDPM/1000,gastoAnt:ex(2000),yAnt:2000,Y,m5064:popM(10,13)/1e6,p65:popM(13,21)/1e6,m1564:popM(3,13)/1e6,
+    dep0:P.olddep[2025],dep50:P.proj[2050],dep70:P.proj[2070],depEU50:P.projEU[2050],sPast,sAfterR,cfG,pensX:pens/1e6,
+    r13:a13.r,rY:bY.r,g13:a13.g*100,gY:bY.g*100,dR,dG,tot:ex(Y)-sPast,ahorroG,ahorroGMM:eurMM(ahorroG),Ghist,y13,
+    real0,lim:LIM,limP:LIM_PTS,limMM:eurMM(LIM_PTS),cot,sNada:sc.nada.s50,sDeriva:sc.deriva.s50,sIpc:sc.ipc.s50,sRef:sc.reformas.s50,sTrabajo:sc.trabajo.s50,sTarde:sc.tarde.s50,sEq:sc.equilibrio.s50,
+    sNada70:sc.nada.s70,sIpcPeso:Math.abs(sc.ipc.peso50),sIpcReal:sc.ipc.real50,sEqReal:sc.equilibrio.real50,sEqPeso:Math.abs(sc.equilibrio.peso50),sTrabajoReal:sc.trabajo.real50,
+    sIpc70:sc.ipc.s70,sRefEx:Math.abs(sc.reformas.s50-LIM),mm1:eurMM(1),soloE:solo.E,soloM:solo.M,soloD:solo.D,nOk:SC.filter(s=>s.ok).length,
+    sNadaEx:sc.nada.s50-LIM,sNadaMM:eurMM(sc.nada.s50-LIM),sDerivaEx:sc.deriva.s50-LIM,
+    aireF:16.1,fedea:17.1,empEs:72.4,empNl:83.4,empUe:76.1};
+  const MAPOK=(()=>{ let n=0,t=0; GY.forEach(g=>EX.forEach(e=>{ t++; if(model({E:e,M:0,D:0,G:g,p:1},2050)<=LIM) n++; })); return {n,t}; })();
+  V.mapaN=MAPOK.n; V.mapaT=MAPOK.t;
+  // frontera: peso de cada pensión más alto con el que aún cabe, con y sin ayudas del resto de mandos
+  const gMax=(E,M,D)=>{ let lo=-5,hi=5; for(let i=0;i<40;i++){ const m=(lo+hi)/2; if(model({E,M,D,G:m,p:1},2050)<=LIM) lo=m; else hi=m; } return lo; };
+  V.gFrontNada=gMax(0,0,0); V.gFrontTodo=gMax(10,10,2); V.gFrontRef=gMax(5,5,1);
+  mdRender(B,"pensiones",V,G);
+  AB.fill({lede:null});
+  methods(B,[["Qué se hace","Se cuenta primero qué ha movido el gasto en pensiones desde 2013 y después se simulan siete futuros hasta 2070 con un modelo de una línea alimentado por la proyección demográfica de Eurostat. Es un ejercicio de escenarios, no una previsión."],["Modelo",`Gasto/PIB = pensionistas por ocupado × peso de cada pensión (pensión media / PIB por ocupado). Hasta 2024 son datos de Eurostat. Después, los pensionistas por ocupado siguen la dependencia proyectada (mayores de 65 por cada 100 de 15 a 64, EUROPOP2023, escenario base), ajustada por tres mandos que actúan de forma lineal hasta 2050: el empleo, la población en edad de trabajar y la edad efectiva de jubilación (un 5 % menos de pensionistas por cada año de retraso); y el peso de cada pensión cambia un G % al año. Base: ${Y}.`],["Qué deja fuera","Carreras de cotización por cohortes, la estructura de edades de los inmigrantes, la inflación y la productividad como variables propias (la productividad solo entra en el cálculo de la pensión en euros de hoy), los efectos de segunda vuelta (más empleo cambia la productividad) y los ingresos del sistema."],["Límite","«Sostenible» aquí significa que el gasto no pasa de la cifra de hoy más 3 puntos de PIB (16,2 %, cerca de la proyección de la AIReF, 16,1 %). Es una elección, no un dato: el simulador la deja mover."],["Peso de cada pensión",`Gasto por pensionista dividido entre el PIB por ocupado (ocupados de 20 a 64 años, EPA). Entre ${y13} y ${Y} ha subido un ${nf1.format(Ghist)}${NB}% al año; incluye la revalorización, que las nuevas pensiones son más altas que las que se extinguen y cambios en la composición.`],["Referencias","AIReF: 16,1 % del PIB en 2050; Fedea: 17,1 % (BBVA Mi jubilación). Tasas de empleo de 20 a 64 años de 2025: España 72,4 %, UE 76,1 %, Países Bajos 83,4 % (Eurostat, vía Destatis)."]]);
   const ft=document.querySelector("footer.method"); if(ft) ft.outerHTML=govNote();
 }
 // =====================================================================
