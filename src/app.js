@@ -2859,7 +2859,7 @@ const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
 <section class="finding"><h2>3. Mirar los cambios, no solo los niveles</h2><div class="txt"><p>Lo que es fijo en cada lugar desaparece al comparar cuánto ha cambiado cada uno. Si donde más subió una cosa más subió la otra, la relación es más creíble que si solo coinciden los niveles. La etiqueta «Mirar los cambios» te lleva a ese gráfico cuando hay datos.</p></div></section>
-<section class="finding"><h2>4. Buscar un antes y un después</h2><div class="txt"><p>Cuando una ley o un suceso afecta a unos lugares y a otros no, se compara cómo cambian los afectados con cómo cambian los demás. Si antes iban parejos y después se separan, esa separación es la mejor pista de un efecto. Se llama <b>diferencias en diferencias</b>; el estudio del <a href="/preguntas/tope-cataluna/">tope del alquiler en Cataluña</a> es un ejemplo. En el laboratorio lo haces tú con <a href="/laboratorio/antes/">Antes y después</a>: eliges los municipios afectados y la fecha, y la herramienta busca gemelos, mide la diferencia año a año y la compara con grupos elegidos al azar.</p></div></section>
+<section class="finding"><h2>4. Buscar un antes y un después</h2><div class="txt"><p>Cuando una ley o un suceso afecta a unos lugares y a otros no, se compara cómo cambian los afectados con cómo cambian los demás. Si antes iban parejos y después se separan, esa separación es la mejor pista de un efecto. Se llama <b>diferencias en diferencias</b>; el estudio del <a href="/preguntas/tope-cataluna/">tope del alquiler en Cataluña</a> es un ejemplo. Los estudios de la <a href="/preguntas/ave/">alta velocidad</a>, los <a href="/preguntas/prohibir-pisos-turisticos/">pisos turísticos</a> y la <a href="/preguntas/pandemia-turismo/">pandemia</a> siguen el mismo método: buscan gemelos, miden la diferencia año a año y la comparan con grupos elegidos al azar.</p></div></section>
 <section class="finding"><h2>5. Pensar en la causa al revés</h2><div class="txt"><p>¿Los pisos turísticos suben el alquiler, o los pisos turísticos van a donde el alquiler ya era caro? Con datos de un solo momento no se puede saber. Ayuda preguntarse qué pasó antes.</p></div></section>
 <section class="finding"><h2>6. Desconfiar de uno mismo</h2><div class="txt"><p>Siempre puede quedar un factor que no hemos medido. Un buen análisis dice lo que no puede descartar. Y son datos de municipios: no dicen nada de cómo se comporta cada persona.</p>
 <p>Para aprender más: <i>The Effect</i>, de Nick Huntington-Klein, y <i>Causal Inference: The Mixtape</i>, de Scott Cunningham. Los dos se pueden leer gratis en internet.</p></div></section>
@@ -4197,18 +4197,16 @@ function exCruce(out){
   if(EX.u){ out.innerHTML=scaleBar(); scaleWire(out); exCruceAgg(out,x,y); return; }
   LBPOS=null;
   out.innerHTML=scaleBar()+`<div id="ctlnote"></div><div id="cplot"></div>`; scaleWire(out);
-  const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" data-tab="p" aria-label="Comparar y probar causa">
-    <div class="czt-tabs" role="tablist"><button type="button" role="tab" class="czt-tab on" data-t="p" aria-selected="true">Comparar municipios</button><button type="button" role="tab" class="czt-tab" data-t="c" aria-selected="false">Probar causa</button></div>
+  const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" aria-label="Cuánto van juntos y si aguanta">
     <div class="czg">
       <div class="czb czb-c czv" id="czl"></div>
       <div class="czb czb-e"><div class="czeh-row"><h3><span id="czeh">En números</span>${czIt("Cuánto cambia un dato cuando cambia el otro, en sus propias unidades, con el rango en el que probablemente se mueve de verdad.","Qué son los números")}</h3><span id="czevd"></span></div><div id="czeur"></div></div>
     </div>
-    <div class="czpar"><h3>¿Y entre municipios parecidos?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Marca en qué deben parecerse y mira cuánta relación queda.</p><div class="czchips" id="cztags"></div><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div><button type="button" class="czlink" id="czmore" aria-expanded="false" aria-controls="lbcausal"><span class="t">Ver las comprobaciones extra ▾</span></button></div>
-    <div class="czcausa" id="czcausa" role="tabpanel"></div>
+    <div class="czpar"><h3>¿Y entre municipios parecidos?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Marca en qué deben parecerse y mira cuánta relación queda.</p><div class="czchips" id="cztags"></div><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div><button type="button" class="czlink" id="czmore" aria-expanded="false" aria-controls="lbcausal"><span class="t">¿Podría ser una causa? Ver qué se puede comprobar ▾</span></button></div>
     <p class="czc-m"><a href="/laboratorio/metodo/">Guía: de la relación a la causa →</a></p></section>`;
-  if(tst){ czTipBind(tst); tst.querySelectorAll(".czt-tab").forEach(b=>b.addEventListener("click",()=>czTab(b.dataset.t))); }
+  if(tst) czTipBind(tst);
   const cb=document.getElementById("lbcausal"); if(cb) cb.hidden=true;
-  document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.querySelector(".t").textContent=o?"Ocultar las comprobaciones ▴":"Ver las comprobaciones extra ▾"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
+  document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.querySelector(".t").textContent=o?"Ocultar ▴":"¿Podría ser una causa? Ver qué se puede comprobar ▾"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
   const more=document.getElementById("lbmore");
   more.innerHTML=`<details class="howm"><summary>Más números de esta relación: por grupos, los que se salen de la norma y todas las relaciones</summary><div class="xsay" id="csay"></div><section class="finding" id="cquint"></section><section class="finding" id="cout"></section><section class="finding" id="cmat"></section><section class="finding" id="ccav"></section></details>`;
   drawRel(); drawMatrix(true); drawCaveats();
@@ -4607,21 +4605,7 @@ function steps(x,y,w){
 const CZLEV=[["Se explica por otra cosa","La relación no aguanta al comparar entre iguales: lo más probable es que dependa de algo que va junto."],["Aguanta poco","Supera alguna prueba, pero no las importantes. Conviene desconfiar."],["Aguanta casi todo","Sobrevive a casi todas las explicaciones que podemos medir. Merece la pena investigarla con un antes y un después."],["Aguanta todas las pruebas","Descarta las explicaciones que hemos medido (tamaño, edad, renta, estudios, provincia), no las demás. Que aguante no la convierte en causa."]];
 // ---------- pestaña «Probar causa»: qué diseños sirven para este par ----------
 const czAdKey=k=>/^(renta)/.test(k)?"renta":/^(pop|lpop|varPob)/.test(k)?"pad":/^paro/.test(k)?"paro":/^(alq|ipva)/.test(k)?"ipva":/^(vt|vtp)/.test(k)?"vtp":null;
-function czTab(t){ const sec=document.querySelector(".czc"); if(!sec) return; sec.dataset.tab=t;
-  sec.querySelectorAll(".czt-tab").forEach(b=>{ const on=b.dataset.t===t; b.classList.toggle("on",on); b.setAttribute("aria-selected",String(on)); });
-  if(t==="c") czCausa(); }
-function czCausa(){ const el=document.getElementById("czcausa"); if(!el||EX.d.length<2) return;
-  const [x,y]=EX.d, xl=low(labK(x)), yl=low(labK(y));
-  if(!CZ||CZ.x!==x||CZ.y!==y||CZ.lev==null){ el.innerHTML=`<p class="czlead">${CZ&&CZ.x===x&&CZ.y===y?`Entre ${xl} y ${yl} casi no hay relación: no hay nada que probar.`:"Calculando las pruebas…"}</p>`; return; }
-  const tw=(CZ.T||[]).find(t=>t.k==="tw"), ks=[czAdKey(x),czAdKey(y)], evs=Object.keys(ADEV).filter(k=>!ADEV[k].free&&ks.includes(ADEV[k].y));
-  const card=(t,pill,cls,txt,act="")=>`<div class="czd"><h4>${t} <span class="czp ${cls}">${pill}</span></h4><p>${txt}</p>${act}</div>`;
-  const out=[card("Entre municipios parecidos","Hecho","ok",`Ya está en «Comparar municipios»: la relación supera <b>${CZ.passed} de ${CZ.total}</b> comprobaciones.`,`<button type="button" class="czlink" data-go="p">Volver a comparar</button>`),
-    tw&&!tw.na?card("Municipios gemelos","Hecho","ok","Parejas de pueblos casi iguales de la misma provincia. Sale en las comprobaciones extra.",`<button type="button" class="czlink" data-go="x">Ver las comprobaciones extra</button>`):card("Municipios gemelos","Faltan datos","no","No hay suficientes parejas de gemelos para esta selección."),
-    ...(evs.length?evs.map(k=>card("Antes y después","Se puede","ok",`${ADEV[k].l}. Mide si ${low(ADY[ADEV[k].y].l)} cambió más donde ocurrió que en sus gemelos.`,`<a class="czlink" href="/laboratorio/antes/?ev=${k}&oy=${ADEV[k].y}">Abrir «Antes y después» →</a>`)):[card("Antes y después","Ningún suceso encaja","no","Hoy comparamos antes y después de cuatro sucesos (tope del alquiler, alta velocidad, pisos turísticos y pandemia). Ninguno mide estos dos datos.",`<a class="czlink" href="/laboratorio/antes/">Ver los sucesos disponibles →</a>`)]),
-    card("Umbral o corte","Aún no disponible","no","Sirve cuando una regla separa a los municipios por una cifra (por ejemplo, un límite de población). Todavía no lo tenemos.")];
-  el.innerHTML=`<p class="czlead">Para pasar de «van juntos» a «uno causa el otro» hace falta un diseño que separe la causa de lo que va a la vez. Estos son los que valen para <b>${xl}</b> y <b>${yl}</b>:</p><div class="czds">${out.join("")}</div>
-    <p class="czev">Nivel de evidencia ahora: <b>${CZLEV[CZ.lev][0]}</b>. Con un buen antes y un después podría subir; sin él, la relación sigue siendo una pista.</p>`;
-  el.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ czTab("p"); if(b.dataset.go==="x"){ const m=document.getElementById("czmore"); if(m&&m.getAttribute("aria-expanded")!=="true") m.click(); } })); }
+const CZSTUDY={tensionadas:"tope-cataluna",ave:"ave",vut:"prohibir-pisos-turisticos",covid:"pandemia-turismo"};
 function exCausal(x,y){
   const box=document.getElementById("lbcausal"); if(!box) return;
   const w=!!EX.w, base=partialR(x,y,[],w); CZ=null; if(!base){ box.innerHTML=""; return; }
@@ -4652,26 +4636,30 @@ function exCausal(x,y){
     :`<b>${cap(CNAME[top.c])}.</b> Comparando municipios con ${CNAME[top.c].replace(/^(el|la|los) /,"")} parecid${/^la /.test(CNAME[top.c])?"a":/^los /.test(CNAME[top.c])?"os":"o"}, la relación pasa de ${rFmt(base.r)} a ${rFmt(top.p.r)}. Puede que ${CNAME[top.c]} influya a la vez en ${xl} y en ${yl}.`;
   const em=t=>t.na?"⚪":t.ok?"✅":"❌";
   const ex=!TW||!TW.pairs.length?[]:(()=>{ const nOk=Math.round(TW.share*4), a=TW.pairs.filter(p=>p.agree).slice(0,nOk), b=TW.pairs.filter(p=>!p.agree).slice(0,4-nOk); return [...a,...b].slice(0,4); })();
-  const fx=fmtK(x), fy=fmtK(y);
+  const fx=fmtK(x), fy=fmtK(y), evs=Object.keys(ADEV).filter(k=>!ADEV[k].free&&[czAdKey(x),czAdKey(y)].includes(ADEV[k].y));
   // veredicto arriba; una línea por prueba; el porqué, los gemelos y el mapa, plegados
   const twinsH=ex.length?`<div class="twins"><h4>Algunas parejas de gemelos</h4><p class="muted">Misma provincia y parecidos en ${TW.cs.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")}, pero que se diferencian en ${xl}.</p><ul>${ex.map(p=>`<li><span class="${p.agree?"ok":"ko"}" aria-hidden="true">${p.agree?"✓":"✗"}</span><span><a href="#m${p.hi[F.code]}">${esc(dispName(p.hi[F.name]))}</a> <small>${fx(p.hi[F[x]])} · ${fy(p.hi[F[y]])}</small></span><span class="vs">frente a</span><span><a href="#m${p.lo[F.code]}">${esc(dispName(p.lo[F.name]))}</a> <small>${fx(p.lo[F[x]])} · ${fy(p.lo[F[y]])}</small></span><a class="gol" href="#comparar-${p.hi[F.code]}-${p.lo[F.code]}">Comparar →</a></li>`).join("")}</ul></div>`:"";
-  CZ.lev=lev; CZ.passed=passed; CZ.total=done.length; CZ.T=T.map(t=>({k:t.k,ok:!!t.ok,na:!!t.na})); czCausa();
+  CZ.lev=lev; CZ.passed=passed; CZ.total=done.length;
   const cx2=CHG[x], cy2=CHG[y];
-  box.innerHTML=`<div class="cz"><h3>A fondo: las pruebas una a una</h3>
+  box.innerHTML=`<div class="cz"><h3>¿Podría ser una causa?</h3>
+    <p class="czlead">Que dos datos vayan juntos no prueba que uno cause el otro. Esto es lo que se puede comprobar con ${xl} y ${yl}, de menos a más exigente.</p>
     <div class="meter" role="img" aria-label="Nivel: ${CZLEV[lev][0]}"><div class="track">${[0,1,2,3].map(i=>`<span class="${i<=lev?"on l"+lev:""}"></span>`).join("")}</div><div class="labs">${CZLEV.map((l,i)=>i===lev?`<b>${l[0]}</b>`:`<span>${l[0]}</span>`).join("")}</div></div>
     <div class="verdict">${CZLEV[lev][0]}<small>${CZLEV[lev][1]}</small></div>
+    <details class="czd"><summary><span class="czdt">Comparar entre municipios</span><span class="czp ${passed>=done.length-1&&done.length?"ok":"no"}">Supera ${passed} de ${done.length}</span></summary><div class="czdb">
     <p class="czn">Supera <b>${passed} de ${done.length}</b> pruebas${done.length<T.length?` <span class="muted">(${T.length-done.length} no se pueden hacer con estos datos)</span>`:""}:</p>
     <ul class="tests">${T.map(t=>`<li class="${t.na?"na":t.ok?"ok":"ko"}"><span class="em" aria-hidden="true">${em(t)}</span><span><b>${t.t}.</b> ${t.d}</span></li>`).join("")}</ul>
     <div class="suspect"><span class="tag">Principal sospechoso</span>${sus}</div>
     <p class="czact">Más pruebas: ${cx2&&cy2&&cx2!==cy2?`<button type="button" class="ctag" data-a="chg">📈 Mirar los cambios, no los niveles</button> `:""}<button type="button" class="ctag" data-a="big" aria-pressed="${EX.t==="g10"}">Solo municipios de más de 10.000 hab.</button></p>
-    <div class="mustbe"><h4>Qué tendría que ser cierto para que fuera causa</h4><ol>
+    <details class="czmore"><summary>Por qué importa cada prueba${ex.length?", parejas de gemelos":""}${BP?" y mapa por provincias":""}</summary>
+      <dl class="czwhy">${T.map(t=>`<dt>${em(t)} ${t.t}</dt><dd>${t.why}${t.extra&&!t.na?t.extra:""}</dd>`).join("")}</dl>${twinsH}</details>
+    </div></details>
+    <div class="czd"><h4><span class="czdt">Antes y después</span><span class="czp ${evs.length?"ok":"no"}">${evs.length?"Hay un estudio":"Sin estudio"}</span></h4>${evs.length?`<p>Un estudio de Indicio lo mide con un suceso real: ${evs.map(k=>`<a href="/preguntas/${CZSTUDY[k]}/">${ADEV[k].l}</a>`).join("; ")}.</p>`:`<p>Ningún estudio de Indicio mide estos dos datos con un suceso real. Los que hay: ${Object.keys(CZSTUDY).map(k=>`<a href="/preguntas/${CZSTUDY[k]}/">${ADEV[k].l.replace(/ \(.*$/,"")}</a>`).join(", ")}.</p>`}</div>
+    <p class="czmut">Otros diseños, como un umbral o corte, todavía no están disponibles.</p>
+    <details class="czd"><summary><span class="czdt">Qué tendría que ser cierto para que fuera causa</span></summary><div class="czdb"><ol>
       <li><b>Que nada que no hemos medido mueva a la vez</b> ${xl} y ${yl}. Aquí solo se pueden descontar el tamaño, la edad, la renta, los estudios y la provincia; todo lo demás (historia, clima, carreteras, decisiones políticas) sigue dentro.</li>
       <li><b>Que no vaya al revés.</b> ↺ Quizá no es ${xl} lo que mueve ${yl}, sino ${yl} lo que atrae ${xl}. Con datos de un solo momento no se puede saber: hace falta ver qué cambió antes.</li>
       <li><b>Que lo que vale para municipios valga para personas,</b> si la pregunta es sobre personas. Que los municipios con más de algo tengan más de otra cosa no dice que cada vecino sea así.</li>
-      <li><b>Que los controles no estropeen la comparación.</b> Descontar algo que está en medio del camino o que es consecuencia puede borrar o inventar una relación. <a href="/laboratorio/metodo/#controles">Cómo elegirlos →</a></li></ol>
-      <p>La forma de acercarse de verdad es encontrar un momento en que ${xl} cambió en unos sitios y no en otros, por una ley o un suceso, y comparar antes y después. <a href="/laboratorio/antes/">Abre «Antes y después» →</a></p></div>
-    <details class="czmore"><summary>Por qué importa cada prueba${ex.length?", parejas de gemelos":""}${BP?" y mapa por provincias":""}</summary>
-      <dl class="czwhy">${T.map(t=>`<dt>${em(t)} ${t.t}</dt><dd>${t.why}${t.extra&&!t.na?t.extra:""}</dd>`).join("")}</dl>${twinsH}</details>
+      <li><b>Que los controles no estropeen la comparación.</b> Descontar algo que está en medio del camino o que es consecuencia puede borrar o inventar una relación. <a href="/laboratorio/metodo/#controles">Cómo elegirlos →</a></li></ol></div></details>
     <p style="margin-top:14px;font-size:14px"><a href="/laboratorio/metodo/">Guía: de la relación a la causa →</a> · <a href="/preguntas/">Mira cómo se hace en un análisis de verdad →</a></p></div>`;
   const chb=box.querySelector('[data-a="chg"]'); if(chb) chb.addEventListener("click",()=>{ EX.d=[cx2,cy2,...EX.d.slice(2).filter(k=>k!==cx2&&k!==cy2)]; EX.c=[]; exUpdate(); });
   box.querySelector('[data-a="big"]').addEventListener("click",()=>{ EX.t=EX.t==="g10"?"":"g10"; exUpdate(); });
