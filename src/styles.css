@@ -1600,3 +1600,9 @@ details.chk > section{margin-top:18px}
 .np-t:hover h3{color:var(--brand)}
 @media (max-width:980px){ .np-tg{grid-template-columns:repeat(3,minmax(0,1fr))} .np-lab{grid-template-columns:minmax(0,1fr); padding:28px 24px} }
 @media (max-width:620px){ .np-tg{grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 16px} }
+/* menús desplegables: la flecha y el texto cambian juntos y la píldora actual se pinta entera */
+.navdd .ddb,.navdd .ddb:hover{color:var(--ink-2)!important}
+.navdd:hover a,.navdd:hover .ddb{color:var(--brand)!important}
+.navdd a[aria-current="page"]{background:none; box-shadow:none; border-radius:20px 0 0 20px}
+.navdd:has(a[aria-current="page"]),.navdd:has(a[aria-current="page"]):hover{background:var(--acc); box-shadow:inset 0 -2px 0 var(--brand)}
+.navdd:has(a[aria-current="page"]) a,.navdd:has(a[aria-current="page"]) .ddb{color:var(--ink)!important}
