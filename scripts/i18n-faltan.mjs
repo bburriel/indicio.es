@@ -17,10 +17,20 @@ export const CERRADAS=["quien-soy","laboratorio","laboratorio__metodo","municipi
 const NUMRE=/\d[\d.,]*\d|\d/g;
 const norm=s=>s.replace(/\s+/g," ").trim().replace(NUMRE,"{#}");
 const HAVE=new Set(ROWS.map(r=>norm(r[0])));
+// «A y B: r = −0,45» se traduce por piezas (rel() en src/i18n.js): vale si A y B están en el diccionario
+const cubierto=t=>{
+  if(HAVE.has(t)) return true;
+  const m=t.match(/^(.+): r = −?\{#\}$/); if(!m) return false;
+  const p=m[1].split(" y ");
+  for(let i=1;i<p.length;i++) if(HAVE.has(p.slice(0,i).join(" y "))&&HAVE.has(p.slice(i).join(" y "))) return true;
+  return false;
+};
 const ENT={"&amp;":"&","&lt;":"<","&gt;":">","&quot;":'"',"&#39;":"'","&apos;":"'","&nbsp;":" ","&shy;":""};
 const unent=s=>s.replace(/&(amp|lt|gt|quot|apos|nbsp|shy|#39);/g,m=>ENT[m]).replace(/&#(\d+);/g,(_,n)=>String.fromCharCode(+n)).replace(/&#x([0-9a-f]+);/gi,(_,n)=>String.fromCharCode(parseInt(n,16)));
 // nombres propios, siglas, nombres de idioma y marcas de la plantilla: no se traducen
 const IGNORAR=new Set(["Indic","Indicio","RSS","Castellano","Català","Galego","Euskara","English"]);
+// nombres de municipios y de provincias (data/index.json): no se traducen
+try{ const idx=JSON.parse(fs.readFileSync(path.join(ROOT,"data/index.json"),"utf8")); for(const r of idx.rows) IGNORAR.add(r[1]); for(const p of (Array.isArray(idx.provs)?idx.provs:Object.values(idx.provs))) IGNORAR.add(typeof p==="string"?p:p&&p.n||""); for(const n of ["Madrid","Meliana","Teruel","Vigo","Valencia","A Coruña","Castellón","Las Palmas","No rellenar"]) IGNORAR.add(n); }catch(e){}
 const hasLetters=s=>/[A-Za-zÁÉÍÓÚÑáéíóúñ]{2}/.test(s)&&!IGNORAR.has(s)&&!/^\{\{.*\}\}$/.test(s);
 
 function textosDeHtml(html){
@@ -47,7 +57,7 @@ const fuentes=()=>{
 export function faltan({todas=false}={}){
   const res=[]; let cerradas=0;
   for(const [nombre,textos,cerrada] of fuentes()){
-    const unicos=[...new Set(textos)], sin=unicos.filter(t=>!HAVE.has(t));
+    const unicos=[...new Set(textos)], sin=unicos.filter(t=>!cubierto(t));
     if(cerrada) cerradas+=sin.length;
     res.push({nombre,cerrada,total:unicos.length,sin});
   }

@@ -36,7 +36,7 @@ var NOTE={
 };
 
 var MAP={ca:{},gl:{},eu:{},en:{}};
-ROWS.forEach(function(r){ ["ca","gl","eu","en"].forEach(function(l,i){ if(r[i+1]) MAP[l][norm(r[0]).replace(/\d[\d.,]*\d|\d/g,"{#}")]=r[i+1]; }); });
+ROWS.forEach(function(r){ ["ca","gl","eu","en"].forEach(function(l,i){ if(typeof r[i+1]==="string") MAP[l][norm(r[0]).replace(/\d[\d.,]*\d|\d/g,"{#}")]=r[i+1]; }); });
 function norm(s){ return s.replace(/\s+/g," ").trim(); }
 
 var lang="es";
@@ -51,24 +51,37 @@ function fmtNum(l,t){
   if(/^\d+,\d+$/.test(t)) return t.replace(",",".");
   return t;
 }
+var AND={ca:"i",gl:"e",eu:"eta",en:"and"};
+// «Renta por persona y Paro registrado: r = −0,45»: se traduce cada nombre de variable por separado
+function rel(key){
+  var m=key.match(/^(.+): r = (−?\{#\})$/); if(!m) return;
+  var parts=m[1].split(" y ");
+  for(var i=1;i<parts.length;i++){
+    var a=MAP[lang][parts.slice(0,i).join(" y ")], b=MAP[lang][parts.slice(i).join(" y ")];
+    if(a!==undefined&&b!==undefined) return a+" "+AND[lang]+" "+b+": r = "+m[2];
+  }
+}
 function tr(s){
   if(lang==="es") return s;
   var m=s.match(/^(\s*)([\s\S]*?)(\s*)$/), core=m[2];
   if(!core) return s;
   var nums=core.match(NUMRE)||[], key=norm(core).replace(NUMRE,"{#}"), hit=MAP[lang][key];
+  if(hit===undefined) hit=rel(key);
   if(hit!==undefined){ var k=0; hit=hit.replace(/\{#\}/g,function(){ return k<nums.length?fmtNum(lang,nums[k++]):"{#}"; }); }
   else hit=core.replace(DATE_RE,function(_,d,mo,y){ return fmtDate(lang,d,mo,y); });
   return hit===core?s:m[1]+hit+m[3];
 }
 function skip(n){
   var e=n.nodeType===1?n:n.parentElement;
-  return !e||!!e.closest("script,style,[translate=no],option,.langnote");
+  return !e||!!e.closest("script,style,[translate=no],.langnote");
 }
 function doText(n){
   if(skip(n)) return;
   var cur=n.nodeValue;
   if(lastText.has(n)&&cur===lastText.get(n)) return;      // lo escribimos nosotros
   origText.set(n,cur);
+  var pe=n.parentElement;
+  if(pe&&pe.tagName==="OPTION"&&!pe.hasAttribute("value")) pe.setAttribute("value",norm(cur));   // lo que se envía sigue en castellano
   var t=tr(cur);
   if(t!==cur){ lastText.set(n,t); n.nodeValue=t; } else lastText.delete(n);
 }
