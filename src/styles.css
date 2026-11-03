@@ -1519,3 +1519,21 @@ details.chk > section{margin-top:18px}
 .np-lf{aspect-ratio:auto}
 .np-lf .pt-g{height:auto}
 .np-c .pt-g-t{font-size:14.5px} .np-c .pt-g-l{font-size:15.5px} .np-c .pt-g-n{font-size:26px} .np-c .pt-g-g{font-size:16px}
+/* panel de comparar: tarjetas */
+.czc{border-top:0; padding-top:4px}
+.czc .czg{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; border-top:0; padding-top:0}
+.czc .czg .czb,.czc .czpar{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:20px 24px; margin:0}
+.czc .czg .czb-c,.czc .czg .czb-e{border-left:1px solid var(--rule); padding-left:24px; padding-right:24px}
+.czc .czpar{margin-top:16px}
+.czc h3{font-weight:600; font-size:19px; margin:0 0 10px}
+.czdots{display:flex; gap:9px; margin:4px 0 10px}
+.czdots i{width:14px; height:14px; border-radius:50%; background:var(--rule-2)} .czdots i.on{background:var(--brand)}
+.czc .czvh em{font-family:inherit; font-style:normal; font-weight:700; font-size:19px}
+.czc .czplain{color:var(--muted); font-size:15.5px}
+.czb-e svg{margin-top:8px}
+.czc .czbar{flex-wrap:nowrap; margin:16px 0 4px}
+.czc .czbar .trk{flex:1; min-width:0; height:12px; border-radius:6px}
+.czc .czbar .pc{white-space:nowrap; font-size:16px}
+.czlink{display:block; margin:14px 0 0; padding:0; border:0; background:none; color:var(--brand); font:inherit; font-weight:600; font-size:14.5px; cursor:pointer}
+.czlink:hover{text-decoration:underline}
+@media (max-width:700px){ .czc .czg{grid-template-columns:1fr} .czc .czg .czb-e{border-top:1px solid var(--rule); padding-top:20px} .czc .czbar{flex-wrap:wrap} .czc .czbar .trk{flex:1 1 100%} .czc .czbar .pc{white-space:normal} .czc .czg .czb,.czc .czpar{padding:16px 18px} }

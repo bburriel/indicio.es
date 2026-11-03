@@ -4128,12 +4128,11 @@ function exCruce(out){
       <div class="czb czb-c czv" id="czl"></div>
       <div class="czb czb-e"><h3><span id="czeh">En números</span>${czIt("Cuánto cambia un dato cuando cambia el otro, en sus propias unidades, con el rango en el que probablemente se mueve de verdad.","Qué son los números")}</h3><div id="czeur"></div></div>
     </div>
-    <div class="czpar"><h3>¿Y entre municipios parecidos?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Marca en qué deben parecerse. Verás cuánta relación sigue ahí.</p><div class="czchips" id="cztags"></div><p class="czhelp">El porcentaje de cada botón es lo que se pierde de la relación si igualas solo eso.</p><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div></div>
-    <div class="czgo"><button type="button" class="czcard" id="czmore" aria-expanded="false" aria-controls="lbcausal"><b class="t">Entender esta relación a fondo ↓</b><span>Las comprobaciones extra, una a una</span></button></div>
+    <div class="czpar"><h3>¿Y entre municipios parecidos?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Marca en qué deben parecerse. Verás cuánta relación sigue ahí.</p><div class="czchips" id="cztags"></div><p class="czhelp">El porcentaje de cada botón es lo que se pierde de la relación si igualas solo eso.</p><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div><button type="button" class="czlink" id="czmore" aria-expanded="false" aria-controls="lbcausal"><span class="t">Ver las comprobaciones extra ▾</span></button></div>
     <p class="czc-m"><a href="/laboratorio/metodo/">Guía: de la relación a la causa →</a></p></section>`;
   if(tst) czTipBind(tst);
   const cb=document.getElementById("lbcausal"); if(cb) cb.hidden=true;
-  document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.querySelector(".t").textContent=o?"Ocultar el detalle ↑":"Entender esta relación a fondo ↓"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
+  document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.querySelector(".t").textContent=o?"Ocultar las comprobaciones ▴":"Ver las comprobaciones extra ▾"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
   const more=document.getElementById("lbmore");
   more.innerHTML=`<details class="howm"><summary>Más números de esta relación: por grupos, los que se salen de la norma y todas las relaciones</summary><div class="xsay" id="csay"></div><section class="finding" id="cquint"></section><section class="finding" id="cout"></section><section class="finding" id="cmat"></section><section class="finding" id="ccav"></section></details>`;
   drawRel(); drawMatrix(true); drawCaveats();
@@ -4157,12 +4156,12 @@ function czVerdict(r,adj){
   const plain=a<.1?`Saber ${xl} apenas ayuda a adivinar ${yl}.`:`Donde hay más ${xl}, suele haber ${r>0?"más":"menos"} ${yl}.`;
   const tipR="La r mide cuánto van juntos dos datos, de −1 a +1. Cerca de 0, no van juntos. Cerca de +1, cuando uno sube el otro también. Cerca de −1, cuando uno sube el otro baja.";
   const tipP="Repetimos la comparación de otras formas para ver si la relación resiste: entre municipios parecidos, dentro de cada provincia, mirando los cambios y con municipios gemelos. El detalle está en «Entender esta relación a fondo».";
-  const op=box.querySelector("details")?.open;
+  const op=box.querySelector("details")?.open, nd=Math.round(Math.min(1,a/0.7)*5);
   const tipG="Mide si los dos datos suben y bajan a la vez en los municipios. No dice que uno cause el otro.";
   box.innerHTML=`<h3>Cuánto van juntos${czIt(tipG,"Qué mide esto")}</h3>
+    <div class="czdots" role="img" aria-label="${T[i]}">${[1,2,3,4,5].map(n=>`<i class="${n<=nd?"on":""}"></i>`).join("")}</div>
     <div class="czvh"><em>${T[i]}</em>${adj?'<span class="czadj">tras igualar</span>':""}</div>
     <p class="czplain">${plain}</p>
-    <div class="czscale" role="img" aria-label="${T[i]}, r = ${rFmt(r)}"><div class="seg"><i></i><i></i><i></i><i></i><span class="czmk" style="left:${czPos(a).toFixed(1)}%"></span></div><div class="labs">${L.map(l=>`<span>${l}</span>`).join("")}</div></div>
     <details class="czdet"${op?" open":""}><summary>Más detalle</summary><p class="czr">r = ${rFmt(r)}${czIt(tipR,"Qué es la r")}</p>${CZ.lev!=null?`<p class="czpr">Comprobaciones extra: <b>supera ${CZ.passed} de ${CZ.total}</b> <span class="muted">· ${low(CZLEV[CZ.lev][0])}</span>${czIt(tipP,"Qué son las comprobaciones extra")}</p>`:""}</details>`;
   czTipBind(box);
 }
@@ -4213,12 +4212,12 @@ function czRefresh(animate){
   else { note.innerHTML=""; if(LBPOS){ LBPOS=null; drawRel(); } }
   // barra «queda» y frase
   const bar=document.getElementById("czbar"), sum=document.getElementById("czsum");
-  if(!cs.length){ bar.innerHTML=`<span class="q">Relación que queda</span><span class="trk"><span class="kp" style="width:100%"></span></span><span class="pc"><b>100${NB}%</b>${czIt(CZTIPQ,"Qué mide la relación que queda")}</span>`; czTipBind(bar);
+  if(!cs.length){ bar.innerHTML=`<span class="trk"><span class="kp" style="width:100%"></span></span><span class="pc">Queda el <b>100${NB}%</b> de la relación${czIt(CZTIPQ,"Qué mide la relación que queda")}</span>`; czTipBind(bar);
     sum.innerHTML=CZ.suspect?`Prueba con <b>${CZ.suspect==="prov"?"la provincia":CNAME[CZ.suspect]}</b>: es la que más cambia la relación.`:"Marca algo para ver cuánta relación queda.";
     czVerdict(base.r,false); czEuros(x,y,cs,w); czNotes(); return; }
   const pfin=partialR(x,y,cs,w), left=pfin&&Math.sign(pfin.r)===Math.sign(base.r)?Math.min(a0,Math.abs(pfin.r)):0, share=a0?left/a0:0;
   let prev=a0, top=null; cs.forEach((c,i)=>{ const p=partialR(x,y,cs.slice(0,i+1),w); const now=p?(Math.sign(p.r)===Math.sign(base.r)?Math.abs(p.r):0):prev; const lost=Math.max(0,prev-now); if(!top||lost>top.lost) top={c,lost}; prev=Math.min(prev,now); });
-  bar.innerHTML=`<span class="q">Relación que queda</span><span class="trk"><span class="kp" style="width:${Math.max(0,Math.min(100,share*100)).toFixed(1)}%"></span></span><span class="pc"><b>${nf0.format(share*100)}${NB}%</b>${czIt(CZTIPQ,"Qué mide la relación que queda")}</span>`; czTipBind(bar);
+  bar.innerHTML=`<span class="trk"><span class="kp" style="width:${Math.max(0,Math.min(100,share*100)).toFixed(1)}%"></span></span><span class="pc">Queda el <b>${nf0.format(share*100)}${NB}%</b> de la relación${czIt(CZTIPQ,"Qué mide la relación que queda")}</span>`; czTipBind(bar);
   const flip=pfin&&Math.sign(pfin.r)!==Math.sign(base.r)&&Math.abs(pfin.r)>=0.1, verb=flip?"cambia de sentido":share<0.25?"casi desaparece":share<0.6?"se debilita mucho":share<0.85?"se debilita algo":"apenas cambia";
   sum.innerHTML=`Si los municipios fueran iguales en ${cs.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")}, la relación <b>${verb}</b>${top&&top.lost/a0>=0.15?`: ${top.c==="prov"?"la provincia":CNAME[top.c]} es lo que más pesa`:""}.`;
   czVerdict(pfin?pfin.r:base.r,true); czEuros(x,y,cs,w); czNotes();
@@ -4240,21 +4239,21 @@ function czEuros(x,y,cs,w){
   const sig=o=>o.ci&&(o.ci[0]>0||o.ci[1]<0), stTxt=unitTxt(x,st).replace(/^1 punto$/,"punto");
   const rows=e1?[["Sin igualar",e0,"g"],["Tras igualar",e1,"b"]]:[["Estimación",e0,"b"]];
   const lo=Math.min(0,...rows.map(r=>r[1].ci?r[1].ci[0]:r[1].b)), hi=Math.max(0,...rows.map(r=>r[1].ci?r[1].ci[1]:r[1].b)), pad=(hi-lo||1)*0.06;
-  const W=Math.max(260,Math.round(box.clientWidth||340)), m=10, X=v=>m+(v-lo+pad)/(hi-lo+2*pad)*(W-2*m), P=50, H=rows.length*P+24;
-  const step=d3.tickStep(lo,hi,5), dg=step>=1?0:step>=0.1?1:2, tf=new Intl.NumberFormat("es-ES",{minimumFractionDigits:dg,maximumFractionDigits:dg});
+  const W=Math.max(260,Math.round(box.clientWidth||340)), m=10, X=v=>m+(v-lo+pad)/(hi-lo+2*pad)*(W-2*m), P=rows.length>1?44:34, H=rows.length*P+22;
+  const step=d3.tickStep(lo,hi,3), dg=step>=1?0:step>=0.1?1:2, tf=new Intl.NumberFormat("es-ES",{minimumFractionDigits:dg,maximumFractionDigits:dg});
   const tk=v=>(v>0?"+":v<0?"−":"")+tf.format(Math.abs(v));
   let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Efecto estimado con su intervalo del 95 %, respecto a cero">`;
-  d3.ticks(lo,hi,5).forEach(v=>{ s+=`<line class="cze-t" x1="${X(v)}" x2="${X(v)}" y1="4" y2="${rows.length*P}"/><text class="cze-x" x="${X(v)}" y="${rows.length*P+16}" text-anchor="middle">${v===0?"0":tk(v)}</text>`; });
+  d3.ticks(lo,hi,3).forEach(v=>{ s+=`<line class="cze-t" x1="${X(v)}" x2="${X(v)}" y1="4" y2="${rows.length*P}"/><text class="cze-x" x="${X(v)}" y="${rows.length*P+16}" text-anchor="middle">${v===0?"0":tk(v)}</text>`; });
   s+=`<line class="cze-0" x1="${X(0)}" x2="${X(0)}" y1="2" y2="${rows.length*P}"/>`;
-  rows.forEach(([lab,o,c],i)=>{ const y0=i*P, cy=y0+34, a=o.ci?X(o.ci[0]):X(o.b), b=o.ci?X(o.ci[1]):X(o.b);
-    s+=`<text class="cze-l ${c}" x="${m}" y="${y0+16}">${lab}: <tspan>${sv(o.b)}</tspan>${esc(rng(o))}</text><rect class="cze-b ${c}" x="${a}" y="${cy-5}" width="${Math.max(2,b-a)}" height="10" rx="5"/><circle class="cze-d ${c}" cx="${X(o.b)}" cy="${cy}" r="7"/>`; });
+  rows.forEach(([lab,o,c],i)=>{ const y0=i*P, cy=y0+(e1?28:16), a=o.ci?X(o.ci[0]):X(o.b), b=o.ci?X(o.ci[1]):X(o.b);
+    s+=(e1?`<text class="cze-l ${c}" x="${m}" y="${y0+12}">${lab}</text>`:"")+`<rect class="cze-b ${c}" x="${a}" y="${cy-5}" width="${Math.max(2,b-a)}" height="10" rx="5"/><circle class="cze-d ${c}" cx="${X(o.b)}" cy="${cy}" r="7"/>`; });
   s+=`</svg>`;
   const un=f==="eur"?"euros":f==="years"?"años":f==="int"?"habitantes":"puntos";
   const nd=e1?e0.n-e1.n:0, nTxt=nd>0?` Faltan datos de ${nf0.format(nd)} municipio${nd===1?"":"s"} en lo que descuentas.`:"";
   const op=box.querySelector("details")?.open;
   box.innerHTML=`<div class="czbigrow"><span class="czbig">${sv(e.b)}</span><span class="czsent">En media, por cada ${stTxt} más de ${low(labK(x))}, ${low(labK(y))} es <b>${unitTxt(y,e.b)} ${e.b>=0?"mayor":"menor"}</b>${cs.length?" entre municipios parecidos":""}.</span></div>${s}
     <p class="czvd ${sig(e)?"ok":"nz"}">${sig(e)?"Hay un efecto claro":"No se puede asegurar que haya efecto"}${czIt(sig(e)?"El rango probable no toca el cero, así que es poco probable que sea casualidad.":"El rango probable incluye el cero: con estos datos no se puede asegurar que haya efecto, podría ser casualidad.","Qué significa")}</p>
-    <details class="czdet"${op?" open":""}><summary>Ver rango y detalle</summary><p class="czcap">Escala en ${un}. El 0 es «sin efecto»; la barra marca el rango probable.${czIt("Es el intervalo del 95 %: si repitiéramos el cálculo con otros municipios parecidos, el resultado caería dentro de este rango 95 de cada 100 veces.","Qué es el rango probable")}</p>
+    <details class="czdet"${op?" open":""}><summary>Ver rango y detalle</summary><p class="czm">Rango probable: ${rows.map(([lab,o])=>`${e1?lab.toLowerCase()+" ":""}<b>${sv(o.b)}</b>${esc(rng(o))}`).join("; ")}.</p><p class="czcap">Escala en ${un}. El 0 es «sin efecto»; la barra marca el rango probable.${czIt("Es el intervalo del 95 %: si repitiéramos el cálculo con otros municipios parecidos, el resultado caería dentro de este rango 95 de cada 100 veces.","Qué es el rango probable")}</p>
     <p class="czm">Calculado con <b>${nf0.format(e.n)}</b> municipios.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}</p></details>`; czTipBind(box);
 }
 function adjScatter(box,x,y,cs,w,animate){
