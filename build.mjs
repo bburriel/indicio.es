@@ -162,7 +162,7 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
 }
 
 // ---------- laboratorio, municipios, quién soy, comparar ----------
-for(const route of ["/laboratorio/","/laboratorio/metodo/","/municipio/","/quien-soy/","/quien-soy/contacto/","/comparar/"]){
+for(const route of ["/laboratorio/","/laboratorio/metodo/","/laboratorio/datos/","/municipio/","/quien-soy/","/quien-soy/contacto/","/comparar/"]){
   const P=PAGES[route];
   const main=snapshot(route)||`<header class="phead"><h1>${esc(P.t.replace(" · Indicio",""))}</h1><p class="dek">${esc(P.d)}</p></header><p class="loading">Cargando datos…</p>`;
   page({route,title:P.t,desc:P.d,main,robots:route==="/comparar/"?"noindex,follow":""});
