@@ -348,10 +348,10 @@ function realChart(parent,opts){
 const S3=(r,d,key)=>[{n:r[F.name],v:d.s[key],c:"--s-mun",main:true},{n:"Provincia",v:REFS.prov[r[F.prov]][key],c:"--s-prov"},{n:"España",v:REFS.es[key],c:"--s-es"}];
 
 // barras horizontales: [{l, v, me}] con línea de referencia opcional
-function hbars(parent,rows,{fmt,ref,refLabel,color,scroll,max,min,wide}={}){
+function hbars(parent,rows,{fmt,ref,refLabel,color,scroll,max,min,wide,wrap}={}){
   const f=fmt||(v=>nf1.format(v)); const vals=rows.map(r=>r.v).filter(v=>v!=null);
   const lo=min!=null?min:Math.min(0,d3.min(vals)), hi=max!=null?max:Math.max(0,d3.max(vals.concat(ref!=null?[ref]:[])));
-  const w=add(parent,"div","hbars"+(scroll?" scroll":"")+(wide?" wide":""));
+  const w=add(parent,"div","hbars"+(scroll?" scroll":"")+(wide?" wide":"")+(wrap?" wrapl":""));
   w.innerHTML=rows.map(r=>{ const z=(0-lo)/(hi-lo)*100, p=(r.v-lo)/(hi-lo)*100;
     const left=Math.min(z,p), width=Math.max(0.6,Math.abs(p-z));
     return `<div class="hb${r.me?" me":""}"><span title="${esc(r.l)}">${esc(r.l)}</span><span class="t"><i style="left:${left}%;width:${width}%;background:${r.c?`var(${r.c})`:(color?`var(${color})`:(r.v<0?"var(--neg)":"var(--stone)"))}"></i>${ref!=null?`<b class="ref" style="left:${(ref-lo)/(hi-lo)*100}%" title="${esc(refLabel||"")}"></b>`:""}</span><em>${f(r.v)}</em></div>`; }).join("");
@@ -3313,7 +3313,7 @@ async function studyPens(B){
     const rows=gr.map((g,i)=>({l:g,v:T[i]/1e6,c:i>=13?"--rust":(i>=10?"--mustard":"--stone")})); const f=fig(d,{title:"Población de España por edad, 1 de enero de 2025 (millones de personas, tramos de cinco años)",source:"En granate, 65 años o más; en ocre, 50 a 64, los que se jubilarán en los próximos quince años. Fuente: INE, Estadística Continua de Población."});
     hbars(f.body,rows,{fmt:v=>nf1.format(v)+" M",max:Math.max(...rows.map(r=>r.v))}); };
   G.pasado=d=>{ const f=fig(d,{title:`Qué ha movido el gasto en pensiones entre ${y13} y ${Y} (puntos de PIB)`,source:`Del ${pc(sPast)} al ${pc(ex(Y))} del PIB. Se aplican los cambios uno tras otro: primero los pensionistas por ocupado, luego el peso de cada pensión. Fuente: Eurostat; cálculo de Indicio.`});
-    hbars(f.body,[{l:"Pensionistas por cada ocupado",v:dR,c:"--olive"},{l:"Peso de cada pensión frente a lo que produce un ocupado",v:dG,c:"--rust"},{l:"Total",v:ex(Y)-sPast,c:"--ink"}],{fmt:v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" pts",min:-2,max:2.5});
+    hbars(f.body,[{l:"Pensionistas por cada ocupado",v:dR,c:"--olive"},{l:"Peso de cada pensión frente a lo que produce un ocupado",v:dG,c:"--rust"},{l:"Total",v:ex(Y)-sPast,c:"--ink"}],{fmt:v=>(v<0?"−":"+")+nf1.format(Math.abs(v))+" pts",min:-2,max:2.5,wrap:true});
     const g2=add(d,"div","cols2"), ys=yrs.filter(y=>y>=y13&&ben(y)&&emp(y)), xt=[ys[0],ys[Math.floor(ys.length/2)],ys[ys.length-1]];
     lineChart(g2,{title:"Pensionistas por cada ocupado",source:"Ocupados de 20 a 64 años. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>Dn(y).r),c:"--olive",main:true}],years:ys,xticks:xt,fmt:v=>nf2.format(v),tickFmt:v=>nf2.format(v)});
     lineChart(g2,{title:"Peso de cada pensión frente al PIB por ocupado",source:"Gasto por pensionista dividido entre el PIB por ocupado. Fuente: Eurostat.",series:[{n:"España",v:ys.map(y=>Dn(y).g*100),c:"--rust",main:true}],years:ys,xticks:xt,fmt:pc,tickFmt:v=>nf0.format(v)+"%"}); };

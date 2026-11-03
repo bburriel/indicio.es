@@ -13,9 +13,9 @@ En España hay hoy **{{m5064|n1}} millones de personas de 50 a 64 años** y {{p6
 
 [[grafico:piramide]]
 
-Las pensiones cuestan hoy el **{{gasto0|pct1}} del PIB**, unos {{gastoMM|n0}} mil millones de euros al año. La pregunta de si ese gasto es sostenible suele despacharse con un sí o un no, según quién hable. Aquí se hace otra cosa: mirar de dónde viene el gasto, qué trae la demografía y cuánto habría que mover cada palanca para que el sistema quepa.
+Las pensiones cuestan hoy el **{{gasto0|pct1}} del PIB**, unos {{gastoMM|n0}} mil millones de euros al año. Que ese gasto sea sostenible depende de cuánto se considere asumible y de lo que traiga la demografía en las próximas décadas. El análisis repasa de dónde viene el gasto, qué cambiará con la jubilación del baby boom y cuánto habría que mover cada variable para mantenerlo dentro de un límite.
 
-Para eso hay que decir qué significa «cabe». Aquí: que en 2050, cuando el baby boom ya esté jubilado, el gasto no pase de la cifra de hoy más {{limP|n0}} puntos de PIB, es decir, el **{{lim|pct1}}**, unos {{limMM|n0}} mil millones de euros más al año. Es casi lo que proyecta la AIReF ({{aireF|pct1}}); Fedea llega a {{fedea|pct1}}. Es una elección, no un dato, y al final puedes moverla.
+Ese límite es que en 2050, con el baby boom ya jubilado, el gasto no supere el actual en más de {{limP|n0}} puntos de PIB: el **{{lim|pct1}}**, unos {{limMM|n0}} mil millones de euros más al año. Es una cifra próxima a las proyecciones de dos instituciones para el gasto en pensiones en 2050: la Autoridad Independiente de Responsabilidad Fiscal (AIReF), el organismo público que vigila las cuentas públicas, lo sitúa en el {{aireF|pct1}} del PIB, y Fedea, un centro de estudios económicos privado, en el {{fedea|pct1}}. Son estimaciones hechas con modelos más completos que el de este análisis. El límite es un criterio, no un dato, y el simulador del final permite modificarlo. En los gráficos, «cabe» significa que el gasto queda dentro de ese límite.
 
 ## Dónde estamos: del {{gastoAnt|pct1}} al {{gasto0|pct1}} del PIB
 
@@ -55,7 +55,7 @@ Si solo cambia la demografía y cada pensión mantiene su peso de hoy, el gasto 
 
 ## Cuatro palancas, y ninguna basta sola
 
-Hay cuatro cosas que se pueden mover: **cuánta gente trabaja**, **cuánta gente en edad de trabajar hay** (la inmigración), **cuándo se jubila la gente** y **cuánto pesa cada pensión** frente a lo que produce un trabajador. En todos los casos la demografía es la misma, la de Eurostat. Probadas una a una, con un valor ambicioso, ninguna llega al límite.
+Hay dos formas de actuar. La primera es **reducir el coste de las pensiones**, con dos palancas: **cuánto pesa cada pensión** frente a lo que produce un trabajador (por ejemplo, actualizándolas solo con el IPC) y **cuándo se jubila la gente**, que cambia el número de pensionistas. La segunda es **aumentar el PIB** sobre el que se mide el gasto, también con dos: **cuánta gente trabaja** y **cuánta gente en edad de trabajar hay**, que depende sobre todo de la inmigración. En todos los casos la demografía es la misma, la de Eurostat. Probadas una a una, con un valor ambicioso, ninguna llega al límite.
 
 [[grafico:palancas]]
 

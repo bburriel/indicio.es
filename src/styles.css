@@ -1960,3 +1960,6 @@ details.chk > section{margin-top:18px}
 @media (max-width:900px){ .rk-grid{grid-template-columns:minmax(0,1fr)} .rk-box.wide .rk-rows{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:520px){ .rk-box > h2{padding:22px 20px 14px} .rk-row{padding:18px 20px} .rk-row b{font-size:22px} }
 @media (prefers-reduced-motion:reduce){ .rk-box,.rk-row,.rk-row small,.rk-ar{transition:none} .rk-row:hover .rk-ar{transform:none} }
+/* barras horizontales con etiquetas largas: se parten en varias líneas en lugar de cortarse con «…» */
+.hbars.wrapl .hb{grid-template-columns:minmax(100px,min(190px,38%)) minmax(0,1fr) 62px; align-items:center}
+.hbars.wrapl .hb > span:first-child{white-space:normal; overflow:visible; text-overflow:clip; line-height:1.25; padding:3px 0}
