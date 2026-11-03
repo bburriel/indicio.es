@@ -1931,3 +1931,23 @@ details.chk > section{margin-top:18px}
 #abres{margin:0; font-size:14.5px; color:var(--ink-2)}
 .ab-tips{margin-top:56px}
 @media (max-width:640px){ .ab-fm{grid-template-columns:minmax(0,1fr); gap:22px} .ab-tips{margin-top:40px} }
+
+/* ---- Índice de rankings (/rankings/): cuatro cuadros por tema, con los enlaces dentro ---- */
+.rk-grid{--rk-on:#fff; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; padding:32px 0 8px}
+:root[data-theme="dark"] .rk-grid{--brand:#d0505f; --rk-on:#191a17}
+.rk-box{display:flex; flex-direction:column; border:1px solid var(--rule); border-radius:16px; overflow:hidden; background:var(--card); transition:border-color .2s, box-shadow .2s}
+.rk-box:hover{border-color:var(--rule-2); box-shadow:0 14px 30px -22px rgba(28,27,25,.5)}
+.rk-box.wide{grid-column:1/-1}
+.rk-box > h2{font-family:inherit; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--brand); padding:26px 28px 18px; margin:0}
+.rk-box.wide .rk-rows{display:grid; grid-template-columns:repeat(2,minmax(0,1fr))}
+.rk-row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 28px; border-top:1px solid var(--rule); text-decoration:none; color:var(--ink); transition:background .2s, color .2s}
+.rk-row b{display:block; font-family:var(--serif); font-weight:500; font-size:25px; line-height:1.2; letter-spacing:-.01em}
+.rk-row small{display:block; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--brand); margin-bottom:6px; transition:color .2s}
+.rk-ar{flex:none; color:var(--brand); transition:transform .2s, color .2s}
+.rk-row:hover,.rk-row:focus-visible{background:var(--brand); color:var(--rk-on); outline:none}
+.rk-row:hover small,.rk-row:focus-visible small,.rk-row:hover .rk-ar,.rk-row:focus-visible .rk-ar{color:var(--rk-on)}
+.rk-row:hover .rk-ar,.rk-row:focus-visible .rk-ar{transform:translateX(5px)}
+.rk-row:focus-visible{outline:2px solid var(--brand); outline-offset:-2px}
+@media (max-width:900px){ .rk-grid{grid-template-columns:minmax(0,1fr)} .rk-box.wide .rk-rows{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:520px){ .rk-box > h2{padding:22px 20px 14px} .rk-row{padding:18px 20px} .rk-row b{font-size:22px} }
+@media (prefers-reduced-motion:reduce){ .rk-box,.rk-row,.rk-row small,.rk-ar{transition:none} .rk-row:hover .rk-ar{transform:none} }
