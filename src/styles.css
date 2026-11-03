@@ -209,18 +209,19 @@ label.chk{display:flex; align-items:center; gap:7px; font-size:14px; color:var(-
 .glance td{padding:8px 10px 8px 0; border-bottom:1px solid var(--rule); vertical-align:middle}
 .glance tr.grp td{padding-top:18px; font-weight:700; font-size:14px; color:var(--ink); border-bottom:1px solid var(--rule-2)}
 .glance td.lab small{display:block; color:var(--muted); font-size:12.5px}
-/* icono de ayuda (una sola pieza para toda la web): la «i» del logotipo (ı con el punto en granate) dentro de un
-   círculo rosado tenue que se ve siempre, para que se lea como botón. Es un SVG (IQ_SVG en app.js), así el punto
-   queda siempre sobre el palo, sin depender de la fuente. Al pasar el ratón el círculo se intensifica. */
-.iq{display:inline-flex; align-items:center; justify-content:center; flex:none; width:20px; height:20px; margin-left:4px; padding:0;
-    border:0; background:none; color:var(--ink-2); cursor:help; vertical-align:middle; line-height:1}
-.iq .iqs{display:block; width:20px; height:20px; overflow:visible}
-.iq .iqc{fill:var(--mark); stroke:var(--acc); stroke-width:1; transition:fill .12s, stroke .12s}
-.iq .iqg{fill:currentColor; transition:fill .12s}
-.iq .iqd{fill:var(--brand); transition:fill .12s}
-.iq:hover .iqc,.iq:focus-visible .iqc{fill:var(--acc); stroke:var(--brand)}
-.iq:hover,.iq:focus-visible{color:var(--brand)}
+/* icono de ayuda (una sola pieza para toda la web): un círculo de color con la «i» del logotipo recortada, de modo
+   que la letra y su punto son del color del fondo. Es un SVG (IQ_SVG en app.js) con un solo trazo y relleno
+   par-impar, así el punto cae siempre sobre el palo. El color es el del texto de su entorno: gris sobre papel,
+   el verde o el gris de la etiqueta donde esté, blanco sobre el granate. Al pasar el ratón sube a granate
+   (salvo dentro de una etiqueta de color, que conserva el suyo y se oscurece un poco). */
+.iq{display:inline-flex; align-items:center; justify-content:center; flex:none; width:17px; height:17px; margin-left:5px; padding:0;
+    border:0; background:none; color:var(--muted); cursor:help; vertical-align:middle; line-height:1; opacity:.8; transition:color .12s, opacity .12s}
+.iq .iqs{display:block; width:17px; height:17px; fill:currentColor}
+.iq:hover,.iq:focus-visible{color:var(--brand); opacity:1}
 .iq:focus-visible{outline:2px solid var(--brand); outline-offset:2px; border-radius:50%}
+.czvd .iq,.czt .iq{color:inherit}
+.czvd .iq:hover,.czvd .iq:focus-visible{color:inherit; opacity:1}
+.czchip.sus .iq{color:var(--mustard)}
 .glance td.v{font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums}
 .glance td.e{color:var(--ink-2); white-space:nowrap; font-variant-numeric:tabular-nums}
 .glance td.pos{width:34%}
@@ -1557,9 +1558,7 @@ details.chk > section{margin-top:18px}
 .czwarn2{width:18px; height:18px; margin:0 8px 0 -6px; padding:0; border:0; border-radius:50%; background:color-mix(in srgb,var(--mustard) 25%,transparent); color:var(--mustard); font:700 12px/18px var(--sans,system-ui); cursor:pointer}
 .czchip.on .czwarn2{background:#fff; color:var(--brand)}
 .czchip.on .czt.su{background:#fff; color:var(--brand)}
-.czchip.on .iq{color:#fff}
-.czchip.on .iq .iqc{fill:rgba(255,255,255,.22); stroke:rgba(255,255,255,.55)}
-.czchip.on .iq .iqd{fill:#fff}
+.czchip.on .iq,.czchip.on.sus .iq{color:#fff; opacity:1}
 .czpar .czbar{margin:20px 0 0}
 .czpar .czc-s:empty{display:none}
 .czpar .czlink{margin-top:18px}
