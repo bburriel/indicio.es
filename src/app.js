@@ -6207,9 +6207,9 @@ async function renderInicio(){
   // mientras llega portada.json (unos cientos de bytes) sigue a la vista la portada pre-renderizada
   const D=await loadPortada(); if(location.pathname!=="/") return;
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
-  // «Puesto a prueba»: una pieza por fila, imagen y texto, alternando el lado de la imagen; en el móvil, lista con miniatura
+  // «Puesto a prueba»: una pieza por fila, gráfico y texto, alternando el lado del gráfico; en el móvil, el gráfico debajo del texto
   const tira=PTIRA.filter(([id])=>byId[id]).map(([id,b,t])=>{ const S=byId[id];
-    return `<a class="pt-n" href="/preguntas/${id}/"><div class="pt-im">${ptIll(S)}</div><div class="pt-tx"><div class="pt-k">${esc(TOPICL(S.tema))}</div><h3>${esc(S.t)}</h3><p class="pt-vd">${esc(b)}</p><p class="pt-sm">${esc(t)}</p><span class="pt-go">Ver la respuesta →</span></div></a>`; }).join("");
+    return `<a class="pt-n" href="/preguntas/${id}/"><figure class="pt-fig" data-cv="${id}"></figure><div class="pt-tx"><div class="pt-k">${esc(TOPICL(S.tema))}</div><h3>${esc(S.t)}</h3><p class="pt-vd">${esc(b)}</p><p class="pt-sm">${esc(t)}</p><span class="pt-go">Ver la respuesta →</span></div></a>`; }).join("");
   const autor=(window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author&&window.__INDICIO.site.author.name)||"";
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<div class="pt-lema"><b>Indicio</b> · Preguntas reales. Respuestas con datos públicos.</div>
@@ -6236,6 +6236,9 @@ async function renderInicio(){
   <section class="ed-sec"><div class="ed-k">Por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   heroCarBind(view.querySelector(".pt-car"));
+  // el gráfico de cabecera de cada análisis (data/covers.json), con su pie; si falta, su ilustración
+  loadCovers().then(cv=>view.querySelectorAll(".pt-fig[data-cv]").forEach(f=>{ const c=coverOf(f.dataset.cv,cv);
+    f.innerHTML=c?c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`:`<div class="pt-im">${ptIll(byId[f.dataset.cv])}</div>`; }));
   bindBig("q2");
   // la nube de municipios: imagen fija y, encima, qué municipio es cada punto
   const ar=document.getElementById("qhart");
