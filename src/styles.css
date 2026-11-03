@@ -519,9 +519,9 @@ ul.semaforo li.ok .ic{background:#4f8a5b} ul.semaforo li.ko .ic{background:var(-
 .dest{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
 .dest > div{background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:12px 14px; font-size:14.5px; line-height:1.4}
 .dest .pct{display:block; font-size:21px; font-weight:800; color:var(--rust)}
-.dest .pct.lo{color:var(--slate)}
 .dest small{display:block; font-size:12.5px; color:var(--muted); margin-top:4px}
-.dstrip{position:relative; height:8px; margin:10px 0 2px; border-radius:4px; background:linear-gradient(90deg,var(--band),var(--mark))}
+.dstrip{position:relative; height:8px; margin:10px 0 2px; border-radius:4px; background:var(--band)}
+.dstrip-x{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-bottom:2px}
 .dstrip i{position:absolute; top:-4px; width:16px; height:16px; border-radius:50%; background:var(--rust); border:2px solid var(--card); transform:translateX(-50%)}
 .acc{border-top:1px solid var(--rule-2)}
 .accrow{border-bottom:1px solid var(--rule)}
