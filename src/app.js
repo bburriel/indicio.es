@@ -1814,7 +1814,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(q.has("p")) EX.p=PROVS[q.get("p")]?q.get("p"):""; if(q.has("t")) EX.t=EXSIZES.some(s=>s[0]===q.get("t"))?q.get("t"):""; if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
   if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=["ccaa","prov","size","q"].includes(q.get("gb"))?q.get("gb"):"ccaa"; if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa","eu"].includes(q.get("u"))?q.get("u"):"";
   if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0; EX.dg=["ccaa","prov","size","renta"].includes(q.get("dg"))?q.get("dg"):"";
-  EX.ya=+q.get("ya")||null; EX.yb=+q.get("yb")||null; EX.pz=/^(es|c\d\d|p\d\d)$/.test(q.get("pz")||"")?q.get("pz"):"es"; EX.pc=["es","past","none"].includes(q.get("pc"))?q.get("pc"):"es"; EX.pp=q.get("pp")==="0"?0:1; EX.cf=COMPF[q.get("cf")]?q.get("cf"):"sector"; EX.co=+q.get("co")||0;
+  EX.ya=+q.get("ya")||null; EX.yb=+q.get("yb")||null; EX.pz=/^(es|c\d\d|p\d\d)$/.test(q.get("pz")||"")?q.get("pz"):"es"; EX.pc=["es","past","other","none"].includes(q.get("pc"))?q.get("pc"):"es"; EX.pq=/^(es|c\d\d|p\d\d)$/.test(q.get("pq")||"")?q.get("pq"):""; EX.py=q.get("py")==="past"?"past":""; EX.pp=q.get("pp")==="0"?0:1; EX.cf=COMPF[q.get("cf")]?q.get("cf"):"sector"; EX.co=+q.get("co")||0;
   if(EX.v==="burbujas"&&q.has("sz")) EX.sz=q.get("sz");
   if(q.has("e")) ES_.sel=q.get("e").split(",").filter(k=>EVOK[k]).slice(0,6); if(q.has("b")) ES_.base=+q.get("b"); if(q.has("r")) REAL=q.get("r")==="1";
   if(q.has("lv")) ES_.lev=["es","prov","mun"].includes(q.get("lv"))?q.get("lv"):"es"; if(EX.v==="evolucion"&&q.has("m")&&BYCODE.has(q.get("m"))) ES_.mun=q.get("m");
@@ -1829,7 +1829,7 @@ function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParam
   if(S.v==="grupos") q.set("gb",S.gb); if(S.o) q.set("o",S.o); if(!S.w) q.set("w","0"); if(S.lx) q.set("lx","1");
   if(S.v==="mapa"&&S.bv) q.set("bv","1"); if((S.v==="mapa"||S.v==="pendientes")&&S.u) q.set("u",S.u); if(S.v==="burbujas"&&S.sz) q.set("sz",S.sz);
   if(S.v==="pendientes"){ ["d","p","t","c","o","w","lx"].forEach(k=>q.delete(k)); q.set("d",S.d[0]); if(S.ya) q.set("ya",S.ya); if(S.yb) q.set("yb",S.yb); if(S.p) q.set("p",S.p); }
-  if(S.v==="piramide"){ ["d","p","t","c","o","w","lx","m"].forEach(k=>q.delete(k)); if(S.pz&&S.pz!=="es") q.set("pz",S.pz); if(S.pc&&S.pc!=="es") q.set("pc",S.pc); if(S.pc==="none"&&!S.pp) q.set("pp","0"); }
+  if(S.v==="piramide"){ ["d","p","t","c","o","w","lx","m"].forEach(k=>q.delete(k)); if(S.pz&&S.pz!=="es") q.set("pz",S.pz); if(S.pc&&S.pc!=="es") q.set("pc",S.pc); if(S.pc==="other"){ if(S.pq) q.set("pq",S.pq); if(S.py) q.set("py",S.py); } if(S.pc==="none"&&!S.pp) q.set("pp","0"); }
   if(S.v==="composicion"){ ["d","o","w","lx","c"].forEach(k=>q.delete(k)); q.set("cf",S.cf||"sector"); q.set("gb",S.gb); if(S.co) q.set("co",S.co); } if(S.v==="distribucion"&&S.dg) q.set("dg",S.dg);
   if(S.v==="cruce"){ if(S.u) q.set("u",S.u); if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ ["d","p","t","c","o","m"].forEach(k=>q.delete(k)); q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es"){ q.set("lv",ES_.lev); if(ES_.mun) q.set("m",ES_.mun); } }
@@ -2634,15 +2634,23 @@ async function exPendientes(out){
 // ---------- pirámide de población ----------
 let PIR=null, PIR_P=null; const loadPir=()=>PIR_P||(PIR_P=getJSON("/data/piramide.json").then(d=>PIR=d).catch(e=>{ PIR_P=null; throw e; }));
 const pirGet=z=>!PIR?null:z==="es"?PIR.es:z.startsWith("c")?(PIR.ccaa||{})[z.slice(1)]:z.startsWith("p")?(PIR.prov||{})[z.slice(1)]:null;
+const pirGetPast=z=>!PIR||!PIR.pasado?null:z==="es"?PIR.pasado.es:z.startsWith("c")?(PIR.pasado.ccaa||{})[z.slice(1)]:z.startsWith("p")?(PIR.pasado.prov||{})[z.slice(1)]:null;
+const pirYear=f=>f?String(f).slice(0,4):"";
+// con qué se compara: España, el mismo lugar hace años, otro lugar (hoy o hace años) o nada
+function pirCmp(z){
+  if(EX.pc==="none") return null;
+  if(EX.pc==="past"){ const d=pirGetPast(z); return d?{d,l:`${pirName(z)} en ${pirYear(PIR.pasado.fecha)}`,past:true}:null; }
+  if(EX.pc==="other"){ const first=Object.keys(PIR.ccaa||{}).sort((a,b)=>ccName(a).localeCompare(ccName(b),"es"))[0], q=pirGet(EX.pq)&&EX.pq!==z?EX.pq:(z!=="es"?"es":first?"c"+first:"es"); const past=EX.py==="past"&&PIR.pasado; const d=past?pirGetPast(q):pirGet(q); return d?{d,l:`${pirName(q)}${past?" en "+pirYear(PIR.pasado.fecha):""}`,past:!!past}:null; }
+  return z!=="es"?{d:PIR.es,l:"España"}:null; }
 const pirName=z=>z==="es"?"España":z.startsWith("c")?ccName(z.slice(1)):provShort(PROVS[z.slice(1)]);
 async function exPiramide(out){
   out.innerHTML='<p class="loading">Cargando…</p>';
   try{ await Promise.all([loadPir(),loadRegional()]); }catch(e){ out.innerHTML='<p class="loading">Todavía no están los datos de población por edad y sexo. Hay que descargarlos con <code>python3 scripts/datos/piramide.py</code>.</p>'; return; }
   if(EX.v!=="piramide") return; exBar();
-  const z=pirGet(EX.pz)?EX.pz:"es", A=pirGet(z), cmp=EX.pc==="none"?null:EX.pc==="past"&&PIR.pasado?{d:(EX.pc==="past"?((z==="es"?PIR.pasado.es:z.startsWith("c")?(PIR.pasado.ccaa||{})[z.slice(1)]:(PIR.pasado.prov||{})[z.slice(1)])):null),l:`${pirName(z)} en ${PIR.pasado.fecha.slice(0,4)}`}:z!=="es"?{d:PIR.es,l:"España"}:null;
+  const z=pirGet(EX.pz)?EX.pz:"es", A=pirGet(z), cmp=pirCmp(z);
   const G=PIR.grupos, tot=a=>d3.sum(a.H)+d3.sum(a.M), pct=!!(cmp&&cmp.d)||EX.pp!==0, val=(a,s,i)=>pct?a[s][i]/tot(a)*100:a[s][i];
   out.innerHTML="";
-  const fg=fig(out,{title:`Población de ${pirName(z)} por edad y sexo`,sub:`${pct?"% de la población total en cada grupo de edad":"Personas en cada grupo de edad"}${cmp&&cmp.d?`. La línea: ${cmp.l}`:""}`,source:`INE, Estadística Continua de Población, ${PIR.fecha}${cmp&&cmp.d&&PIR.pasado&&EX.pc==="past"?` y ${PIR.pasado.fecha}`:""}.`});
+  const fg=fig(out,{title:`Población de ${pirName(z)} por edad y sexo`,sub:`${pct?"% de la población total en cada grupo de edad":"Personas en cada grupo de edad"}${cmp&&cmp.d?`. La línea: ${cmp.l}`:""}`,source:`INE, Estadística Continua de Población, ${PIR.fecha}${cmp&&cmp.d&&cmp.past&&PIR.pasado?` y ${PIR.pasado.fecha}`:""}.`});
   const W=Math.max(320,out.clientWidth||760), rh=Math.max(14,Math.min(22,440/G.length)), H=G.length*rh+40, cx=W/2, lw=46, half=cx-lw/2-8;
   const mx=d3.max([A,cmp&&cmp.d].filter(Boolean).flatMap(a=>G.flatMap((_,i)=>[val(a,"H",i),val(a,"M",i)]))), X=d3.scaleLinear().domain([0,mx]).nice().range([0,half]);
   const svg=d3.select(fg.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`Pirámide de población de ${pirName(z)}`);
@@ -2725,14 +2733,17 @@ const CBAR={
     wireSeg(bar,"slu",v=>{ if(isReg(k)&&!scaleOK(v,[k])){ toast("Ese dato no existe a esa escala.",2600); return; } EX.u=v; exUpdate(); });
     const a=bar.querySelector("#sla"), z=bar.querySelector("#slb"); if(a) a.addEventListener("change",e=>{ EX.ya=+e.target.value; exUpdate(); }); if(z) z.addEventListener("change",e=>{ EX.yb=+e.target.value; exUpdate(); }); },
   piramide(bar){ const opt=(v,l)=>`<option value="${v}" ${v===(EX.pz||"es")?"selected":""}>${esc(l)}</option>`;
+    const pyOpts=sel=>{ const o=(v,l)=>`<option value="${v}" ${v===sel?"selected":""}>${esc(l)}</option>`; return o("es","España")+(cc.length?`<optgroup label="Comunidades">${cc.map(c=>o("c"+c,ccName(c))).join("")}</optgroup>`:"")+(pv.length?`<optgroup label="Provincias">${pv.map(p=>o("p"+p,provShort(PROVS[p]))).join("")}</optgroup>`:""); };
+    const pyDef=()=>(EX.pz&&EX.pz!=="es")?"es":(cc[0]?"c"+cc[0]:"es");
     const cc=PIR&&PIR.ccaa?Object.keys(PIR.ccaa).sort((a,b)=>ccName(a).localeCompare(ccName(b),"es")):[], pv=PIR&&PIR.prov?Object.keys(PIR.prov).filter(p=>PROVS[p]).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")):[];
     bar.innerHTML=typesStep()+`<div class="lb-step"><h4><i>2</i>Dónde</h4><select class="sel" id="pyz" aria-label="Dónde">${opt("es","España")}${cc.length?`<optgroup label="Comunidades">${cc.map(c=>opt("c"+c,ccName(c))).join("")}</optgroup>`:""}${pv.length?`<optgroup label="Provincias">${pv.map(p=>opt("p"+p,provShort(PROVS[p]))).join("")}</optgroup>`:""}</select>
       <p class="hint">Por ahora, para España, comunidades y provincias: el INE no publica por API la población por edad de cada municipio.</p></div>
-      <div class="lb-step"><h4><i>3</i>Cómo verlo</h4><label class="lbl">Comparar con</label>${segH("pyc",EX.pc||"es",[["es",EX.pz&&EX.pz!=="es"?"España":"Nada"],...(PIR&&PIR.pasado?[["past",`Hace ${+(PIR.fecha||"").slice(0,4)-+(PIR.pasado.fecha||"").slice(0,4)} años`]]:[]),["none","Sin comparar"]])}
+      <div class="lb-step"><h4><i>3</i>Cómo verlo</h4><label class="lbl">Comparar con</label>${segH("pyc",EX.pc||"es",[["es",EX.pz&&EX.pz!=="es"?"España":"Nada"],...(PIR&&PIR.pasado?[["past",`Hace ${+(PIR.fecha||"").slice(0,4)-+(PIR.pasado.fecha||"").slice(0,4)} años`]]:[]),["other","Otro lugar"],["none","Sin comparar"]])}
+      ${EX.pc==="other"?`<label class="lbl" style="margin-top:10px" for="pyq">Otro lugar</label><select class="sel" id="pyq" aria-label="Otro lugar">${pyOpts(EX.pq||pyDef())}</select>${PIR&&PIR.pasado?`<label class="lbl" style="margin-top:10px">De cuándo</label>${segH("pyy",EX.py||"",[["","Hoy"],["past",`Hace ${+(PIR.fecha||"").slice(0,4)-+(PIR.pasado.fecha||"").slice(0,4)} años`]])}`:""}`:""}
       ${EX.pc==="none"?`<label class="chk" style="margin-top:8px"><input type="checkbox" id="pyp" ${EX.pp!==0?"checked":""}> En porcentaje del total</label>`:""}</div>`;
     wireTypes(bar);
     const s=bar.querySelector("#pyz"); if(s) s.addEventListener("change",e=>{ EX.pz=e.target.value; exUpdate(); });
-    wireSeg(bar,"pyc",v=>{ EX.pc=v; exUpdate(); }); const pp=bar.querySelector("#pyp"); if(pp) pp.addEventListener("change",e=>{ EX.pp=e.target.checked?1:0; exUpdate(); }); },
+    wireSeg(bar,"pyc",v=>{ EX.pc=v; if(v==="other"&&(!EX.pq||EX.pq===EX.pz)) EX.pq=pyDef(); exUpdate(); }); const pq=bar.querySelector("#pyq"); if(pq) pq.addEventListener("change",e=>{ EX.pq=e.target.value; exUpdate(); }); wireSeg(bar,"pyy",v=>{ EX.py=v; exUpdate(); }); const pp=bar.querySelector("#pyp"); if(pp) pp.addEventListener("change",e=>{ EX.pp=e.target.checked?1:0; exUpdate(); }); },
   composicion(bar){ const F0=COMPF[EX.cf]||COMPF.sector;
     bar.innerHTML=typesStep()+`<div class="lb-step"><h4><i>2</i>Qué reparto</h4><select class="sel" id="cof" aria-label="Qué reparto">${Object.entries(COMPF).map(([k,o])=>`<option value="${k}" ${o===F0?"selected":""}>${esc(o.l)}</option>`).join("")}</select>
       <label class="lbl" style="margin-top:10px">Agrupar por</label>${segH("cog",EX.gb,[["ccaa","Comunidad"],["prov","Provincia"],["size","Tamaño"],["q","Nivel de renta"]])}
@@ -3575,6 +3586,10 @@ const LBTIPS=[
   ["#pyc button[data-v=es]","Comparar con España","Superpone la pirámide de España, para ver en qué se diferencia."],
   ["#pyc button[data-v=past]","Comparar con el pasado","Superpone la pirámide de hace unos años, para ver cómo ha envejecido."],
   ["#pyc button[data-v=none]","Sin comparar","Solo la pirámide del lugar elegido."],
+  ["#pyc button[data-v=other]","Comparar con otro lugar","Superpone la pirámide de otra comunidad, provincia o España, para ver en qué se diferencian."],
+  ["#pyq","Otro lugar","El lugar con el que se compara. La línea negra es su pirámide."],
+  ["#pyy button[data-v='']","Hoy","Compara con la pirámide actual de ese lugar."],
+  ["#pyy button[data-v=past]","Hace años","Compara con cómo era la población de ese lugar hace unos años. Así puedes comparar un lugar de hoy con otro del pasado."],
   ["label.chk:has(#pyp)","En porcentaje","Cada barra es el porcentaje del total, no el número de personas: permite comparar lugares de distinto tamaño."],
   ["#cof","Qué reparto","Elige qué quieres ver repartido: sectores, voto, edades…"],
   ["#cog button[data-v=ccaa]","Por comunidad","Una barra por comunidad autónoma."],
@@ -3766,7 +3781,7 @@ function lbTitle(){
   if(EX.v==="burbujas") return `Provincias año a año: ${low(L(d[0]))} y ${low(L(d[1]))}`;
   if(EX.v==="matriz") return `Qué datos van juntos: ${d.length} datos, todas las parejas`;
   if(EX.v==="pendientes") return `${L(d[0])}: ${EX.ya||"antes"} frente a ${EX.yb||"ahora"}, por ${EX.u==="ccaa"?"comunidades":"provincias"}`;
-  if(EX.v==="piramide") return `Pirámide de población · ${pirName(EX.pz||"es")}`;
+  if(EX.v==="piramide") return `Pirámide de población · ${pirName(EX.pz||"es")}${EX.pc==="other"&&EX.pq?` frente a ${pirName(EX.pq)}`:""}`;
   if(EX.v==="composicion"){ const F0=COMPF[EX.cf]||COMPF.sector; return `${F0.l} por ${({ccaa:"comunidad",prov:"provincia",size:"tamaño de municipio",q:"nivel de renta"})[EX.gb]||"comunidad"}`; }
   if(EX.v==="mapa"&&EX.u) return `${L(d[0])} · por ${EX.u==="prov"?"provincias":"comunidades"}`;
   if(EX.v==="paises"&&PS.s.length){ const L=k=>SERES[k].l.replace(/ \(.*\)$/,""); return SERES&&SERES[PS.s[0]]?(PS.s.length===1?L(PS.s[0]):`${L(PS.s[0])} frente a ${listY(PS.s.slice(1).filter(k=>SERES[k]).map(k=>low(L(k))))}`):"Series"; }
