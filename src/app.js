@@ -1664,42 +1664,109 @@ function drawCaveats(){
 // COMPARAR DOS MUNICIPIOS
 // =====================================================================
 const CMPROWS=[["Población",["pop","varPob","edad","extr","migExt","migInt","solos"]],["Dinero",["renta","rentaHog","pobreza","gini","pensiones"]],["Trabajo",["paroReg","paroCensal","superiores"]],["Vivienda",["alquiler","noPrincipal","vt","alqVar"]],["Voto",["part","pp","psoe","vox","sumar"]]];
+// ---- Comparar, versión llana: una frase y dos barras por dato, sin leyenda ----
+// [clave, rótulo, qué cuenta, nombre en las frases]
+const CP_SECS=[
+  ["¿Quién vive allí?",[["extr","Población extranjera","De cada 100 vecinos, cuántos","población extranjera"],["edad","Edad media","Años",""],["varPob","Crecimiento desde 2015","Cuántos vecinos más (o menos) hay ahora",""]]],
+  ["¿Cuánto se gana?",[["renta","Renta por persona","Euros netos al año",""],["pobreza","Riesgo de pobreza","De cada 100 vecinos, cuántos","riesgo de pobreza"]]],
+  ["¿Hay trabajo y estudios?",[["paroReg","Paro registrado","De cada 100 personas de 16 a 64 años","paro registrado"],["superiores","Estudios superiores","De cada 100 adultos, cuántos","adultos con estudios superiores"]]],
+  ["¿Cómo es la vivienda?",[["alquiler","Hogares de alquiler","De cada 100 hogares, cuántos","hogares de alquiler"],["alqVar","Subida del alquiler desde 2015","Cuánto más caro, en porcentaje",""]]],
+  ["¿Cuánta gente vota?",[["part","Participación","De cada 100 con derecho a voto, cuántos votaron",""]]]];
+// tipo de comparación y cómo se nombra el dato en los números grandes y en «se parecen»
+const CP_K={
+  pop:{t:"ratio",l:"habitantes"},
+  renta:{t:"ratio",l:"renta por persona",n:"renta por persona"},
+  extr:{t:"ratio",l:"población extranjera",n:"población extranjera"},
+  alquiler:{t:"ratio",l:"hogares de alquiler",n:"hogares de alquiler"},
+  superiores:{t:"ratio",l:"estudios superiores",n:"adultos con estudios superiores"},
+  paroReg:{t:"ratio",l:"paro registrado",n:"paro registrado"},
+  pobreza:{t:"ratio",l:"riesgo de pobreza",n:"riesgo de pobreza"},
+  solos:{t:"ratio",l:"hogares de una persona",n:"hogares de una persona"},
+  noPrincipal:{t:"ratio",l:"viviendas vacías o secundarias",n:"viviendas vacías o secundarias"},
+  edad:{t:"diff",l:"edad media",n:"edad media",u:"años"},
+  varPob:{t:"diff",l:"crecimiento desde 2015",n:"crecimiento desde 2015"},
+  alqVar:{t:"diff",l:"subida del alquiler",n:"subida del alquiler desde 2015"},
+  part:{t:"diff",l:"participación",n:"participación en las elecciones"}};
+const CP_SD={}, cpG=new Intl.NumberFormat("es-ES",{maximumFractionDigits:0,useGrouping:"always"});
+function cpSd(k){ if(k in CP_SD) return CP_SD[k]; const lg=CP_K[k].t==="ratio"; const v=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null&&(!lg||z>0)).map(z=>lg?Math.log(z):z); return CP_SD[k]=d3.deviation(v)||1; }
+// cuánto se separan los dos, en desviaciones típicas de todos los municipios (null si falta un dato o no se puede medir)
+function cpZ(k,va,vb){ if(va==null||vb==null||F[k]==null) return null; const lg=CP_K[k].t==="ratio"; if(lg&&(va<=0||vb<=0)) return null; return Math.abs(lg?Math.log(va/vb):va-vb)/cpSd(k); }
+// la frase de cada dato: [antes, en negrita, después]
+function cpSentence(k,nA,nB,va,vb){
+  const f=fmtK(k), hiA=va>vb, H=hiA?nA:nB, L=hiA?nB:nA, hi=hiA?va:vb, lo=hiA?vb:va, d=hi-lo, both=`: ${f(va)} y ${f(vb)}.`, vs=`: ${f(hi)} frente a ${f(lo)}.`;
+  const row=CP_SECS.flatMap(s=>s[1]).find(r=>r[0]===k), noun=row?row[3]:"";
+  if(k==="renta"){ const p=lo>0?(hi/lo-1)*100:0; return p<2?["","Casi la misma renta",both]:["",`${H} ingresa ${cpG.format(d)}${NB}€ más`,` por persona al año (un ${nf0.format(p)}${NB}% más).`]; }
+  if(k==="edad") return d<0.3?["","Prácticamente la misma edad media",`: ${nf1.format(d)} años de diferencia.`]:["En ",`${H} la edad media es mayor`,vs];
+  if(k==="varPob"){ if(d<1) return ["","Casi igual en los dos",both]; return hi>0&&lo<0?["",`${H} ha ganado vecinos y ${L} ha perdido`,vs]:hi>0?["",`${H} ha crecido más`,vs]:["",`${H} ha perdido menos vecinos`,vs]; }
+  if(k==="alqVar"){ if(d<1) return ["","Casi igual en los dos",both]; return hi>0&&lo<0?["",`El alquiler ha subido en ${H} y bajado en ${L}`,vs]:hi>0?["El alquiler ha subido ",`más en ${H}`,vs]:["El alquiler ha bajado ",`menos en ${H}`,vs]; }
+  if(k==="part") return d<1?["","Casi igual en los dos",both]:["En ",`${H} se vota más`,`: participó el ${f(hi)} frente al ${f(lo)}.`];
+  // porcentajes de población u hogares
+  if(d<0.5||(lo>0&&hi/lo<1.06)) return ["","Casi igual en los dos",both];
+  return ["",lo>0&&hi/lo>=2?`${H} tiene más del doble de ${noun}`:`${H} tiene más ${noun}`,vs];
+}
+// los números grandes: [z, número, frase, detalle], o null
+function cpBig(k,A,Bm,va,vb){
+  const z=cpZ(k,va,vb); if(z==null) return null; const c=CP_K[k], f=fmtK(k), hiA=va>vb, H=dispName((hiA?A:Bm)[F.name]), hi=hiA?va:vb, lo=hiA?vb:va, d=hi-lo, det=`${f(hi)} frente a ${f(lo)}`;
+  if(c.t==="diff"){ if(k==="edad") return [z,`${nf1.format(d)} años`,`más de edad media en ${H}.`,det]; return [z,`${d>=10?nf0.format(d):nf1.format(d)} puntos`,`más de ${c.n} en ${H}.`,det]; }
+  const r=hi/lo;
+  if(k==="pop") return r<2?null:[z,`${r>=10?cpG.format(r):nf1.format(r)} veces`,`más habitantes tiene ${H}.`,det];
+  if(r>=3) return [z,`${nf1.format(r)} veces`,`más ${c.n} en ${H}.`,det];
+  if(r>=2) return [z,"Más del doble",`de ${c.n} en ${H}.`,det];
+  return [z,`+${nf0.format((r-1)*100)}${NB}%`,`de ${c.n} en ${H}.`,det];
+}
+// barras desde cero; si algún valor es negativo, el cero queda dentro y las negativas van a su izquierda
+function cpBars(k,items){
+  const f=fmtK(k), vs=items.map(x=>x[2]).filter(v=>v!=null), mn=Math.min(0,...vs), mx=Math.max(0,...vs), rg=(mx-mn)||1, S=66, x0=-mn/rg*S;
+  return items.map(([nm,cl,v])=>{ if(v==null) return `<div class="cp-bar ${cl}"><span class="n">${nm}</span><div class="t"><em style="left:0">sin dato</em></div></div>`;
+    const w=Math.max(Math.abs(v)/rg*S,.8), l=v<0?x0-w:x0, p=v<0?x0:x0+w;
+    return `<div class="cp-bar ${cl}"><span class="n">${nm}</span><div class="t">${mn<0?`<i class="z" style="left:${x0}%"></i>`:""}<i class="f" style="left:${l}%;width:${w}%"></i><em style="left:${p}%">${f(v)}</em></div></div>`; }).join("");
+}
+
 async function renderComparar(a,b){
   document.title="Comparar · Indicio";
   if(!a||!BYCODE.has(a)) a=lastMun&&BYCODE.has(lastMun)?lastMun:"28079";
   if(!b||!BYCODE.has(b)||b===a) b=a==="08019"?"28079":"08019";
   const A=BYCODE.get(a), Bm=BYCODE.get(b);
   view.innerHTML=pageHead("Comparar dos municipios",`Elige dos municipios y míralos lado a lado. Desde la ficha de cada municipio puedes comparar directamente con los que más se le parecen.`)+
-   `<div class="cmpbar">${[["a",A,"--rust"],["b",Bm,"--slate"]].map(([k,r,c])=>`<div><div class="who"><i style="background:var(${c})"></i>${k==="a"?"Primer":"Segundo"} municipio</div><div class="nm"><a href="#m${r[F.code]}">${esc(r[F.name])}</a></div><div class="search" id="cs-${k}" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="margin:8px 0 0;max-width:340px;flex:none"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="cq-${k}" type="search" placeholder="Cambiar por otro municipio" autocomplete="off" aria-label="Cambiar el ${k==="a"?"primer":"segundo"} municipio"><ul id="cr-${k}" class="results" role="listbox" hidden></ul></div></div>`).join("")}</div>
+   `<div class="cp-head">${[["a",A,"--rust"],["b",Bm,"--s-b"]].map(([k,r,c],i)=>`${i?`<div class="cp-vs">frente a</div>`:""}<div class="cp-who"><div class="cp-nm"><i style="background:var(${c})"></i><a href="#m${r[F.code]}">${esc(dispName(r[F.name]))}</a></div><div class="cp-sub">Provincia de ${esc(provShort(PROVS[r[F.prov]]))}${r[F.pop]!=null?" · "+nf0.format(r[F.pop])+" habitantes":""}</div><div class="search" id="cs-${k}" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="cq-${k}" type="search" placeholder="Cambiar de municipio" autocomplete="off" aria-label="Cambiar el ${k==="a"?"primer":"segundo"} municipio"><ul id="cr-${k}" class="results" role="listbox" hidden></ul></div></div>`).join("")}</div>
    <div id="cbody"></div>${methodNote()}`;
   attachSearch(document.getElementById("cq-a"),document.getElementById("cr-a"),document.getElementById("cs-a"),x=>{ navTo("comparar-"+x[F.code]+"-"+b); });
   attachSearch(document.getElementById("cq-b"),document.getElementById("cr-b"),document.getElementById("cs-b"),x=>{ navTo("comparar-"+a+"-"+x[F.code]); });
   const B=document.getElementById("cbody");
-  // tabla
-  // una fila por dato, con una escala común: dónde queda cada municipio entre todos los de España (del 1 % al 99 %; el padrón, en logaritmos)
-  const eA=esc(dispName(A[F.name])), eB=esc(dispName(Bm[F.name])), QS={};
-  const scaleOf=k=>{ if(QS[k]) return QS[k]; const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null&&(k!=="pop"||z>0)).sort(d3.ascending), T=k==="pop"?Math.log:(z=>z);
-    const lo=T(d3.quantile(vals,.01)), hi=T(d3.quantile(vals,.99)), X=z=>Math.max(0,Math.min(1,(T(z)-lo)/((hi-lo)||1)));
-    return QS[k]={X,b0:X(d3.quantile(vals,.1)),b1:X(d3.quantile(vals,.9))}; };
-  let h=`<div class="cv-h"><span><i class="a"></i>${eA}</span><span><i class="b"></i>${eB}</span><span><i class="e"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span><span class="cv-n">Cada fila va de menos a más entre los municipios de España</span></div><div class="cv">`;
-  for(const [g,ks] of CMPROWS){ h+=`<div class="cv-g">${g}</div>`;
-    for(const k of ks){ if(F[k]==null||!CATK[k]) continue; const f=fmtK(k), va=A[F[k]], vb=Bm[F[k]], e=k==="pop"?null:esMean(k), S=scaleOf(k);
-      const big=va!=null&&vb!=null&&Math.abs(va-vb)>Math.max(Math.abs(e||0)*0.15,0.0001), ca=big&&va>vb?"win":big?"dim":"", cb=big&&vb>va?"win":big?"dim":"";
-      const xa=va==null?null:S.X(va), xb=vb==null?null:S.X(vb), pt=(c,x)=>x==null?"":`<i class="cv-d ${c}" style="--x:${x}"></i>`;
-      h+=`<div class="cv-r"><div class="cv-l">${esc(labK(k))}${iQue(k)}<small>${esc((CATK[k].src||"").replace(/^Atlas de Renta del INE, /,""))}</small></div>
-      <div class="cv-t" aria-hidden="true"><i class="cv-b" style="--x0:${S.b0};--w:${S.b1-S.b0}"></i>${e==null?"":`<i class="cv-e" style="--x:${S.X(e)}"></i>`}${xa!=null&&xb!=null?`<i class="cv-c" style="--x0:${Math.min(xa,xb)};--w:${Math.abs(xa-xb)}"></i>`:""}${pt("b",xb)}${pt("a",xa)}</div>
-      <div class="cv-v"><span class="a ${ca}"><i></i>${va==null?"—":f(va)}</span><span class="b ${cb}"><i></i>${vb==null?"—":f(vb)}</span>${e==null?"":`<small>España ${f(e)}</small>`}</div></div>`; } }
-  h+=`</div><p class="muted" style="font-size:13px;margin-top:8px">Pulsa la <i>i</i> de cada fila para ver qué mide exactamente ese dato. En negrita, el valor más alto cuando la diferencia es clara. El número de habitantes va en escala logarítmica. Los datos tienen años distintos; la fuente aparece bajo cada nombre.</p>`;
-  const t=finding(B,"Dato a dato",""); bindQue(add(t,"div",null,h));
+  const eA=esc(dispName(A[F.name])), eB=esc(dispName(Bm[F.name])), nmA=dispName(A[F.name]), nmB=dispName(Bm[F.name]);
+  const val=(r,k)=>F[k]==null?null:r[F[k]];
+  // lo que más llama la atención: los datos donde más se separan, medidos con la variación que hay entre todos los municipios
+  const big=Object.keys(CP_K).map(k=>cpBig(k,A,Bm,val(A,k),val(Bm,k))).filter(x=>x&&x[0]>=0.5).sort((x,y)=>y[0]-x[0]).slice(0,4);
+  const alike=Object.keys(CP_K).filter(k=>k!=="pop").map(k=>[k,cpZ(k,val(A,k),val(Bm,k))]).filter(x=>x[1]!=null&&x[1]<0.25).sort((x,y)=>x[1]-y[1]).slice(0,3).map(([k])=>{ const f=fmtK(k), fa=f(val(A,k)), fb=f(val(Bm,k)), sx=z=>z.replace(/^[^\d]*[\d.,]+/,""); const both=fa===fb?`${fa} las dos`:sx(fa)&&sx(fa)===sx(fb)?`${fa.slice(0,fa.length-sx(fa).length)} y ${fb}`:`${fa} y ${fb}`; return `${CP_K[k].l} (${both})`; });
+  const join=l=>l.length>1?l.slice(0,-1).join(", ")+" y "+l[l.length-1]:l[0];
+  let top="";
+  if(big.length) top+=`<section class="finding"><h2>Lo que más llama la atención</h2><div class="cp-big">${big.map(([,n,t,d])=>`<div><div class="n">${n}</div><div class="t">${esc(t)}</div><div class="d">${d}</div></div>`).join("")}</div>${alike.length?`<p class="cp-like"><b>En esto se parecen:</b> ${esc(join(alike))}.</p>`:""}</section>`;
+  else top+=`<section class="finding"><h2>Lo que más llama la atención</h2><p class="cp-like">Estos dos municipios se parecen mucho: ninguno de los datos principales los separa de forma clara.${alike.length?" En concreto, "+esc(join(alike))+".":""}</p></section>`;
+  // dato a dato: una frase y tres barras desde cero
+  let h=`<p class="cp-intro">Las barras empiezan en cero: cuanto más larga, más grande es el dato. La barra gris es la media de España.</p>`;
+  for(const [q,rows] of CP_SECS){ h+=`<div class="cp-g">${q}</div>`;
+    for(const [k,l,sub] of rows){ if(F[k]==null||!CATK[k]) continue; const va=val(A,k), vb=val(Bm,k), e=esMean(k), f=fmtK(k);
+      let ph; if(va==null||vb==null){ ph=["",va==null&&vb==null?"No hay dato de ninguno de los dos":"No hay dato de "+(va==null?nmA:nmB),"."]; } else ph=cpSentence(k,nmA,nmB,va,vb);
+      h+=`<div class="cp-r"><div class="cp-t"><div class="cp-l">${esc(l)}</div><div class="cp-s">${esc(sub)}</div><p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div><div class="cp-bars">${cpBars(k,[[eA,"a",va],[eB,"b",vb],["España","e",e]])}</div></div>`; } }
+  const t=finding(B,"Dato a dato",""); add(t,"div","cp",h);
+  // la tabla completa, plegada: los 24 datos con su fuente
+  let tb=`<table class="glance cmptab"><thead><tr><th>Dato</th><th class="r">${eA}</th><th class="r">${eB}</th><th class="r">España</th></tr></thead><tbody>`;
+  for(const [g,ks] of CMPROWS){ tb+=`<tr class="grp"><td colspan="4">${g}</td></tr>`;
+    for(const k of ks){ if(F[k]==null||!CATK[k]) continue; const f=fmtK(k), va=A[F[k]], vb=Bm[F[k]], e=k==="pop"?null:esMean(k);
+      const bg=va!=null&&vb!=null&&Math.abs(va-vb)>Math.max(Math.abs(e||0)*0.15,0.0001);
+      tb+=`<tr><td class="lab">${esc(labK(k))}${iQue(k)}<small>${esc((CATK[k].src||"").replace(/^Atlas de Renta del INE, /,""))}</small></td><td class="a r ${bg&&va>vb?"win":bg?"dim":""}">${va==null?"—":f(va)}</td><td class="b r ${bg&&vb>va?"win":bg?"dim":""}">${vb==null?"—":f(vb)}</td><td class="e r">${e==null?"":f(e)}</td></tr>`; } }
+  tb+=`</tbody></table><p class="muted" style="font-size:13px;margin-top:8px">Pulsa la <i>i</i> de cada fila para ver qué mide exactamente ese dato. En negrita oscura, el valor más alto cuando la diferencia es clara. Los datos tienen años distintos; la fuente aparece bajo cada nombre.</p>`;
+  const dt=add(t,"details","cp-all"); add(dt,"summary",null,"Ver todos los datos ("+CMPROWS.reduce((n,[,ks])=>n+ks.filter(k=>F[k]!=null&&CATK[k]).length,0)+"), con su fuente y su año"); bindQue(add(dt,"div",null,tb));
+  B.insertBefore(Object.assign(document.createElement("div"),{innerHTML:top}).firstElementChild,B.firstChild);
   // gráficos
   let da,db; try{ [da,db]=await Promise.all([loadProv(a.slice(0,2)),loadProv(b.slice(0,2))]).then(([x,y])=>[x[a],y[b]]); }catch(e){ return; }
   if(!da||!db) return;
   const s2=finding(B,"Cómo han cambiado","");
   const g=add(s2,"div","cols2"), nA=dispName(A[F.name]), nB=dispName(Bm[F.name]);
-  const two=(ka)=>[{n:nA,v:da.s[ka],c:"--rust",main:true},{n:nB,v:db.s[ka],c:"--slate"},{n:"España",v:REFS.es[ka],c:"--stone",dash:true}];
+  const two=(ka)=>[{n:nA,v:da.s[ka],c:"--rust",main:true},{n:nB,v:db.s[ka],c:"--s-b"},{n:"España",v:REFS.es[ka],c:"--stone",dash:true}];
   realChart(g,{title:"Renta neta por persona",source:"Fuente: INE, Atlas de Renta e IPC.",series:two("net_income_pc"),fmt:eur,tickFmt:v=>nf0.format(v/1000)+" mil"});
-  if(da.pad&&db.pad) lineChart(g,{title:"Habitantes, 1996 = 100",source:"Fuente: INE, padrón.",series:[{n:nA,v:da.pad,c:"--rust",main:true},{n:nB,v:db.pad,c:"--slate"},{n:"España",v:REFS.es.pad,c:"--stone",dash:true}],years:REFS.padYears,xticks:[1996,2010,2025],index:true});
-  if(da.paro&&db.paro) lineChart(g,{title:"Paro registrado, 2015 = 100",source:"Fuente: SEPE.",series:[{n:nA,v:da.paro.y,c:"--rust",main:true},{n:nB,v:db.paro.y,c:"--slate"},{n:"España",v:REFS.paro.es.paro,c:"--stone",dash:true}],years:REFS.paroYears,xticks:[2015,2020,2026],index:true});
+  if(da.pad&&db.pad) lineChart(g,{title:"Habitantes, 1996 = 100",source:"Fuente: INE, padrón.",series:[{n:nA,v:da.pad,c:"--rust",main:true},{n:nB,v:db.pad,c:"--s-b"},{n:"España",v:REFS.es.pad,c:"--stone",dash:true}],years:REFS.padYears,xticks:[1996,2010,2025],index:true});
+  if(da.paro&&db.paro) lineChart(g,{title:"Paro registrado, 2015 = 100",source:"Fuente: SEPE.",series:[{n:nA,v:da.paro.y,c:"--rust",main:true},{n:nB,v:db.paro.y,c:"--s-b"},{n:"España",v:REFS.paro.es.paro,c:"--stone",dash:true}],years:REFS.paroYears,xticks:[2015,2020,2026],index:true});
   lineChart(g,{title:"Edad media",source:"Fuente: INE, Atlas de Renta.",series:two("mean_age"),fmt:v=>nf1.format(v)+" años"});
 }
 // =====================================================================

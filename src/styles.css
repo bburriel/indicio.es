@@ -2,7 +2,7 @@
 :root{
   --bg:#f6f4ef; --band:#ebeee6; --ink:#1d1c1a; --ink-2:#4a4743; --muted:#7a756c; --rule:#e2e0d8; --rule-2:#cfcbc0; --strong:#2a2826; --card:#ffffff;
   --brand:#6e1423; --brand-2:#8a1c2d; --acc:#a9c9a4; --acc-ink:#3f7a4a;
-  --rust:#b0303f; --mustard:#b07a14; --slate:#2e6fb0; --olive:#5f7a2e; --plum:#7a4f8a; --stone:#a69690;
+  --rust:#b0303f; --mustard:#b07a14; --slate:#2e6fb0; --olive:#5f7a2e; --plum:#7a4f8a; --stone:#a69690; --s-b:#b9803f;
   --s-mun:var(--rust); --s-prov:var(--mustard); --s-es:var(--slate);
   --mark:#d6e7d2; --pos:#b0303f; --neg:#2e6fb0;
   --div-mid:#ebe8e1; --div-neg:#2e6fb0; --div-neg2:#b9cde4;
@@ -16,7 +16,7 @@
 :root[data-theme="dark"]{
   --bg:#191a17; --band:#22241f; --ink:#ecebe6; --ink-2:#c6c3ba; --muted:#959187; --rule:#33352f; --rule-2:#47493f; --strong:#e6e4dd; --card:#20221e;
   --brand:#4a0e18; --brand-2:#5e1520; --acc:#a9c9a4; --acc-ink:#a9c9a4;
-  --rust:#d0505f; --mustard:#a8851f; --slate:#5b8ad6; --olive:#8c9850; --plum:#a882c0; --stone:#6f6260;
+  --rust:#d0505f; --mustard:#a8851f; --slate:#5b8ad6; --olive:#8c9850; --plum:#a882c0; --stone:#6f6260; --s-b:#d3a460;
   --mark:#33503a; --pos:#e0707c; --neg:#7ea4dc;
   --div-mid:#34352f; --div-neg:#6b93d0; --div-neg2:#34475f;
   --ramp-0:#3a1d22; --ramp-1:#5e2532; --ramp-2:#843342; --ramp-3:#a8505a; --ramp-4:#c97c74; --ramp-5:#e2aa8e; --ramp-6:#f2d6b2;
@@ -334,11 +334,6 @@ a.cmpl{font-size:13.5px; font-weight:600}
 .simtab{overflow-x:auto}
 @media (max-width:620px){ .simtab th:nth-child(4),.simtab td:nth-child(4),.simtab th:nth-child(6),.simtab td:nth-child(6){display:none} .simtab td,.simtab th{padding-right:6px} }
 .vtab.mun .vrow{grid-template-columns:minmax(120px,1.5fr) minmax(0,2fr) 52px}
-.cmpbar{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 24px; padding:18px 0; border-bottom:1px solid var(--rule); align-items:end}
-@media (max-width:620px){ .cmpbar{grid-template-columns:minmax(0,1fr)} }
-.cmpbar .who{font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; margin-bottom:4px}
-.cmpbar .who i{width:12px; height:12px; border-radius:2px; display:inline-block}
-.cmpbar .nm{font-size:26px; font-weight:800; line-height:1.15}
 .cmptab td.a,.cmptab td.b{font-weight:500; white-space:nowrap; font-variant-numeric:tabular-nums}
 .cmptab td.win{color:var(--ink); font-weight:800} .cmptab td.dim{color:var(--muted)}
 
@@ -1821,27 +1816,6 @@ details.chk > section{margin-top:18px}
 .mk-f select:disabled{opacity:.6; cursor:not-allowed; background:color-mix(in srgb,var(--ink) 5%,var(--bg))}
 
 /* ---- Comparar dos municipios: una escala común por dato ---- */
-.cv-h{display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center; font-size:12.5px; color:var(--muted); margin:6px 0 4px}
-.cv-h i{display:inline-block; vertical-align:-2px; margin-right:6px}
-.cv-h i.a,.cv-h i.b{width:11px; height:11px; border-radius:50%} .cv-h i.a{background:var(--rust)} .cv-h i.b{background:var(--slate)}
-.cv-h i.e{width:2px; height:13px; background:var(--ink)} .cv-h i.bd{width:18px; height:9px; background:var(--band); border:1px solid var(--rule-2)}
-.cv-h .cv-n{flex-basis:100%}
-.cv-g{margin-top:22px; padding-bottom:6px; border-bottom:1px solid var(--rule-2); font-weight:700; font-size:14px; color:var(--ink)}
-.cv-r{display:grid; grid-template-columns:minmax(0,250px) minmax(0,1fr) 190px; gap:18px; align-items:center; padding:12px 0; border-bottom:1px solid var(--rule)}
-.cv-l{font-size:15.5px} .cv-l small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
-.cv-t{position:relative; height:30px}
-.cv-t::before{content:""; position:absolute; left:6px; right:6px; top:14px; height:1px; background:var(--rule-2)}
-.cv-b{position:absolute; top:7px; height:16px; left:calc(6px + (100% - 12px)*var(--x0)); width:calc((100% - 12px)*var(--w)); background:var(--band); border:1px solid var(--rule); box-sizing:border-box}
-.cv-e{position:absolute; top:3px; height:24px; width:2px; margin-left:-1px; left:calc(6px + (100% - 12px)*var(--x)); background:var(--ink)}
-.cv-c{position:absolute; top:13px; height:3px; left:calc(6px + (100% - 12px)*var(--x0)); width:calc((100% - 12px)*var(--w)); background:var(--ink-2); opacity:.35}
-.cv-d{position:absolute; top:7px; width:16px; height:16px; margin-left:-8px; border-radius:50%; border:2px solid var(--bg); box-sizing:border-box; left:calc(6px + (100% - 12px)*var(--x))}
-.cv-d.a{background:var(--rust)} .cv-d.b{background:var(--slate)}
-.cv-v{display:grid; gap:2px; text-align:right; font-variant-numeric:tabular-nums; font-size:15px; color:var(--ink-2)}
-.cv-v span{display:flex; justify-content:flex-end; align-items:center; gap:7px; white-space:nowrap} .cv-v span i{width:9px; height:9px; border-radius:50%; flex:none}
-.cv-v .a i{background:var(--rust)} .cv-v .b i{background:var(--slate)}
-.cv-v .win{color:var(--ink); font-weight:800} .cv-v .dim{color:var(--muted)}
-.cv-v small{font-size:12.5px; color:var(--muted)}
-@media (max-width:720px){ .cv-r{grid-template-columns:minmax(0,1fr) auto; gap:4px 12px} .cv-t{grid-column:1/-1; grid-row:2} .cv-v{grid-row:1; grid-column:2} }
 
 /* ---- Quién soy: versión editorial (frase de entrada, recorrido, diagrama de causas) ---- */
 .ab-hero h1{font-size:clamp(46px,8vw,92px); line-height:.98; letter-spacing:-.02em; font-weight:500; text-wrap:balance; margin:10px 0 18px}
@@ -1873,6 +1847,44 @@ details.chk > section{margin-top:18px}
 .ab-cols h3{font-family:var(--serif); font-weight:500; font-size:21px; line-height:1.25; margin:0 0 8px}
 .ab-cols p{font-size:15px; line-height:1.6; margin:0}
 .ab-body .ab-note{margin-top:36px}
-@media (max-width:860px){ .ab-row{grid-template-columns:minmax(0,1fr); gap:18px; padding-top:40px; margin-top:48px} .ab-row h2{font-size:27px} .ab-cols{grid-template-columns:minmax(0,1fr); gap:24px} @media (max-width:640px){ .ab-path{grid-template-columns:minmax(0,1fr)} .ab-path li{padding:0 0 26px 30px} .ab-path li::before{top:5px; bottom:0; left:5px; right:auto; width:1px; height:auto} .ab-path li:last-child::before{display:none} .ab-lead{margin-top:26px} }
+@media (max-width:860px){ .ab-row{grid-template-columns:minmax(0,1fr); gap:18px; padding-top:40px; margin-top:48px} .ab-row h2{font-size:27px} .ab-cols{grid-template-columns:minmax(0,1fr); gap:24px} @media (max-width:640px){ .ab-path{grid-template-columns:minmax(0,1fr)} .ab-path li{padding:0 0 26px 30px} .ab-path li::before{top:5px; bottom:0; left:5px; right:auto; width:1px; height:auto} .ab-path li:last-child::before{display:none} .ab-lead{margin-top:26px} } }
 .ab-row + .ab-sec{margin-top:64px; padding-top:56px; border-top:1px solid var(--rule)}
 @media (max-width:860px){ .ab-row + .ab-sec{margin-top:48px; padding-top:40px} }
+
+/* Comparar dos municipios: frases y barras desde cero */
+.cp-head{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:10px 28px; align-items:start; padding:20px 0 6px; border-top:1px solid var(--ink)}
+.cp-vs{font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:22px; color:var(--muted); padding-top:12px}
+.cp-nm{display:flex; align-items:center; gap:12px; font-family:'Newsreader',Georgia,serif; font-size:clamp(32px,4.4vw,46px); line-height:1.05}
+.cp-nm i{width:16px; height:16px; border-radius:50%; flex:none}
+.cp-nm a{color:var(--ink); text-decoration:none} .cp-nm a:hover{text-decoration:underline}
+.cp-sub{font-size:14.5px; color:var(--ink-2); margin:8px 0 0 28px}
+.cp-who .search{margin:10px 0 0 28px; max-width:300px; flex:none}
+@media (max-width:620px){ .cp-head{grid-template-columns:minmax(0,1fr)} .cp-vs{padding:0 0 0 28px; font-size:19px} .cp-sub{margin-left:26px} .cp-who .search{margin-left:0} }
+.cp-big{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px 16px; margin-top:6px}
+.cp-big>div{border-top:1px solid var(--rule-2); padding-top:12px}
+.cp-big .n{font-family:'Newsreader',Georgia,serif; font-size:clamp(28px,3.4vw,38px); line-height:1.05}
+.cp-big .t{font-size:15.5px; line-height:1.35; margin-top:6px}
+.cp-big .d{font-size:13px; color:var(--muted); margin-top:6px; font-variant-numeric:tabular-nums}
+@media (max-width:760px){ .cp-big{grid-template-columns:repeat(2,minmax(0,1fr))} .cp-big .t{font-size:14px} }
+.cp-like{margin:20px 0 0; font-size:15.5px; line-height:1.5; color:var(--ink-2)} .cp-like b{color:var(--ink)}
+.cp-intro{font-size:14.5px; line-height:1.5; color:var(--ink-2); margin:0}
+.cp-g{margin-top:30px; padding-bottom:8px; border-bottom:1px solid var(--ink); font-family:'Newsreader',Georgia,serif; font-size:23px; font-weight:500}
+.cp-r{display:grid; grid-template-columns:minmax(0,330px) minmax(0,1fr); gap:10px 36px; align-items:center; padding:20px 0; border-bottom:1px solid var(--rule)}
+.cp-l{font-size:16.5px; font-weight:600} .cp-s{font-size:13px; color:var(--muted); margin-top:1px}
+.cp-t p{font-size:15.5px; line-height:1.4; margin:8px 0 0} .cp-t p b{font-weight:700}
+.cp-bars{display:flex; flex-direction:column; gap:8px}
+.cp-bar{display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:center}
+.cp-bar .n{font-size:14px; overflow-wrap:anywhere}
+.cp-bar .t{position:relative; height:16px}
+.cp-bar .t .f{position:absolute; top:0; height:16px; background:var(--rust)}
+.cp-bar.b .t .f{background:var(--s-b)} .cp-bar.e .t .f{background:var(--rule-2)}
+.cp-bar .t .z{position:absolute; top:-3px; height:22px; width:1px; background:var(--muted)}
+.cp-bar .t em{position:absolute; top:50%; transform:translateY(-50%); margin-left:8px; font-style:normal; font-size:14.5px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap}
+.cp-bar.e .n,.cp-bar.e .t em{color:var(--muted); font-weight:400}
+@media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-bar{grid-template-columns:74px minmax(0,1fr)} .cp-bar .n{font-size:13.5px} .cp-bar .t em{font-size:14px} }
+.cp-all{margin-top:28px; border:1px solid var(--rule-2); border-radius:10px; padding:0 18px}
+.cp-all summary{cursor:pointer; padding:15px 0; font-size:15px; list-style:none; display:flex; justify-content:space-between; gap:12px}
+.cp-all summary::-webkit-details-marker{display:none}
+.cp-all summary::after{content:"Desplegar ▾"; font-weight:600; white-space:nowrap}
+.cp-all[open] summary::after{content:"Plegar ▴"}
+.cp-all[open]{padding-bottom:16px}
