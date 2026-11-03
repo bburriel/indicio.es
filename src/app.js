@@ -3044,6 +3044,25 @@ async function studyTope(B){
     ventasD:TC.D,ventasDu:TC.Du,extraV:Math.round(TC.extra/100)*100,ampl:AMPL.size,
     hog:TC.escala?TC.escala.hog:0,ahorroM:TC.escala?TC.escala.ahorroM:0,share:TC.escala?TC.escala.share:0,
     cfAhorro:bR?eur(ES.post):null,lo:Math.abs(hi),hi:Math.abs(lo)};
+  // los grises: tres mandos y tres lecturas del mismo dato
+  G.grises=d=>{ const w=add(d,"div","calc pn-sim"), ctl=add(w,"div","ctl"), out=add(w,"div","res");
+    const hog=V.hog, mes=Math.abs(V.ahorroNuevo||0), ex=V.extraV;
+    const ST2={n:20,s:50,a:70}, PRE=[["Lo que defiende quien apoya el tope",{n:25,s:10,a:100}],["Entre medias",{n:20,s:50,a:70}],["Lo que teme quien lo critica",{n:10,s:100,a:50}]];
+    const defs=[["n","Hogares de alquiler que firman contrato nuevo en un año","%",5,40,1,"El tope solo toca esos contratos. No es un dato de esta web: es el supuesto que más mueve el resultado."],
+      ["a","Parte del freno que se debe al tope","%",25,100,5,"El resto sería otra cosa de Cataluña en 2024. Con 100 se da por bueno todo el freno medido."],
+      ["s","Compraventas de más que salieron del alquiler","%",0,100,5,"Estos datos no lo dicen. Un piso vendido puede seguir alquilado o comprarlo quien vive en él."]];
+    ctl.innerHTML=defs.map(([k,l,u,a,b,st,n])=>`<label>${l} <output data-k="${k}"></output><input type="range" min="${a}" max="${b}" step="${st}" value="${ST2[k]}" data-k="${k}"><small>${n}</small></label>`).join("")
+      +`<p class="muted" style="font-size:13.5px">Probar una lectura: ${PRE.map(([l],i)=>`<button type="button" class="lnk" data-p="${i}">${esc(l)}</button>`).join(" · ")}</p>`;
+    out.innerHTML='<div id="grres"></div>';
+    const upd=()=>{ ctl.querySelectorAll("output").forEach(o=>o.textContent=ST2[o.dataset.k]+NB+"%");
+      const ahorran=Math.round(hog*ST2.n/100), eurAnio=mes*12*ST2.a/100, millones=ahorran*eurAnio/1e6, salen=Math.round(ex*ST2.s/100), ratio=salen?ahorran/salen:null;
+      out.querySelector("#grres").innerHTML=`<div class="big">${nf0.format(ahorran)} <span class="muted" style="font-size:16px;font-weight:400">hogares ahorran unos ${nf0.format(eurAnio)}${NB}€ al año</span></div>
+        <p>Son unos <b>${nf1.format(millones)} millones de euros al año</b> para los inquilinos que firman contrato.</p>
+        <div class="big" style="margin-top:14px">${nf0.format(salen)} <span class="muted" style="font-size:16px;font-weight:400">pisos menos en alquiler al año</span></div>
+        <p>${salen?`Por cada piso que sale del alquiler, <b>${ratio>=1?nf0.format(ratio):nf1.format(ratio)} ${ratio===1?"hogar ahorra":"hogares ahorran"}</b>. Para un inquilino que busca piso, esos pisos son menos opciones; para quien ya tiene contrato, no cambian nada.`:"Sin ventas que salgan del alquiler, el tope no resta oferta y el balance es solo el ahorro."}</p>`; };
+    ctl.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{ ST2[i.dataset.k]=+i.value; upd(); }));
+    ctl.querySelectorAll("button[data-p]").forEach(b=>b.addEventListener("click",()=>{ Object.assign(ST2,PRE[+b.dataset.p][1]); ctl.querySelectorAll("input").forEach(i=>i.value=ST2[i.dataset.k]); upd(); }));
+    upd(); };
   mdRender(B,"tope-cataluna",V,G);
   B.appendChild(DET);
   AB.fill({lede:allNeg?`Frenó la subida, pero no bajó el alquiler. En 2024 el alquiler subió un ${nf1.format(post(tens))}${NB}% donde hay tope y, sin él, habría subido en torno a un ${nf1.format(cf)}${NB}%${bR?`: unos ${nf0.format(eur(ES.post))}${NB}€ menos al mes en un piso como los de Barcelona`:""}. En los contratos nuevos, que son los que limita la norma, el freno es mayor: ${nf1.format(evNew)} puntos${bR?`, unos ${nf0.format(eur(didN))}${NB}€ al mes`:""}.${ventas?` En esos mismos municipios se vendieron unas ${nf0.format(Math.round(TC.extra/100)*100)} viviendas más al año de lo esperable, y los datos no dicen si salieron del alquiler.`:""}`:null});
