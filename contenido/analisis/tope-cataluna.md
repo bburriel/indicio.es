@@ -51,6 +51,14 @@ Son unas {{extraV|n0}} compraventas más al año de lo esperable. Que se vendan 
 
 Para ponerlo en la misma escala: en los {{tens}} municipios con tope viven unos {{hog|n0}} hogares de alquiler, según una estimación a partir del censo y del Atlas de Renta. Si todos ahorraran lo que sale con el alquiler medio de Barcelona, serían unos **{{ahorroM|n0}} millones de euros al año** para los inquilinos, como máximo. Las {{extraV|n0}} compraventas de más equivalen a un {{share|pct1}} de esos hogares, incluso si todas hubieran salido del alquiler.
 
+## Entre el blanco y el negro
+
+Con el mismo dato caben lecturas muy distintas. Depende de cuántos hogares firman contrato nuevo en un año, de cuánto del freno se debe de verdad al tope y de cuántas de las ventas de más salieron del alquiler. Ninguna de las tres cifras la dan estos datos; por eso aquí no hay un número, hay un mapa de lecturas. Empieza por las tres de abajo y mueve lo que no te convenza.
+
+[[grafico:grises]]
+
+Al moverlos se ve que el balance cambia de signo según cómo se lean los datos. Quien aplaude parte de que muchos contratos se firman a precio limitado y de que lo vendido sigue siendo vivienda. Quien critica parte de lo contrario. Lo que no cambia en ninguna lectura es que el ahorro es real, pequeño por hogar, y que la oferta que se pierde, si se pierde, no se puede medir todavía con estos datos.
+
 ## Qué significa
 
 Quien defiende el tope tiene un freno real desde el primer año, mayor en los contratos que la norma toca, y que debería crecer según se renueven los contratos. Quien lo critica tiene un ahorro pequeño, unos {{ahorroMes|eur}} al mes de media, unos contratos nuevos que aun así subieron un {{postC|pct1}} y más ventas de las esperables. Los datos no cierran el debate: Berlín, donde la congelación de 2020 abarató los pisos afectados pero hizo que salieran menos al mercado, sigue siendo la advertencia de unos y la excusa de otros.
