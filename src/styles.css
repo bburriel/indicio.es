@@ -1819,3 +1819,26 @@ details.chk > section{margin-top:18px}
 /* Datos propios: el segundo dato sale en la misma unidad que el primero (nota bajo el selector) */
 .mk-sn{margin:-4px 0 10px; padding:7px 11px; border-left:3px solid var(--rule-2); background:color-mix(in srgb,var(--ink) 4%,var(--card)); font-size:13px; line-height:1.5; color:var(--ink-2)}
 .mk-f select:disabled{opacity:.6; cursor:not-allowed; background:color-mix(in srgb,var(--ink) 5%,var(--bg))}
+
+/* ---- Comparar dos municipios: una escala común por dato ---- */
+.cv-h{display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center; font-size:12.5px; color:var(--muted); margin:6px 0 4px}
+.cv-h i{display:inline-block; vertical-align:-2px; margin-right:6px}
+.cv-h i.a,.cv-h i.b{width:11px; height:11px; border-radius:50%} .cv-h i.a{background:var(--rust)} .cv-h i.b{background:var(--slate)}
+.cv-h i.e{width:2px; height:13px; background:var(--ink)} .cv-h i.bd{width:18px; height:9px; background:var(--band); border:1px solid var(--rule-2)}
+.cv-h .cv-n{flex-basis:100%}
+.cv-g{margin-top:22px; padding-bottom:6px; border-bottom:1px solid var(--rule-2); font-weight:700; font-size:14px; color:var(--ink)}
+.cv-r{display:grid; grid-template-columns:minmax(0,250px) minmax(0,1fr) 190px; gap:18px; align-items:center; padding:12px 0; border-bottom:1px solid var(--rule)}
+.cv-l{font-size:15.5px} .cv-l small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
+.cv-t{position:relative; height:30px}
+.cv-t::before{content:""; position:absolute; left:6px; right:6px; top:14px; height:1px; background:var(--rule-2)}
+.cv-b{position:absolute; top:7px; height:16px; left:calc(6px + (100% - 12px)*var(--x0)); width:calc((100% - 12px)*var(--w)); background:var(--band); border:1px solid var(--rule); box-sizing:border-box}
+.cv-e{position:absolute; top:3px; height:24px; width:2px; margin-left:-1px; left:calc(6px + (100% - 12px)*var(--x)); background:var(--ink)}
+.cv-c{position:absolute; top:13px; height:3px; left:calc(6px + (100% - 12px)*var(--x0)); width:calc((100% - 12px)*var(--w)); background:var(--ink-2); opacity:.35}
+.cv-d{position:absolute; top:7px; width:16px; height:16px; margin-left:-8px; border-radius:50%; border:2px solid var(--bg); box-sizing:border-box; left:calc(6px + (100% - 12px)*var(--x))}
+.cv-d.a{background:var(--rust)} .cv-d.b{background:var(--slate)}
+.cv-v{display:grid; gap:2px; text-align:right; font-variant-numeric:tabular-nums; font-size:15px; color:var(--ink-2)}
+.cv-v span{display:flex; justify-content:flex-end; align-items:center; gap:7px; white-space:nowrap} .cv-v span i{width:9px; height:9px; border-radius:50%; flex:none}
+.cv-v .a i{background:var(--rust)} .cv-v .b i{background:var(--slate)}
+.cv-v .win{color:var(--ink); font-weight:800} .cv-v .dim{color:var(--muted)}
+.cv-v small{font-size:12.5px; color:var(--muted)}
+@media (max-width:720px){ .cv-r{grid-template-columns:minmax(0,1fr) auto; gap:4px 12px} .cv-t{grid-column:1/-1; grid-row:2} .cv-v{grid-row:1; grid-column:2} }
