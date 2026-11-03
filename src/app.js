@@ -4024,7 +4024,7 @@ function exCruce(out){
       <div class="czb czb-c"><h3>Compara solo municipios parecidos${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Marca qué quieres igualar. Así ves si la relación sigue ahí.</p><div class="czchips" id="cztags"></div><p class="czhelp">El porcentaje de cada botón es lo que se pierde de la relación si igualas solo eso.</p><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div></div>
       <div class="czb czb-e"><h3 id="czeh">En números</h3><div id="czeur"></div></div>
     </div>
-    <div class="czgo"><button type="button" class="czcard" id="czmore" aria-expanded="false" aria-controls="lbcausal"><b class="t">Entender esta relación a fondo ↓</b><span>Las comprobaciones extra, una a una</span></button><a class="czcard" href="/laboratorio/antes/"><b>¿Y si es la causa? →</b><span>Que dos datos vayan juntos no prueba que uno cause el otro. Hace falta mirar antes y después de un cambio.</span></a></div>
+    <div class="czgo"><button type="button" class="czcard" id="czmore" aria-expanded="false" aria-controls="lbcausal"><b class="t">Entender esta relación a fondo ↓</b><span>Las comprobaciones extra, una a una</span></button></div>
     <p class="czc-m"><a href="/laboratorio/metodo/">Guía: de la relación a la causa →</a></p></section>`;
   if(tst) czTipBind(tst);
   const cb=document.getElementById("lbcausal"); if(cb) cb.hidden=true;
