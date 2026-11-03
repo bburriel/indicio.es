@@ -56,7 +56,7 @@ Promise.all([getJSON("/data/index.json"),getJSON("/data/refs.json"),getJSON("/da
 }).catch(e=>{ console.error(e); view.innerHTML='<p class="loading">No se pudieron cargar los datos. Recarga la página.</p>'; });
 
 const rowsAll=()=>IDX.map(o=>o.row);
-const FMT={int:v=>nf0.format(v),pct:pc,pct_chg:sgn,pts:sgn,eur:eur,years:v=>nf1.format(v)+NB+"años",num1:v=>nf1.format(Math.abs(v)<0.05?0:v),km:v=>nf0.format(v)+NB+"km",veces:v=>Math.abs(v-1)<0.05?"1"+NB+"vez":nf1.format(v)+NB+"veces",pp:v=>nf1.format(v)+NB+"puntos",num:v=>(Math.abs(v)>=1000?nf0:Math.abs(v)>=1?nf1:nf2).format(v),dens:v=>(v<10?nf1:nf0).format(v)+NB+"hab./km²"};
+const FMT={int:v=>nf0.format(v),pct:pc,pct_chg:sgn,pts:sgn,eur:eur,eurm2:v=>nf1.format(v)+NB+"€/m²",years:v=>nf1.format(v)+NB+"años",num1:v=>nf1.format(Math.abs(v)<0.05?0:v),km:v=>nf0.format(v)+NB+"km",veces:v=>Math.abs(v-1)<0.05?"1"+NB+"vez":nf1.format(v)+NB+"veces",pp:v=>nf1.format(v)+NB+"puntos",num:v=>(Math.abs(v)>=1000?nf0:Math.abs(v)>=1?nf1:nf2).format(v),dens:v=>(v<10?nf1:nf0).format(v)+NB+"hab./km²"};
 const fmtK=k=>FMT[(CATK[k]||{}).f]||(v=>nf1.format(v));
 const labK=k=>(CATK[k]||{}).l||k;
 
@@ -1537,7 +1537,7 @@ function niceStep(k,pts){
 const unitTxt=(k,v)=>{ const f=(CATK[k]||{}).f; const a=Math.abs(v);
   if((CATK[k]||{}).un) return (a<1?nf2:a<100?nf1:nf0).format(a)+" "+CATK[k].un;
   if(f==="veces") return (a<1?nf2:nf1).format(a)+(a===1?" vez":" veces"); if(f==="pp") return (a<1?nf2:nf1).format(a)+(a===1?" punto":" puntos"); if(f==="num") return (a<1?nf2:a<100?nf1:nf0).format(a);
-  return f==="eur"?eur(a):f==="years"?nf1.format(a)+" años":f==="int"?nf0.format(a)+" habitantes":f==="num1"?nf1.format(a)+" puntos":(Number.isInteger(a)?nf0.format(a):a<1?nf2.format(a):nf1.format(a))+(a===1?" punto":" puntos"); };
+  return f==="eur"?eur(a):f==="eurm2"?nf1.format(a)+NB+"€/m²":f==="years"?nf1.format(a)+" años":f==="int"?nf0.format(a)+" habitantes":f==="num1"?nf1.format(a)+" puntos":(Number.isInteger(a)?nf0.format(a):a<1?nf2.format(a):nf1.format(a))+(a===1?" punto":" puntos"); };
 
 function drawRel(){
   const S=XS, x=S.x, y=S.y, xl=labK(x), yl=labK(y), fx=fmtK(x), fy=fmtK(y);

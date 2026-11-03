@@ -10,7 +10,7 @@ export const SITE={
   url:"https://indicio.es",
   tagline:"Preguntas reales, respuestas con datos públicos",
   description:"Indicio: preguntas reales sobre cómo vivimos, respondidas con datos públicos de los 8.139 municipios de España. Y un laboratorio para que compruebes tú si una relación aguanta y qué pasó antes y después de una ley.",
-  dataUpdated:"2026-10-24",
+  dataUpdated:"2026-11-03",
   author:{name:"Borja Burriel",url:"https://indicio.es/quien-soy/",
     bio:"Data scientist con un máster en Estadística y siete años en equipos de datos, especializado en experimentación e inferencia causal. En Indicio aplica ese método a los datos públicos de España.",
     linkedin:"", web:"", foto:""},
