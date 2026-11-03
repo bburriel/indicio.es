@@ -34,9 +34,9 @@ fs.mkdirSync(OUT,{recursive:true});
 const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.readdirSync(from,{withFileTypes:true})){ const a=path.join(from,e.name), b=path.join(to,e.name); if(e.isDirectory()) copyDir(a,b); else fs.writeFileSync(b,fs.readFileSync(a)); } };
 const css=rd("src/styles.css"), js=rd("src/app.js"), tpl=rd("src/template.html"), body=rd("src/body.html");
 const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
-const CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js";
+const i18n=rd("src/i18n.js"), CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js", I18N="/assets/i18n."+h8(i18n)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
-fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js);
+fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js); fs.writeFileSync(path.join(OUT,I18N),i18n);
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
 const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:HIDDEN,md:MDBODY,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
@@ -74,7 +74,7 @@ copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
   fs.writeFileSync(path.join(OUT,"data","portada.json"),JSON.stringify({cesta,casa,contratos:{meses:RF.periodos,temporales:tm3,antes:r1(mean(antes))}}));
 }
 // el service worker lleva la versión del build
-fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+CONTENT)).replace("__JS__",JS).replace("__CSS__",CSS));
+fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+i18n+CONTENT)).replace("__JS__",JS).replace("__I18N__",I18N).replace("__CSS__",CSS));
 fs.writeFileSync(path.join(OUT,"manifest.webmanifest"),rd("manifest.webmanifest").replace(/"\.\/#?(\w*)"/g,(m,k)=>`"/${({inicio:"",preguntas:"preguntas/",municipio:"municipio/",explorar:"laboratorio/"})[k]??""}"`).replace('"scope": "./"','"scope": "/"'));
 
 // ---------- datos para las fichas ----------
@@ -98,7 +98,7 @@ function page({route,title,desc,ogTitle,main,jsonld,ogImage,type="website",robot
   const canon=SITE.url+route;
   const html=tpl.replace("{{TITLE}}",esc(title)).replace(/\{\{DESC\}\}/g,esc(stripTags(desc))).replace(/\{\{CANON\}\}/g,canon)
     .replace(/\{\{OGTITLE\}\}/g,esc(stripTags(ogTitle||title))).replace("{{OGTYPE}}",type).replace(/\{\{OGIMG\}\}/g,SITE.url+(ogImage||"/og-image.png"))
-    .replace("{{ROBOTS}}",robots?`<meta name="robots" content="${robots}">`:"").replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{CONTENT}}",CONTENT)
+    .replace("{{ROBOTS}}",robots?`<meta name="robots" content="${robots}">`:"").replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{I18N}}",I18N).replace("{{CONTENT}}",CONTENT)
     .replace("{{JSONLD}}",jsonld?`<script type="application/ld+json">${JSON.stringify(jsonld)}</script>`:"")
     .replace("{{PRELOAD}}",route==="/"?'<link rel="preload" href="/data/portada.json" as="fetch" crossorigin>':route==="/preguntas/"?'<link rel="preload" href="/data/municipios.topo.json" as="fetch" crossorigin>':"").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
   const dir=path.join(OUT,route); fs.mkdirSync(dir,{recursive:true}); fs.writeFileSync(path.join(dir,"index.html"),html);
@@ -175,7 +175,7 @@ for(const v of ["mapa","ranking","cruce","grupos","tabla","distribucion","burbuj
 // 404
 {
   const main=`<header class="phead"><h1>No encontramos esa página</h1><p class="dek">Puede que el enlace sea antiguo. Prueba desde la portada o busca tu municipio arriba.</p></header><p><a class="ed-go" href="/">Ir a la portada →</a></p>`;
-  const html=tpl.replace("{{PRELOAD}}","").replace("{{TITLE}}","Página no encontrada · Indicio").replace(/\{\{DESC\}\}/g,"").replace(/\{\{CANON\}\}/g,SITE.url+"/").replace(/\{\{OGTITLE\}\}/g,"Indicio").replace("{{OGTYPE}}","website").replace(/\{\{OGIMG\}\}/g,SITE.url+"/og-image.png").replace("{{ROBOTS}}",'<meta name="robots" content="noindex">').replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{CONTENT}}",CONTENT).replace("{{JSONLD}}","").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
+  const html=tpl.replace("{{PRELOAD}}","").replace("{{TITLE}}","Página no encontrada · Indicio").replace(/\{\{DESC\}\}/g,"").replace(/\{\{CANON\}\}/g,SITE.url+"/").replace(/\{\{OGTITLE\}\}/g,"Indicio").replace("{{OGTYPE}}","website").replace(/\{\{OGIMG\}\}/g,SITE.url+"/og-image.png").replace("{{ROBOTS}}",'<meta name="robots" content="noindex">').replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{I18N}}",I18N).replace("{{CONTENT}}",CONTENT).replace("{{JSONLD}}","").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
   fs.writeFileSync(path.join(OUT,"404.html"),html);
 }
 
