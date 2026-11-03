@@ -1323,7 +1323,7 @@ function destaca(box,r){
   if(!top.length){ box.innerHTML=`<div style="grid-column:span 2"><span class="pct" style="color:var(--ink-2)">Sin extremos</span>En casi todo se parece a la mayoría de ${nm} de España.</div>`+simCard; return; }
   box.innerHTML=top.slice(0,simCard?5:6).map(it=>{ const hi=it.p>.5, pct=Math.max(1,Math.round((hi?1-it.p:it.p)*100)), f=fmtK(it.k);
       const pv=prov.filter(x=>x[F[it.k]]!=null).sort((a,b)=>hi?b[F[it.k]]-a[F[it.k]]:a[F[it.k]]-b[F[it.k]]), pos=pv.findIndex(x=>x[F.code]===r[F.code])+1;
-      return `<div><span class="pct${hi?"":" lo"}">Top ${pct}${NB}%</span>de los municipios con ${DPHRASE[it.k][hi?0:1]}<div class="dstrip"><i style="left:${Math.max(2,Math.min(98,it.p*100))}%;background:var(${hi?"--rust":"--slate"})"></i></div><small>${esc(labK(it.k))}: ${f(it.v)} · España: ${f(esOff(it.k))}${pos&&pos<=3&&pv.length>=5?` · ${pos}.º de su provincia`:""}</small></div>`; }).join("")+simCard;
+      return `<div><span class="pct">Top ${pct}${NB}%</span>de los municipios con ${DPHRASE[it.k][hi?0:1]}<div class="dstrip"><i style="left:${Math.max(2,Math.min(98,it.p*100))}%"></i></div><div class="dstrip-x"><span>menos</span><span>más</span></div><small>${esc(labK(it.k))}: ${f(it.v)} · España: ${f(esOff(it.k))}${pos&&pos<=3&&pv.length>=5?` · ${pos}.º de su provincia`:""}</small></div>`; }).join("")+simCard;
 }
 
 // ---------- municipios parecidos ----------
