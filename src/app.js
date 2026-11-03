@@ -5911,7 +5911,7 @@ async function studySueldos(B){
 // ---------- vivienda: por qué cuesta tanto pagar una casa ----------
 // El texto está en contenido/analisis/vivienda.md; aquí las cifras (V) y los gráficos (G).
 async function studyVivienda(B){
-  const [D,S,A,PW,VC]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null),getJSON("/data/vivienda_censo.json")]);
+  const [D,S,A,PW,VC,VCI]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null),getJSON("/data/vivienda_censo.json"),getJSON("/data/vivienda_ciudades.json")]);
   const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
   const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
@@ -6024,6 +6024,36 @@ async function studyVivienda(B){
           +bar("Turísticas que vuelven a ser vivienda",mt,"color-mix(in srgb,var(--brand) 30%,var(--bg))","")
           +(tot?`<p style="margin-top:14px">De lo que aportan las dos ideas, <b>construir pone el ${nf0.format(shB)}${NB}%</b> y que las casas sean para vivir, el ${nf0.format(100-shB)}${NB}%. ${mv+mt>bu?"Movilizar lo que hay llega antes, pero se agota: es una vez. ":"Construir tarda en empezar, pero sigue sumando cada año. "}Lo que no se cubre se reparte como hasta ahora: precios más altos, más jóvenes en casa de sus padres y más pisos compartidos.</p>`
             :`<p style="margin-top:14px">Sin cambiar nada, el hueco crece y se reparte como hasta ahora: precios más altos, más jóvenes en casa de sus padres y más pisos compartidos.</p>`); }}); };
+  // ciudad por ciudad (scripts/datos/vivienda_esfuerzo.py): tres tipos de ciudad de 50.000 habitantes o más y, de contraste, los pueblos pequeños y lejanos
+  const CN2={"Elx/Elche":"Elche","Alacant/Alicante":"Alicante","Palma de Mallorca":"Palma"}, cName=n=>{ if(CN2[n]) return CN2[n]; const m=n.match(/^(.*), (L'|Las|Los|La|El|A|O|Os|As)$/); return m?(m[2].endsWith("'")?m[2]+m[1]:m[2]+" "+m[1]):dispName(n); };
+  const CI=VCI.ciudades, TIPOS=[["costa","Costa y compradores extranjeros"],["atrae","Ciudades que atraen población"],["estable","Crecen poco"]];
+  const rowBy=new Map(rowsAll().map(r=>[r[F.code],r])), md=(a,k)=>d3.median(a.map(x=>x[k]).filter(v=>v!=null));
+  const grp=Object.fromEntries(TIPOS.map(([t])=>{ const a=CI.filter(x=>x.tipo===t), rs=a.map(x=>rowBy.get(x.c)).filter(Boolean);
+    return [t,{n:a.length,a08:md(a,"a08"),a19:md(a,"a19"),a24:md(a,"a24"),vtVar:md(a,"vtVar"),alqVar:md(a,"alqVar"),hog:md(a,"hogNue1000"),ini:md(a,"ini"),comp:md(a,"compHab"),extr:md(a,"extr"),tur:md(a,"tur"),dpob:md(a,"dpob"),
+      np:d3.median(rs.map(r=>r[F.noPrincipal]).filter(v=>v!=null)),alq:d3.median(rs.map(r=>r[F.alquiler]).filter(v=>v!=null)),ej:a.slice(0,4).map(x=>cName(x.n))}]; }));
+  const rural=rowsAll().filter(r=>r[F.pop]&&r[F.pop]<2000&&r[F.distCiudad]!=null&&r[F.distCiudad]>=45), rm=k=>d3.median(rural.map(r=>r[F[k]]).filter(v=>v!=null));
+  Object.assign(V,{cN:CI.length, ...Object.fromEntries(TIPOS.flatMap(([t])=>Object.entries(grp[t]).filter(([k])=>k!=="ej").map(([k,v])=>[t+"_"+k,v]))),
+    rurN:rural.length, rurPob:rm("varPob"), rurNp:rm("noPrincipal"), rurAlq:rm("alquiler"), rurExtr:rm("extr")});
+  [["mad","Madrid"],["bcn","Barcelona"],["vlc","València"],["mlg","Málaga"],["pmi","Palma"],["zgz","Zaragoza"],["mur","Murcia"]].forEach(([k,n])=>{ const x=CI.find(c=>c.n===n); if(x) Object.assign(V,{["c_"+k+"08"]:x.a08,["c_"+k+"19"]:x.a19,["c_"+k+"24"]:x.a24}); });
+  const rd=v=>v>=1000?Math.round(v/100)*100:Math.round(v/10)*10;
+  G.tipos=el=>{ const f=fig(el,{title:"Tres tipos de ciudad, tres problemas distintos",sub:`Mediana de las ${CI.length} ciudades de 50.000 habitantes o más con datos, y los pueblos pequeños de contraste`,
+      source:"Fuente: elaboración propia con Ministerio de Vivienda, INE (Censo 2021, padrón, Encuesta de Estructura Salarial, alquiler) y Registradores. Hogares nuevos: cambio del padrón 2019–2025 entre las personas por hogar de 2021."});
+    const e1=v=>v==null?"—":nf1.format(v), p0=v=>v==null?"—":nf0.format(v)+NB+"%";
+    table(f.body,["","Años de sueldo (80 m²) 2008 → 2024","Precio de tasación 2015–2024","Hogares nuevos al año*","Viviendas iniciadas al año*","Viviendas no habituales","Hogares en alquiler"],
+      [...TIPOS.map(([t,l])=>{ const g=grp[t]; return [`<b>${l}</b><br><small class="muted">${g.n} ciudades: ${g.ej.join(", ")}…</small>`,`${e1(g.a08)} → <b>${e1(g.a24)}</b>`,sgn(g.vtVar),e1(g.hog),e1(g.ini),p0(g.np),p0(g.alq)]; }),
+       [`<b>Pueblos de menos de 2.000 habitantes a 45 km o más de una gran ciudad</b><br><small class="muted">${nf0.format(rural.length)} municipios</small>`,"—","—",`Pierden población (${sgn(rm("varPob"))} desde 2015)`,"—",p0(rm("noPrincipal")),p0(rm("alquiler"))]]);
+    add(f.body,"p","muted","* Por cada 1.000 habitantes. Las viviendas iniciadas son las de la provincia (no hay dato municipal). Los pueblos: cambio de población desde 2015, según el padrón.").style.cssText="font-size:13px;margin-top:6px"; };
+  // tabla de ciudades con enlace a la ficha de cada una
+  G.fichaCiudades=el=>{ const f=fig(el,{title:"Tu ciudad, con todos los datos",sub:"Años de sueldo, hogares nuevos, viviendas no habituales, alquiler y compraventas",source:"Fuente: ver arriba. Cada nombre lleva a la ficha del municipio."});
+    const box=add(f.body,"div"), inp=document.createElement("input"); inp.type="search"; inp.placeholder="Busca una ciudad…"; inp.setAttribute("aria-label","Buscar una ciudad"); inp.style.cssText="width:100%;max-width:320px;padding:8px 10px;margin:6px 0 10px;border:1px solid var(--line,#ccc);border-radius:6px;font:inherit;background:var(--bg);color:var(--ink)"; box.appendChild(inp);
+    const out=add(box,"div"), more=add(box,"p"); let all=false;
+    const draw=()=>{ const q=norm(inp.value.trim()), a=CI.filter(x=>!q||norm(cName(x.n)).includes(q)), v=(all||q)?a:a.slice(0,20); out.innerHTML="";
+      const lab={costa:"costa y extranjeros",atrae:"atrae población",estable:"crece poco"};
+      table(out,["Ciudad","Años de sueldo 2008 → 2024","Hogares nuevos al año","Viviendas no habituales","En alquiler","Compraventas al año"],
+        v.map(x=>{ const r=rowBy.get(x.c); return [`<a href="${munPath(x.c)}">${esc(cName(x.n))}</a><br><small class="muted">${lab[x.tipo]}</small>`,`${nf1.format(x.a08)} → <b>${nf1.format(x.a24)}</b>`,x.hogNue>=0?nf0.format(rd(x.hogNue)):"pierde población",r&&r[F.noPrincipal]!=null?nf0.format(r[F.noPrincipal])+NB+"%":"—",x.alq!=null?nf0.format(x.alq)+NB+"%":"—",x.comp!=null?nf0.format(rd(x.comp)):"—"]; }));
+      more.innerHTML=(q||all)?"":`<button type="button" class="btn">Ver las ${CI.length} ciudades</button>`; const b=more.querySelector("button"); if(b) b.onclick=()=>{ all=true; draw(); }; };
+    inp.addEventListener("input",draw); draw();
+    add(f.body,"p","pt-cta").innerHTML=`<a class="btn" href="/municipio/">Busca tu municipio →</a>`; };
   mdRender(B,"vivienda",V,G);
 }
 
