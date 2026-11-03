@@ -1056,7 +1056,7 @@ const QUEMIDE={
   vox:"Votos a Vox por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco).",
   sumar:"Votos a Sumar y sus aliados por cada 100 votos válidos en las generales de julio de 2023 (los válidos son los votos a candidaturas más los votos en blanco)."};
 // el icono que abre la explicación; sin texto para esa clave, no se pinta nada
-const IQ_SVG='<svg class="iqs" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 1 0 0-19ZM7.3 8.9 10.4 7.7H11.7V14.5H13.3V15.6H6.7V14.5H8.4V8.9ZM10 3.65a1.35 1.35 0 1 0 0 2.7 1.35 1.35 0 1 0 0-2.7Z"/></svg>';
+const IQ_SVG='<svg class="iqs" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 1 0 0-19ZM8.9 8.6h2.2v6.6H8.9ZM10 4.3a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 1 0 0-2.6Z"/></svg>';
 const iQue=(k,lab)=>QUEMIDE[k]?`<button type="button" class="iq" data-q="${k}" data-ql="${esc(lab||labK(k))}" aria-label="Qué mide ${esc(lab||labK(k))}">${IQ_SVG}</button>`:"";
 const bindQue=root=>tipBind(root.querySelectorAll(".iq"),b=>`<b>${esc(b.dataset.ql)}:</b> ${esc(QUEMIDE[b.dataset.q])}`);
 
