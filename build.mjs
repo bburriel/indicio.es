@@ -259,8 +259,15 @@ h.textContent="Los "+n.toLocaleString("es-ES")+" municipios, "+(k==="pop"?(desc?
 btn.forEach(function(b){b.addEventListener("click",function(){var nk=b.getAttribute("data-k");if(nk===k)desc=!desc;else{k=nk;desc=nk!=="name"}draw()})});})();</script>`;
 {
   const plist=Object.keys(byProv).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es"));
+  // Provincias agrupadas por comunidad autónoma (código INE de provincia). Las de una sola provincia y las ciudades autónomas
+  // van juntas al final para no repetir el mismo nombre como título y como enlace.
+  const CCAA=[["Andalucía",["04","11","14","18","21","23","29","41"]],["Aragón",["22","44","50"]],["Canarias",["35","38"]],["Castilla y León",["05","09","24","34","37","40","42","47","49"]],
+    ["Castilla-La Mancha",["02","13","16","19","45"]],["Cataluña",["08","17","25","43"]],["Comunitat Valenciana",["03","12","46"]],["Extremadura",["06","10"]],["Galicia",["15","27","32","36"]],["País Vasco",["01","20","48"]],
+    ["Comunidades de una sola provincia",["33","39","07","26","28","30","31"]],["Ciudades autónomas",["51","52"]]];
+  const provRow=p=>`<a href="/provincia/${provSlug(p)}/"><span>${esc(provShort(PROVS[p]))}</span><small>${nf0.format(byProv[p].length)}<span class="vh"> municipios</span></small></a>`;
+  const grouped=CCAA.map(([n,ps])=>[n,ps.filter(p=>byProv[p]).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es"))]).filter(g=>g[1].length);
   const idx=`<header class="phead"><h1>Municipios por provincia</h1><p class="dek">Renta, población, paro y edad de todos los municipios de España, provincia a provincia.</p></header>
-    <div class="provlist">${plist.map(p=>`<a href="/provincia/${provSlug(p)}/">${esc(provShort(PROVS[p]))} <small>${nf0.format(byProv[p].length)}</small></a>`).join("")}</div>${sources}`;
+    <div class="provgroups">${grouped.map(([n,ps])=>`<section class="provgroup"><h2>${esc(n)}</h2><div class="provlist">${ps.map(provRow).join("")}</div></section>`).join("")}</div>${sources}`;
   page({route:"/provincia/",title:"Municipios por provincia: renta, población y paro · Indicio",desc:"Todos los municipios de cada provincia de España con su renta por persona, población, paro registrado y edad media.",main:idx,jsonld:breadcrumb([["Municipios","/municipio/"],["Provincias","/provincia/"]])});
   addUrl("/provincia/",0.7);
   for(const p of plist){
