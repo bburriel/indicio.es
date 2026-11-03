@@ -214,8 +214,8 @@ label.chk{display:flex; align-items:center; gap:7px; font-size:14px; color:var(-
    gris sobre papel, el verde o el gris de la etiqueta donde esté, blanco sobre el granate. Al pasar el ratón sobre
    papel sube a granate y el tinte se intensifica; dentro de una etiqueta de color solo se intensifica el tinte. */
 .iq{display:inline-flex; align-items:center; justify-content:center; flex:none; width:18px; height:18px; margin-left:5px; padding:0;
-    border:0; background:none; color:var(--muted); cursor:help; vertical-align:middle; line-height:1; transition:color .12s}
-.iq .iqs{display:block; width:18px; height:18px; fill:currentColor}
+    border:0; background:none; color:var(--muted); cursor:help; vertical-align:calc(.3em - 9px); line-height:1; transition:color .12s}
+.iq .iqs{display:block; width:18px; height:18px; max-width:none; margin:0; transform:none; fill:currentColor}
 .iq .iqc{fill-opacity:.16; transition:fill-opacity .12s}
 .iq:hover,.iq:focus-visible{color:var(--brand)}
 .iq:hover .iqc,.iq:focus-visible .iqc{fill-opacity:.26}
@@ -1315,7 +1315,7 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .lbseg button{flex:1 1 0; min-width:0; padding-left:2px; padding-right:2px; white-space:nowrap; font-size:12.5px}
 
 /* Menú del laboratorio: iconos de ayuda en títulos y casillas */
-.lb-step h4 .iq, label.chk .iq{margin-left:6px; vertical-align:middle}
+.lb-step h4 .iq, label.chk .iq{margin-left:6px}
 .types button{padding-top:6px; padding-bottom:5px}
 .types button svg{margin-bottom:3px}
 
@@ -1323,7 +1323,7 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 /* panel del laboratorio: textos de apoyo */
 .czplain{margin:8px 0 0; font-size:16px; line-height:1.4; color:var(--ink)}
 .czhelp{margin:10px 0 0; font-size:13px; line-height:1.4; color:var(--muted)}
-.czr .iq,.czpr .iq,.czcap .iq,.czvd .iq,.czc h3 .iq{margin-left:2px; vertical-align:middle}
+.czr .iq,.czpr .iq,.czcap .iq,.czvd .iq,.czc h3 .iq{margin-left:2px}
 .czvd{display:inline-flex; align-items:center; gap:2px}
 .czcard{display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start}
 /* Portada (noviembre 2026): lema, carrusel de cuatro preguntas con su gráfico, tira «Puesto a prueba» y «Por qué fiarte».
@@ -1473,7 +1473,7 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 .czdet .czr,.czdet .czpr,.czdet .czcap,.czdet .czm{margin:8px 0 0}
 .czpar{border-top:1px solid var(--rule); margin-top:22px; padding-top:18px}
 .czpar .czlead{margin:0 0 8px; color:var(--ink-2)}
-.czb-e h3 .iq,.czb-c h3 .iq{margin-left:2px; vertical-align:middle}
+.czb-e h3 .iq,.czb-c h3 .iq{margin-left:2px}
 
 /* Glosario de datos */
 .gl-bar{display:flex; flex-direction:column; gap:10px; margin:8px 0 10px}
