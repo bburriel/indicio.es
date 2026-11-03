@@ -1058,7 +1058,7 @@ details.ficha dd{color:var(--ink-2)}
 .enclg{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:13px; color:var(--ink-2); margin:8px 0 2px} .enclg span{display:inline-flex; align-items:center; gap:6px}
 .enclg i{display:inline-block; width:11px; height:11px; border-radius:50%}
 .enclg .sz i{background:var(--stone)} .enclg .sz .s1{width:5px;height:5px} .enclg .sz .s2{width:9px;height:9px} .enclg .sz .s3{width:14px;height:14px}
-svg line.quad{stroke:var(--rule-2); stroke-width:1.2; stroke-dasharray:3 4} svg text.quadt{fill:var(--muted); font-size:11.5px; font-weight:500}
+svg line.quad{stroke:var(--brand-2); stroke-width:2; stroke-dasharray:7 5; opacity:.85} svg rect.quadbg{fill:var(--brand-2); opacity:.06; pointer-events:none} svg text.quadt{fill:var(--ink); font-size:12.5px; font-weight:700; paint-order:stroke; stroke:var(--bg); stroke-width:4px; stroke-linejoin:round}
 .czadd{font:inherit; font-size:13.5px; font-weight:600; color:var(--ink-2); background:none; border:1.5px dashed var(--rule-2); border-radius:99px; padding:1px 10px; cursor:pointer} .czadd:hover{border-color:var(--ink); color:var(--ink)}
 
 /* mapa de dos datos, comunidad a comunidad, burbujas */
@@ -1394,3 +1394,5 @@ img.il.il-t{aspect-ratio:8/5; object-position:50% 50%}
 /* en el tema oscuro --brand es casi negro; en la portada el granate se aclara para que se lea (como --rust) */
 :root[data-theme="dark"] .pt-lema,:root[data-theme="dark"] .pt-car,:root[data-theme="dark"] .pt-tira,:root[data-theme="dark"] .pt-why{--brand:#d0505f}
 .pt-f-mu{fill:var(--rule-2)}
+
+@media (max-width:600px){ svg text.quadt{font-size:10.5px; stroke-width:3px} }

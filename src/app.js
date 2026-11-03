@@ -1428,9 +1428,11 @@ function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,
   const E=enc&&(enc.sz||enc.col)?makeEnc(pts.map(p=>p.r),enc):null, rad=r=>E&&E.r?E.r(r):Rr(r[F.pop]||1);
   const sorted=pts.slice().sort((a,b)=>rad(b.r)-rad(a.r));
   if(quad&&c){ const mx_=d3.mean(pts,p=>p.x0), my_=d3.mean(pts,p=>p.y0); const [x0_]=X.range(), qx=logX?X(Math.pow(10,d3.mean(pts,p=>Math.log10(p.x0)))):X(mx_), qy=Y(my_);
+    svg.append("rect").attr("class","quadbg").attr("x",m.l).attr("y",m.t).attr("width",Math.max(0,qx-m.l)).attr("height",Math.max(0,qy-m.t)); svg.append("rect").attr("class","quadbg").attr("x",qx).attr("y",qy).attr("width",Math.max(0,W-m.r-qx)).attr("height",Math.max(0,H-m.b-qy));
     svg.append("line").attr("class","quad").attr("x1",qx).attr("x2",qx).attr("y1",m.t).attr("y2",H-m.b); svg.append("line").attr("class","quad").attr("x1",m.l).attr("x2",W-m.r).attr("y1",qy).attr("y2",qy);
     const T=(tx,ty,an,t)=>svg.append("text").attr("class","lab quadt").attr("x",tx).attr("y",ty).attr("text-anchor",an).text(t);
-    const sh=k=>labK(k).toLowerCase(); T(m.l+6,m.t+12,"start",`menos ${sh(x)} · más ${sh(y)}`.slice(0,46)); T(W-m.r-4,m.t+12,"end",`más ${sh(x)} · más ${sh(y)}`.slice(0,46)); T(m.l+6,H-m.b-6,"start",`menos ${sh(x)} · menos ${sh(y)}`.slice(0,46)); T(W-m.r-4,H-m.b-6,"end",`más ${sh(x)} · menos ${sh(y)}`.slice(0,46)); }
+    const nar=W<600, sh=k=>{ const t=labK(k).toLowerCase(), n=nar?9:17; return t.length>n?t.slice(0,n-1).trimEnd()+"…":t; }, qt_=(a,b)=>nar?`${a} horiz. · ${b} vert.`:`${a==="−"?"menos":"más"} ${sh(x)} · ${b==="−"?"menos":"más"} ${sh(y)}`;
+    T(m.l+6,m.t+12,"start",qt_("−","+")); T(W-m.r-4,m.t+12,"end",qt_("+","+")); T(m.l+6,H-m.b-6,"start",qt_("−","−")); T(W-m.r-4,H-m.b-6,"end",qt_("+","−")); }
   function paint(focus){
     ctx.clearRect(0,0,W,H);
     for(const p of sorted){ const isP=prov&&p.r[F.prov]===prov; ctx.beginPath(); ctx.arc(X(p.x0),Y(p.y0),rad(p.r),0,7); ctx.fillStyle=E&&E.c&&!prov?E.c(p.r):isP?hl:base; ctx.globalAlpha=prov?(isP?.8:.10):E&&E.c?.5:.30; ctx.fill(); }
