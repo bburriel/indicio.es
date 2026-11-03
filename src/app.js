@@ -1398,7 +1398,29 @@ function makeEnc(rows,{sz="",col=""}){
   out.legend=()=>{ const parts=[]; if(out.cl) parts.push(...out.cl.map(([c,l])=>`<span><i style="background:${c}"></i>${esc(l)}</span>`)); if(out.rl&&sz!=="1") parts.push(`<span class="sz"><i class="s1"></i><i class="s2"></i><i class="s3"></i>${esc(out.rl.replace("Tamaño: ","Tamaño: más grande = más "))}</span>`); return parts.length?`<div class="enclg">${parts.join("")}</div>`:""; };
   return out;
 }
-function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,diag=false,height,weighted=true,compact=false,title,source,hideSay=false,enc=null,quad=false}){
+// ---------- zoom y desplazamiento ----------
+// Arrastrar para moverse; botones +, − y ⟲; Ctrl (o ⌘) + rueda y pellizco para acercar. La rueda sola sigue desplazando la página.
+let SCID=0;
+function zoomBtns(host,onAct){ const zb=document.createElement("div"); zb.className="zbtns";
+  zb.innerHTML='<button type="button" data-z="in" aria-label="Acercar" title="Acercar (o Ctrl + rueda)">+</button><button type="button" data-z="out" aria-label="Alejar" title="Alejar">−</button><button type="button" data-z="reset" aria-label="Ver todo" title="Ver todo" hidden>⟲</button>';
+  zb.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; e.stopPropagation(); onAct(b.dataset.z); });
+  zb.addEventListener("pointerdown",e=>e.stopPropagation()); zb.addEventListener("dblclick",e=>e.stopPropagation());
+  host.appendChild(zb); return zb; }
+const zoomFilter=ev=>ev.type==="wheel"?(ev.ctrlKey||ev.metaKey):!ev.button;
+function addZoom(wrap,{m,W,H,X0,Y0,max=40,onZoom}){
+  const sel=d3.select(wrap), ex=[[m.l,m.t],[W-m.r,H-m.b]];
+  const z=d3.zoom().scaleExtent([1,max]).extent(ex).translateExtent(ex).filter(zoomFilter).on("zoom",ev=>{ const t=ev.transform, id=t.k===1&&t.x===0&&t.y===0; rb.hidden=id;
+    onZoom(id?X0:t.rescaleX(X0.copy().clamp(false)),id?Y0:t.rescaleY(Y0.copy().clamp(false)),!id); });
+  sel.call(z).on("dblclick.zoom",null); wrap.style.touchAction="pan-y"; wrap.title="Arrastra para moverte · Ctrl + rueda para acercar";
+  const zb=zoomBtns(wrap,a=>{ if(a==="reset") sel.transition().duration(250).call(z.transform,d3.zoomIdentity); else sel.transition().duration(250).call(z.scaleBy,a==="in"?1.8:1/1.8); }), rb=zb.querySelector("[data-z=reset]");
+  return z; }
+function zoomStrokes(gg,k){ gg.selectAll("path").each(function(){ if(!this.dataset.w) this.dataset.w=this.getAttribute("stroke-width")||"1"; this.setAttribute("stroke-width",(+this.dataset.w)/k); }); }
+function addMapZoom(svg,zg,gg,W,H,mb){
+  const z=d3.zoom().scaleExtent([1,14]).translateExtent([[0,0],[W,H]]).filter(zoomFilter).on("zoom",ev=>{ zg.attr("transform",ev.transform); zoomStrokes(gg,ev.transform.k); rb.hidden=ev.transform.k===1&&ev.transform.x===0&&ev.transform.y===0; });
+  svg.call(z).on("dblclick.zoom",null); svg.style("touch-action","pan-y"); mb.title="Arrastra para moverte · Ctrl + rueda para acercar";
+  const zb=zoomBtns(mb,a=>{ if(a==="reset") svg.transition().duration(250).call(z.transform,d3.zoomIdentity); else svg.transition().duration(250).call(z.scaleBy,a==="in"?1.8:1/1.8); }), rb=zb.querySelector("[data-z=reset]"); }
+
+function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,diag=false,height,weighted=true,compact=false,title,source,hideSay=false,enc=null,quad=false,zoom=false}){
   const fx=fmtK(x), fy=fmtK(y), xl=labK(x), yl=labK(y);
   const pts=pairPts(x,y,{minPop,logX,logY,weighted});
   const c=wcorr(pts);
@@ -1410,39 +1432,46 @@ function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,
   const sx=pts.map(p=>p.x0).sort(d3.ascending), sy=pts.map(p=>p.y0).sort(d3.ascending);
   const xd=[d3.quantile(sx,.003),d3.quantile(sx,.99)], yd=[d3.quantile(sy,.003),d3.quantile(sy,.99)];
   if(diag){ const lo=Math.min(xd[0],yd[0]), hi=Math.max(xd[1],yd[1]); xd[0]=yd[0]=lo; xd[1]=yd[1]=hi; }
-  const X=(logX?d3.scaleLog():d3.scaleLinear()).domain(xd).nice().range([m.l,W-m.r]).clamp(true), Y=(logY?d3.scaleLog():d3.scaleLinear()).domain(yd).nice().range([H-m.b,m.t]).clamp(true);
+  const X0=(logX?d3.scaleLog():d3.scaleLinear()).domain(xd).nice().range([m.l,W-m.r]).clamp(true), Y0=(logY?d3.scaleLog():d3.scaleLinear()).domain(yd).nice().range([H-m.b,m.t]).clamp(true);
+  let X=X0, Y=Y0, ZM=false; const cid="scc"+(++SCID);
   const mxP=d3.max(pts,p=>p.r[F.pop]||1), Rr=d3.scaleSqrt().domain([0,mxP]).range([1.5,Math.max(4,Math.min(compact?12:16,(compact?12:16)*Math.sqrt(mxP/2e6)))]);
   const cv=f.body.querySelector("canvas"), ctx=cv.getContext("2d"); ctx.scale(2,2);
   const svg=d3.select(f.body).select("svg");
   const tks=(sc,n,lg)=>lg?sc.ticks(5).filter(t=>[1,2,5].includes(+String(t).replace(/^0\.0*/,"")[0])):sc.ticks(n);
   const short=(fm,v)=>fm(v).replace(/ (%|€)$/,"$1").replace(/(\d)\.000 ?€$/,"$1 mil €");
+  const base=css("--rust"), hl=css("--slate"), ink=css("--ink");
+  const E=enc&&(enc.sz||enc.col)?makeEnc(pts.map(p=>p.r),enc):null, rad=r=>E&&E.r?E.r(r):Rr(r[F.pop]||1);
+  const sorted=pts.slice().sort((a,b)=>rad(b.r)-rad(a.r));
+  function drawSvg(){ svg.selectAll("*").remove();
+    svg.append("defs").append("clipPath").attr("id",cid).append("rect").attr("x",m.l).attr("y",m.t).attr("width",W-m.l-m.r).attr("height",H-m.t-m.b);
+    const cg=svg.append("g").attr("clip-path",`url(#${cid})`);
   svg.append("g").attr("class","grid").selectAll("line").data(tks(Y,5,logY)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",Y).attr("y2",Y);
   svg.append("g").attr("class","axis").selectAll("text").data(tks(Y,5,logY)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>short(fy,v));
   svg.append("g").attr("class","axis").selectAll("text").data(tks(X,W<500?4:6,logX)).join("text").attr("x",X).attr("y",H-m.b+16).attr("text-anchor","middle").text(v=>short(fx,v));
   svg.append("text").attr("class","lab strong").attr("x",W).attr("y",H-4).attr("text-anchor","end").text(xl+" →");
   svg.append("text").attr("class","lab strong").attr("x",0).attr("y",m.t-10).attr("text-anchor","start").text("↑ "+yl);
-  if(diag){ const [a,b]=X.domain(); svg.append("line").attr("x1",X(a)).attr("y1",Y(a)).attr("x2",X(b)).attr("y2",Y(b)).attr("stroke",css("--ink")).attr("stroke-dasharray","4 3"); svg.append("text").attr("class","lab").attr("x",X(b)-4).attr("y",Y(b)+14).attr("text-anchor","end").text("misma subida"); }
+  if(diag){ const [a,b]=X.domain(); cg.append("line").attr("x1",X(a)).attr("y1",Y(a)).attr("x2",X(b)).attr("y2",Y(b)).attr("stroke",css("--ink")).attr("stroke-dasharray","4 3"); svg.append("text").attr("class","lab").attr("x",X(b)-4).attr("y",Y(b)+14).attr("text-anchor","end").text("misma subida"); }
   else if(c&&Math.abs(c.r)>=0.1){ const [a,b]=X.domain(), tx=v=>logX?Math.log10(v):v, ty=v=>logY?Math.pow(10,v):v; const N=24, line=d3.range(N+1).map(i=>{ const xv=logX?a*Math.pow(b/a,i/N):a+(b-a)*i/N; return [X(xv),Y(ty(c.a+c.b*tx(xv)))]; });
-    svg.append("path").attr("d",d3.line()(line)).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-width",1.3).attr("stroke-dasharray","5 4"); }
-  const base=css("--rust"), hl=css("--slate"), ink=css("--ink");
-  const E=enc&&(enc.sz||enc.col)?makeEnc(pts.map(p=>p.r),enc):null, rad=r=>E&&E.r?E.r(r):Rr(r[F.pop]||1);
-  const sorted=pts.slice().sort((a,b)=>rad(b.r)-rad(a.r));
+    cg.append("path").attr("d",d3.line()(line)).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-width",1.3).attr("stroke-dasharray","5 4"); }
   if(quad&&c){ const mx_=d3.mean(pts,p=>p.x0), my_=d3.mean(pts,p=>p.y0); const [x0_]=X.range(), qx=logX?X(Math.pow(10,d3.mean(pts,p=>Math.log10(p.x0)))):X(mx_), qy=Y(my_);
-    svg.append("rect").attr("class","quadbg").attr("x",m.l).attr("y",m.t).attr("width",Math.max(0,qx-m.l)).attr("height",Math.max(0,qy-m.t)); svg.append("rect").attr("class","quadbg").attr("x",qx).attr("y",qy).attr("width",Math.max(0,W-m.r-qx)).attr("height",Math.max(0,H-m.b-qy));
-    svg.append("line").attr("class","quad").attr("x1",qx).attr("x2",qx).attr("y1",m.t).attr("y2",H-m.b); svg.append("line").attr("class","quad").attr("x1",m.l).attr("x2",W-m.r).attr("y1",qy).attr("y2",qy);
+    cg.append("rect").attr("class","quadbg").attr("x",m.l).attr("y",m.t).attr("width",Math.max(0,qx-m.l)).attr("height",Math.max(0,qy-m.t)); cg.append("rect").attr("class","quadbg").attr("x",qx).attr("y",qy).attr("width",Math.max(0,W-m.r-qx)).attr("height",Math.max(0,H-m.b-qy));
+    cg.append("line").attr("class","quad").attr("x1",qx).attr("x2",qx).attr("y1",m.t).attr("y2",H-m.b); cg.append("line").attr("class","quad").attr("x1",m.l).attr("x2",W-m.r).attr("y1",qy).attr("y2",qy);
     const T=(tx,ty,an,t)=>svg.append("text").attr("class","lab quadt").attr("x",tx).attr("y",ty).attr("text-anchor",an).text(t);
     const nar=W<600, sh=k=>{ const t=labK(k).toLowerCase(), n=nar?9:17; return t.length>n?t.slice(0,n-1).trimEnd()+"…":t; }, qt_=(a,b)=>nar?`${a} horiz. · ${b} vert.`:`${a==="−"?"menos":"más"} ${sh(x)} · ${b==="−"?"menos":"más"} ${sh(y)}`;
     T(m.l+6,m.t+12,"start",qt_("−","+")); T(W-m.r-4,m.t+12,"end",qt_("+","+")); T(m.l+6,H-m.b-6,"start",qt_("−","−")); T(W-m.r-4,H-m.b-6,"end",qt_("+","−")); }
+  }
+  drawSvg();
   function paint(focus){
-    ctx.clearRect(0,0,W,H);
+    ctx.clearRect(0,0,W,H); if(ZM){ ctx.save(); ctx.beginPath(); ctx.rect(m.l,m.t-4,W-m.l-m.r+4,H-m.t-m.b+8); ctx.clip(); }
     for(const p of sorted){ const isP=prov&&p.r[F.prov]===prov; ctx.beginPath(); ctx.arc(X(p.x0),Y(p.y0),rad(p.r),0,7); ctx.fillStyle=E&&E.c&&!prov?E.c(p.r):isP?hl:base; ctx.globalAlpha=prov?(isP?.8:.10):E&&E.c?.5:.30; ctx.fill(); }
     ctx.globalAlpha=1;
     for(const code of [mark,(typeof MUN2!=="undefined"?MUN2:null),focus].filter(Boolean)){ const p=pts.find(q=>q.r[F.code]===code); if(!p) continue; const px=X(p.x0), py=Y(p.y0);
       ctx.beginPath(); ctx.arc(px,py,Math.max(5,rad(p.r)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke();
       ctx.font="600 12.5px 'Libre Franklin', Arial, sans-serif"; ctx.fillStyle=ink; const nm=dispName(p.r[F.name]), tw=ctx.measureText(nm).width; ctx.fillText(nm,px+tw+12>W?px-tw-9:px+9,py-8); }
+    if(ZM) ctx.restore();
   }
   paint();
-  const qt=d3.quadtree().x(p=>X(p.x0)).y(p=>Y(p.y0)).addAll(pts);
+  let qt; const rebuild=()=>{ qt=d3.quadtree().x(p=>X(p.x0)).y(p=>Y(p.y0)).addAll(pts); }; rebuild();
   const tip=f.body.querySelector(".maptip"), wrap=f.body.querySelector(".scat-wrap");
   const at=ev=>{ const bb=cv.getBoundingClientRect(); return [bb,qt.find((ev.clientX-bb.left)*W/bb.width,(ev.clientY-bb.top)*H/bb.height,16)]; };
   wrap.addEventListener("pointermove",ev=>{ const [bb,p]=at(ev);
@@ -1451,6 +1480,7 @@ function scatter(parent,{x,y,minPop=0,prov=null,mark=null,logX=false,logY=false,
     tip.style.left=Math.max(tip.offsetWidth/2+4,Math.min(bb.width-tip.offsetWidth/2-4,(X(p.x0)/W)*bb.width))+"px"; tip.style.top=(Y(p.y0)/H*bb.height-6)+"px"; paint(p.r[F.code]); });
   wrap.addEventListener("pointerleave",()=>{ tip.hidden=true; paint(); });
   wrap.addEventListener("click",ev=>{ const [,p]=at(ev); if(p){ go(p.r[F.code]); window.scrollTo(0,0); } });
+  if(zoom&&!compact) addZoom(wrap,{m,W,H,X0,Y0,onZoom:(xz,yz,z)=>{ X=xz; Y=yz; ZM=z; drawSvg(); rebuild(); paint(); }});
   if(!source){ const n=add(f,"figcaption",null,""); n.textContent=`${nf0.format(pts.length)} municipios${minPop?` de ${nf0.format(minPop)} habitantes o más`:""}.`; }
   else f._cap.textContent+=` Cada círculo es un municipio${E&&E.r?"":", más grande cuanta más población"}. Pulsa uno para abrir su ficha.`;
   if(E&&E.legend().length){ const lg=el("div",null,E.legend()); f.body.after(lg.firstChild); }
@@ -1469,7 +1499,7 @@ function renderRelaciones(x,y){
   document.title="Relaciones · Indicio";
   if(x&&CATK[x]) XS.x=x; if(y&&CATK[y]) XS.y=y;
   const opt=sel=>{ let h="",g=null; CAT.forEach(c=>{ if(c.g!==g){ if(g) h+="</optgroup>"; h+=`<optgroup label="${c.g}">`; g=c.g; } h+=`<option value="${c.k}" ${c.k===sel?"selected":""}>${esc(c.l)}</option>`; }); return h+"</optgroup>"; };
-  view.innerHTML=pageHead("¿Qué va con qué?",`Elige dos datos y mira si se mueven juntos en los municipios de España. Por ejemplo: ¿los municipios con más estudios tienen más renta? ¿Donde hay más pisos turísticos hay más alquiler? Debajo verás cuánto se parecen, qué municipios se salen de la norma y qué relaciones son las más fuertes de todas.`)+
+  view.innerHTML=pageHead("¿Van juntos?",`Elige dos datos y mira si se mueven juntos en los municipios de España. Por ejemplo: ¿los municipios con más estudios tienen más renta? ¿Donde hay más pisos turísticos hay más alquiler? Debajo verás cuánto se parecen, qué municipios se salen de la norma y qué relaciones son las más fuertes de todas.`)+
   `<div class="xsug" aria-label="Ejemplos">${SUGG.map(([a,b,l])=>`<a href="#relaciones-${a}-${b}">${l}</a>`).join("")}</div>
   <div class="xform">
     <label class="fld" for="cx">Dato horizontal<select class="sel" id="cx">${opt(XS.x)}</select></label>
@@ -1505,7 +1535,7 @@ const unitTxt=(k,v)=>{ const f=(CATK[k]||{}).f; const a=Math.abs(v);
 function drawRel(){
   const S=XS, x=S.x, y=S.y, xl=labK(x), yl=labK(y), fx=fmtK(x), fy=fmtK(y);
   const box=document.getElementById("cplot"); box.innerHTML="";
-  const c=scatter(box,{x,y,minPop:S.minPop,prov:S.prov||null,logX:S.logX,weighted:S.weighted,mark:lastMun,hideSay:true,diag:x==="rentaVar"&&y==="alqVar",enc:{sz:S.sz,col:S.col},quad:!!S.quad,
+  const c=scatter(box,{x,y,minPop:S.minPop,prov:S.prov||null,logX:S.logX,weighted:S.weighted,mark:lastMun,hideSay:true,diag:x==="rentaVar"&&y==="alqVar",enc:{sz:S.sz,col:S.col},quad:!!S.quad,zoom:true,
     source:`Fuentes: ${CATK[x].src} (horizontal) y ${CATK[y].src} (vertical).`});
   const pts=pairPts(x,y,{minPop:S.minPop,logX:S.logX,weighted:S.weighted});
   const say=document.getElementById("csay");
@@ -1837,7 +1867,7 @@ async function exMapa(out){
   else { const regions=topojson.feature(TOPO,TOPO.objects.autonomous_regions); regions.features.forEach(rewind); proj=d3.geoConicConformalSpain().fitSize([W-10,H-10],regions); }
   const path=d3.geoPath(proj);
   const svg=d3.select(mb).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label","Mapa de "+labK(k));
-  const gg=svg.append("g").attr("transform","translate(5,5)");
+  const zg=svg.append("g"), gg=zg.append("g").attr("transform","translate(5,5)");
   const tip=el("div","maptip"); tip.hidden=true; mb.appendChild(tip);
   const vals=rows.map(r=>r[F[k]]), ramp=[0,1,2,3,4,5,6].map(i=>css("--ramp-"+i));
   const neg=d3.quantile(vals.slice().sort((a,b)=>a-b),.15)<0&&d3.quantile(vals.slice().sort((a,b)=>a-b),.85)>0;
@@ -1860,6 +1890,7 @@ async function exMapa(out){
     .on("pointerleave",()=>tip.hidden=true).on("click",(ev,ft)=>{ if(BYCODE.has(ft.id)) go(ft.id); });
   if(!EX.p){ gg.append("path").datum(topojson.mesh(TOPO,TOPO.objects.provinces,(a,b)=>a!==b)).attr("fill","none").attr("stroke",css("--geo-line")).attr("stroke-width",.6).attr("d",path); gg.append("path").attr("d",proj.getCompositionBorders()).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",.8); }
   [EX.m,MUN2].filter(Boolean).forEach((c,i)=>{ const ft=feats.find(x=>x.id===c); if(ft) gg.append("path").datum(ft).attr("d",path).attr("fill","none").attr("stroke",css(i?"--slate":"--ink")).attr("stroke-width",2.2); });
+  addMapZoom(svg,zg,gg,W,H,mb);
   if(!k2) lg.innerHTML=`<span class="num">${labels[0]}</span><span class="bar">${stops.map(c=>`<i style="background:${c}"></i>`).join("")}</span><span class="num">${labels[1]}</span><span class="help">${neg?"En azul, valores negativos; en granate, positivos.":"Siete grupos con el mismo número de municipios."} En gris, sin dato o fuera del filtro. Pulsa un municipio para abrir su ficha.</span>`;
 }
 
@@ -2513,7 +2544,7 @@ async function exMapaAgg(out,k){
   const fc=u==="prov"?topojson.feature(TOPO,TOPO.objects.provinces):regions; if(u==="prov") fc.features.forEach(rewind);
   const proj=d3.geoConicConformalSpain().fitSize([W-10,H-10],regions), path=d3.geoPath(proj);
   const svg=d3.select(mb).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`Mapa de ${labK(k)} por ${u==="prov"?"provincias":"comunidades"}`);
-  const gg=svg.append("g").attr("transform","translate(5,5)"), tip=el("div","maptip"); tip.hidden=true; mb.appendChild(tip);
+  const zg=svg.append("g"), gg=zg.append("g").attr("transform","translate(5,5)"), tip=el("div","maptip"); tip.hidden=true; mb.appendChild(tip);
   const vals=[...V.values()], ramp=[0,1,2,3,4,5,6].map(i=>css("--ramp-"+i)), lo=d3.min(vals), hi=d3.max(vals);
   const neg=lo<0&&hi>0; let scale,stops;
   if(neg){ const m=Math.max(-lo,hi); stops=[css("--div-neg"),css("--div-neg2"),"#c9d6e6",css("--div-mid"),ramp[2],ramp[4],ramp[6]]; scale=d3.scaleThreshold().domain([-m*.6,-m*.25,-m*.05,m*.05,m*.25,m*.6]).range(stops); }
@@ -2524,6 +2555,7 @@ async function exMapaAgg(out,k){
     .on("pointerleave",()=>tip.hidden=true)
     .on("click",(ev,ft)=>{ if(u!=="prov"||isReg(k)||!PROVS[ft.id]) return; EX.u=""; EX.p=ft.id; navTo(exHash()); });
   gg.append("path").attr("d",proj.getCompositionBorders()).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",.8);
+  addMapZoom(svg,zg,gg,W,H,mb);
   lg.innerHTML=`<span class="num">${f(lo)}</span><span class="bar">${stops.map(c=>`<i style="background:${c}"></i>`).join("")}</span><span class="num">${f(hi)}</span><span class="help">${neg?"En azul, valores negativos; en granate, positivos.":"Siete tramos de igual anchura entre el valor más bajo y el más alto."}</span>`;
 }
 
@@ -3477,7 +3509,7 @@ const LBTYPES=[["mapa","Mapa",`<path d="M6 4h12l4 6 10 1 3 10H8z"/>`],["tabla","
   ["composicion","Composición",`<rect x="4" y="2" width="13" height="6"/><rect x="18" y="2" width="9" height="6"/><rect x="28" y="2" width="8" height="6" style="opacity:.5"/><rect x="4" y="10" width="7" height="6"/><rect x="12" y="10" width="16" height="6"/><rect x="29" y="10" width="7" height="6" style="opacity:.5"/><rect x="4" y="18" width="18" height="6"/><rect x="23" y="18" width="7" height="6"/><rect x="31" y="18" width="5" height="6" style="opacity:.5"/>`]];
 const LBDESC={matriz:"¿Qué datos van juntos? Todas las parejas de datos a la vez, municipio a municipio",pendientes:"¿Quién ha mejorado y quién se ha quedado atrás? Cada provincia o comunidad, entre dos años",piramide:"¿Cómo es la población? Hombres y mujeres por edad, en España, una comunidad o una provincia",composicion:"¿De qué se compone? Sectores, voto o edades en cada comunidad, provincia, tamaño o nivel de renta",paises:"¿Cómo ha cambiado? Las series que quieras, año a año, con un año de referencia si quieres: precios, sueldos, vivienda, empleo… de España, tu provincia o tu municipio, o España frente a otros países",mapa:"¿Dónde es más alto o más bajo? Un dato, municipio a municipio",tabla:"¿Quiénes encabezan la lista? Ordena y filtra por varios datos",cruce:"¿Van juntos dos datos? Mira si la relación aguanta al comparar entre iguales",antes:"¿Cambió algo tras una ley o un suceso? Afectados frente a gemelos, año a año",evolucion:"¿Cómo ha cambiado? Cuánto ha crecido cada dato desde un año",grupos:"¿Qué zona destaca? Medias por comunidad, provincia, tamaño o nivel",distribucion:"¿Cómo se reparte? Un dato entre toda la población",burbujas:"¿Cómo se mueven las provincias? Dos datos y el tamaño, año a año"};
 // Paso 1 del laboratorio: cada gráfico se nombra por la pregunta que responde, con el nombre del gráfico debajo
-const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Qué va con qué",grupos:"Qué zona destaca",distribucion:"Cómo se reparte",matriz:"Todo con todo",paises:"Cómo ha cambiado",pendientes:"Quién mejoró",burbujas:"Cómo se mueven",piramide:"Por edades",composicion:"De qué se compone"};
+const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Si van juntos",grupos:"Qué zona destaca",distribucion:"Cómo se reparte",matriz:"Todo con todo",paises:"Cómo ha cambiado",pendientes:"Quién mejoró",burbujas:"Cómo se mueven",piramide:"Por edades",composicion:"De qué se compone"};
 const LBEJ={mapa:"dónde hay más paro registrado",tabla:"los municipios con la renta más alta",cruce:"si donde se estudia más se gana más",grupos:"la renta media por comunidad",distribucion:"cuántos municipios tienen mucho paro y cuántos poco",matriz:"qué datos se mueven juntos en los municipios",paises:"cómo han subido los alquileres en tu provincia",pendientes:"qué provincias han mejorado su renta desde 2015",burbujas:"cómo se mueven las provincias en renta y paro",piramide:"cómo de envejecida está una provincia",composicion:"qué sectores dan trabajo en cada comunidad"};
 const typesHTML=cur=>`<div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===cur}">${typeIcon(svg)}<b>${LBQ[k]}</b><small>${l}</small></button>`).join("")}</div>`;
 const typesTips=root=>tipBind(root.querySelectorAll(".types button"),b=>{ const k=b.dataset.v; return `<b>${LBQ[k]}</b> <span style="opacity:.7">· ${LBTYPES.find(t=>t[0]===k)[1]}</span><br>${LBDESC[k]}.${LBEJ[k]?`<br><i>Ejemplo: ${LBEJ[k]}.</i>`:""}`; });
@@ -3698,7 +3730,7 @@ function exBar(){
       <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Ampliar los valores bajos (horizontal)</label>
       <button type="button" class="sel" id="exswap" style="margin-top:6px">⇄ Intercambiar ejes</button>
       <p class="hint">Debajo del gráfico podrás comprobar si la relación es real o se explica por otra cosa.</p>`
-      :`<p class="hint" style="margin:0">Para comprobar si dos datos van juntos, pásalo a «Qué va con qué».</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
+      :`<p class="hint" style="margin:0">Para comprobar si dos datos van juntos, pásalo a «Si van juntos».</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
   wireTypes(bar); lbBind(bar); if(VOPT[EX.v]&&VOPT[EX.v].wire) VOPT[EX.v].wire(bar);
   bar.querySelectorAll("#exmu button").forEach(b=>b.addEventListener("click",async()=>{ const u=b.dataset.u; if(u) await loadRegional(); if(isReg(EX.d[0])&&!(u&&scaleOK(u,[EX.d[0]]))){ toast("Ese dato no existe a esa escala: elige otro.",2800); if(!u) EX.d=["renta"]; else return; } EX.u=u; if(u) EX.bv=0; exUpdate(); }));
   { const bz=bar.querySelector("button[data-bsz]"); if(bz) bz.addEventListener("click",async()=>{ await loadAllCat(); openPicker(bz,{current:EX.sz||null,extras:[["","Habitantes"]],all:true,jump:false,here:k=>BSER.some(x=>x[0]===k)||(isReg(k)&&CATK[k].np>=40),onPick:v=>{ EX.sz=v; exUpdate(); }}); });
@@ -4124,27 +4156,34 @@ function adjScatter(box,x,y,cs,w,animate){
   const q=(a,p)=>d3.quantile(a.slice().sort(d3.ascending),p);
   const xs=pts.flatMap(p=>[p.x0,p.x1]), ys=pts.flatMap(p=>[p.y0,p.y1]);
   const W=Math.max(300,Math.round(box.clientWidth||800)), H=Math.round(Math.min(440,Math.max(260,W*0.54))), m={t:22,r:16,b:40,l:58};
-  const X=d3.scaleLinear().domain([q(xs,.004),q(xs,.993)]).nice().range([m.l,W-m.r]).clamp(true), Y=d3.scaleLinear().domain([q(ys,.004),q(ys,.993)]).nice().range([H-m.b,m.t]).clamp(true);
+  const X0=d3.scaleLinear().domain([q(xs,.004),q(xs,.993)]).nice().range([m.l,W-m.r]).clamp(true), Y0=d3.scaleLinear().domain([q(ys,.004),q(ys,.993)]).nice().range([H-m.b,m.t]).clamp(true);
+  let X=X0, Y=Y0, ZM=false;
   const fx=fmtK(x), fy=fmtK(y), short=(fm,v)=>fm(v).replace(/ (%|€)$/,"$1");
   box.innerHTML=`<figure><div class="scat-wrap"><canvas width="${W*2}" height="${H*2}" role="img" aria-label="${esc(labK(x))} frente a ${esc(labK(y))}, descontando ${esc(cs.map(c=>CNAME[c]).join(", "))}"></canvas><svg viewBox="0 0 ${W} ${H}"></svg></div><figcaption>Cada punto es un municipio, colocado según su valor «a igualdad de ${esc(cs.map(c=>CNAME[c]).join(", ").replace(/, ([^,]*)$/," y $1"))}»: lo que tendría si en eso fuera como la media. ${nf0.format(pts.length)} municipios.</figcaption></figure>`;
   const svg=d3.select(box).select("svg"), cv=box.querySelector("canvas"), ctx=cv.getContext("2d"); ctx.scale(2,2);
+  const drawAxes=()=>{ svg.selectAll(".grid,.axis,.lab").remove();
   svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",Y).attr("y2",Y);
   svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>short(fy,v));
   svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(W<500?4:6)).join("text").attr("x",X).attr("y",H-m.b+16).attr("text-anchor","middle").text(v=>short(fx,v));
   svg.append("text").attr("class","lab strong").attr("x",W).attr("y",H-4).attr("text-anchor","end").text(labK(x)+", a igualdad →");
   svg.append("text").attr("class","lab strong").attr("x",0).attr("y",m.t-10).attr("text-anchor","start").text("↑ "+labK(y)+", a igualdad");
+  };
+  drawAxes();
   const c=D.c; const line=svg.append("line").attr("stroke",css("--ink")).attr("stroke-width",1.3).attr("stroke-dasharray","5 4").attr("opacity",0);
-  if(c&&Math.abs(c.r)>=0.05){ const [a,b]=X.domain(); line.attr("x1",X(a)).attr("y1",Y(c.a+c.b*a)).attr("x2",X(b)).attr("y2",Y(c.a+c.b*b)); }
+  const setLine=()=>{ if(c&&Math.abs(c.r)>=0.05){ const [a,b]=X.domain(); line.attr("x1",X(a)).attr("y1",Y(c.a+c.b*a)).attr("x2",X(b)).attr("y2",Y(c.a+c.b*b)); } };
+  const lcid="scc"+(++SCID); svg.append("defs").append("clipPath").attr("id",lcid).append("rect").attr("x",m.l).attr("y",m.t).attr("width",W-m.l-m.r).attr("height",H-m.t-m.b); line.attr("clip-path",`url(#${lcid})`);
+  setLine();
   const mxP=d3.max(pts,p=>p.r[F.pop]||1), Rr=d3.scaleSqrt().domain([0,mxP]).range([1.5,Math.max(4,Math.min(16,16*Math.sqrt(mxP/2e6)))]), base=css("--rust"), ink=css("--ink");
   const sorted=pts.slice().sort((a,b)=>(b.r[F.pop]||0)-(a.r[F.pop]||0));
   const E=(EX.sz||EX.col)?makeEnc(pts.map(p=>p.r),{sz:EX.sz,col:EX.col}):null, rad=r=>E&&E.r?E.r(r):Rr(r[F.pop]||1);
   sorted.sort((a,b)=>rad(b.r)-rad(a.r)); if(E&&E.legend().length) box.querySelector("figure").insertAdjacentHTML("beforeend",E.legend());
-  const paint=t=>{ ctx.clearRect(0,0,W,H); ctx.fillStyle=base; ctx.globalAlpha=E&&E.c?.5:.3;
+  const paint=t=>{ ctx.clearRect(0,0,W,H); if(ZM){ ctx.save(); ctx.beginPath(); ctx.rect(m.l,m.t-4,W-m.l-m.r+4,H-m.t-m.b+8); ctx.clip(); } ctx.fillStyle=base; ctx.globalAlpha=E&&E.c?.5:.3;
     for(const p of sorted){ const px=p.x0+(p.x1-p.x0)*t, py=p.y0+(p.y1-p.y0)*t; ctx.beginPath(); ctx.arc(X(px),Y(py),rad(p.r),0,7); if(E&&E.c) ctx.fillStyle=E.c(p.r); ctx.fill(); }
-    ctx.globalAlpha=1; for(const mc of [lastMun,MUN2].filter(Boolean)){ const mk=pts.find(p=>p.r[F.code]===mc); if(!mk) continue; const px=X(mk.x0+(mk.x1-mk.x0)*t), py=Y(mk.y0+(mk.y1-mk.y0)*t); ctx.beginPath(); ctx.arc(px,py,Math.max(5,rad(mk.r)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke(); ctx.font="600 12.5px 'Libre Franklin', Arial, sans-serif"; ctx.fillStyle=ink; ctx.fillText(dispName(mk.r[F.name]),px+9,py-8); } };
+    ctx.globalAlpha=1; for(const mc of [lastMun,MUN2].filter(Boolean)){ const mk=pts.find(p=>p.r[F.code]===mc); if(!mk) continue; const px=X(mk.x0+(mk.x1-mk.x0)*t), py=Y(mk.y0+(mk.y1-mk.y0)*t); ctx.beginPath(); ctx.arc(px,py,Math.max(5,rad(mk.r)),0,7); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke(); ctx.font="600 12.5px 'Libre Franklin', Arial, sans-serif"; ctx.fillStyle=ink; ctx.fillText(dispName(mk.r[F.name]),px+9,py-8); } if(ZM) ctx.restore(); };
   const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(animate&&!reduce){ const tm=d3.timer(el=>{ const t=Math.min(1,el/750); paint(d3.easeCubicInOut(t)); if(t>=1){ tm.stop(); line.transition().duration(300).attr("opacity",1); } }); }
   else { paint(1); line.attr("opacity",1); }
+  addZoom(box.querySelector(".scat-wrap"),{m,W,H,X0,Y0,onZoom:(xz,yz,z)=>{ X=xz; Y=yz; ZM=z; drawAxes(); setLine(); paint(1); }});
   LBPOS=new Map(pts.map(p=>[p.r[F.code],[p.x1,p.y1]]));
 }
 
