@@ -3437,21 +3437,49 @@ const exampleChips=()=>{ const ex=EXAMPLES.filter(([c])=>BYCODE.has(c)).slice(0,
   return `<div class="chipsq">${lm?`<a href="#m${lm}"><b>Seguir con ${esc(dispName(BYCODE.get(lm)[F.name]))}</b></a>`:""}<span>${lm?"o prueba:":"O prueba:"}</span>${ex.filter(([c])=>c!==lm).map(([c,n])=>`<a href="#m${c}">${n}</a>`).join("")}</div>`; };
 
 // mapa de España por municipios con capas que se pueden cambiar
-function spainMap(box,{onClick,width=560,height=440}={}){
+// refine:true (portada de municipios) recoloca Canarias en el hueco de la izquierda, la enmarca entera,
+// recorta el lienzo al mapa y marca las provincias con un trazo que se ve sobre colores claros y oscuros.
+function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
   const regions=topojson.feature(TOPO,TOPO.objects.autonomous_regions); regions.features.forEach(rewind);
   const proj=d3.geoConicConformalSpain().fitSize([width,height],regions), path=d3.geoPath(proj);
   const svg=d3.select(box).append("svg").attr("viewBox",`0 0 ${width} ${height}`).attr("role","img").style("display","block").style("width","100%").style("max-width",width+"px").style("height","auto").style("margin","0 auto");
   const g=svg.append("g");
   const ps=g.selectAll("path").data(FEATS).join("path").attr("d",path).attr("stroke",css("--geo-line")).attr("stroke-width",.12).attr("fill",css("--nodata"));
   if(onClick) ps.style("cursor","pointer").on("click",(e,f)=>{ if(BYCODE.has(f.id)) onClick(f.id); });
-  g.append("path").datum(topojson.mesh(TOPO,TOPO.objects.provinces,(a,b)=>a!==b)).attr("fill","none").attr("stroke",css("--geo-line")).attr("stroke-width",.5).attr("d",path);
-  g.append("path").attr("d",proj.getCompositionBorders()).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",.6);
+  const provMesh=topojson.mesh(TOPO,TOPO.objects.provinces,(a,b)=>a!==b);
+  const isCan=f=>/^(35|38)/.test(f.id); let canDy=0;
+  if(!refine){
+    g.append("path").datum(provMesh).attr("fill","none").attr("stroke",css("--geo-line")).attr("stroke-width",.5).attr("d",path);
+    g.append("path").attr("d",proj.getCompositionBorders()).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",.6);
+  } else {
+    // provincias: un filete de color papel por debajo y otro de tinta por encima, para que se lean sobre cualquier color
+    g.append("path").datum(provMesh).attr("fill","none").attr("stroke",css("--geo-line")).attr("stroke-width",1.3).attr("stroke-linejoin","round").attr("pointer-events","none").attr("d",path);
+    g.append("path").datum(provMesh).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-opacity",.55).attr("stroke-width",.45).attr("stroke-linejoin","round").attr("pointer-events","none").attr("d",path);
+    // Canarias: sube al hueco de la izquierda (alineada por abajo con la península) y lleva marco entero y rótulo
+    const uni=(a,[[x0,y0],[x1,y1]])=>a?[[Math.min(a[0][0],x0),Math.min(a[0][1],y0)],[Math.max(a[1][0],x1),Math.max(a[1][1],y1)]]:[[x0,y0],[x1,y1]];
+    let cb=null, pb=null; FEATS.forEach(f=>{ const b=path.bounds(f); if(!isFinite(b[0][0])) return; if(isCan(f)) cb=uni(cb,b); else pb=uni(pb,b); });
+    if(cb&&pb){
+      canDy=pb[1][1]-cb[1][1]-4;
+      const can=g.insert("g","path").attr("class","canarias").attr("transform",`translate(0,${canDy})`);
+      ps.filter(isCan).each(function(){ can.node().appendChild(this); });
+      const pad=6, bx=Math.max(.5,cb[0][0]-pad), by=cb[0][1]-pad+canDy, bw=cb[1][0]+pad-bx, bh=cb[1][1]-cb[0][1]+2*pad;
+      g.append("rect").attr("class","can-box").attr("x",bx).attr("y",by).attr("width",bw).attr("height",bh).attr("rx",2).attr("fill","none").attr("stroke",css("--rule-2")).attr("stroke-width",.8).attr("pointer-events","none");
+      g.append("text").attr("class","can-lbl").attr("x",bx+1).attr("y",by-4).attr("pointer-events","none").text("Canarias");
+      const x0=Math.min(pb[0][0],bx)-2, x1=Math.max(pb[1][0],bx+bw)+2, y0=pb[0][1]-4, y1=Math.max(pb[1][1],by+bh)+4;
+      svg.attr("viewBox",`${x0} ${y0} ${x1-x0} ${y1-y0}`).style("overflow","visible");
+    }
+  }
   const api={svg,paths:ps,proj,path,
     set(k,{dur=900}={}){ const fi=F[k]; const ramp=[0,1,2,3,4,5,6].map(i=>css("--ramp-"+i));
       const vals=rowsAll().map(r=>r[fi]).filter(v=>v!=null), sc=d3.scaleQuantile().domain(vals).range(ramp);
       ps.transition().duration(dur).attr("fill",f=>{ const r=BYCODE.get(f.id); return r&&r[fi]!=null?sc(r[fi]):css("--nodata"); }); return sc; },
     setCat(k,colorOf){ const fi=F[k]; ps.attr("fill",f=>{ const r=BYCODE.get(f.id); return r&&r[fi]?colorOf(r[fi]):css("--nodata"); }); },
-    mark(code){ g.selectAll(".mk").remove(); const ft=FEATS.find(x=>x.id===code); if(!ft) return; const [cx,cy]=path.centroid(ft); g.append("circle").attr("class","mk").attr("cx",cx).attr("cy",cy).attr("r",7).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-width",1.6); }};
+    // label (opcional): nombre junto al aro, para las vistas previas de los ejemplos
+    mark(code,label){ g.selectAll(".mk").remove(); const ft=FEATS.find(x=>x.id===code); if(!ft) return; let [cx,cy]=path.centroid(ft); if(refine&&isCan(ft)) cy+=canDy;
+      const m=g.append("g").attr("class","mk").attr("pointer-events","none");
+      m.append("circle").attr("cx",cx).attr("cy",cy).attr("r",7).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-width",1.6);
+      if(label){ const vb=svg.attr("viewBox").split(" ").map(Number), left=cx<vb[0]+vb[2]*.6;
+        m.append("text").attr("class","mk-lbl").attr("x",left?cx+11:cx-11).attr("y",cy+4).attr("text-anchor",left?"start":"end").attr("stroke",css("--bg")).text(label); } }};
   return api;
 }
 
@@ -3576,12 +3604,12 @@ function pathImg(k){
 // =====================================================================
 async function renderMunLanding(){
   document.title="Municipios · Indicio";
-  view.innerHTML=`<section class="ci-hero" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+  view.innerHTML=`<section class="ci-hero mun-hero">
     <div><span class="kk">Municipios</span><h1>Busca tu municipio y míralo de un vistazo</h1>
       <p class="dek">Sus cifras clave frente a España, cómo ha cambiado desde 2015, en qué destaca y a qué municipios se parece. Con todo el detalle plegado por si quieres más.</p>
       ${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}
-      <p style="margin-top:18px;font-size:15px"><a href="#comparar">Comparar dos municipios</a> · <a href="/provincia/">Municipios por provincia</a> · <a href="/rankings/">Rankings</a></p></div>
-    <div class="ci-map"><div class="mlab"><span><b>O pulsa en el mapa</b> · color según la renta por persona</span></div><div id="mlmap" style="min-height:240px"></div></div>
+      <p class="linkrow"><a href="#comparar">Comparar dos municipios</a> · <a href="/provincia/">Municipios por provincia</a> · <a href="/rankings/">Rankings</a></p></div>
+    <div class="ci-map"><div id="mlmap" style="min-height:240px"></div><div class="mleg" id="mleg"></div></div>
   </section>
   <section class="ci-band" style="margin-top:6px"><h2>Qué vas a encontrar en la ficha</h2><div class="g3">
     <div class="cardx"><span class="kk">1 · Las cifras clave</span><p style="margin-top:6px;font-size:15px;color:var(--ink-2)">Seis datos con una barra que dice dónde queda tu municipio frente a todos los de España. La raya negra es la media.</p>${kpiDemo()}</div>
@@ -3591,8 +3619,20 @@ async function renderMunLanding(){
   bindBig("q2");
   try{ await loadTopo(); }catch(e){ return; }
   const mb=document.getElementById("mlmap"); if(!mb) return; mb.style.minHeight="";
-  const M=spainMap(mb,{onClick:code=>go(code)}); M.set("renta",{dur:0}); if(lastMun&&BYCODE.has(lastMun)) M.mark(lastMun);
+  const M=spainMap(mb,{onClick:code=>go(code),refine:true}); const sc=M.set("renta",{dur:0}); if(lastMun&&BYCODE.has(lastMun)) M.mark(lastMun);
+  M.svg.attr("aria-label","Mapa de España por municipios, coloreado por la renta neta media por persona");
   M.paths.append("title").text(f=>{ const r=BYCODE.get(f.id); return r?r[F.name]:""; });
+  // leyenda: la escala de colores con los cortes en euros (tres de los seis cortes de la escala por cuantiles)
+  const L=document.getElementById("mleg");
+  if(L){ const q=sc.quantiles(), tk=i=>`<span style="left:${(i+1)/7*100}%">${nf0.format(Math.round(q[i]/100)*100)}${NB}€</span>`;
+    L.innerHTML=`<div class="mleg-t"><b>Renta neta media por persona</b><span class="mleg-hint"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l8 4.2-3.4 1L5.6 10z" fill="currentColor"/></svg>Pulsa en un municipio</span></div>
+      <div class="mleg-row"><em>menos</em><div class="mleg-bar" aria-hidden="true">${[0,1,2,3,4,5,6].map(i=>`<i style="background:var(--ramp-${i})"></i>`).join("")}</div><em>más</em></div>
+      <div class="mleg-row"><em></em><div class="mleg-ticks" aria-hidden="true">${[1,3,5].map(tk).join("")}</div><em></em></div>`; }
+  // los ejemplos enseñan en el mapa dónde está cada municipio al pasar el ratón o con el foco
+  const rest=()=>M.mark(lastMun&&BYCODE.has(lastMun)?lastMun:null);
+  document.querySelectorAll(".mun-hero .chipsq a").forEach(a=>{ const c=/(\d{5})/.exec(a.getAttribute("href")||""); if(!c) return;
+    const nm=a.textContent.trim().replace(/^Seguir con\s*/,""), on=()=>M.mark(c[1],nm);
+    a.addEventListener("mouseenter",on); a.addEventListener("focus",on); a.addEventListener("mouseleave",rest); a.addEventListener("blur",rest); });
 }
 const kpiDemo=()=>`<div class="bul" style="margin-top:20px"><span class="es" style="left:52%"></span><span class="me" style="left:38%"></span></div><div class="bul-l"><span>menos</span><span>más</span></div>`;
 
