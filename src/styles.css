@@ -1552,7 +1552,8 @@ details.chk > section{margin-top:18px}
 
 .sh{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:22px 48px; align-items:center; padding:8px 0 30px; border-bottom:1px solid var(--rule-2)}
 .sh.nofig{grid-template-columns:minmax(0,1fr)}
-.sh-q{font-family:var(--serif); font-weight:500; font-size:clamp(34px,4.6vw,56px); line-height:1.04; letter-spacing:-.02em; margin:10px 0 0; text-wrap:balance}
+.sh-q{font-family:var(--serif); font-weight:500; font-size:clamp(36px,4.9vw,58px); line-height:1.03; letter-spacing:-.02em; margin:10px 0 0; text-wrap:balance}
+.sh-q em{color:var(--brand)}
 .sh-v{font:500 clamp(22px,2.4vw,30px)/1.18 var(--serif); color:var(--brand); margin:16px 0 0}
 .sh-d{font:clamp(17px,1.7vw,19px)/1.5 var(--serif); color:var(--ink-2); margin:12px 0 0; max-width:var(--medida)}
 .sh .byline{margin-top:16px}
@@ -1963,3 +1964,14 @@ details.chk > section{margin-top:18px}
 /* barras horizontales con etiquetas largas: se parten en varias líneas en lugar de cortarse con «…» */
 .hbars.wrapl .hb{grid-template-columns:minmax(100px,min(190px,38%)) minmax(0,1fr) 62px; align-items:center}
 .hbars.wrapl .hb > span:first-child{white-space:normal; overflow:visible; text-overflow:clip; line-height:1.25; padding:3px 0}
+
+/* De la portada a un análisis (ptToStudy): lo de arriba se desliza a su sitio y el resto se funde */
+:root.vt-study::view-transition-group(*){animation-duration:.55s; animation-timing-function:cubic-bezier(.2,.7,.2,1)}
+:root.vt-study::view-transition-old(root){animation:vt-out .28s ease both}
+:root.vt-study::view-transition-new(root){animation:vt-in .45s ease .12s both}
+:root.vt-study::view-transition-old(vt-v),:root.vt-study::view-transition-new(vt-v),:root.vt-study::view-transition-old(vt-q),:root.vt-study::view-transition-new(vt-q),:root.vt-study::view-transition-old(vt-k),:root.vt-study::view-transition-new(vt-k){height:100%; object-fit:none; object-position:left top}
+/* el veredicto de la portada y el del análisis no siempre dicen lo mismo: uno sale y luego entra el otro, sin superponerse */
+:root.vt-study::view-transition-old(vt-v){animation:vt-out .2s ease both}
+:root.vt-study::view-transition-new(vt-v){animation:vt-in .32s ease .2s both}
+@keyframes vt-out{to{opacity:0}}
+@keyframes vt-in{from{opacity:0; transform:translateY(8px)}}

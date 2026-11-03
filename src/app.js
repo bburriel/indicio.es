@@ -137,12 +137,31 @@ function urlInit(){
     const href=a.getAttribute("href")||"";
     if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); navTo(k); return; }
     if(/^\/(data|og|provincia|rankings)(\/|$)/.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
-    if(href.startsWith("/")){ e.preventDefault(); navTo(href); }
+    if(href.startsWith("/")){ e.preventDefault(); if(a.closest(".pt-car")&&/^\/preguntas\/[\w-]+\/?$/.test(href)) ptToStudy(href); else navTo(href); }
   });
   // los enlaces #antiguos que generan las plantillas pasan a ruta real (también para el HTML pre-renderizado)
   const fix=root=>root.querySelectorAll('a[href^="#"]').forEach(a=>{ const k=a.getAttribute("href").slice(1); if(k==="inicio"||ROUTE_KEY.test(k)) a.setAttribute("href",keyToPath(k)); });
   new MutationObserver(()=>fix(view)).observe(view,{childList:true,subtree:true});
   fix(document);
+}
+// De la portada a un análisis: el titular, el veredicto y el gráfico de la diapositiva se deslizan hasta su sitio en la
+// cabecera del análisis (View Transitions API) y el resto cambia con un fundido. Sin soporte o con «reducir movimiento», navega sin más.
+const VT_PARTS=[["kk2","vt-k"],["q","vt-q"],["v","vt-v"],["f","vt-f"]];
+function ptToStudy(href){
+  const on=document.querySelector(".pt-car .pt-s.on");
+  if(!document.startViewTransition||!on||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){ navTo(href); return; }
+  const OLD={kk2:on.querySelector(".kk2"),q:on.querySelector(".pt-q"),v:on.querySelector(".pt-v"),f:on.querySelector(".pt-sc svg")};
+  VT_PARTS.forEach(([k,n])=>{ if(OLD[k]) OLD[k].style.viewTransitionName=n; });
+  document.documentElement.classList.add("vt-study");
+  const t=document.startViewTransition(()=>new Promise(res=>{
+    navTo(href);
+    const name=()=>{ const h=view.querySelector(".sh"); if(!h) return false; const f=h.querySelector("#shf svg");
+      const NEW={kk2:h.querySelector(".kk2"),q:h.querySelector(".sh-q"),v:h.querySelector(".sh-v"),f};
+      VT_PARTS.forEach(([k,n])=>{ if(NEW[k]&&(k!=="f"||f)) NEW[k].style.viewTransitionName=n; }); return !!f; };
+    // la cabecera se pinta al momento; el gráfico llega en cuanto carga data/covers.json (normalmente ya en caché).
+    // Con setTimeout y no requestAnimationFrame: mientras dura la transición el navegador no pinta y rAF no avanza.
+    if(name()) return res(); const t0=Date.now(), poll=()=>{ if(name()||Date.now()-t0>450) res(); else setTimeout(poll,25); }; setTimeout(poll,25); }));
+  t.finished.finally(()=>{ document.documentElement.classList.remove("vt-study"); document.querySelectorAll("[style*='view-transition-name']").forEach(e=>e.style.viewTransitionName=""); });
 }
 function render404(){ document.title="Página no encontrada · Indicio"; view.innerHTML=pageHead("No encontramos esa página","Puede que el enlace sea antiguo. Prueba desde la portada o busca tu municipio arriba.")+`<p><a class="ed-go" href="/">Ir a la portada →</a></p>`; }
 
@@ -3000,9 +3019,11 @@ function coverOf(id,{C,D}){
   const hq=HEROQ.find(h=>h.id===id);
   if(hq&&(hq.chart==="tope"||(D&&D[hq.chart]))){ try{ return {svg:ptCharts[hq.chart](D),cap:hq.cap(ptNums(D))}; }catch(e){ console.error(e); } }
   const c=C[id]; return c?{svg:c.svg,cap:c.cap}:null; }
+// el titular de los análisis del carrusel lleva el mismo final en granate que en la portada, para que la transición encaje
+const shTitle=S=>{ const h=(typeof HEROQ!=="undefined"?HEROQ:[]).find(x=>x.id===S.id); return h&&h.em&&S.t.endsWith(h.em)?esc(S.t.slice(0,-h.em.length))+`<em>${esc(h.em)}</em>`:esc(S.t); };
 function studyHead(S){ const {v}=splitA(S.a);
   return `<nav class="crumbs"><a href="/preguntas/">Análisis</a> › <a href="/preguntas/?tema=${S.tema}">${esc(TOPICL(S.tema))}</a></nav>`
-    +`<header class="sh"><div class="sh-t"><div class="kk2">${esc(TOPICL(S.tema))}</div><h1 class="sh-q">${esc(S.t)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
+    +`<header class="sh"><div class="sh-t"><div class="kk2">${esc(TOPICL(S.tema))}</div><h1 class="sh-q">${shTitle(S)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
     +`<figure class="sh-f" id="shf"><div class="sh-ph"></div></figure></header>`; }
 function studyCover(S){ loadCovers().then(cv=>{ const f=document.getElementById("shf"); if(!f||!document.body.contains(f)) return; const c=coverOf(S.id,cv);
   if(c) f.innerHTML=c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`; else { f.parentNode.classList.add("nofig"); f.remove(); } }); }
