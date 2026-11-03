@@ -1842,3 +1842,37 @@ details.chk > section{margin-top:18px}
 .cv-v .win{color:var(--ink); font-weight:800} .cv-v .dim{color:var(--muted)}
 .cv-v small{font-size:12.5px; color:var(--muted)}
 @media (max-width:720px){ .cv-r{grid-template-columns:minmax(0,1fr) auto; gap:4px 12px} .cv-t{grid-column:1/-1; grid-row:2} .cv-v{grid-row:1; grid-column:2} }
+
+/* ---- Quién soy: versión editorial (frase de entrada, recorrido, diagrama de causas) ---- */
+.ab-hero h1{font-size:clamp(46px,8vw,92px); line-height:.98; letter-spacing:-.02em; font-weight:500; text-wrap:balance; margin:10px 0 18px}
+.ab-meta{margin:-8px 0 0; font-size:15px; color:var(--muted)}
+.ab-lead{font-family:var(--serif); font-weight:400; font-size:clamp(25px,3.4vw,36px); line-height:1.32; letter-spacing:-.005em; max-width:24em; margin:34px 0 0; text-wrap:pretty}
+.ab-lead mark{background:linear-gradient(transparent 58%,var(--mark) 58%); color:inherit; padding:0 .05em}
+.ab-path{list-style:none; margin:48px 0 0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0 32px}
+.ab-path li{position:relative; padding-top:30px; min-width:0}
+.ab-path li::before{content:""; position:absolute; top:5px; left:0; right:-32px; height:1px; background:var(--rule-2)}
+.ab-path li:last-child::before{right:0}
+.ab-path li::after{content:""; position:absolute; top:0; left:0; width:11px; height:11px; border-radius:50%; background:var(--bg); border:1.5px solid var(--ink-2)}
+.ab-path li:last-child::after{background:var(--brand); border-color:var(--brand)}
+.ab-path h3{font-family:var(--serif); font-weight:500; font-size:22px; line-height:1.25; margin:0 0 6px}
+.ab-path p{margin:0; color:var(--ink-2); font-size:15px; line-height:1.55}
+.ab-row{display:grid; grid-template-columns:220px minmax(0,1fr); gap:0 48px; padding-top:56px; margin-top:64px; border-top:1px solid var(--rule)}
+.ab-row h2{font-size:30px; line-height:1.15; margin:0; text-wrap:balance}
+.ab-body{min-width:0; max-width:40em}
+.ab-body p{margin:0 0 1.2em; font-size:17px; line-height:1.65; color:var(--ink-2)} .ab-body p:last-child{margin-bottom:0}
+.ab-body b{color:var(--ink); font-weight:600} .ab-body a{color:var(--brand)}
+.ab-fig{margin:32px 0; padding:0}
+.ab-fig svg{width:100%; max-width:520px; height:auto; display:block}
+.ab-fig text{font-family:var(--sans,inherit); font-size:15px; fill:var(--ink-2)}
+.ab-fig text.hot{fill:var(--brand); font-weight:600} .ab-fig text.node{fill:var(--ink); font-weight:600}
+.ab-fig line{stroke:var(--rule-2); stroke-width:1.25} .ab-fig line.hot{stroke:var(--brand); stroke-width:1.5; stroke-dasharray:4 4}
+.ab-fig circle{fill:var(--ink)}
+.ab-fig figcaption{font-family:var(--serif); font-style:italic; font-size:24px; line-height:1.3; color:var(--ink); margin-top:14px; max-width:20em}
+.ab-cols{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0 28px; margin-top:32px}
+.ab-cols>div{border-top:1px solid var(--ink); padding-top:14px}
+.ab-cols h3{font-family:var(--serif); font-weight:500; font-size:21px; line-height:1.25; margin:0 0 8px}
+.ab-cols p{font-size:15px; line-height:1.6; margin:0}
+.ab-body .ab-note{margin-top:36px}
+@media (max-width:860px){ .ab-row{grid-template-columns:minmax(0,1fr); gap:18px; padding-top:40px; margin-top:48px} .ab-row h2{font-size:27px} .ab-cols{grid-template-columns:minmax(0,1fr); gap:24px} @media (max-width:640px){ .ab-path{grid-template-columns:minmax(0,1fr)} .ab-path li{padding:0 0 26px 30px} .ab-path li::before{top:5px; bottom:0; left:5px; right:auto; width:1px; height:auto} .ab-path li:last-child::before{display:none} .ab-lead{margin-top:26px} }
+.ab-row + .ab-sec{margin-top:64px; padding-top:56px; border-top:1px solid var(--rule)}
+@media (max-width:860px){ .ab-row + .ab-sec{margin-top:48px; padding-top:40px} }

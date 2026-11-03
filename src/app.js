@@ -6247,17 +6247,42 @@ function renderSobre(sec){
   view.innerHTML=`<section class="ab-hero">
       <div><span class="kk">Quién soy</span><h1>${esc(A.name||"Borja Burriel")}</h1>
       <p class="ab-role">Data scientist · Experimentación e inferencia causal</p>
+      <p class="ab-meta">Máster en Estadística</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
     </section>
-    <p class="ab-bio">Soy data scientist y tengo un máster en Estadística. Empecé en investigación y en el deporte, en el FC Barcelona. Después, siete años en equipos de datos orientado a producto digital (Domestika, Wallapop y Northius), siempre con la misma pregunta: si un cambio ha producido de verdad el efecto que se le atribuye. La estudio con experimentación e inferencia causal, y en Indicio la aplico a los datos públicos.</p>
-    <section class="ab-why"><h2>Por qué Indicio</h2>
-      <p>España publica más datos de los que nadie puede leer, y casi siempre se discute con ellos del mismo modo: dos cosas aparecen juntas y se da por hecho que una causa la otra. Los alquileres suben donde hay pisos turísticos, pero también donde hay más turistas, más trabajo y más demanda de vivienda.</p>
-      <p>Separar unas cosas de otras es justo lo que enseña la experimentación, y es lo que suele faltar cuando se habla de políticas públicas. Indicio nace para llevar ese método a los datos públicos.</p>
+    <p class="ab-lead">Me dedico a comprobar <mark>si un cambio ha producido de verdad el efecto que se le atribuye</mark>. En Indicio lo hago con los datos públicos.</p>
+    <ol class="ab-path" aria-label="Recorrido profesional">
+      <li><h3>Investigación y deporte</h3><p>FC Barcelona</p></li>
+      <li><h3>Siete años de producto digital</h3><p>Equipos de datos en Domestika, Wallapop y Northius</p></li>
+      <li><h3>Indicio</h3><p>Experimentación e inferencia causal aplicadas a los datos públicos</p></li>
+    </ol>
+    <section class="ab-row"><h2>Por qué Indicio</h2>
+      <div class="ab-body">
+        <p>España publica más datos de los que nadie puede leer, y casi siempre se discuten del mismo modo. Dos cosas aparecen juntas y se da por hecho que una causa la otra.</p>
+        <figure class="ab-fig">
+          <svg viewBox="0 0 480 214" role="img" aria-label="Cuatro posibles causas que coinciden con la subida del alquiler: pisos turísticos, más turistas, más trabajo y más demanda de vivienda">
+            <line class="hot" x1="200" y1="28" x2="334" y2="107"/><line x1="200" y1="80" x2="334" y2="107"/><line x1="200" y1="132" x2="334" y2="107"/><line x1="200" y1="184" x2="334" y2="107"/>
+            <text class="hot" x="188" y="33" text-anchor="end">Pisos turísticos</text><text x="188" y="85" text-anchor="end">Más turistas</text><text x="188" y="137" text-anchor="end">Más trabajo</text><text x="188" y="189" text-anchor="end">Más demanda de vivienda</text>
+            <circle cx="338" cy="107" r="5"/><text class="node" x="352" y="112">El alquiler sube</text>
+          </svg>
+          <figcaption>¿Cuál de estas cosas mueve el precio?</figcaption>
+        </figure>
+        <p>Los alquileres suben donde hay pisos turísticos, sí, pero también donde hay más turistas, más trabajo y más gente buscando casa.</p>
+        <p>Separar unas cosas de otras es lo que enseña la experimentación, y lo que suele faltar cuando se habla de políticas públicas. <b>Indicio nace para llevar ese método a los datos públicos.</b></p>
+      </div>
     </section>
-    <section class="ab-why"><h2>Qué busca</h2>
-      <p>Responder con datos públicos preguntas que importan (vivienda, empleo, población, voto, gasto público) y hacerlo de forma que cualquiera pueda comprobar cómo se ha llegado a la respuesta.</p>
-      <p>Cada análisis dice qué muestran los datos y dónde dejan de servir, y publica sus fuentes y su método. El <a href="/laboratorio/">laboratorio</a> permite repetir los cálculos con tus propias preguntas, sin saber estadística. Indicio es un proyecto independiente, sin publicidad ni financiación de partidos.</p>
+    <section class="ab-row"><h2>Qué busca</h2>
+      <div class="ab-body">
+        <p>Responder con datos públicos las preguntas que importan, y hacerlo a la vista de todos para que cualquiera pueda comprobar cómo se ha llegado a la respuesta.</p>
+        <div class="ab-cols">
+          <div><h3>Preguntas que importan</h3><p>Vivienda, empleo, población, voto y gasto público.</p></div>
+          <div><h3>Fuentes y método a la vista</h3><p>Cada análisis dice qué muestran los datos y dónde dejan de servir.</p></div>
+          <div><h3>Tus propias preguntas</h3><p>El <a href="/laboratorio/">laboratorio</a> permite repetir los cálculos sin saber estadística.</p></div>
+        </div>
+        <p class="ab-note">Indicio es un proyecto independiente, sin publicidad ni financiación de partidos.</p>
+      </div>
     </section>
+
     <section class="ab-sec" id="contacto"><h2>Escríbeme</h2>
       <div class="ab-form"><form id="abform" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
         <input type="hidden" name="form-name" value="contacto"><p hidden><label>No rellenar <input name="bot-field"></label></p>
