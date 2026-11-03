@@ -4197,14 +4197,16 @@ function exCruce(out){
   if(EX.u){ out.innerHTML=scaleBar(); scaleWire(out); exCruceAgg(out,x,y); return; }
   LBPOS=null;
   out.innerHTML=scaleBar()+`<div id="ctlnote"></div><div id="cplot"></div>`; scaleWire(out);
-  const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" aria-label="¿Aguanta la relación?">
+  const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" data-tab="p" aria-label="Comparar y probar causa">
+    <div class="czt-tabs" role="tablist"><button type="button" role="tab" class="czt-tab on" data-t="p" aria-selected="true">Comparar municipios</button><button type="button" role="tab" class="czt-tab" data-t="c" aria-selected="false">Probar causa</button></div>
     <div class="czg">
       <div class="czb czb-c czv" id="czl"></div>
       <div class="czb czb-e"><div class="czeh-row"><h3><span id="czeh">En números</span>${czIt("Cuánto cambia un dato cuando cambia el otro, en sus propias unidades, con el rango en el que probablemente se mueve de verdad.","Qué son los números")}</h3><span id="czevd"></span></div><div id="czeur"></div></div>
     </div>
     <div class="czpar"><h3>¿Y entre municipios parecidos?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Marca en qué deben parecerse y mira cuánta relación queda.</p><div class="czchips" id="cztags"></div><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div><button type="button" class="czlink" id="czmore" aria-expanded="false" aria-controls="lbcausal"><span class="t">Ver las comprobaciones extra ▾</span></button></div>
+    <div class="czcausa" id="czcausa" role="tabpanel"></div>
     <p class="czc-m"><a href="/laboratorio/metodo/">Guía: de la relación a la causa →</a></p></section>`;
-  if(tst) czTipBind(tst);
+  if(tst){ czTipBind(tst); tst.querySelectorAll(".czt-tab").forEach(b=>b.addEventListener("click",()=>czTab(b.dataset.t))); }
   const cb=document.getElementById("lbcausal"); if(cb) cb.hidden=true;
   document.getElementById("czmore").addEventListener("click",e=>{ const c=document.getElementById("lbcausal"), o=c.hidden; c.hidden=!o; e.currentTarget.setAttribute("aria-expanded",String(o)); e.currentTarget.querySelector(".t").textContent=o?"Ocultar las comprobaciones ▴":"Ver las comprobaciones extra ▾"; if(o) c.scrollIntoView({behavior:"smooth",block:"start"}); });
   const more=document.getElementById("lbmore");
@@ -4603,6 +4605,23 @@ function steps(x,y,w){
 }
 
 const CZLEV=[["Se explica por otra cosa","La relación no aguanta al comparar entre iguales: lo más probable es que dependa de algo que va junto."],["Aguanta poco","Supera alguna prueba, pero no las importantes. Conviene desconfiar."],["Aguanta casi todo","Sobrevive a casi todas las explicaciones que podemos medir. Merece la pena investigarla con un antes y un después."],["Aguanta todas las pruebas","Descarta las explicaciones que hemos medido (tamaño, edad, renta, estudios, provincia), no las demás. Que aguante no la convierte en causa."]];
+// ---------- pestaña «Probar causa»: qué diseños sirven para este par ----------
+const czAdKey=k=>/^(renta)/.test(k)?"renta":/^(pop|lpop|varPob)/.test(k)?"pad":/^paro/.test(k)?"paro":/^(alq|ipva)/.test(k)?"ipva":/^(vt|vtp)/.test(k)?"vtp":null;
+function czTab(t){ const sec=document.querySelector(".czc"); if(!sec) return; sec.dataset.tab=t;
+  sec.querySelectorAll(".czt-tab").forEach(b=>{ const on=b.dataset.t===t; b.classList.toggle("on",on); b.setAttribute("aria-selected",String(on)); });
+  if(t==="c") czCausa(); }
+function czCausa(){ const el=document.getElementById("czcausa"); if(!el||EX.d.length<2) return;
+  const [x,y]=EX.d, xl=low(labK(x)), yl=low(labK(y));
+  if(!CZ||CZ.x!==x||CZ.y!==y||CZ.lev==null){ el.innerHTML=`<p class="czlead">${CZ&&CZ.x===x&&CZ.y===y?`Entre ${xl} y ${yl} casi no hay relación: no hay nada que probar.`:"Calculando las pruebas…"}</p>`; return; }
+  const tw=(CZ.T||[]).find(t=>t.k==="tw"), ks=[czAdKey(x),czAdKey(y)], evs=Object.keys(ADEV).filter(k=>!ADEV[k].free&&ks.includes(ADEV[k].y));
+  const card=(t,pill,cls,txt,act="")=>`<div class="czd"><h4>${t} <span class="czp ${cls}">${pill}</span></h4><p>${txt}</p>${act}</div>`;
+  const out=[card("Entre municipios parecidos","Hecho","ok",`Ya está en «Comparar municipios»: la relación supera <b>${CZ.passed} de ${CZ.total}</b> comprobaciones.`,`<button type="button" class="czlink" data-go="p">Volver a comparar</button>`),
+    tw&&!tw.na?card("Municipios gemelos","Hecho","ok","Parejas de pueblos casi iguales de la misma provincia. Sale en las comprobaciones extra.",`<button type="button" class="czlink" data-go="x">Ver las comprobaciones extra</button>`):card("Municipios gemelos","Faltan datos","no","No hay suficientes parejas de gemelos para esta selección."),
+    ...(evs.length?evs.map(k=>card("Antes y después","Se puede","ok",`${ADEV[k].l}. Mide si ${low(ADY[ADEV[k].y].l)} cambió más donde ocurrió que en sus gemelos.`,`<a class="czlink" href="/laboratorio/antes/?ev=${k}&oy=${ADEV[k].y}">Abrir «Antes y después» →</a>`)):[card("Antes y después","Ningún suceso encaja","no","Hoy comparamos antes y después de cuatro sucesos (tope del alquiler, alta velocidad, pisos turísticos y pandemia). Ninguno mide estos dos datos.",`<a class="czlink" href="/laboratorio/antes/">Ver los sucesos disponibles →</a>`)]),
+    card("Umbral o corte","Aún no disponible","no","Sirve cuando una regla separa a los municipios por una cifra (por ejemplo, un límite de población). Todavía no lo tenemos.")];
+  el.innerHTML=`<p class="czlead">Para pasar de «van juntos» a «uno causa el otro» hace falta un diseño que separe la causa de lo que va a la vez. Estos son los que valen para <b>${xl}</b> y <b>${yl}</b>:</p><div class="czds">${out.join("")}</div>
+    <p class="czev">Nivel de evidencia ahora: <b>${CZLEV[CZ.lev][0]}</b>. Con un buen antes y un después podría subir; sin él, la relación sigue siendo una pista.</p>`;
+  el.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ czTab("p"); if(b.dataset.go==="x"){ const m=document.getElementById("czmore"); if(m&&m.getAttribute("aria-expanded")!=="true") m.click(); } })); }
 function exCausal(x,y){
   const box=document.getElementById("lbcausal"); if(!box) return;
   const w=!!EX.w, base=partialR(x,y,[],w); CZ=null; if(!base){ box.innerHTML=""; return; }
@@ -4636,7 +4655,7 @@ function exCausal(x,y){
   const fx=fmtK(x), fy=fmtK(y);
   // veredicto arriba; una línea por prueba; el porqué, los gemelos y el mapa, plegados
   const twinsH=ex.length?`<div class="twins"><h4>Algunas parejas de gemelos</h4><p class="muted">Misma provincia y parecidos en ${TW.cs.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")}, pero que se diferencian en ${xl}.</p><ul>${ex.map(p=>`<li><span class="${p.agree?"ok":"ko"}" aria-hidden="true">${p.agree?"✓":"✗"}</span><span><a href="#m${p.hi[F.code]}">${esc(dispName(p.hi[F.name]))}</a> <small>${fx(p.hi[F[x]])} · ${fy(p.hi[F[y]])}</small></span><span class="vs">frente a</span><span><a href="#m${p.lo[F.code]}">${esc(dispName(p.lo[F.name]))}</a> <small>${fx(p.lo[F[x]])} · ${fy(p.lo[F[y]])}</small></span><a class="gol" href="#comparar-${p.hi[F.code]}-${p.lo[F.code]}">Comparar →</a></li>`).join("")}</ul></div>`:"";
-  CZ.lev=lev; CZ.passed=passed; CZ.total=done.length;
+  CZ.lev=lev; CZ.passed=passed; CZ.total=done.length; CZ.T=T.map(t=>({k:t.k,ok:!!t.ok,na:!!t.na})); czCausa();
   const cx2=CHG[x], cy2=CHG[y];
   box.innerHTML=`<div class="cz"><h3>A fondo: las pruebas una a una</h3>
     <div class="meter" role="img" aria-label="Nivel: ${CZLEV[lev][0]}"><div class="track">${[0,1,2,3].map(i=>`<span class="${i<=lev?"on l"+lev:""}"></span>`).join("")}</div><div class="labs">${CZLEV.map((l,i)=>i===lev?`<b>${l[0]}</b>`:`<span>${l[0]}</span>`).join("")}</div></div>

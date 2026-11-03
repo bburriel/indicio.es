@@ -1693,3 +1693,21 @@ details.chk > section{margin-top:18px}
 .pn-sim{margin-top:10px}
 .pn-sim small{font-weight:400; color:var(--muted); font-size:12.5px; line-height:1.4}
 .calc .lnk{background:none; border:0; padding:0; color:var(--brand); cursor:pointer; text-decoration:underline; font:inherit}
+
+/* laboratorio: pestañas «Comparar municipios» / «Probar causa» */
+.czt-tabs{display:flex; gap:4px; margin:0 0 16px; border-bottom:1px solid var(--rule)}
+.czt-tab{background:none; border:0; border-bottom:3px solid transparent; margin-bottom:-1px; padding:8px 14px; font:600 14.5px var(--font); color:var(--muted); cursor:pointer}
+.czt-tab:hover{color:var(--ink)}
+.czt-tab.on{color:var(--brand); border-bottom-color:var(--brand)}
+.czc .czcausa{display:none}
+.czc[data-tab="c"] .czcausa{display:block}
+.czc[data-tab="c"] .czg,.czc[data-tab="c"] .czpar{display:none}
+.czds{display:grid; gap:10px; margin:12px 0}
+.czd{background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:12px 14px}
+.czd h4{margin:0 0 4px; font:500 17px/1.25 "Newsreader",var(--serif,Georgia,serif)}
+.czd p{margin:0; font-size:14.5px; color:var(--ink-2)}
+.czd .czlink{display:inline-block; margin-top:6px}
+.czp{display:inline-block; vertical-align:2px; margin-left:6px; padding:1px 9px; border-radius:11px; font:600 11.5px var(--font)}
+.czp.ok{background:color-mix(in srgb,var(--ok,#3f7a4a) 16%,transparent); color:var(--ok,#3f7a4a)}
+.czp.no{background:var(--band,#eee); color:var(--muted)}
+.czev{font-size:14.5px; color:var(--ink-2); margin:8px 0 0}
