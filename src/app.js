@@ -3335,17 +3335,17 @@ async function studyPens(B){
     hbars(f.body,rows,{fmt:pc,min:0,ref:LIM,refLabel:"Límite"}); };
   // mapa: con los otros mandos del simulador, qué combinaciones de empleo (columnas) y peso de cada pensión (filas) caben
   const EX=d3.range(0,21,2), GY=d3.range(1.5,-2.01,-0.25);
-  G.mapa=d=>{ const f=fig(d,{title:"¿Cabe? Combinaciones de empleo y peso de cada pensión, gasto en 2050",source:"Verde: cabe dentro del límite; rojo: se pasa. El resto de mandos, los del simulador de abajo. Pasa el ratón para ver el gasto de cada casilla."});
+  G.mapa=d=>{ const f=fig(d,{title:"Gasto en 2050 según el empleo y el peso de cada pensión",source:"Verde: dentro del límite; rojo: lo supera. El resto de mandos, los del simulador de abajo. Pasa el ratón para ver el gasto de cada casilla."});
     const box=add(f.body,"div","pn-map"); const note=add(f,"p","pn-note");
     const draw=()=>{ const cw=44, ch=22, ml=84, mt=8, W=ml+EX.length*cw+8, Hh=mt+GY.length*ch+40, L=lim(); let ok=0;
       const cells=[]; GY.forEach((g,j)=>EX.forEach((e,i)=>{ const v=model({...ST,E:e,G:g},2050), good=v<=L; if(good) ok++; cells.push({x:ml+i*cw,y:mt+j*ch,v,good,e,g}); }));
       const mx=Math.max(...cells.map(c=>c.v)), op=c=>c.good?0.25+0.6*Math.min(1,(L-c.v)/6):0.2+0.65*Math.min(1,(c.v-L)/(mx-L||1));
-      box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Mapa de combinaciones que caben">`+cells.map(c=>`<rect x="${c.x}" y="${c.y}" width="${cw-1}" height="${ch-1}" rx="2" style="fill:${c.good?"var(--ok,#3f7a4a)":"var(--ko,#b0303f)"};fill-opacity:${op(c).toFixed(2)}"><title>Empleo +${c.e}${NB}%, peso de cada pensión ${c.g>0?"+":""}${nf2.format(c.g)}${NB}% al año: ${nf1.format(c.v)}${NB}% del PIB</title></rect>`).join("")
+      box.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Mapa de combinaciones de empleo y peso de cada pensión">`+cells.map(c=>`<rect x="${c.x}" y="${c.y}" width="${cw-1}" height="${ch-1}" rx="2" style="fill:${c.good?"var(--ok,#3f7a4a)":"var(--ko,#b0303f)"};fill-opacity:${op(c).toFixed(2)}"><title>Empleo +${c.e}${NB}%, peso de cada pensión ${c.g>0?"+":""}${nf2.format(c.g)}${NB}% al año: ${nf1.format(c.v)}${NB}% del PIB</title></rect>`).join("")
         +GY.map((g,j)=>(Math.abs(g*2-Math.round(g*2))<1e-9)?`<text x="${ml-8}" y="${mt+j*ch+ch/2+4}" text-anchor="end" class="lab">${g>0?"+":g<0?"−":""}${nf1.format(Math.abs(g))}${NB}%</text>`:"").join("")
         +EX.map((e,i)=>i%2===0?`<text x="${ml+i*cw+cw/2}" y="${mt+GY.length*ch+14}" text-anchor="middle" class="lab">+${e}${NB}%</text>`:"").join("")
         +`<text x="${ml+EX.length*cw/2}" y="${Hh-4}" text-anchor="middle" class="lab">Más gente con empleo, en 2050</text><text x="10" y="${mt+GY.length*ch/2}" class="lab" transform="rotate(-90 10 ${mt+GY.length*ch/2})" text-anchor="middle">Peso de cada pensión, % al año</text>`
         +`<rect x="${ml+Math.min(EX.length-1,Math.round(ST.E/2))*cw}" y="${mt+Math.max(0,Math.min(GY.length-1,Math.round((1.5-ST.G)/0.25)))*ch}" width="${cw-1}" height="${ch-1}" rx="2" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>`;
-      note.innerHTML=`Con los demás mandos como están (población activa +${ST.M}${NB}%, jubilación +${nf1.format(ST.D)} años, límite ${pc(L)}), caben <b>${ok} de ${cells.length}</b> combinaciones. El recuadro marca tu combinación actual.`; };
+      note.innerHTML=`Con los demás mandos como están (población activa +${ST.M}${NB}%, jubilación +${nf1.format(ST.D)} años, límite ${pc(L)}), <b>${ok} de ${cells.length}</b> combinaciones quedan dentro del límite. El recuadro marca tu combinación actual.`; };
     SUB.push(draw); draw(); };
   G.simulador=d=>{ const w=add(d,"div","calc pn-sim"), ctl=add(w,"div","ctl"), out=add(w,"div","res");
     const defs=[["E","Más gente con empleo","+%",0,20,1,"Hoy tienen empleo 72 de cada 100 personas de 20 a 64 años; en los Países Bajos, 83 (Eurostat, 2025). Un +10 % llevaría a España a unos 80."],
@@ -3377,7 +3377,7 @@ async function studyPens(B){
     sNada70:sc.nada.s70,sIpcPeso:Math.abs(sc.ipc.peso50),sIpcReal:sc.ipc.real50,sEqReal:sc.equilibrio.real50,sEqPeso:Math.abs(sc.equilibrio.peso50),sTrabajoReal:sc.trabajo.real50,
     sIpc70:sc.ipc.s70,sRefEx:Math.abs(sc.reformas.s50-LIM),mm1:eurMM(1),soloE:solo.E,soloM:solo.M,soloD:solo.D,nOk:SC.filter(s=>s.ok).length,
     sNadaEx:sc.nada.s50-LIM,sNadaMM:eurMM(sc.nada.s50-LIM),sDerivaEx:sc.deriva.s50-LIM,
-    aireF:16.1,fedea:17.1,empEs:72.4,empNl:83.4,empUe:76.1};
+    aireF:16.1,fedea:17.1,lim6:S0+6,empEs:72.4,empNl:83.4,empUe:76.1};
   const MAPOK=(()=>{ let n=0,t=0; GY.forEach(g=>EX.forEach(e=>{ t++; if(model({E:e,M:0,D:0,G:g,p:1},2050)<=LIM) n++; })); return {n,t}; })();
   V.mapaN=MAPOK.n; V.mapaT=MAPOK.t;
   { const eur=y=>ex(y)/100*gdpY(y);

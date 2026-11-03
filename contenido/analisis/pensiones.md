@@ -49,9 +49,15 @@ Según Eurostat, hoy hay {{dep0|n0}} personas de 65 o más por cada 100 de 15 a 
 
 La proyección supone una natalidad y una inmigración concretas. Con más inmigración, la cifra baja; con menos nacimientos, sube. Más abajo se mueve ese mando.
 
-Si solo cambia la demografía y cada pensión mantiene su peso de hoy, el gasto pasa del {{gasto0|pct1}} al **{{sNada|pct1}} del PIB** en 2050: {{sNadaEx|n1}} puntos por encima del límite, unos {{sNadaMM|n0}} mil millones de euros al año de hoy. Es el escenario de referencia. Sirve para medir cuánto hay que mover, no porque nadie lo defienda.
+Si solo cambia la demografía y cada pensión mantiene su peso de hoy, el gasto pasa del {{gasto0|pct1}} al **{{sNada|pct1}} del PIB** en 2050: {{sNadaEx|n1}} puntos por encima del límite, unos {{sNadaMM|n0}} mil millones de euros al año de hoy. Es el escenario de referencia.
 
 [[grafico:esc_nada]]
+
+## El límite: por qué el {{lim|pct1}} del PIB
+
+No hay una cifra objetiva que separe un gasto asumible de otro que no lo es. Aquí se parte del gasto de hoy y se deja que suba {{limP|n0}} puntos de PIB hasta 2050. Es un criterio, y sirve de referencia por dos razones. Deja el límite en el entorno de las proyecciones de la AIReF ({{aireF|pct1}}) y de Fedea ({{fedea|pct1}}), dos instituciones distintas, de modo que lo que entra o no entra aquí se puede comparar con lo que esperan ellas. Y {{limP|n0}} puntos son unos {{limMM|n0}} mil millones de euros más al año que hoy, un esfuerzo grande que habría que financiar con impuestos, cotizaciones o deuda.
+
+El límite no es un máximo que la economía pueda soportar ni una norma, y cambia mucho el resultado. Con 6 puntos de margen, el límite subiría al {{lim6|pct1}} y bastaría, por poco, con actualizar las pensiones solo con el IPC: el gasto quedaría en el {{sIpc|pct1}}, unas centésimas por debajo. Sin ningún margen, con el gasto igual que hoy ({{gasto0|pct1}}), ni siquiera sumar el máximo de empleo, inmigración y jubilación que admite el simulador evita que cada pensión pierda peso. El simulador del final permite mover el límite entre 0 y 6 puntos.
 
 ## Cuatro palancas, y ninguna basta sola
 
