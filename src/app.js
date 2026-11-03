@@ -958,30 +958,51 @@ function openSec(k,scroll){ if(!k) return; if(k==="destaca"||k==="glance"){ k=k=
 
 // ---------- cifras clave con barra ----------
 function kpis(box,r,d){
-  const es=REFS.es, PY=REFS.padYears, i15=PY.indexOf(2015), ce=REFS.census.es, pe=REFS.paro.es, k=VG();
+  const es=REFS.es, PY=REFS.padYears, i15=PY.indexOf(2015), ce=REFS.census.es, k=VG();
   const gE=(lastV(es.pad)/es.pad[i15]-1)*100;
-  const rel=(v,e,unit)=>{ if(v==null||e==null) return ""; const q=(v/e-1)*100; return Math.abs(q)<3?"como la media de España":`un ${nf0.format(Math.abs(q))}${NB}% ${q>0?"por encima":"por debajo"} de España`; };
-  const pts_=(v,e,u)=>{ if(v==null||e==null) return ""; const dd=v-e; return Math.abs(dd)<0.5?"como España":`${nf1.format(Math.abs(dd))} ${u} ${dd>0?"más":"menos"} que España`; };
-  const K=[["renta",`Renta por persona · 2024`,r[F.renta],esMean("renta"),v=>rel(v,esMean("renta")),["menos","más"]],
-    ["varPob","Crecimiento desde 2015",r[F.varPob],gE,v=>`España ${sgn(gE)}`,["pierde","gana"]],
-    ["edad","Edad media · 2023",r[F.edad],lastV(es.mean_age),v=>pts_(v,lastV(es.mean_age),"años"),["más joven","mayor"]],
-    ["paroReg","Paro registrado · 2025",r[F.paroReg],esOff("paroReg"),v=>`% de 16 a 64 años · ${pts_(v,esOff("paroReg"),"puntos")}`,["menos","más"]],
-    ["alquiler","Hogares de alquiler · 2021",r[F.alquiler],ce.rented,v=>`España ${pc(ce.rented)}`,["menos","más"]],
-    ["part",`Participación · ${k.slice(2,6)}`,r[F.part],VREFS.es[k].turnout,v=>`España ${pc(VREFS.es[k].turnout)}`,["menos","más"]]];
-  // «dónde queda entre todos»: cada fila pinta los 8.000 municipios como puntos y marca el tuyo
-  box.className="strips"; const n=rowsAll().length;
-  box.innerHTML=`<div class="st-h">Dónde queda entre los ${nf0.format(n)} municipios</div>`+K.map(([kk,l,v,e,mid,lr],i)=>`<div class="st-r"><div class="st-l">${l}<small>${v==null?"":mid(v)}</small></div><div class="st-c"><canvas data-i="${i}" aria-hidden="true"></canvas><div class="st-x"><span>${lr[0]}</span><span>${lr[1]}</span></div></div><div class="st-v">${v==null?'<span class="muted">sin dato</span>':fmtK(kk)(v)}</div></div>`).join("");
-  const draw=()=>box.querySelectorAll("canvas").forEach(cv=>{ const [kk,,v,e]=K[+cv.dataset.i];
+  // [clave, título, valor, valor de España, cómo se mide la diferencia, nota bajo el título, extremos]
+  const K=[["renta","Renta por persona · 2024",r[F.renta],esMean("renta"),"rel","",["menos","más"]],
+    ["varPob","Crecimiento desde 2015",r[F.varPob],gE,"pp","",["pierde","gana"]],
+    ["edad","Edad media · 2023",r[F.edad],lastV(es.mean_age),"años","",["más joven","mayor"]],
+    ["paroReg","Paro registrado · 2025",r[F.paroReg],esOff("paroReg"),"pp","% de 16 a 64 años",["menos","más"]],
+    ["alquiler","Hogares de alquiler · 2021",r[F.alquiler],ce.rented,"pp","",["menos","más"]],
+    ["part",`Participación · ${k.slice(2,6)}`,r[F.part],VREFS.es[k].turnout,"pp","",["menos","más"]]];
+  // la misma comparación en todas las filas: «España X · ▲/▼ diferencia». Flechas neutras: más no es ni bueno ni malo
+  const cmp=(v,e,mode)=>{ if(v==null||e==null) return null; let a,t;
+    if(mode==="rel"){ a=(v/e-1)*100; t=nf0.format(Math.abs(a))+NB+"%"; if(Math.abs(a)<.5) a=0; }
+    else{ a=v-e; t=nf1.format(Math.abs(a))+NB+(mode==="años"?"años":"puntos"); if(Math.abs(a)<.05) a=0; }
+    return a===0?{a:0,t:"igual",ar:"=",sr:"igual que España"}:{a,t,ar:a>0?"▲":"▼",sr:`${t} ${a>0?(mode==="rel"?"por encima":"más"):(mode==="rel"?"por debajo":"menos")} que España`}; };
+  // «dónde queda entre todos»: cada fila pinta los 8.000 municipios como puntos y marca el tuyo y España
+  box.className="strips"; const n=rowsAll().length, nm=esc(dispName(r[F.name]));
+  box.innerHTML=`<div class="st-h">Dónde queda entre los ${nf0.format(n)} municipios</div>`+K.map(([kk,l,v,e,mode,nota,lr],i)=>{ const c=cmp(v,e,mode), fe=e==null?"":fmtK(kk)(e);
+    const cl=e==null?"":`<small class="st-cmp"${c?` aria-label="España ${fe}; ${c.sr}"`:""}>España ${fe}${c?` · <span class="st-ar" aria-hidden="true">${c.ar==="="?"":c.ar}</span>${c.ar==="="?"":" "}${c.t}`:""}</small>`;
+    return `<div class="st-r"><div class="st-l">${l}${nota?`<small>${nota}</small>`:""}</div>
+    <div class="st-c"><div class="st-a"><span class="st-ln">${nm}</span></div>
+      <div class="st-s"><canvas data-i="${i}" aria-hidden="true"></canvas><i class="st-band" hidden></i><i class="st-m es"></i><i class="st-m me"></i>${c&&c.a?`<b class="st-d" hidden aria-hidden="true">${c.ar} ${c.t}</b>`:""}</div>
+      <div class="st-x"><span class="st-e0">${lr[0]}</span><span class="st-le">España</span><span class="st-e1">${lr[1]}</span></div></div>
+    <div class="st-v"><span class="st-n">${v==null?'<span class="muted">sin dato</span>':fmtK(kk)(v)}</span>${cl}</div></div>`; }).join("");
+  const draw=()=>{ if(!box.isConnected) return; box.querySelectorAll(".st-r").forEach(row=>{ const cv=row.querySelector("canvas"), [kk,,v,e]=K[+cv.dataset.i];
     const W=cv.clientWidth||600, H=38; cv.width=W*2; cv.height=H*2; const x=cv.getContext("2d"); x.scale(2,2);
     const vals=rowsAll().map(q=>q[F[kk]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length) return;
     const lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99), X=z=>4+(W-8)*Math.max(0,Math.min(1,(z-lo)/((hi-lo)||1)));
     let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
     x.fillStyle=css("--ink"); x.globalAlpha=.16; for(const z of vals){ x.fillRect(X(z),4+rnd()*(H-8),1.3,1.3); } x.globalAlpha=1;
     x.fillStyle=css("--rule-2"); x.fillRect(3,2,1,H-4); x.fillRect(W-4,2,1,H-4);
-    if(e!=null){ x.fillStyle=css("--ink"); x.fillRect(X(e)-.75,0,1.5,H); }
-    if(v!=null){ x.fillStyle=css("--rust"); x.fillRect(X(v)-1.5,0,3,H); } });
+    // marcas y etiquetas: HTML encima del canvas
+    const $=s=>row.querySelector(s), put=(el,px)=>{ const w=el.offsetWidth; el.style.left=Math.max(0,Math.min(W-w,px-w/2))+"px"; };
+    const xv=v==null?null:X(v), xe=e==null?null:X(e), mv=$(".st-m.me"), me_=$(".st-m.es"), band=$(".st-band"), pill=$(".st-d"), ln=$(".st-ln"), le=$(".st-le");
+    mv.hidden=ln.hidden=xv==null; me_.hidden=le.hidden=xe==null; band.hidden=true; if(pill) pill.hidden=true; mv.classList.remove("mix");
+    if(xv!=null) mv.style.left=(xv-1.5)+"px";
+    if(xe!=null) me_.style.left=(xe-.75)+"px";
+    if(xv!=null&&xe!=null){ if(Math.abs(xv-xe)<4){ mv.classList.add("mix"); me_.hidden=true; }
+      else{ const a=Math.min(xv,xe), bw=Math.abs(xv-xe); band.hidden=false; band.style.left=a+"px"; band.style.width=bw+"px";
+        if(pill){ pill.hidden=false; const pw=pill.offsetWidth; if(bw>=pw+10) pill.style.left=(a+bw/2-pw/2)+"px"; else pill.hidden=true; } } }
+    if(xv!=null) put(ln,xv); if(xe!=null) put(le,xe);
+    row.querySelectorAll(".st-e0,.st-e1").forEach(el=>{ el.style.visibility="visible"; if(le.hidden) return; const A=le.getBoundingClientRect(), B=el.getBoundingClientRect(); if(B.left<A.right+6&&B.right>A.left-6) el.style.visibility="hidden"; }); }); };
   requestAnimationFrame(draw);
-  box.insertAdjacentHTML("beforeend",`<div class="st-k"><span><i class="me"></i>${esc(dispName(r[F.name]))}</span><span><i></i>Media de España</span><span>Cada punto gris es un municipio</span></div>`);
+  try{ new ResizeObserver(draw).observe(box); }catch(e){}
+  try{ document.fonts.ready.then(draw); }catch(e){}
+  box.insertAdjacentHTML("beforeend",`<div class="st-k"><span>Cada punto gris es un municipio</span><span>La franja entre las dos marcas es la diferencia con España</span></div>`);
 }
 // ---------- minigráficos de cambio ----------
 function smalls(box,r,d){
