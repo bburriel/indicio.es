@@ -1615,3 +1615,11 @@ details.chk > section{margin-top:18px}
 .czb-e .czsent{margin:2px 0 0; font-size:15.5px; color:var(--muted)}
 .czb-e .czbig{margin:8px 0 0; font-size:44px}
 .czmorebtn{border-style:solid}
+
+/* laboratorio: icono de ayuda sencillo (círculo con «i» de palo), sin el punto aparte del logotipo */
+.iq.czit,.iq.czi{width:16px; height:16px; font-family:var(--sans,system-ui,sans-serif); font-weight:700; font-size:11px; font-variation-settings:normal;
+  border:1.4px solid var(--ink-3,#8a8580); color:var(--ink-3,#8a8580); background:none}
+.iq.czit::after,.iq.czi::after{display:none}
+.iq.czit i,.iq.czi i{font-style:normal; line-height:1}
+.iq.czit:hover,.iq.czit:focus-visible,.iq.czi:hover,.iq.czi:focus-visible{color:var(--brand); border-color:var(--brand); background:none}
+.czchip.on .iq.czit,.czchip.on .iq.czi{color:#fff; border-color:#fff}

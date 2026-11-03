@@ -4156,7 +4156,7 @@ let CZMORE=false;
 const CZI=new Set();   // avisos abiertos con la «i» (clave: «control|risk» o «control|sus»)
 // escala del veredicto: cuatro tramos de |r|; devuelve la posición del marcador (0-100)
 const czPos=a=>a<.1?a/.1*25:a<.3?25+(a-.1)/.2*25:a<.5?50+(a-.3)/.2*25:Math.min(100,75+(a-.5)/.5*25);
-const czIt=(t,l)=>`<button type="button" class="iq czit" data-t="${esc(t)}" aria-label="${esc(l||"Más información")}"><i>ı</i></button>`;
+const czIt=(t,l)=>`<button type="button" class="iq czit" data-t="${esc(t)}" aria-label="${esc(l||"Más información")}"><i>i</i></button>`;
 const czTipBind=root=>tipBind(root.querySelectorAll(".czit"),b=>b.dataset.t);
 function czVerdict(r,adj){
   const box=document.getElementById("czl"); if(!box||!CZ) return; const a=Math.abs(r), i=a<.1?0:a<.3?1:a<.5?2:3, xl=low(labK(CZ.x)), yl=low(labK(CZ.y));
@@ -4201,7 +4201,7 @@ function czRefresh(animate){
   const wt=k=>{ const p=solo[k]; if(p==null||a0<0.1) return ""; if(Math.sign(p)!==sgn&&Math.abs(p)>=0.1) return "invierte";
     const d=((Math.sign(p)===sgn?Math.abs(p):0)-a0)/a0*100; return Math.abs(d)<5?"":(d<0?"−":"+")+nf0.format(Math.min(100,Math.abs(d)))+NB+"%"; };
   const chip=(k,lab,on)=>{ const rk=ctrlRisk(x,y,k), sus=k===CZ.suspect, t=wt(k);
-    const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Qué significa «${txt}» en ${esc(lab)}"><i>ı</i></button>`;
+    const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Qué significa «${txt}» en ${esc(lab)}"><i>i</i></button>`;
     return `<span class="czchip${on?" on":""}${sus?" sus":""}${rk?" risk":""}"><button type="button" class="czpick" data-k="${k}" aria-pressed="${on}"${t?` title="${esc(`Si igualas solo esto, la relación cambia un ${t.replace(/^[+−]/,"").replace(NB," ")}${t[0]==="+"?" más":" menos"} (r pasa de ${rFmt(base.r)} a ${rFmt(solo[k])})`)}"`:""}>${esc(cap(lab))}</button>${rk?`<button type="button" class="czwarn2 czi" data-i="${k}|risk" aria-expanded="false" aria-label="Cuidado con igualar ${esc(lab)}">!</button>`:""}${sus?tag("su","la que más pesa","sus"):""}</span>`; };
   const allK=CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y), lossOf=k=>{ const p=solo[k]; return p==null?0:a0-(Math.sign(p)===sgn?Math.abs(p):0); },
     ranked=[...allK].sort((a,b)=>(b===CZ.suspect)-(a===CZ.suspect)||lossOf(b)-lossOf(a)), topK=new Set(ranked.slice(0,3)),
