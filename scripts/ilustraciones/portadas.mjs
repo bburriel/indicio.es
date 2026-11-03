@@ -99,29 +99,36 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   add("pensiones","Pirámide de población de España hoy (barras) y en 2005 (línea); en granate, los mayores de 65. Fuente: INE.",
     `Los mayores de 65 pasan del ${nf(p65*100)} % de la población en 2005 al ${nf(o65*100)} % hoy.`,s); }
 
-// ---------- 6. pandemia y turismo: caída de las noches de hotel en 2020 ----------
-{ const P=PROVS.filter(p=>REG.data.prov[p]?.pernoct_hotel?.["2019"]&&REG.data.prov[p].pernoct_hotel["2020"]).map(p=>{ const o=REG.data.prov[p].pernoct_hotel; return {p,d:(o["2020"]/o["2019"]-1)*100,t:o["2019"]}; }).sort((a,b)=>b.d-a.d);
-  const tur=new Set([...P].sort((a,b)=>b.t-a.t).slice(0,10).map(d=>d.p)), mt=(g)=>d3.sum(g,d=>d.t*d.d)/d3.sum(g,d=>d.t), A=mt(P.filter(d=>tur.has(d.p))), Bm=mt(P.filter(d=>!tur.has(d.p)));
-  const x0=34,x1=W-10,y0=70,y1=H-30, w=(x1-x0)/P.length, Y=d3.scaleLinear().domain([0,-90]).range([y0,y1]); let s=T(x0,18,"Noches de hotel en 2020 frente a 2019, por provincia","pt-g-l");
-  s+=[0,-30,-60,-90].map(g=>L(x0,Y(g),x1,Y(g),g?"pt-g-gr":"pt-g-tick")+T(x0-6,Y(g)+4,(g?"−"+Math.abs(g):"0")+NB+"%","pt-g-t","end")).join("");
-  P.forEach((d,i)=>{ s+=R(x0+i*w+w*.14,y0,w*.72,Y(d.d)-y0,tur.has(d.p)?"pt-f-br":"pt-f-mu",1); });
-  s+=T(x0+2,40,`Las 10 provincias más turísticas (granate): ${pc(A)}`,"pt-g-n br").replace('class="pt-g-n br"','class="pt-g-l br"').replace(/y="[\d.]+"/,'y="40"');
-  s+=T(x0+2,56,`Las demás: ${pc(Bm)}`,"pt-g-l");
-  add("pandemia-turismo","Cambio de las pernoctaciones en hoteles de 2019 a 2020, una barra por provincia; en granate, las diez con más noches en 2019. Fuente: INE, Coyuntura Turística Hotelera.",
-    `En 2020 las noches de hotel cayeron un ${nf(-A)} % en las diez provincias más turísticas y un ${nf(-Bm)} % en las demás.`,s); }
+// ---------- 6. pandemia y turismo: noches de hotel de 2017 a hoy, las diez provincias más turísticas frente al resto (2019 = 100) ----------
+{ const yrs=d3.range(2017,2026), P=PROVS.filter(p=>{ const o=REG.data.prov[p]?.pernoct_hotel; return o&&yrs.every(y=>o[String(y)]>0); });
+  const tur=new Set([...P].sort((a,b)=>REG.data.prov[b].pernoct_hotel["2019"]-REG.data.prov[a].pernoct_hotel["2019"]).slice(0,10));
+  const serie=g=>yrs.map(y=>[y,d3.sum(g,p=>REG.data.prov[p].pernoct_hotel[String(y)])/d3.sum(g,p=>REG.data.prov[p].pernoct_hotel["2019"])*100]);
+  const A=serie(P.filter(p=>tur.has(p))), B=serie(P.filter(p=>!tur.has(p))), a20=A.find(d=>d[0]===2020)[1]-100, b20=B.find(d=>d[0]===2020)[1]-100;
+  const x0=40,x1=W-92,y0=H-34,y1=30, X=d3.scaleLinear().domain([yrs[0],yrs[yrs.length-1]]).range([x0,x1]), Y=d3.scaleLinear().domain([0,120]).range([y0,y1]);
+  let s=T(x0,14,"Noches de hotel (2019 = 100)","pt-g-t");
+  s+=[0,50,100].map(g=>L(x0,Y(g),x1,Y(g),g===100?"pt-g-base":"pt-g-gr")+T(x0-8,Y(g)+4,String(g),"pt-g-t","end")).join("");
+  s+=yrs.filter(y=>y%2).map(y=>T(X(y),y0+22,String(y),"pt-g-t","middle")).join("");
+  s+=PL(B.map(([y,v])=>[X(y),Y(v)]),"ink")+PL(A.map(([y,v])=>[X(y),Y(v)]),"br");
+  const la=A[A.length-1], lb=B[B.length-1]; let ya=Y(la[1]), yb=Y(lb[1]); if(Math.abs(ya-yb)<34){ const m=(ya+yb)/2, up=la[1]>=lb[1]; ya=m+(up?-17:17); yb=m+(up?17:-17); }
+  s+=C(X(la[0]),Y(la[1]),4.5,"pt-f-br")+C(X(lb[0]),Y(lb[1]),4,"pt-f-ink");
+  s+=T(X(la[0])+10,ya-2,"Las 10 más","pt-g-l br")+T(X(la[0])+10,ya+13,"turísticas","pt-g-l br")+T(X(lb[0])+10,yb+4,"El resto","pt-g-l");
+  const xa=X(2020); s+=C(xa,Y(a20+100),4.5,"pt-f-br")+C(xa,Y(b20+100),4,"pt-f-ink");
+  s+=T(xa+10,Y(a20+100)+5,pc(a20)+" en 2020","pt-g-g")+T(xa-10,Y(b20+100)+4,pc(b20),"pt-g-t","end");
+  add("pandemia-turismo","Pernoctaciones en hoteles cada año respecto a 2019. En granate, las diez provincias con más noches en 2019; en negro, el resto. Fuente: INE, Coyuntura Turística Hotelera.",
+    `En 2020 las noches de hotel cayeron un ${nf(-a20)} % en las diez provincias más turísticas y un ${nf(-b20)} % en el resto; en ${la[0]} ya estaban de nuevo en torno a su nivel de 2019.`,s); }
 
-// ---------- 7. quién gobierna: crecimiento de la población según el margen de victoria ----------
+// ---------- 7. quién gobierna: cuánto creció la población donde el PP o el PSOE ganó por poco ----------
 { const sf={}; EST.fields.forEach((f,i)=>sf[f]=i); const pi=EST.padYears.indexOf(2019), pj=EST.padYears.indexOf(2025), pts=[];
-  EST.rows.forEach(r=>{ const m=r[sf.mun]&&r[sf.mun][0], pad=r[sf.pad], x=IX.rows.find?null:null; if(!m||!pad||!pad[pi]||!pad[pj]) return; const pp=m.find(l=>l[0]==="PP"), ps=m.find(l=>l[0]==="PSOE"); if(!pp||!ps) return; pts.push({m:ps[1]-pp[1],y:(pad[pj]/pad[pi]-1)*100,pop:pad[pj]}); });
-  const sel=pts.filter(d=>d.pop>=250&&Math.abs(d.m)<=10&&isFinite(d.y)&&d.y>-40&&d.y<60), bw=2.5, bins=d3.range(-10,10,bw).map(a=>{ const g=sel.filter(d=>d.m>=a&&d.m<a+bw); return {x:a+bw/2,y:d3.mean(g,d=>d.y),n:g.length}; }).filter(b=>b.n>8);
-  const x0=40,x1=W-16,y0=H-50,y1=44, X=d3.scaleLinear().domain([-10,10]).range([x0,x1]), lo=Math.min(...bins.map(b=>b.y)), hi=Math.max(...bins.map(b=>b.y)), Y=d3.scaleLinear().domain([Math.min(-1,lo-1.2),hi+1.6]).range([y0,y1]);
-  let s=T(x0,18,"Población 2019 → 2025 según el margen de la elección","pt-g-t");
-  s+=[Y.domain()[0],Y.domain()[1]].map(()=>"").join("")+L(X(0),y1-8,X(0),y0+4,"pt-g-tick dash");
-  bins.forEach(b=>{ s+=C(X(b.x),Y(b.y),6.5,b.x<0?"pt-f-ink":"pt-f-br")+T(X(b.x),Y(b.y)-12,(b.y>=0?"+":"−")+nf(Math.abs(b.y),1)+NB+"%","pt-g-t","middle"); });
-  s+=T(X(-5),y0+22,"Ganó el PP por poco","pt-g-l","middle")+T(X(5),y0+22,"Ganó el PSOE por poco","pt-g-l br","middle")+T(X(0),H-8,"empate","pt-g-t","middle");
-  s+=T(X(0)+10,y1+4,"Sin salto en el empate","pt-g-g");
-  add("quien-gobierna","Municipios de 250 habitantes o más donde PP y PSOE fueron las listas más votadas en 2019, agrupados por su ventaja. Fuente: Ministerio del Interior e INE (padrón).",
-    "La población de los municipios decididos por pocos votos evoluciona igual donde ganó el PP y donde ganó el PSOE: no hay salto en el empate.",s); }
+  EST.rows.forEach(r=>{ const m=r[sf.mun]&&r[sf.mun][0], pad=r[sf.pad]; if(!m||!pad||!pad[pi]||!pad[pj]) return; const pp=m.find(l=>l[0]==="PP"), ps=m.find(l=>l[0]==="PSOE"); if(!pp||!ps) return; pts.push({m:ps[1]-pp[1],y:(pad[pj]/pad[pi]-1)*100,pop:pad[pj]}); });
+  const MG=5, sel=pts.filter(d=>d.pop>=250&&Math.abs(d.m)<=MG&&d.m!==0&&isFinite(d.y)&&d.y>-40&&d.y<60);
+  const G=[["Ganó el PP por poco",sel.filter(d=>d.m<0),"pt-f-ink",""],["Ganó el PSOE por poco",sel.filter(d=>d.m>0),"pt-f-br"," br"]].map(([l,g,c,cl])=>({l,n:g.length,v:d3.mean(g,d=>d.y),c,cl}));
+  const x0=24,x1=W-90, mx=Math.max(...G.map(g=>g.v),1)*1.08, sc=v=>(x1-x0)*Math.max(0,v)/mx;
+  let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-l");
+  s+=T(x0,38,`Municipios donde PP y PSOE quedaron a menos de ${MG} puntos`,"pt-g-t");
+  G.forEach((g,i)=>{ const y=78+i*80; s+=T(x0,y,g.l,"pt-g-l"+g.cl)+R(x0,y+12,sc(g.v),34,g.c,3)+T(x0+sc(g.v)+10,y+40,(g.v>=0?"+":"−")+nf(Math.abs(g.v),1)+NB+"%","pt-g-n"+g.cl); });
+  s+=T(x0,H-22,"Casi lo mismo: quién gobernó no cambió","pt-g-g")+T(x0,H-4,"cuánto creció el pueblo","pt-g-g");
+  add("quien-gobierna",`Media de los municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en 2019 y quedaron a menos de ${MG} puntos (${G[0].n} donde ganó el PP y ${G[1].n} donde ganó el PSOE). Fuente: Ministerio del Interior e INE (padrón).`,
+    `Donde el PP ganó por poco la población creció un ${nf(G[0].v,1)} % de 2019 a 2025, y donde ganó el PSOE por poco, un ${nf(G[1].v,1)} %.`,s); }
 
 // ---------- mapas ----------
 const FE=topojson.feature(TOPO,TOPO.objects.municipalities).features, CEN=new Map(FE.map(f=>[f.id,d3.geoCentroid(f)])), BY=new Map(ROWS.map(r=>[r[F.code],r]));
