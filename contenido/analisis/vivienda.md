@@ -12,7 +12,7 @@ orden: -1
 
 Desde 2015, el alquiler medio en España ha subido un **{{alq15|pct0}}**. El sueldo mediano, un {{sal15|pct0}}. En València, el alquiler medio ha pasado de {{vlc15|eur}} a {{vlc24|eur}} al mes; en Málaga, de {{mlg15|eur}} a {{mlg24|eur}}.
 
-Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a cuatro preguntas: cuánto ha subido de verdad, a quién le golpea, por qué ha pasado y qué funcionaría.
+Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a cuatro preguntas: cuánto ha subido de verdad, a quién le golpea, por qué ha pasado (y si pasa igual en todas partes) y qué funcionaría.
 
 ## Lo que ha subido
 
@@ -33,28 +33,6 @@ Aquí los datos llevan la contraria a la intuición. Un piso de 80 m² al precio
 [[grafico:compra]]
 
 Y en {{añoVt}} el precio de tasación subió otro {{vt25|pct0}}, más deprisa que los sueldos. Que no esté peor que en 2008 no quiere decir que sea fácil. Los precios suben otra vez deprisa (un {{ipv19|pct0}} desde 2019, frente a un {{sal19|pct0}} los sueldos), y el obstáculo ya no es la hipoteca sino la entrada: los bancos financian como mucho el 80 % y hay que pagar impuestos y gastos. Eso son unos {{entrada|r1000|eur}} ahorrados de antemano, **{{entradaAños|n1}} años de sueldo mediano íntegro**. Para quien paga un alquiler alto, ahorrar esa cantidad es casi imposible.
-
-## Ciudad por ciudad: no es el mismo problema
-
-La media nacional esconde que en cada sitio pasan cosas distintas. Con los mismos datos de tasación y de sueldo mediano de cada comunidad, el esfuerzo de comprar 80 m² ha bajado desde 2008 casi en todas partes, pero no igual y no por las mismas razones. Madrid pasa de {{c_mad08|n1}} a {{c_mad24|n1}} años de sueldo, y Barcelona, de {{c_bcn08|n1}} a {{c_bcn24|n1}}: siguen siendo las más caras del país. Zaragoza baja de {{c_zgz08|n1}} a {{c_zgz24|n1}} y Murcia, de {{c_mur08|n1}} a {{c_mur24|n1}}. Entre las que más han empeorado desde 2019 están Málaga ({{c_mlg19|n1}} a {{c_mlg24|n1}} años), València ({{c_vlc19|n1}} a {{c_vlc24|n1}}) y Palma ({{c_pmi19|n1}} a {{c_pmi24|n1}}).
-
-Para no juntarlo todo en el mismo saco, repartimos las {{cN|n0}} ciudades de 50.000 habitantes o más en tres grupos con una regla sencilla (no es un modelo, y a veces una ciudad cae en un grupo discutible): **costa y compradores extranjeros**, si en su provincia los extranjeros hacen un 25 % o más de las compras; **ciudades que atraen población**, si no y han ganado un 3 % o más de habitantes desde 2019; y el resto, que **crece poco**.
-
-[[grafico:tipos]]
-
-**En la costa, el comprador viene de fuera.** Los {{costa_n|n0}} municipios del grupo (Málaga, Palma, Las Palmas, Alicante, Murcia…) tienen bastantes más compraventas por habitante que el resto ({{costa_comp|n0}} al año por cada 1.000, frente a {{atrae_comp|n0}} y {{estable_comp|n0}}), más extranjeros empadronados ({{costa_extr|pct0}}) y el doble de viviendas que no son hogar de nadie ({{costa_np|pct0}}, entre vacías y segundas residencias, frente al {{atrae_np|pct0}} de las que atraen población). Aquí el precio de tasación ha subido un {{costa_vtVar|pct0}} desde 2015 y llegan {{costa_hog|n1}} hogares nuevos al año por cada 1.000 habitantes, cuando se empiezan unas {{costa_ini|n1}} viviendas. Es coherente con la idea de que parte de la demanda no busca casa para vivir, aunque estos datos no separan una cosa de otra. Los pisos turísticos que cuenta el INE son pocos (el {{costa_tur|pct1}} de las viviendas, de mediana), pero se concentran en barrios concretos y esa media los diluye.
-
-**En las ciudades que atraen población, el problema es la gente que llega.** Madrid, Barcelona, València y sus coronas (Hospitalet, Badalona, Getafe…) han ganado habitantes a un ritmo de {{atrae_hog|n1}} hogares nuevos al año por cada 1.000 habitantes y empiezan unas {{atrae_ini|n1}} viviendas por cada 1.000: la mitad. Tienen pocas viviendas sin habitar (el {{atrae_np|pct0}} no son hogar de nadie) y algo más de alquiler que el resto (el {{atrae_alq|pct0}} de los hogares) y los precios de tasación más disparados desde 2015: un {{atrae_vtVar|pct0}}. Los datos no dicen si el alquiler sube por especulación o porque hay más gente buscando; lo que sí dicen es que aquí no sobran casas.
-
-**Donde llega menos gente, el problema es menor.** Las {{estable_n|n0}} ciudades que crecen poco (Zaragoza, Sevilla, Bilbao, Valladolid, Gijón…) tienen un esfuerzo mediano de {{estable_a24|n1}} años de sueldo, el precio ha subido un {{estable_vtVar|pct0}} y llegan {{estable_hog|n1}} hogares nuevos por cada 1.000 habitantes, menos de lo que se empieza a construir. Aun así hay excepciones: Sevilla, Bilbao o A Coruña, con entre 7 y 8 años de sueldo, están por encima de la mediana de las ciudades que atraen población.
-
-**Y los pueblos pequeños y lejanos sufren lo contrario.** En los {{rurN|n0}} municipios de menos de 2.000 habitantes a 45 km o más de una gran ciudad, la mediana ha perdido un {{rurPob|abs|pct0}} de población desde 2015, el {{rurNp|pct0}} de las viviendas no es el hogar de nadie y solo el {{rurAlq|pct0}} de los hogares vive de alquiler. Casi no hay mercado, ni para comprar ni para alquilar: la casa es barata y lo que falta es gente y trabajo. Aquí mover viviendas vacías ayuda poco, porque el problema es que no hay quien las ocupe.
-
-Hay cosas que faltan en el cuadro. **La obra terminada** solo se publica por provincia, así que comparamos con las viviendas iniciadas de cada provincia y no con las de cada ciudad. **La multipropiedad** (quién tiene varias casas) solo está para el conjunto de España: el Catastro publica el detalle por municipio, pero todavía no lo hemos incorporado. Y **la edad de quien llega** o el peso de los inversores no se pueden medir con datos públicos municipales; por eso no afirmamos que en Barcelona suba el alquiler por los jóvenes o por la inversión, aunque sea plausible.
-
-Busca tu ciudad (cada nombre abre su ficha):
-
-[[grafico:fichaCiudades]]
 
 ## A quién le golpea
 
@@ -80,9 +58,31 @@ Mientras, se construye una fracción de lo que se construía. En 2006 se termina
 
 > La burbuja de los 2000 dejó una lección que pesa todavía: se construyó mucho, en sitios donde nadie quería vivir, con crédito barato. Tras el estallido, la construcción se hundió y no se ha recuperado, aunque ahora la demanda sí está, y está en las ciudades.
 
+## No es el mismo problema en todas partes
+
+Hasta aquí, los números son los de España entera. Pero una media que junta a Palma, Barcelona, Zaragoza y un pueblo de 300 vecinos no describe a ninguno. Con los mismos datos de tasación y de sueldo mediano de cada comunidad, el esfuerzo de comprar 80 m² ha bajado desde 2008 casi en todas partes, pero no igual: Madrid pasa de {{c_mad08|n1}} a {{c_mad24|n1}} años de sueldo y Barcelona, de {{c_bcn08|n1}} a {{c_bcn24|n1}}, y siguen siendo las más caras del país. Zaragoza baja de {{c_zgz08|n1}} a {{c_zgz24|n1}} y Murcia, de {{c_mur08|n1}} a {{c_mur24|n1}}. Entre las que más han empeorado desde 2019 están Málaga ({{c_mlg19|n1}} a {{c_mlg24|n1}} años), València ({{c_vlc19|n1}} a {{c_vlc24|n1}}) y Palma ({{c_pmi19|n1}} a {{c_pmi24|n1}}).
+
+Para no juntarlo todo en el mismo saco, repartimos las {{cN|n0}} ciudades de 50.000 habitantes o más en tres grupos con una regla sencilla (no es un modelo, y a veces una ciudad cae en un grupo discutible): **costa y compradores extranjeros**, si en su provincia los extranjeros hacen un 25 % o más de las compras; **ciudades que atraen población**, si no y han ganado un 3 % o más de habitantes desde 2019; y el resto, que **crece poco**.
+
+[[grafico:tipos]]
+
+**En la costa, el comprador viene de fuera.** Los {{costa_n|n0}} municipios del grupo (Málaga, Palma, Las Palmas, Alicante, Murcia…) tienen bastantes más compraventas por habitante que el resto ({{costa_comp|n0}} al año por cada 1.000, frente a {{atrae_comp|n0}} y {{estable_comp|n0}}), más extranjeros empadronados ({{costa_extr|pct0}}) y el doble de viviendas que no son hogar de nadie ({{costa_np|pct0}}, entre vacías y segundas residencias, frente al {{atrae_np|pct0}} de las que atraen población). Aquí el precio de tasación ha subido un {{costa_vtVar|pct0}} desde 2015 y llegan {{costa_hog|n1}} hogares nuevos al año por cada 1.000 habitantes, cuando se empiezan unas {{costa_ini|n1}} viviendas. Es coherente con la idea de que parte de la demanda no busca casa para vivir, aunque estos datos no separan una cosa de otra. Los pisos turísticos que cuenta el INE son pocos (el {{costa_tur|pct1}} de las viviendas, de mediana), pero se concentran en barrios concretos y esa media los diluye. **Lo que apuntan los datos:** aquí pesa más que en otros sitios lo que no es hogar de nadie (vacías, segundas residencias, turísticas), así que movilizar lo que hay puede aportar más que solo construir; lo vemos en «Dos ideas», más abajo.
+
+**En las ciudades que atraen población, el problema es la gente que llega.** Madrid, Barcelona, València y sus coronas (Hospitalet, Badalona, Getafe…) han ganado habitantes a un ritmo de {{atrae_hog|n1}} hogares nuevos al año por cada 1.000 habitantes y empiezan unas {{atrae_ini|n1}} viviendas por cada 1.000: la mitad. Tienen pocas viviendas sin habitar (el {{atrae_np|pct0}} no son hogar de nadie) y algo más de alquiler que el resto (el {{atrae_alq|pct0}} de los hogares) y los precios de tasación más disparados desde 2015: un {{atrae_vtVar|pct0}}. Los datos no dicen si el alquiler sube por especulación o porque hay más gente buscando; lo que sí dicen es que aquí no sobran casas. **Lo que apuntan los datos:** aquí casi no hay viviendas que movilizar y llega más gente de la que se construye para, así que lo que más encaja es construir; la vivienda pública de alquiler es la forma de que lo que se construya sea asequible.
+
+**Donde llega menos gente, el problema es menor.** Las {{estable_n|n0}} ciudades que crecen poco (Zaragoza, Sevilla, Bilbao, Valladolid, Gijón…) tienen un esfuerzo mediano de {{estable_a24|n1}} años de sueldo, el precio ha subido un {{estable_vtVar|pct0}} y llegan {{estable_hog|n1}} hogares nuevos por cada 1.000 habitantes, menos de lo que se empieza a construir. Aun así hay excepciones: Sevilla, Bilbao o A Coruña, con entre 7 y 8 años de sueldo, están por encima de la mediana de las ciudades que atraen población. **Lo que apuntan los datos:** es donde menos se nota el desajuste entre hogares y obra y donde el esfuerzo de compra es menor, con excepciones.
+
+**Y los pueblos pequeños y lejanos sufren lo contrario.** En los {{rurN|n0}} municipios de menos de 2.000 habitantes a 45 km o más de una gran ciudad, la mediana ha perdido un {{rurPob|abs|pct0}} de población desde 2015, el {{rurNp|pct0}} de las viviendas no es el hogar de nadie y solo el {{rurAlq|pct0}} de los hogares vive de alquiler. Casi no hay mercado, ni para comprar ni para alquilar: la casa es barata y lo que falta es gente y trabajo. Aquí mover viviendas vacías ayuda poco, porque el problema es que no hay quien las ocupe. **Lo que apuntan los datos:** no es un problema de falta de vivienda; lo que falta es gente.
+
+Hay cosas que faltan en el cuadro. **La obra terminada** solo se publica por provincia, así que comparamos con las viviendas iniciadas de cada provincia y no con las de cada ciudad. **La multipropiedad** (quién tiene varias casas) solo está para el conjunto de España: el Catastro publica el detalle por municipio, pero todavía no lo hemos incorporado. Y **la edad de quien llega** o el peso de los inversores no se pueden medir con datos públicos municipales; por eso no afirmamos que en Barcelona suba el alquiler por los jóvenes o por la inversión, aunque sea plausible.
+
+Busca tu ciudad (cada nombre abre su ficha):
+
+[[grafico:fichaCiudades]]
+
 ## Dos ideas: construir más o que cada casa sea para vivir
 
-Cuando se discute qué hacer, aparecen dos ideas. Una dice que faltan casas y que hay que construir más. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas y cada vez más se acumulan en manos de quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál de las dos, sino cuánto puede aportar cada una.
+Con los tres tipos de sitio en la cabeza, vuelve la pregunta de qué hacer. Cuando se discute, aparecen dos ideas. Una dice que faltan casas y que hay que construir más. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas y cada vez más se acumulan en manos de quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál de las dos, sino cuánto puede aportar cada una.
 
 ### Construir más
 
