@@ -5567,10 +5567,9 @@ function renderSobre(sec){
   view.innerHTML=`<section class="ab-hero">
       <div><span class="kk">Quién soy</span><h1>${esc(A.name||"Borja Burriel")}</h1>
       <p class="ab-role">Data scientist · Experimentación e inferencia causal</p>
-      <p class="dek">${A.frase?esc(A.frase):"Ayudo a saber si un cambio ha funcionado de verdad: una política pública, una medida o un producto. En Indicio publico análisis independientes con datos públicos de España."}</p>
       <div class="chipsq">${A.linkedin?`<a href="${esc(A.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`:""}${A.web?`<a href="${esc(A.web)}" target="_blank" rel="noopener">Web</a>`:""}<a href="/quien-soy/contacto/" id="abgo">✉ Escríbeme</a></div></div>
     </section>
-    <p class="ab-bio">Tengo un máster en Estadística y siete años de experiencia en departamentos de datos como data scientist, especializado en experimentación e inferencia causal: diseñar y analizar experimentos y, cuando no se puede experimentar, estimar el efecto de una medida con datos observacionales. He trabajado en Domestika, Wallapop y Northius.</p>
+    <p class="ab-bio">Soy data scientist y tengo un máster en Estadística. Empecé en la investigación y en el deporte, en el FC Barcelona. Después, siete años en equipos de datos (Domestika, Wallapop y Northius), siempre con la misma pregunta: si un cambio ha producido de verdad el efecto que se le atribuye. La estudio con experimentación e inferencia causal, y en Indicio la aplico a los datos públicos.</p>
     <section class="ab-why"><h2>Por qué Indicio</h2>
       <p>España publica más datos de los que nadie puede leer, y casi siempre se discute con ellos del mismo modo: dos cosas aparecen juntas y se da por hecho que una causa la otra. Los alquileres suben donde hay pisos turísticos, pero también donde hay más turistas, más trabajo y más demanda de vivienda.</p>
       <p>Separar unas cosas de otras es justo lo que enseña la experimentación, y es lo que suele faltar cuando se habla de políticas públicas. Indicio nace para llevar ese método a los datos públicos.</p>
