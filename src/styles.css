@@ -1163,8 +1163,17 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .seo-extra .faq h3{font-size:17px; margin:18px 0 4px}
 .seo-extra .faq p{max-width:var(--medida); color:var(--ink-2); line-height:1.55}
 .seo-extra .near{line-height:1.9; max-width:var(--medida)}
-.provlist{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:6px 18px; margin:10px 0 30px}
-.provlist a{padding:6px 0; border-bottom:1px solid var(--rule)} .provlist small{color:var(--muted)}
+/* índice de provincias: agrupadas por comunidad, título a la izquierda y filas a la derecha */
+.provgroups{margin:6px 0 34px}
+.provgroup{display:grid; grid-template-columns:minmax(150px,230px) minmax(0,1fr); gap:6px 40px; padding:26px 0 22px; border-top:1px solid var(--rule)}
+.provgroup:first-child{border-top:0}
+.provgroup > h2{font-family:var(--serif); font-weight:500; font-size:clamp(20px,2vw,24px); line-height:1.2; letter-spacing:-.01em; color:var(--ink); margin:0; padding-top:5px}
+.provlist{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0 34px; margin:0}
+.provlist a{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px solid var(--rule); text-decoration:none; font-family:var(--serif); font-size:19px; line-height:1.3; color:var(--ink)}
+.provlist a:hover{color:var(--brand); border-bottom-color:var(--brand)}
+.provlist small{font-family:inherit; font-size:15px; color:var(--muted); font-variant-numeric:tabular-nums}
+.vh{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+@media (max-width:760px){ .provgroup{grid-template-columns:minmax(0,1fr); padding:20px 0 14px} .provgroup > h2{padding-top:0; margin-bottom:6px} .provlist{grid-template-columns:minmax(0,1fr)} }
 /* laboratorio, mapa: el mapa ocupa todo el ancho y las listas van debajo, en dos columnas */
 .lb-out .exmap, .exmap{grid-template-columns:minmax(0,1fr)}
 .exmap-m .mapbox{max-width:var(--medida); margin:0 auto}
