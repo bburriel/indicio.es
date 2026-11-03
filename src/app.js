@@ -4137,8 +4137,8 @@ function exBar(){
       <p class="hint" id="excount"></p></div>`}
     <div class="lb-step"><h4><i>${isEvo||isB||isMapAgg?3:4}</i>${VOPT[EX.v]||isMapAgg?"Cómo verlo":"Ajustes"}${VOPT[EX.v]||isMapAgg?"":lbh("Cambios opcionales. Puedes dejarlo todo como está.","Qué son los ajustes")}</h4>${VOPT[EX.v]?VOPT[EX.v].html():isMapAgg?`<p class="hint" style="margin:0">${isReg(EX.d[0])?"Dato oficial de cada "+(EX.u==="prov"?"provincia":"comunidad")+".":"Cada "+(EX.u==="prov"?"provincia":"comunidad")+" muestra la media de sus municipios, ponderada por población."} Al elegir dato, salen los que existen a esta escala.</p>`:EX.v==="mapa"?`<label class="chk"><input type="checkbox" id="exbv" ${EX.bv?"checked":""}> Añadir un segundo dato (mapa de dos colores)</label>${EX.bv?"":`<p class="hint">Así ves a la vez dónde coinciden, por ejemplo, poca renta y mucho paro.</p>`}`:EX.v==="cruce"?`
       <label class="chk"><input type="checkbox" id="exw" ${EX.w?"checked":""}> Dar más peso a los municipios grandes</label>
-      <label class="chk"><input type="checkbox" id="exq" ${EX.q?"checked":""}> Dividir en cuatro zonas</label>
-      <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Ampliar los valores bajos (horizontal)</label>
+      ${EX.u?"":`<label class="chk"><input type="checkbox" id="exq" ${EX.q?"checked":""}> Dividir en cuatro zonas</label>
+      <label class="chk"><input type="checkbox" id="exlx" ${EX.lx?"checked":""}> Ampliar los valores bajos (horizontal)</label>`}
       <button type="button" class="sel" id="exswap" style="margin-top:6px">⇄ Intercambiar ejes</button>
       <p class="hint">Debajo del gráfico podrás comprobar si la relación es real o se explica por otra cosa.</p>`
       :`<p class="hint" style="margin:0">Para comprobar si dos datos van juntos, pásalo a «Si van juntos».</p>${EX.d.length>=1&&!isEvo&&!isB?`<button type="button" class="sel" id="exgo" style="margin-top:8px">Ver ${esc(labK(EX.d[0]))} en una relación</button>`:""}`}</div>`;
