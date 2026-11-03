@@ -1900,3 +1900,12 @@ details.chk > section{margin-top:18px}
 .mleg-ticks span{position:absolute; top:3px; transform:translateX(-50%); font-variant-numeric:tabular-nums; white-space:nowrap}
 .mleg-ticks span::before{content:""; position:absolute; left:50%; top:-4px; height:4px; border-left:1px solid var(--rule-2)}
 @media (max-width:860px){ .ci-hero.mun-hero{grid-template-columns:minmax(0,1fr); gap:26px; padding-top:22px} .mun-hero > div:first-child{display:block} .mun-hero .linkrow{margin-top:0; padding-top:18px} .mun-hero #mlmap svg{max-width:560px; margin:0 auto} }
+
+/* selector de idioma (cabecera) y nota de «solo en castellano» */
+.langsw{margin-left:auto; display:flex; align-items:center}
+.langsw label{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.langsw select{font:inherit; font-size:14px; color:var(--ink-2); background:transparent; border:1px solid var(--rule-2); border-radius:20px; padding:4px 26px 4px 12px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23777' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center}
+.langsw select:hover{color:var(--brand); border-color:var(--brand)}
+.langsw select:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+.langnote{margin:0 auto; max-width:var(--wrap,1120px); padding:8px 16px; font-size:13.5px; color:var(--ink-2); background:var(--card,#fff); border-bottom:1px solid var(--rule-2)}
+@media (max-width:860px){ .langsw{order:3} }
