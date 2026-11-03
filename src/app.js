@@ -5844,6 +5844,18 @@ async function studyVivienda(B){
   const BANDS=[[0,1000,"Menos de 1.000"],[1000,5000,"1.000 a 5.000"],[5000,20000,"5.000 a 20.000"],[20000,100000,"20.000 a 100.000"],[100000,1e9,"Más de 100.000"]].map(([a,b,l])=>({l,...band(a,b)}));
   const vtRows=rowsAll().filter(r=>r[F.vt]!=null&&r[F.pop]), vtES=d3.sum(vtRows,r=>r[F.vt]*r[F.pop])/d3.sum(vtRows,r=>r[F.pop]);
   const hpi=geo=>{ const o=(EU[geo]||{}).hpi||{}, y=lastK(o); return o["2015"]&&y?(o[y]/o["2015"]-1)*100:null; };
+  // Dos ideas: construir más o que cada casa sea para vivir.
+  // Zonas con demanda: municipios de 20.000 habitantes o más que han ganado población desde 2015.
+  // Viviendas de cada municipio ≈ hogares / (1 − % no principal), con hogares ≈ población / personas por hogar de España
+  // (Eurostat): el reparto entre vacías y segundas residencias no se publica por municipio, así que se usa el de España
+  // en el Censo de 2021 (3.837.328 vacías de 8.087.092 no principales; el resto, uso esporádico u otro).
+  const pph=(pob[hY]||pob[pY])/(hog[hY]*1000), VAC_ES=3837328, NOP_ES=26623708-18536616, vacSh=VAC_ES/NOP_ES;
+  const zon=rowsAll().filter(r=>r[F.pop]>=20000&&r[F.varPob]>0&&r[F.noPrincipal]!=null), vivZ=r=>r[F.pop]/pph/(1-r[F.noPrincipal]/100);
+  const npZ=d3.sum(zon,r=>vivZ(r)*r[F.noPrincipal]/100), vtZ=d3.sum(zon.filter(r=>r[F.vt]!=null),r=>vivZ(r)*r[F.vt]/100);
+  const pobZ=d3.sum(zon,r=>r[F.pop])/d3.sum(rowsAll(),r=>r[F.pop])*100;
+  // Hogares nuevos y viviendas terminadas desde 2021 (Banco de España: déficit de unas 750.000 en 2021–2025, Informe Anual 2025)
+  const hog21=(hog[hY]-hog["2020"])*1000, term21=d3.sum(d3.range(2021,+hY+1),y=>termTot(y)||0), termAño5=term21/(+hY-2020);
+  const proy10=(proy["2036"]-proy["2026"])/10;
   const V={
     alq15:g(E.alqMes,"2015",String(aY)), sal15:g(ees,"2015",String(Math.min(aY,eY))), ipv15:g(E.ipv,"2015",String(vY)), ipc15:(ipcY(aY)/ipcY(2015)-1)*100, añoAlq:aY,
     vlc15:city("València")["2015"], vlc24:city("València")[aY], mlg15:city("Málaga")["2015"], mlg24:city("Málaga")[aY],
@@ -5858,6 +5870,8 @@ async function studyVivienda(B){
     pob19:pob[pY]-pob["2019"], proyAño, term06:termTot(2006), termMax:d3.max(d3.range(2013,2026),y=>termTot(y)),
     prot0009:avg(E.protegidas,2000,2009), prot1925:avg(E.protegidas,2019,2025),
     npPeq:BANDS[0].np, npGr:BANDS[4].np, vpPeq:BANDS[0].vp, vpGr:BANDS[4].vp, vtES,
+    nZ:zon.length, pobZ, npZ, vacZ:npZ*vacSh, vtZ, vac13:npZ*vacSh*.13, hog21, term21, def21:hog21-term21, termAño5, proy10, añoHog21:hY,
+    ...(()=>{ const d0=Math.round((hog21-term21)/50000)*50000, need=d0+Math.max(0,proy10-termAño5)*10, bu=60000*8, mv=npZ*vacSh*.13+vtZ*.25; return {cenNeed:need,cenB:bu,cenM:mv,cenCov:(bu+mv)/need*100,cenRat:bu/mv}; })(),
     hpiES:hpi("ES"), hpiEU:hpi("EU27_2020"), hpiNL:hpi("NL"), hpiPT:hpi("PT"),
     inv06:(EU.ES.inversionVivienda||{})["2006"], invES:euL("ES","inversionVivienda").v, invEU:euL("EU27_2020","inversionVivienda").v,
     socialES:ten.alqSocial[tenY], socialAT:euL("AT","alquilerReducido").v, socialNL:euL("NL","alquilerReducido").v };
@@ -5884,6 +5898,25 @@ async function studyVivienda(B){
       lineChart(el,{title:"Precio de la vivienda en Europa (2015 = 100)",sub:"Índice de precios de la vivienda, medias anuales",source:"Fuente: Eurostat (prc_hpi_a).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
         series:C.map(([k,n,c,main])=>({n,c,main,v:Y.map(y=>{ const o=(EU[k]||{}).hpi||{}; return o[y]&&o["2015"]?o[y]/o["2015"]*100:null; })}))}); }
   };
+  // los grises: cuánto puede aportar cada idea en los próximos años
+  G.grises=d=>{ const k0=Math.round(V.def21/50000)*50, mil=v=>nf0.format(Math.round(v/1000)*1000);
+    playBox(d,{defs:[
+      ["d","Viviendas que faltan hoy (miles)",300,900,25,"Nuestra cuenta desde 2021 da unas "+mil(V.def21)+"; el Banco de España, unas 750.000. Depende de desde cuándo se cuente y de qué hogares.",v=>nf0.format(v)+" mil"],
+      ["n","Años por delante",5,15,1,"Los hogares que se formarán salen de la proyección del INE: unos "+mil(V.proy10)+" al año.",v=>v+" años"],
+      ["b","Viviendas terminadas de más cada año (miles)",0,120,10,"Sobre las "+mil(V.termAño5)+" de ahora. Empiezan a contar a los dos años: es lo que tarda una obra.",v=>"+"+nf0.format(v)+" mil"],
+      ["v","Vacías que vuelven a habitarse",0,30,1,"De unas "+mil(V.vacZ)+" en los municipios con demanda. En Francia, gravarlas redujo su número un 13"+NB+"%. Una parte siempre está en venta, en obras o en una herencia.",v=>v+NB+"%"],
+      ["t","Turísticas que vuelven a ser vivienda",0,60,5,"De unas "+mil(V.vtZ)+" en los mismos municipios.",v=>v+NB+"%"]],
+      pre:[["Las dos a la vez",{d:k0,n:10,b:60,v:13,t:25}],["Lo que pasa hoy",{d:k0,n:10,b:0,v:0,t:0}],["Apostar por construir",{d:k0,n:10,b:100,v:3,t:10}],["Apostar por que cada casa sea para vivir",{d:k0,n:10,b:10,v:30,t:60}]],
+      render:st=>{ const need=st.d*1000+Math.max(0,V.proy10-V.termAño5)*st.n, bu=st.b*1000*Math.max(0,st.n-2), mv=V.vacZ*st.v/100, mt=V.vtZ*st.t/100, tot=bu+mv+mt, mx=Math.max(need,tot,1);
+        const bar=(l,v,c,note)=>`<div style="margin:10px 0 0"><div style="display:flex;justify-content:space-between;gap:10px;font-size:14.5px"><span>${l}</span><b>${mil(v)}</b></div><div style="height:12px;background:var(--rule);border-radius:3px;overflow:hidden;margin-top:4px"><div style="height:100%;width:${(v/mx*100).toFixed(1)}%;background:${c}"></div></div>${note?`<small class="muted">${note}</small>`:""}</div>`;
+        const cov=Math.min(100,tot/need*100), shB=tot?bu/tot*100:0;
+        return `<div class="big">${nf0.format(cov)}${NB}% <span class="muted" style="font-size:16px;font-weight:400">de las viviendas que faltarían en ${st.n} años</span></div>`
+          +bar("Lo que faltaría",need,"var(--ink-2)","Lo que falta hoy más los hogares nuevos que no cubre el ritmo actual de obra.")
+          +bar("Construir más",bu,"var(--brand)","")
+          +bar("Vacías que vuelven a habitarse",mv,"color-mix(in srgb,var(--brand) 55%,var(--bg))","")
+          +bar("Turísticas que vuelven a ser vivienda",mt,"color-mix(in srgb,var(--brand) 30%,var(--bg))","")
+          +(tot?`<p style="margin-top:14px">De lo que aportan las dos ideas, <b>construir pone el ${nf0.format(shB)}${NB}%</b> y que las casas sean para vivir, el ${nf0.format(100-shB)}${NB}%. ${mv+mt>bu?"Movilizar lo que hay llega antes, pero se agota: es una vez. ":"Construir tarda en empezar, pero sigue sumando cada año. "}Lo que no se cubre se reparte como hasta ahora: precios más altos, más jóvenes en casa de sus padres y más pisos compartidos.</p>`
+            :`<p style="margin-top:14px">Sin cambiar nada, el hueco crece y se reparte como hasta ahora: precios más altos, más jóvenes en casa de sus padres y más pisos compartidos.</p>`); }}); };
   mdRender(B,"vivienda",V,G);
 }
 
@@ -6386,9 +6419,9 @@ let QH_T=null;
 // con las mismas cuentas que sus análisis. Las del tope (3,1 % y 3,7 %, unos 7 € al mes en Barcelona) son resultados
 // de studyTope, y los 4.100 empleos de la reforma laboral, de studyReforma: si cambian allí, hay que cambiarlas aquí.
 const HEROQ=[
-  {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver qué funcionaría →",
-    v:()=>`Porque se forman más hogares de los que se construyen casas.`,
-    a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Desde 2019 se forman muchos más hogares de los que se construyen viviendas, sobre todo en las ciudades que crean empleo. Ninguna de las medidas que se discuten compensa por sí sola que falten casas.`,
+  {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver cuánto pesa cada idea →",
+    v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
+    a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Se forman muchos más hogares de los que se construyen viviendas, y parte de las que hay están vacías o son turísticas. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
     cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados, sueldo mediano y resto de precios hasta ${N.alquilerY}. Fuente: INE.`},
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"la cesta de la compra?",chart:"cesta",cta:"Ver qué ha subido más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
