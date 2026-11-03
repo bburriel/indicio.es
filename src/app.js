@@ -6699,7 +6699,7 @@ let QH_T=null;
 const HEROQ=[
   {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver cuánto pesa cada idea →",
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
-    a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Se forman muchos más hogares de los que se construyen viviendas, y parte de las que hay están vacías o son turísticas. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
+    a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
     cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados, sueldo mediano y resto de precios hasta ${N.alquilerY}. Fuente: INE.`},
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué ha subido más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
