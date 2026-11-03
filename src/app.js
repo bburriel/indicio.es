@@ -1655,12 +1655,20 @@ async function renderComparar(a,b){
   attachSearch(document.getElementById("cq-b"),document.getElementById("cr-b"),document.getElementById("cs-b"),x=>{ navTo("comparar-"+a+"-"+x[F.code]); });
   const B=document.getElementById("cbody");
   // tabla
-  let h=`<table class="glance cmptab"><thead><tr><th>Dato</th><th class="r">${esc(dispName(A[F.name]))}</th><th class="r">${esc(dispName(Bm[F.name]))}</th><th class="r">España</th></tr></thead><tbody>`;
-  for(const [g,ks] of CMPROWS){ h+=`<tr class="grp"><td colspan="4">${g}</td></tr>`;
-    for(const k of ks){ if(F[k]==null||!CATK[k]) continue; const f=fmtK(k), va=A[F[k]], vb=Bm[F[k]], e=k==="pop"?null:esMean(k);
-      const big=va!=null&&vb!=null&&Math.abs(va-vb)>Math.max(Math.abs(e||0)*0.15,0.0001);
-      h+=`<tr><td class="lab">${esc(labK(k))}${iQue(k)}<small>${esc((CATK[k].src||"").replace(/^Atlas de Renta del INE, /,""))}</small></td><td class="a r ${big&&va>vb?"win":big?"dim":""}">${va==null?"—":f(va)}</td><td class="b r ${big&&vb>va?"win":big?"dim":""}">${vb==null?"—":f(vb)}</td><td class="e r">${e==null?"":f(e)}</td></tr>`; } }
-  h+=`</tbody></table><p class="muted" style="font-size:13px;margin-top:8px">Pulsa la <i>i</i> de cada fila para ver qué mide exactamente ese dato. En negrita oscura, el valor más alto cuando la diferencia es clara. Los datos tienen años distintos; la fuente aparece bajo cada nombre.</p>`;
+  // una fila por dato, con una escala común: dónde queda cada municipio entre todos los de España (del 1 % al 99 %; el padrón, en logaritmos)
+  const eA=esc(dispName(A[F.name])), eB=esc(dispName(Bm[F.name])), QS={};
+  const scaleOf=k=>{ if(QS[k]) return QS[k]; const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null&&(k!=="pop"||z>0)).sort(d3.ascending), T=k==="pop"?Math.log:(z=>z);
+    const lo=T(d3.quantile(vals,.01)), hi=T(d3.quantile(vals,.99)), X=z=>Math.max(0,Math.min(1,(T(z)-lo)/((hi-lo)||1)));
+    return QS[k]={X,b0:X(d3.quantile(vals,.1)),b1:X(d3.quantile(vals,.9))}; };
+  let h=`<div class="cv-h"><span><i class="a"></i>${eA}</span><span><i class="b"></i>${eB}</span><span><i class="e"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span><span class="cv-n">Cada fila va de menos a más entre los municipios de España</span></div><div class="cv">`;
+  for(const [g,ks] of CMPROWS){ h+=`<div class="cv-g">${g}</div>`;
+    for(const k of ks){ if(F[k]==null||!CATK[k]) continue; const f=fmtK(k), va=A[F[k]], vb=Bm[F[k]], e=k==="pop"?null:esMean(k), S=scaleOf(k);
+      const big=va!=null&&vb!=null&&Math.abs(va-vb)>Math.max(Math.abs(e||0)*0.15,0.0001), ca=big&&va>vb?"win":big?"dim":"", cb=big&&vb>va?"win":big?"dim":"";
+      const xa=va==null?null:S.X(va), xb=vb==null?null:S.X(vb), pt=(c,x)=>x==null?"":`<i class="cv-d ${c}" style="--x:${x}"></i>`;
+      h+=`<div class="cv-r"><div class="cv-l">${esc(labK(k))}${iQue(k)}<small>${esc((CATK[k].src||"").replace(/^Atlas de Renta del INE, /,""))}</small></div>
+      <div class="cv-t" aria-hidden="true"><i class="cv-b" style="--x0:${S.b0};--w:${S.b1-S.b0}"></i>${e==null?"":`<i class="cv-e" style="--x:${S.X(e)}"></i>`}${xa!=null&&xb!=null?`<i class="cv-c" style="--x0:${Math.min(xa,xb)};--w:${Math.abs(xa-xb)}"></i>`:""}${pt("b",xb)}${pt("a",xa)}</div>
+      <div class="cv-v"><span class="a ${ca}"><i></i>${va==null?"—":f(va)}</span><span class="b ${cb}"><i></i>${vb==null?"—":f(vb)}</span>${e==null?"":`<small>España ${f(e)}</small>`}</div></div>`; } }
+  h+=`</div><p class="muted" style="font-size:13px;margin-top:8px">Pulsa la <i>i</i> de cada fila para ver qué mide exactamente ese dato. En negrita, el valor más alto cuando la diferencia es clara. El número de habitantes va en escala logarítmica. Los datos tienen años distintos; la fuente aparece bajo cada nombre.</p>`;
   const t=finding(B,"Dato a dato",""); bindQue(add(t,"div",null,h));
   // gráficos
   let da,db; try{ [da,db]=await Promise.all([loadProv(a.slice(0,2)),loadProv(b.slice(0,2))]).then(([x,y])=>[x[a],y[b]]); }catch(e){ return; }
