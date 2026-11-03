@@ -3845,15 +3845,35 @@ const VKEY="indicio.vars", VMAX=10, VGROUP="Mis datos";
 let VARS=[], VBYK={}, VINIT=false;
 const vLow=s=>/^[A-ZÁÉÍÓÚÑ]{2,}/.test(s)?s:low(s);
 const vShort=k=>((CATK[k]||{}).l||k).replace(/\s*\([^)]*\)/g,"").trim();
-const vUC=f=>/^(pct|pct_chg|pts)$/.test(f)?"pct":f;
-const VFORMS=[["pct","%"],["veces","veces"],["eur","€"],["pp","puntos"],["years","años"],["num","número"]];
+// Unidad de cada dato (para saber qué datos se pueden combinar). Sale del formato del catálogo, con retoques para los datos
+// cuyo formato dice menos de lo que son (el valor tasado va en €/m², el alquiler mensual en €/mes, los saldos migratorios son tasas...).
+// Un dato nuevo cuyo formato no conocemos cuenta como su propia unidad: no se mezcla con nada hasta que se le ponga nombre aquí.
+// [cómo se dice «está en…», abreviatura para el resultado, singular para «por…», plural para «por cada 100…»]
+const VU={eur:["euros","€","euro","euros"],eurm2:["euros por m²","€/m²","euro por m²","euros por m²"],eurmes:["euros al mes","€/mes","euro al mes","euros al mes"],
+  pct:["%","%","1 %","%"],chg:["cambio en %","%","1 % de cambio","% de cambio"],pts:["puntos de porcentaje","puntos","punto","puntos"],
+  pers:["habitantes","hab.","habitante","habitantes"],viv:["viviendas","viviendas","vivienda","viviendas"],dens:["habitantes por km²","hab./km²","hab./km²","hab./km²"],
+  km:["km","km","km","km"],km2:["km²","km²","km²","km²"],years:["años","años","año","años"],mil:["compraventas por 1.000 habitantes","por 1.000 hab.","por 1.000 hab.","por 1.000 hab."],
+  migmil:["saldo por 1.000 habitantes y año","por 1.000 hab. y año","por 1.000 hab. y año","por 1.000 hab. y año"],gini:["índice de Gini","puntos de Gini","punto de Gini","puntos de Gini"],
+  ratio:["veces (P80/P20)","veces","vez","veces"],hog:["personas por hogar","pers./hogar","persona por hogar","personas por hogar"]};
+const VUF={eur:"eur",eurm2:"eurm2",pct:"pct",pct_chg:"chg",pts:"pts",int:"pers",dens:"dens",km:"km",years:"years"};
+const VUK={valorTasado:"eurm2",alqEurMes:"eurmes",alqInmuebles:"viv",migExt:"migmil",migInt:"migmil",superficie:"km2",hogarMedio:"hog",compHab:"mil",gini:"gini",p80p20:"ratio"};
+const vUC=k=>VUK[k]||VUF[(CATK[k]||{}).f]||"u:"+k;
+const vUN=c=>(VU[c]||["una unidad propia"])[0];
+// operaciones que solo tienen sentido con datos en la misma unidad
+const VSAME=/^(res|sum|pct)$/;
+// unidad del resultado de dividir un dato entre otro (A entre B) cuando las unidades no son las mismas
+const VDIV={"eur|eurm2":"m²","eurmes|eurm2":"m²","eur|eurmes":"meses","pers|km2":"hab./km²"};
+function vRU(op,a,b){ const ca=vUC(a), cb=vUC(b); if(ca===cb||!/^(x|p100)$/.test(op)) return null; const A=VU[ca]||["una unidad propia","","",""], B=VU[cb]||["una unidad propia","","",""];
+  if(op==="x"){ const sp=VDIV[ca+"|"+cb]; if(sp) return {u:sp,t:sp}; return {u:`${A[1]||"unidades"} por ${B[2]||"unidad"}`,t:`${A[0]} por ${B[2]||"unidad"}`}; }
+  return {u:`${A[1]||"unidades"} por cada 100 ${B[3]||"unidades"}`,t:`${A[0]} por cada 100 ${B[3]||"unidades"}`}; }
+const VUMAX=32, VFORMS=[["pct","%"],["veces","veces"],["eur","€"],["pp","puntos"],["years","años"],["num","número"]];
 const VOPS={
   pct:{t:"Qué parte de un dato es otro (en %)",r:["Qué parte de…","…es este otro dato"],div:1,calc:(t,p)=>t?p/t*100:null,
     say:(A,B)=>`En cada municipio: ${B}, como porcentaje de ${A}.`,name:(A,B)=>`${cap(B)} sobre ${vLow(A)}`,how:(A,B)=>`${vLow(B)} como porcentaje de ${vLow(A)}`},
   p100:{t:"Cuántos por cada 100 de otro",r:["Cuántos hay de…","…por cada 100 de"],div:1,calc:(a,b)=>b?a/b*100:null,
     say:(A,B)=>`En cada municipio: ${A} por cada 100 ${B}.`,name:(A,B)=>`${cap(A)} por cada 100 ${vLow(B)}`,how:(A,B)=>`${vLow(A)} por cada 100 ${vLow(B)}`},
   x:{t:"Cuántas veces es un dato respecto a otro",r:["Cuántas veces es…","…respecto a"],div:1,calc:(a,b)=>b?a/b:null,
-    say:(A,B)=>`En cada municipio: ${A} dividido entre ${B}.`,name:(A,B)=>`${cap(A)} entre ${vLow(B)}`,how:(A,B)=>`${vLow(A)} dividido entre ${vLow(B)}`},
+    say:(A,B,u)=>`En cada municipio: ${A} dividido entre ${B}${u?`, en ${u}`:""}.`,name:(A,B,u)=>`${cap(A)} entre ${vLow(B)}${u?` (${u})`:""}`,how:(A,B)=>`${vLow(A)} dividido entre ${vLow(B)}`},
   res:{t:"La diferencia entre dos datos (uno menos otro)",r:["Empieza con…","…y réstale"],calc:(a,b)=>a-b,
     say:(A,B)=>`En cada municipio: ${A} menos ${B}.`,name:(A,B)=>`${cap(A)} menos ${vLow(B)}`,how:(A,B)=>`${vLow(A)} menos ${vLow(B)}`},
   sum:{t:"La suma de dos datos",r:["Suma…","…más"],calc:(a,b)=>a+b,
@@ -3876,13 +3896,15 @@ const vKey=d=>"u_"+d.op+"_"+d.a+(d.b?"_"+d.b:"");
 const vYear=k=>{ const m=((CATK[k]||{}).src||"").match(/\b(?:19|20)\d\d\b/g); return m?+m[m.length-1]:null; };
 // ¿el dato es una cantidad que tiene sentido dividir por su media? (los porcentajes y los cambios, no: se restan)
 function vRatio(a){ const f=(CATK[a]||{}).f; if(/^(eur|int|dens|km|years)$/.test(f)) return true; if(f!=="num1") return false; return !rowsAll().some(r=>r[F[a]]!=null&&r[F[a]]<0); }
-function vDefF(d){ const fa=vUC((CATK[d.a]||{}).f||""), fb=d.b?vUC((CATK[d.b]||{}).f||""):"";
+function vDefF(d){ const fa=vUC(d.a), fb=d.b?vUC(d.b):"", pc=/^(pct|chg|pts)$/;
   if(d.op==="pct") return "pct"; if(d.op==="p100") return "num"; if(d.op==="x") return "veces";
-  if(d.op==="prov"||d.op==="es") return vRatio(d.a)?"pct":fa==="pct"?"pp":"num";
-  if(d.op==="res") return fa==="pct"&&fb==="pct"?"pp":fa===fb&&/^(eur|years)$/.test(fa)?fa:"num";
-  return fa===fb&&/^(pct|eur|years)$/.test(fa)?fa:"num"; }
+  if(d.op==="prov"||d.op==="es") return vRatio(d.a)?"pct":pc.test(fa)?"pp":"num";
+  if(d.op==="res") return fa===fb&&pc.test(fa)?"pp":fa===fb&&/^(eur|years)$/.test(fa)?fa:"num";
+  return fa!==fb?"num":fa==="pts"?"pp":pc.test(fa)?"pct":/^(eur|years)$/.test(fa)?fa:"num"; }
+// formato y unidad por defecto: si se divide entre una unidad distinta, la cifra lleva la unidad que sale («€ por habitante»), no «veces» ni «%»
+function vDefFU(d){ const ru=d.b?vRU(d.op,d.a,d.b):null, un=ru&&ru.u.length<=VUMAX?ru.u:""; return un?{f:"num",un}:{f:vDefF(d),un:""}; }
 function vSanit(d){ d.op=String(d.op||""); d.a=String(d.a||""); d.b=VOPS[d.op]&&VOPS[d.op].un?"":String(d.b||""); const clean=t=>String(t||"").replace(/'/g,"’").replace(/"/g,"”").replace(/&/g," y ").replace(/[~<>`\\\u0000-\u001f]/g," ").replace(/\s+/g," ").trim();   // los nombres viajan en enlaces: nada que se pueda colar en el HTML
-  d.n=clean(d.n).slice(0,80); d.un=clean(d.un).slice(0,14); if(d.un) d.f="num"; else if(!VFORMS.some(x=>x[0]===d.f)&&vValid(d)) d.f=vDefF(d); d.f=VFORMS.some(x=>x[0]===d.f)?d.f:"num"; return d; }
+  d.n=clean(d.n).slice(0,80); d.un=clean(d.un).slice(0,VUMAX); if(d.un) d.f="num"; else if(!VFORMS.some(x=>x[0]===d.f)&&vValid(d)){ const fu=vDefFU(d); d.f=fu.f; d.un=fu.un; } d.f=VFORMS.some(x=>x[0]===d.f)?d.f:"num"; return d; }
 function vValid(d){ return !!d&&!!VOPS[d.op]&&vBase(d.a)&&(VOPS[d.op].un?!d.b:(vBase(d.b)&&d.b!==d.a)); }
 // una columna con el valor de cada municipio (null si no hay dato o no se puede calcular)
 function vValues(d){
@@ -3945,10 +3967,15 @@ function vStats(d){
   return {n,nA,nB,zero,popShare:popAll?pop/popAll:0,min:who(arr[0]),max:who(arr[n-1]),med:q(.5),hist,lo,hi,ex,out:oHi.length+oLo.length,outTop:oHi.length?who(oHi[oHi.length-1]):oLo.length?who(oLo[0]):null,total:rows.length};
 }
 // avisos de método, en palabras llanas; no bloquean nada
-function vWarns(d,st){
+function vWarns(d,st,me){
   const w=[], o=VOPS[d.op], f=vFmt(d.un?"num":d.f,d.un), la=esc(vLow(vShort(d.a))), lb=d.b?esc(vLow(vShort(d.b))):"";
   if(d.b){ const ya=vYear(d.a), yb=vYear(d.b); if(ya&&yb&&Math.abs(ya-yb)>=2) w.push(`«${la}» es de ${ya} y «${lb}» de ${yb}. Si el municipio ha cambiado mucho en esos años, la cifra mezcla dos momentos distintos.`);
-    const ca=vUC(CATK[d.a].f), cb=vUC(CATK[d.b].f); if(/^(res|sum)$/.test(d.op)&&ca!==cb&&!(/^(num1|int)$/.test(ca)&&/^(num1|int)$/.test(cb))) w.push(`Los dos datos no están en la misma unidad: ${d.op==="res"?"restar":"sumar"} «${la}» y «${lb}» tiene poco sentido.`); }
+    const ca=vUC(d.a), cb=vUC(d.b);
+    if(ca!==cb){ const ua=vUN(ca), ub=vUN(cb), ru=vRU(d.op,d.a,d.b);
+      if(/^(res|sum)$/.test(d.op)) w.push(`«${la}» está en ${ua} y «${lb}» en ${ub}: ${d.op==="res"?"restar":"sumar"} datos en unidades distintas no tiene sentido.`);
+      else if(d.op==="pct") w.push(`«${la}» está en ${ua} y «${lb}» en ${ub}: no se puede decir qué parte de uno es el otro, y la cifra no es un porcentaje de verdad.`);
+      else if(ru){ w.push(`${d.op==="x"?(me?`Estás dividiendo ${ua} entre ${ub}`:`Se dividen ${ua} entre ${ub}`):(me?`Estás mezclando ${ua} y ${ub}`:`Se mezclan ${ua} y ${ub}`)}: el resultado ${me?"serán":"son"} ${ru.t}.`);
+        if(!d.un&&/^(veces|pct)$/.test(d.f)) w.push(`La cifra se muestra en «${d.f==="pct"?"%":"veces"}», pero la unidad real es otra. Puedes corregirla con «Editar», en «${VGROUP}».`); } } }
   if(st&&st.n){ if(st.zero) w.push(`En ${nfG.format(st.zero)} municipio${st.zero===1?"":"s"}, «${d.op==="pct"?la:lb}» vale 0 y no se puede dividir: se quedan sin cifra.`);
     if(d.b&&st.n<0.8*Math.min(st.nA,st.nB)) w.push(`Se pierden municipios: «${la}» tiene dato en ${nfG.format(st.nA)} y «${lb}» en ${nfG.format(st.nB)}, y solo cuentan los que tienen los dos.`);
     if(st.out) w.push(`${nfG.format(st.out)} municipio${st.out===1?"":"s"} tiene${st.out===1?"":"n"} cifras desorbitadas (por ejemplo, ${esc(st.outTop.name)}, ${nfG.format(st.outTop.pop)} habitantes, con ${f(st.outTop.v)}). Suele pasar cuando el dato por el que se divide es casi cero, sobre todo en pueblos pequeños. En el gráfico puedes dejarlos fuera con «Qué municipios».`); }
@@ -4031,9 +4058,9 @@ document.addEventListener("pointerdown",e=>{ const p=document.getElementById("dp
 let MK_BTN=null;
 function closeMaker(refocus){ const p=document.getElementById("dmake"); if(p){ p.remove(); document.removeEventListener("keydown",mkKey); } const bd=document.getElementById("dmake-bd"); if(bd) bd.remove(); const b=MK_BTN; MK_BTN=null; if(refocus&&b&&document.body.contains(b)) b.focus(); }
 function mkKey(e){ if(e.key==="Escape"){ e.preventDefault(); closeMaker(true); return; }
-  if(e.key==="Tab"){ const p=document.getElementById("dmake"); if(!p) return; const f=[...p.querySelectorAll("input:not([hidden]),select,button:not([disabled]),summary")].filter(x=>x.offsetParent!==null); if(!f.length) return;
+  if(e.key==="Tab"){ const p=document.getElementById("dmake"); if(!p) return; const f=[...p.querySelectorAll("input:not([hidden]),select:not([disabled]),button:not([disabled]),summary")].filter(x=>x.offsetParent!==null); if(!f.length) return;
     if(e.shiftKey&&document.activeElement===f[0]){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); } else if(!p.contains(document.activeElement)){ e.preventDefault(); f[0].focus(); } } }
-const vOptions=sel=>{ const gs=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])]; return `<option value="">Elige un dato</option>`+gs.map(g=>{ const it=CAT.filter(c=>c.g===g&&vBase(c.k)); return it.length?`<optgroup label="${esc(g)}">${it.map(c=>`<option value="${c.k}"${c.k===sel?" selected":""}>${esc(c.l)}</option>`).join("")}</optgroup>`:""; }).join(""); };
+const vOptions=(sel,ok)=>{ const gs=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])]; return `<option value="">Elige un dato</option>`+gs.map(g=>{ const it=CAT.filter(c=>c.g===g&&vBase(c.k)&&(!ok||ok(c.k))); return it.length?`<optgroup label="${esc(g)}">${it.map(c=>`<option value="${c.k}"${c.k===sel?" selected":""}>${esc(c.l)}</option>`).join("")}</optgroup>`:""; }).join(""); };
 // un ejemplo real de lo que da cada receta (con el municipio del lector, o con uno grande), para enseñarlo en la tarjeta; no guarda nada
 function vRecEx(r){ try{ const d=vSanit({op:r.op,a:r.a,b:r.b||"",f:"",un:r.un||"",n:""}); if(!vValid(d)) return null; const vals=vValues(d), f=vFmt(d.un?"num":d.f,d.un), rows=rowsAll();
     for(const c of [...(myOk(lastMun)?[lastMun]:[]),...VEXM]){ const i=IDX.findIndex(x=>x.row[F.code]===c); if(i>=0&&vals[i]!=null) return {name:dispName(rows[i][F.name]),v:f(vals[i])}; } }catch(e){} return null; }
@@ -4041,7 +4068,7 @@ const VUNL={pct:"% (porcentaje)",veces:"veces",eur:"€ (euros)",pp:"puntos de p
 function openMaker(btn,o){
   o=o||{}; closeMaker(false); closePicker(); MK_BTN=btn||null;
   const edit=o.edit&&VBYK[o.edit]?VBYK[o.edit]:null, atMax=!edit&&VARS.filter(d=>!d.tmp).length>=VMAX;
-  const M={op:edit?edit.op:"",a:edit?edit.a:"",b:edit?edit.b:"",n:edit?edit.n:"",f:edit?(edit.un?"otra":edit.f):"",un:edit?edit.un:"",nT:!!edit&&!!edit.n,fT:!!edit,rec:-1};
+  const M={msg:"",op:edit?edit.op:"",a:edit?edit.a:"",b:edit?edit.b:"",n:edit?edit.n:"",f:edit?(edit.un?"otra":edit.f):"",un:edit?edit.un:"",nT:!!edit&&!!edit.n,fT:!!edit,rec:-1};
   const recs=edit||atMax?[]:VREC.filter(r=>vBase(r.a)&&(!r.b||vBase(r.b))).map(r=>({...r,ex:vRecEx(r)}));
   const bd=el("div","dmake-bd"); bd.id="dmake-bd"; document.body.appendChild(bd);
   const p=el("div","dmake"); p.id="dmake"; p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-labelledby","mk-t"); document.body.appendChild(p);
@@ -4053,7 +4080,8 @@ function openMaker(btn,o){
         <label class="mk-f"><span class="mk-nb" aria-hidden="true">1</span>Elige el cálculo<select id="mk-op"><option value="">Elige un cálculo</option>${Object.entries(VOPS).map(([k,v])=>`<option value="${k}"${k===M.op?" selected":""}>${esc(v.t)}</option>`).join("")}</select></label>
         <div id="mk-ds" hidden><p class="mk-st"><span class="mk-nb" aria-hidden="true">2</span>Elige los datos</p>
           <label class="mk-f" id="mk-la"><span id="mk-ra">Primer dato</span><select id="mk-a">${vOptions(M.a)}</select></label>
-          <label class="mk-f" id="mk-lb"><span id="mk-rb">Segundo dato</span><select id="mk-b2">${vOptions(M.b)}</select></label></div>
+          <label class="mk-f" id="mk-lb"><span id="mk-rb">Segundo dato</span><select id="mk-b2" aria-describedby="mk-sn">${vOptions(M.b)}</select></label>
+          <p class="mk-sn" id="mk-sn" role="status" hidden></p></div>
         <p class="mk-say" id="mk-say"></p>
       </div></details>
     <section class="mk-prev" id="mk-prev" aria-live="polite" aria-label="Así sale"></section>
@@ -4061,22 +4089,34 @@ function openMaker(btn,o){
     <div id="mk-nmw" hidden><p class="mk-nl">Se guardará como <b id="mk-nl"></b>.</p>
       <details class="mk-adv" id="mk-adv"${edit?" open":""}><summary>Cambiar nombre y unidad</summary><div class="mk-nm"><label class="mk-f">Nombre<input type="text" id="mk-n" maxlength="80" autocomplete="off" value="${esc(M.n)}"></label>
         <label class="mk-f mk-u">Unidad de la cifra<select id="mk-f">${VFORMS.map(([k])=>`<option value="${k}">${VUNL[k]}</option>`).join("")}<option value="otra">otra (la escribes tú)…</option></select></label>
-        <label class="mk-f mk-u2" id="mk-lu" hidden>Escribe la unidad<input type="text" id="mk-u" maxlength="14" autocomplete="off" placeholder="m², años, €/mes…" value="${esc(M.un)}"></label></div></details></div>`}</div>
+        <label class="mk-f mk-u2" id="mk-lu" hidden>Escribe la unidad<input type="text" id="mk-u" maxlength="${VUMAX}" autocomplete="off" placeholder="m², años, €/mes…" value="${esc(M.un)}"></label></div></details></div>`}</div>
   <div class="mk-ft"><button type="button" class="mk-sec" id="mk-back">${o.back?"Volver a la lista":"Cancelar"}</button>${atMax?"":`<button type="button" class="mk-ok" id="mk-ok" disabled>${edit?"Guardar cambios":"Usar este dato"}</button>`}</div>`;
   const $=id=>document.getElementById(id), close=()=>closeMaker(!o.back);
   $("mk-x").addEventListener("click",()=>closeMaker(true)); $("mk-back").addEventListener("click",()=>{ closeMaker(false); if(o.back) o.back(); else if(btn&&document.body.contains(btn)) btn.focus(); });
   document.addEventListener("keydown",mkKey);
   const first=edit?$("mk-op"):$("mk-rs")||$("mk-fs")||$("mk-back"); setTimeout(()=>{ try{ (window.innerWidth>900?first:$("mk-x")).focus({preventScroll:true}); }catch(e){} },20);
   if(atMax) return;
-  const cur=()=>{ const d={op:M.op,a:M.a,b:VOPS[M.op]&&VOPS[M.op].un?"":M.b,n:M.n,f:M.f==="otra"?"num":M.f,un:M.f==="otra"?M.un:""}; return vValid(d)?vSanit(d):null; };
+  const cur=()=>{ const d={op:M.op,a:M.a,b:VOPS[M.op]&&VOPS[M.op].un?"":M.b,n:M.n,f:M.f==="otra"?"num":M.f,un:M.f==="otra"?M.un:""}; return vValid(d)&&!(VSAME.test(d.op)&&vUC(d.a)!==vUC(d.b))?vSanit(d):null; };
   const fmtOf=d=>vFmt(d.f,d.un);
   let wasOpen=false;
-  const render=()=>{ const op=VOPS[M.op], d=cur(), free=$("mk-free").open;
+  // con «res», «sum» y «pct» el segundo dato tiene que estar en la misma unidad que el primero: solo se ofrecen esos
+  let bKey=null;
+  const syncB=()=>{ const op=VOPS[M.op], same=!!op&&VSAME.test(M.op), sb=$("mk-b2"), sn=$("mk-sn"), ua=M.a?vUN(vUC(M.a)):"", la=M.a?esc(vLow(vShort(M.a))):""; let note="", msg="";
+    const okB=same&&M.a?(k=>k!==M.a&&vUC(k)===vUC(M.a)):null, n=okB?CAT.filter(c=>vBase(c.k)&&okB(c.k)).length:0;
+    if(same&&M.b&&(!M.a||!okB||!okB(M.b))&&M.a){ msg=`Hemos quitado «${esc(vLow(vShort(M.b)))}»: está en ${vUN(vUC(M.b))} y «${la}», en ${ua}.`; M.b=""; M.msg=msg; if(!M.fT) M.f=""; }
+    const key=(same?"s":"f")+"|"+(same?M.a:"");
+    if(key!==bKey){ bKey=key; sb.innerHTML=vOptions(M.b,okB); }
+    sb.value=M.b||""; sb.disabled=same&&(!M.a||!n);
+    if(same&&!M.a) note="Elige primero el primer dato: el segundo saldrá en su misma unidad.";
+    else if(same&&!n) note=`No hay ningún otro dato en ${esc(ua)} para combinar con «${la}». Con este cálculo los dos tienen que estar en la misma unidad. Elige otro primer dato, o el cálculo «${esc(VOPS.x.t)}», que sí mezcla unidades.`;
+    else if(same) note=`${n===1?"Solo sale 1 dato":`Solo salen los ${nfG.format(n)} datos`} que ${n===1?"está":"están"} en ${esc(ua)}, como «${la}». Con este cálculo los dos tienen que estar en la misma unidad. Para mezclar unidades, usa «${esc(VOPS.x.t)}».`;
+    sn.innerHTML=[M.msg,note].filter(Boolean).join(" "); sn.hidden=!sn.innerHTML; };
+  const render=()=>{ syncB(); const op=VOPS[M.op], d=cur(), free=$("mk-free").open;
     $("mk-ds").hidden=!op; $("mk-lb").hidden=!op||!!op.un; if(op){ $("mk-ra").textContent=op.r[0]; if(op.r[1]) $("mk-rb").textContent=op.r[1]; }
     $("mk-fs").textContent=edit?"Cómo se calcula":M.rec>=0?"Cambiar los datos o el cálculo":recs.length?"O monta tu propio cálculo":"Monta tu cálculo";
     if($("mk-rs")){ $("mk-rs").textContent=M.rec>=0?"Tu pregunta: "+recs[M.rec].t:"Empieza por una pregunta"; p.querySelectorAll("[data-r]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.r===M.rec))); }
-    const la=M.a?vShort(M.a):"", lb=M.b?vShort(M.b):"", say=op&&M.a&&(op.un||M.b)&&(op.un||M.a!==M.b)?op.say(vLow(la),vLow(lb)):""; $("mk-say").textContent=say||(op&&!op.un&&M.a&&M.a===M.b?"Elige dos datos distintos.":"");
-    if(d){ if(!M.fT) M.f=vDefF(d); const auto=op.name(la,lb); if(!M.nT){ M.n=(auto.length>80?auto.slice(0,79)+"…":auto); $("mk-n").value=M.n; } }
+    const la=M.a?vShort(M.a):"", lb=M.b?vShort(M.b):"", say=op&&M.a&&(op.un||M.b)&&(op.un||M.a!==M.b)?op.say(vLow(la),vLow(lb),M.op==="x"&&M.b?(vRU("x",M.a,M.b)||{}).u:""):""; $("mk-say").textContent=say||(op&&!op.un&&M.a&&M.a===M.b?"Elige dos datos distintos.":"");
+    if(d){ if(!M.fT){ const fu=vDefFU(d); M.f=fu.un?"otra":fu.f; M.un=fu.un; $("mk-u").value=M.un; } const ru=vRU(d.op,d.a,d.b), auto=op.name(la,lb,ru&&ru.u); if(!M.nT){ M.n=(auto.length>80?auto.slice(0,79)+"…":auto); $("mk-n").value=M.n; } }
     $("mk-f").value=M.f||"num"; $("mk-lu").hidden=M.f!=="otra";
     const d2=cur(), ok=$("mk-ok"), pv=$("mk-prev"), wb=$("mk-w"), prevOpen=pv.querySelector(".mk-more"); if(prevOpen) wasOpen=prevOpen.open;
     $("mk-nmw").hidden=!d2; $("mk-nl").textContent=d2?"«"+(M.n||"").trim()+"»":"";
@@ -4093,10 +4133,10 @@ function openMaker(btn,o){
         <svg class="mk-h2" viewBox="0 0 240 44" preserveAspectRatio="none" role="img" aria-label="Cómo se reparten los valores entre municipios, sin contar el 1 % más alto y el 1 % más bajo">${st.hist.map((c,i)=>`<rect x="${(i*bw+.6).toFixed(1)}" y="${(44-Math.sqrt(c)/hm*42).toFixed(1)}" width="${(bw-1.2).toFixed(1)}" height="${(Math.sqrt(c)/hm*42).toFixed(1)}"/>`).join("")}</svg>
         <p class="mk-hs"><span>${esc(f(st.lo))}</span><span>cómo se reparten los municipios</span><span>${esc(f(st.hi))}</span></p>
         ${d2.b?`<p class="mk-cs">«${esc(vLow(vShort(d2.a)))}» tiene dato en ${nfG.format(st.nA)} municipios y «${esc(vLow(vShort(d2.b)))}» en ${nfG.format(st.nB)}. Solo sale cifra donde existen los dos.</p>`:""}</details>`;
-    const W=vWarns(d2,st); if(d2.b) W.push(`Si luego lo comparas con «${esc(vLow(vShort(d2.a)))}» o con «${esc(vLow(vShort(d2.b)))}», irán juntos casi por fuerza, porque este dato se calcula con ellos. Te lo avisaremos en el gráfico.`);
+    const W=vWarns(d2,st,true); if(d2.b) W.push(`Si luego lo comparas con «${esc(vLow(vShort(d2.a)))}» o con «${esc(vLow(vShort(d2.b)))}», irán juntos casi por fuerza, porque este dato se calcula con ellos. Te lo avisaremos en el gráfico.`);
     if(same) W.unshift(`Ya tienes este cálculo, con el nombre «${esc(dup.n||CATK[vKey(dup)].l)}». Si lo creas, se usa ese.`);
     wb.innerHTML=W.map(t=>`<p>${t}</p>`).join(""); ok.disabled=false; ok.textContent=same?"Usar el que ya tienes":edit?"Guardar cambios":"Usar este dato"; };
-  const unrec=()=>{ M.rec=-1; };
+  const unrec=()=>{ M.rec=-1; M.msg=""; };
   $("mk-op").addEventListener("change",e=>{ unrec(); M.op=e.target.value; if(VOPS[M.op]&&VOPS[M.op].un) M.b=""; if(!M.fT) M.f=""; render(); });
   $("mk-a").addEventListener("change",e=>{ unrec(); M.a=e.target.value; if(!M.fT) M.f=""; render(); });
   $("mk-b2").addEventListener("change",e=>{ unrec(); M.b=e.target.value; if(!M.fT) M.f=""; render(); });
@@ -4105,8 +4145,8 @@ function openMaker(btn,o){
   $("mk-u").addEventListener("input",e=>{ M.un=e.target.value; M.fT=true; render(); });
   $("mk-free").addEventListener("toggle",()=>{ if($("mk-free").open&&$("mk-rec")) $("mk-rec").open=false; render(); });   // una sola cosa abierta a la vez: así no hay que bajar
   if($("mk-rec")) $("mk-rec").addEventListener("toggle",()=>{ if($("mk-rec").open&&!edit) $("mk-free").open=false; });
-  p.querySelectorAll("[data-r]").forEach(b=>b.addEventListener("click",()=>{ const r=recs[+b.dataset.r]; Object.assign(M,{op:r.op,a:r.a,b:r.b||"",n:r.n,nT:true,f:r.un?"otra":"",un:r.un||"",fT:!!r.un,rec:+b.dataset.r}); $("mk-op").value=M.op; $("mk-a").value=M.a; $("mk-b2").value=M.b; $("mk-n").value=M.n; $("mk-rec").open=false; render(); $("mk-rs").focus({preventScroll:true}); $("mk-prev").scrollIntoView({block:"nearest",behavior:"smooth"}); }));
-  $("mk-ok").addEventListener("click",()=>{ const d=cur(); if(!d) return; d.n=(M.n||"").trim()||VOPS[d.op].name(vShort(d.a),d.b?vShort(d.b):""); const k=vKey(d); let msg, ms=3800;
+  p.querySelectorAll("[data-r]").forEach(b=>b.addEventListener("click",()=>{ const r=recs[+b.dataset.r]; Object.assign(M,{msg:"",op:r.op,a:r.a,b:r.b||"",n:r.n,nT:true,f:r.un?"otra":"",un:r.un||"",fT:!!r.un,rec:+b.dataset.r}); $("mk-op").value=M.op; $("mk-a").value=M.a; $("mk-b2").value=M.b; $("mk-n").value=M.n; $("mk-rec").open=false; render(); $("mk-rs").focus({preventScroll:true}); $("mk-prev").scrollIntoView({block:"nearest",behavior:"smooth"}); }));
+  $("mk-ok").addEventListener("click",()=>{ const d=cur(); if(!d) return; d.n=(M.n||"").trim()||VOPS[d.op].name(vShort(d.a),d.b?vShort(d.b):"",d.b&&d.op==="x"?(vRU("x",d.a,d.b)||{}).u:""); const k=vKey(d); let msg, ms=3800;
     if(edit){ const old=vKey(edit);
       if(k===old){ Object.assign(edit,{n:d.n,f:d.f,un:d.un,tmp:false}); vDefine(edit); vStore(); }
       else { if(!VBYK[k]){ d.tmp=false; VARS.push(d); vDefine(d); } vSwapUse(old,k); vRemove(old); }
