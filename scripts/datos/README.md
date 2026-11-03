@@ -14,13 +14,13 @@ Cada fuente tiene su script, que descarga de la web oficial y escribe `cache/out
 | SEPE · Paro registrado y contratos por municipios | `sepe.py` | Excel único `ESTADISTICA_MUNICIPIOS.xls` (lo descarga el propio script) | composición del paro (mujeres, jóvenes, mayores de 45, sin empleo anterior) y contratos temporales |
 | Wikidata · superficie de los términos municipales | `wikidata_territorio.py` | consulta SPARQL (límite de una por minuto) | superficie (la altitud se descartó: mezcla criterios) |
 | Ministerio de Vivienda · SERPAVI (alquiler declarado en el IRPF, por municipio, 2011–2024) | `serpavi.py` | Excel único `2026-03_09_bd_SERPAVI_2011-2024 - DEFINITIVO WEB_v2.xlsx` (71 MB) de la página del SERPAVI del Ministerio, guardado a mano como `cache/serpavi/serpavi_2011-2024.xlsx` (el script lo lee en streaming) | alquiler mensual por m² y por vivienda mediana, número de inmuebles, subida desde 2015 y esfuerzo de alquiler (alquiler anual entre renta del hogar) |
+| Ministerio de Hacienda · CONPREL (liquidaciones de los presupuestos de los ayuntamientos: gasto por política y capítulo, ingresos por capítulo; 2023, 2024 y avance de 2025) | `conprel.py` | Un Access por ejercicio, descargado a mano desde el navegador (la función `DescargarFicheroAccess(ejercicio, tipoDato)` de la web de CONPREL, tipo «liquidaciones»), guardado como `cache/conprel/Liquidaciones<año>.zip` (50 MB; el .accdb pesa 400 MB). El script lo descomprime y exporta tres tablas con `mdbtools` (`brew install mdbtools`; unos 5 minutos por año) a `cache/conprel/csv/<año>/` | gasto por habitante (total, servicios sociales, policía y tráfico, educación, cultura y deporte, vivienda y urbanismo, agua, basuras y alumbrado), peso del personal, inversión, ingresos propios, peso de las transferencias y ahorro. Media de 2023 y 2024; el avance de 2025 solo se guarda en `cache/out_conprel_anual.json` |
 
 Orden: descargar → script de la fuente → `python3 construir.py` → `npm run build`.
 
 ## Fuentes que se probaron y no se pudieron usar
 
 - **Banda ancha** (Ministerio para la Transformación Digital): solo informes en PDF, sin archivo por municipio.
-- **Presupuestos municipales** (Ministerio de Hacienda): solo consulta interactiva, sin descarga masiva.
 - **Catastro**: bloquea el acceso desde la IP del entorno de ejecución en la nube; se podría intentar desde un ordenador (estadísticas urbanas anuales, IBI).
 - **Interior (criminalidad)**: solo municipios de más de 20.000 habitantes y detrás de un formulario.
 - **DGT (parque de vehículos)**: solo municipios de más de 10.000 habitantes y agregado.

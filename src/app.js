@@ -3868,7 +3868,9 @@ const VREC=[
   {t:"Renta frente a la de su provincia",d:"Quién tiene más o menos renta que el resto de su provincia.",op:"prov",a:"renta",n:"Renta por persona frente a la media de su provincia"},
   {t:"Metros cuadrados que compra la renta de un año",d:"La renta anual de una persona, entre lo que cuesta un metro cuadrado.",op:"x",a:"renta",b:"valorTasado",un:"m²",n:"Metros cuadrados que compra la renta de un año"},
   {t:"Ingresos que vienen de prestaciones",d:"Prestaciones por desempleo y otras prestaciones, juntas.",op:"sum",a:"ingDesempleo",b:"ingPrestaciones",n:"Ingresos que vienen de prestaciones (desempleo y otras)"},
-  {t:"Crecimiento frente a su provincia",d:"Si el municipio gana o pierde población más que su provincia.",op:"prov",a:"varPob",n:"Crecimiento de la población frente a su provincia"}];
+  {t:"Crecimiento frente a su provincia",d:"Si el municipio gana o pierde población más que su provincia.",op:"prov",a:"varPob",n:"Crecimiento de la población frente a su provincia"},
+  {t:"Parte del gasto que va a servicios sociales",d:"De cada 100 euros que gasta el ayuntamiento, cuántos van a servicios sociales.",op:"pct",a:"gastoHab",b:"gastoSocialHab",n:"Parte del gasto del ayuntamiento que va a servicios sociales"},
+  {t:"Deuda frente a los ingresos propios",d:"La deuda por habitante, como porcentaje de lo que el ayuntamiento recauda cada año en impuestos y tasas.",op:"pct",a:"ingPropiosHab",b:"deudaHab",n:"Deuda del ayuntamiento sobre sus ingresos propios de un año"}];
 const vBase=k=>{ const c=CATK[k]; return !!c&&!c.custom&&!c.reg&&!c.eu&&!c.der&&!c.nat&&F[k]!=null; };
 const vKey=d=>"u_"+d.op+"_"+d.a+(d.b?"_"+d.b:"");
 const vYear=k=>{ const m=((CATK[k]||{}).src||"").match(/\b(?:19|20)\d\d\b/g); return m?+m[m.length-1]:null; };
