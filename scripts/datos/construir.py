@@ -48,7 +48,7 @@ TEMAS = {
  "Población": "varPob var0525 pobVar20 edad menores18 mayores65 extr migExt migInt arraigo llegados inmigReciente",
  "Hogares": "hogarMedio solos casados divorciados solteros3554",
  "Educación": "superiores estudiantes estudiosBasicos superiores2539 brechaSuperiores",
- "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio compHab compNueva compProtegida compVar valorTasado valorTasadoVar alqEurM2 alqEurMes alqInmuebles alqEurM2Var esfuerzoAlq",
+ "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio compHab compNueva compProtegida compVar valorTasado valorTasadoVar anosSueldo anosSueldo08 alqEurM2 alqEurMes alqInmuebles alqEurM2Var esfuerzoAlq",
  "Ayuntamiento": "deudaHab gastoHab gastoSocialHab gastoSeguridadHab gastoEducacionHab gastoCulturaDeporteHab gastoViviendaHab gastoServiciosHab personalPct inversionHab ingPropiosHab transferenciasPct ahorroPct",
  "Voto": "pp psoe vox sumar part part24 salf24",
  "Territorio": "pop densidad superficie distCiudad distCosta",
