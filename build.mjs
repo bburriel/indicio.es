@@ -247,6 +247,16 @@ for(const r of rows){
 }
 
 // ---------- páginas de provincia: todos sus municipios con los datos clave ----------
+// Orden por columnas: pulsar el título ordena de mayor a menor (el nombre, de la A a la Z); pulsarlo otra vez invierte.
+// Los municipios sin dato quedan siempre al final. Sin JavaScript, la tabla sigue ordenada por habitantes.
+const PROVSORT=`<script>(function(){var s=document.getElementById("provtab");if(!s)return;var tb=s.querySelector("tbody"),h=document.getElementById("provtab-h"),n=tb.rows.length,
+btn=s.querySelectorAll(".sortb"),k="pop",desc=true,T={pop:"habitantes",renta:"renta por persona",paro:"paro registrado",edad:"edad media",name:"orden alfabético"},cols={name:0,pop:1,renta:2,paro:3,edad:4},
+rows=[].slice.call(tb.rows),col=function(r,c){return r.cells[c].getAttribute("data-v")};
+function draw(){var c=cols[k];rows.sort(function(a,b){var x=col(a,c),y=col(b,c);if(k!=="name"){var ex=x==="",ey=y==="";if(ex||ey)return ex&&ey?0:ex?1:-1;x=+x;y=+y;}
+var d=k==="name"?x.localeCompare(y,"es"):x-y;return desc?-d:d;});rows.forEach(function(r){tb.appendChild(r)});
+btn.forEach(function(b){var on=b.getAttribute("data-k")===k,lab=b.getAttribute("data-l")||b.textContent.replace(/ [↑↓]$/,"");b.setAttribute("data-l",lab);b.className="sortb"+(on?" on":"");b.textContent=lab+(on?(desc?" ↓":" ↑"):"");b.parentNode.setAttribute("aria-sort",on?(desc?"descending":"ascending"):"none")});
+h.textContent="Los "+n.toLocaleString("es-ES")+" municipios, "+(k==="pop"?(desc?"de más a menos habitantes":"de menos a más habitantes"):k==="name"?(desc?"de la Z a la A":"por orden alfabético"):"ordenados por "+T[k]+(desc?", de mayor a menor":", de menor a mayor"));}
+btn.forEach(function(b){b.addEventListener("click",function(){var nk=b.getAttribute("data-k");if(nk===k)desc=!desc;else{k=nk;desc=nk!=="name"}draw()})});})();</script>`;
 {
   const plist=Object.keys(byProv).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es"));
   const idx=`<header class="phead"><h1>Municipios por provincia</h1><p class="dek">Renta, población, paro y edad de todos los municipios de España, provincia a provincia.</p></header>
@@ -267,12 +277,13 @@ for(const r of rows){
     const cell=(r,k,f)=>r[F[k]]==null?"—":f(r[F[k]]);
     const main=`<nav class="crumbs"><a href="/municipio/">Municipios</a> › <a href="/provincia/">Provincias</a></nav><header class="phead"><h1>Municipios de la provincia de ${esc(prov)}</h1><p class="dek">${esc(facts[0])}</p></header>
       <section class="finding"><div class="txt">${facts.slice(1).map(f=>`<p>${esc(f)}</p>`).join("")}</div></section>
-      <section class="finding"><h2>Los ${nf0.format(list.length)} municipios, de más a menos habitantes</h2><div class="extable"><table class="glance"><thead><tr><th>Municipio</th><th class="r">Habitantes</th><th class="r">Renta por persona</th><th class="r">Paro registrado</th><th class="r">Edad media</th></tr></thead><tbody>
-      ${list.map(r=>`<tr><td>${L(r)}</td><td class="r num">${cell(r,"pop",nf0.format)}</td><td class="r num">${cell(r,"renta",x=>nf0.format(x)+" €")}</td><td class="r num">${cell(r,"paroReg",pctS)}</td><td class="r num">${cell(r,"edad",x=>nf1.format(x))}</td></tr>`).join("")}
+      <section class="finding" id="provtab"><h2 id="provtab-h">Los ${nf0.format(list.length)} municipios, de más a menos habitantes</h2><div class="extable"><table class="glance"><thead><tr><th aria-sort="none"><button type="button" class="sortb" data-k="name" style="text-align:left">Municipio</button></th><th class="r" aria-sort="descending"><button type="button" class="sortb on" data-k="pop">Habitantes ↓</button></th><th class="r" aria-sort="none"><button type="button" class="sortb" data-k="renta">Renta por persona</button></th><th class="r" aria-sort="none"><button type="button" class="sortb" data-k="paro">Paro registrado</button></th><th class="r" aria-sort="none"><button type="button" class="sortb" data-k="edad">Edad media</button></th></tr></thead><tbody>
+      ${list.map(r=>{ const v=k=>r[F[k]]==null?"":r[F[k]]; return `<tr><td data-v="${esc(r[F.name])}">${L(r)}</td><td class="r num" data-v="${v("pop")}">${cell(r,"pop",nf0.format)}</td><td class="r num" data-v="${v("renta")}">${cell(r,"renta",x=>nf0.format(x)+" €")}</td><td class="r num" data-v="${v("paroReg")}">${cell(r,"paroReg",pctS)}</td><td class="r num" data-v="${v("edad")}">${cell(r,"edad",x=>nf1.format(x))}</td></tr>`; }).join("")}
       </tbody></table></div><p class="muted" style="font-size:13px">Renta: ${esc(srcOf("renta"))}. Paro registrado: SEPE, media de 2025, sobre la población de 16 a 64 años. Edad: ${esc(srcOf("edad"))}. En los municipios muy pequeños el INE no publica todos los datos.</p></section>
       <section class="finding"><div class="txt"><p><a href="/laboratorio/mapa/?d=renta&p=${p}">Ver la provincia en el mapa del laboratorio →</a> · <a href="/provincia/">Otras provincias →</a></p></div></section>${sources}`;
+    const after=PROVSORT;
     const ogImage=ogFor("p-"+provSlug(p),{k:"Provincia de "+prov,t:`Los ${nf0.format(list.length)} municipios de ${prov}`,text:rich&&poor&&rich!==poor?`El de más renta: ${rich[F.name]} (${nf0.format(rich[F.renta])} €). El de menos: ${poor[F.name]} (${nf0.format(poor[F.renta])} €).`:facts[0]});
-    page({route,title:`Municipios de ${prov}: renta, población y paro · Indicio`,desc:facts.slice(0,2).join(" ").slice(0,300),ogTitle:`Municipios de la provincia de ${prov}`,main,ogImage,
+    page({route,title:`Municipios de ${prov}: renta, población y paro · Indicio`,desc:facts.slice(0,2).join(" ").slice(0,300),ogTitle:`Municipios de la provincia de ${prov}`,main,after,ogImage,
       jsonld:[breadcrumb([["Municipios","/municipio/"],["Provincias","/provincia/"],["Provincia de "+prov,route]]),{"@context":"https://schema.org","@type":"Dataset",name:`Municipios de la provincia de ${prov}: renta, población, paro y edad`,description:facts.join(" "),url:SITE.url+route,license:"https://creativecommons.org/licenses/by/4.0/",creator:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},isBasedOn:["https://www.ine.es","https://www.sepe.es"],spatialCoverage:{"@type":"Place",name:"Provincia de "+prov+", España"},variableMeasured:["Habitantes","Renta neta media por persona","Paro registrado","Edad media"]}]});
     addUrl(route,0.7);
   }
