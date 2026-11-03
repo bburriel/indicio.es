@@ -2,87 +2,14 @@
    Traduce la interfaz que se repite en todas las páginas (cabecera, menús, pie, temas) en el navegador.
    Los análisis y las fichas siguen en castellano: cuando una página tiene texto sin traducir, avisa con una nota.
    En castellano no hace nada (no observa la página), así que no afecta a quien no cambie de idioma.
-   Para traducir un texto nuevo: añade una fila a ROWS con [castellano exacto, ca, gl, eu, en]. */
+   Los textos están en src/i18n-textos.mjs (el build los antepone a este script como la variable ROWS).
+   Para traducir un texto nuevo: añade una fila allí con [castellano exacto, ca, gl, eu, en]; {#} marca una cifra. */
 (function(){
 "use strict";
 var LANGS=[["es","Castellano"],["ca","Català"],["gl","Galego"],["eu","Euskara"],["en","English"]];
 var CODES=LANGS.map(function(l){ return l[0]; });
 var KEY="indicio.lang";
 
-// [castellano, catalán, gallego, euskera, inglés]
-var ROWS=[
- // cabecera
- ["Análisis","Anàlisi","Análises","Azterketak","Analysis"],
- ["Municipios","Municipis","Municipios","Udalerriak","Municipalities"],
- ["Laboratorio","Laboratori","Laboratorio","Laborategia","Lab"],
- ["Quién soy","Qui sóc","Quen son","Nor naiz","About me"],
- ["Preguntas ya respondidas, por tema","Preguntes ja respostes, per tema","Preguntas xa respondidas, por tema","Erantzundako galderak, gaika","Questions already answered, by topic"],
- ["Fichas, comparador y rankings de los municipios de España","Fitxes, comparador i rànquings dels municipis d'Espanya","Fichas, comparador e clasificacións dos municipios de España","Espainiako udalerrien fitxak, konparagailua eta sailkapenak","Profiles, comparison and rankings for Spain's municipalities"],
- ["Cruza datos, comprueba si una relación aguanta y mide antes y después","Creua dades, comprova si una relació aguanta i mesura abans i després","Cruza datos, comproba se unha relación aguanta e mide antes e despois","Gurutzatu datuak, egiaztatu erlazio bat sendoa den eta neurtu aurretik eta ondoren zer gertatu zen","Cross data, check whether a relationship holds up and measure before and after"],
- ["Abrir el menú de Análisis","Obre el menú d'Anàlisi","Abrir o menú de Análises","Ireki Azterketak menua","Open the Analysis menu"],
- ["Abrir el menú de Municipios","Obre el menú de Municipis","Abrir o menú de Municipios","Ireki Udalerriak menua","Open the Municipalities menu"],
- ["Abrir el menú del Laboratorio","Obre el menú del Laboratori","Abrir o menú do Laboratorio","Ireki Laborategia menua","Open the Lab menu"],
- ["Menú de Análisis","Menú d'Anàlisi","Menú de Análises","Azterketak menua","Analysis menu"],
- ["Menú de Municipios","Menú de Municipis","Menú de Municipios","Udalerriak menua","Municipalities menu"],
- ["Menú del Laboratorio","Menú del Laboratori","Menú do Laboratorio","Laborategia menua","Lab menu"],
- ["Secciones","Seccions","Seccións","Atalak","Sections"],
- ["Pie","Peu de pàgina","Pé de páxina","Orri-oina","Footer"],
- ["Ruta","Ruta","Ruta","Bidea","Breadcrumb"],
- ["Indicio, portada","Indicio, portada","Indicio, portada","Indicio, hasiera","Indicio, home"],
- ["Idioma","Idioma","Idioma","Hizkuntza","Language"],
- // temas (menú, temas y portada de cada tema)
- ["Por tema","Per tema","Por tema","Gaika","By topic"],
- ["Riqueza","Riquesa","Riqueza","Aberastasuna","Wealth"],
- ["Vivienda","Habitatge","Vivenda","Etxebizitza","Housing"],
- ["Población","Població","Poboación","Biztanleria","Population"],
- ["Renta y desigualdad","Renda i desigualtat","Renda e desigualdade","Errenta eta desberdintasuna","Income and inequality"],
- ["Empleo y estudios","Ocupació i estudis","Emprego e estudos","Enplegua eta ikasketak","Employment and education"],
- ["Desde 2015","Des del 2015","Desde 2015","2015etik","Since 2015"],
- ["Trabajo","Treball","Traballo","Lana","Work"],
- ["Dinero público","Diner públic","Diñeiro público","Diru publikoa","Public money"],
- ["Voto","Vot","Voto","Botoa","Vote"],
- ["¿Cómo se reparte la riqueza?","Com es reparteix la riquesa?","Como se reparte a riqueza?","Nola banatzen da aberastasuna?","How is wealth shared out?"],
- ["¿Por qué cuesta tanto encontrar casa?","Per què costa tant trobar casa?","Por que custa tanto atopar casa?","Zergatik da hain zaila etxea aurkitzea?","Why is it so hard to find a home?"],
- ["¿Quién llega y quién se va?","Qui arriba i qui se'n va?","Quen chega e quen se vai?","Nor dator eta nor doa?","Who arrives and who leaves?"],
- ["¿De qué vivimos?","De què vivim?","De que vivimos?","Zertatik bizi gara?","What do we live on?"],
- ["¿En qué se gasta?","En què es gasta?","En que se gasta?","Zertan gastatzen da?","What is it spent on?"],
- ["¿Cómo vota cada España?","Com vota cada Espanya?","Como vota cada España?","Nola bozkatzen du Espainia bakoitzak?","How does each Spain vote?"],
- ["Renta por persona y por hogar, pobreza y desigualdad en cada municipio, comparados con España.","Renda per persona i per llar, pobresa i desigualtat a cada municipi, comparades amb Espanya.","Renda por persoa e por fogar, pobreza e desigualdade en cada municipio, comparadas con España.","Pertsona eta etxe bakoitzeko errenta, pobrezia eta desberdintasuna udalerri bakoitzean, Espainiarekin alderatuta.","Income per person and per household, poverty and inequality in each municipality, compared with Spain."],
- ["Alquiler declarado y anunciado, pisos turísticos y viviendas vacías, municipio a municipio.","Lloguer declarat i anunciat, pisos turístics i habitatges buits, municipi a municipi.","Aluguer declarado e anunciado, pisos turísticos e vivendas baleiras, municipio a municipio.","Aitortutako eta iragarritako alokairua, turismo-etxebizitzak eta etxebizitza hutsak, udalerriz udalerri.","Declared and advertised rent, tourist flats and empty homes, municipality by municipality."],
- ["Qué municipios ganan y pierden vecinos desde 2005, quién llega del extranjero y quién se va a otra parte.","Quins municipis guanyen i perden veïns des del 2005, qui arriba de l'estranger i qui se'n va a un altre lloc.","Que municipios gañan e perden veciños desde 2005, quen chega do estranxeiro e quen se vai a outra parte.","Zein udalerrik irabazten eta galtzen dituzten bizilagunak 2005etik, nor datorren atzerritik eta nor joaten den beste nonbaitera.","Which municipalities gain and lose residents since 2005, who arrives from abroad and who moves elsewhere."],
- ["Paro registrado por municipio, estudios y salarios, del norte al sur.","Atur registrat per municipi, estudis i salaris, del nord al sud.","Paro rexistrado por municipio, estudos e salarios, do norte ao sur.","Udalerri bakoitzeko langabezia erregistratua, ikasketak eta soldatak, iparretik hegora.","Registered unemployment by municipality, education and wages, from north to south."],
- ["En qué gastan las administraciones públicas, cuánto va a pensiones y cómo ha cambiado desde 1995.","En què gasten les administracions públiques, quant va a pensions i com ha canviat des del 1995.","En que gastan as administracións públicas, canto vai a pensións e como cambiou desde 1995.","Administrazio publikoek zertan gastatzen duten, zenbat doan pentsioetara eta zer aldatu den 1995etik.","What public administrations spend on, how much goes to pensions and how it has changed since 1995."],
- ["Participación y voto a cada partido en las últimas generales, municipales y europeas, por municipio.","Participació i vot a cada partit en les últimes generals, municipals i europees, per municipi.","Participación e voto a cada partido nas últimas xerais, municipais e europeas, por municipio.","Parte-hartzea eta alderdi bakoitzaren botoa azken hauteskunde orokor, udal eta Europakoetan, udalerriz udalerri.","Turnout and votes for each party in the latest general, municipal and European elections, by municipality."],
- ["Ver todas las preguntas →","Mostra totes les preguntes →","Ver todas as preguntas →","Ikusi galdera guztiak →","See all the questions →"],
- ["Temas","Temes","Temas","Gaiak","Topics"],
- // municipios
- ["Cada municipio, con sus datos","Cada municipi, amb les seves dades","Cada municipio, cos seus datos","Udalerri bakoitza, bere datuekin","Every municipality, with its data"],
- ["Busca tu municipio","Cerca el teu municipi","Busca o teu municipio","Bilatu zure udalerria","Find your municipality"],
- ["Buscar un municipio","Cerca un municipi","Buscar un municipio","Bilatu udalerri bat","Search for a municipality"],
- ["Fichas de municipios","Fitxes de municipis","Fichas de municipios","Udalerrien fitxak","Municipality profiles"],
- ["Cómo sale cada uno, en el mapa","Com surt cadascun, al mapa","Como sae cada un, no mapa","Bakoitza nola dagoen, mapan","How each one comes out, on the map"],
- ["Comparar dos municipios","Compara dos municipis","Comparar dous municipios","Konparatu bi udalerri","Compare two municipalities"],
- ["Lado a lado, dato a dato","Costat per costat, dada a dada","Lado a lado, dato a dato","Aldez alde, datuz datu","Side by side, figure by figure"],
- ["Municipios por provincia","Municipis per província","Municipios por provincia","Udalerriak probintziaka","Municipalities by province"],
- ["Todos, con su renta y su paro","Tots, amb la seva renda i el seu atur","Todos, coa súa renda e o seu paro","Guztiak, errentarekin eta langabeziarekin","All of them, with income and unemployment"],
- ["Rankings de municipios","Rànquings de municipis","Clasificacións de municipios","Udalerrien sailkapenak","Municipality rankings"],
- ["Los más ricos, con más paro, que más crecen…","Els més rics, amb més atur, els que més creixen…","Os máis ricos, con máis paro, os que máis medran…","Aberatsenak, langabezia handienekoak, gehien hazten direnak…","The richest, with most unemployment, growing fastest…"],
- // laboratorio
- ["Explorar los datos","Explora les dades","Explorar os datos","Esploratu datuak","Explore the data"],
- ["Mapas, rankings y gráficos para cruzar datos","Mapes, rànquings i gràfics per creuar dades","Mapas, clasificacións e gráficos para cruzar datos","Mapak, sailkapenak eta grafikoak datuak gurutzatzeko","Maps, rankings and charts to cross data"],
- ["Qué significa cada dato","Què significa cada dada","Que significa cada dato","Datu bakoitzak zer esan nahi duen","What each figure means"],
- ["Qué mide, de dónde sale y qué tener en cuenta","Què mesura, d'on surt i què cal tenir en compte","Que mide, de onde sae e que hai que ter en conta","Zer neurtzen duen, nondik datorren eta zer hartu behar den kontuan","What it measures, where it comes from and what to keep in mind"],
- ["De la relación a la causa","De la relació a la causa","Da relación á causa","Erlaziotik kausara","From relationship to cause"],
- ["Cuándo «van juntos» no quiere decir «uno causa el otro»","Quan «van junts» no vol dir «un causa l'altre»","Cando «van xuntos» non quere dicir «un causa o outro»","Noiz ez duen «batera doaz»-ek esan nahi «batak bestea eragiten du»","When «they go together» does not mean «one causes the other»"],
- ["Elige tu municipio","Tria el teu municipi","Elixe o teu municipio","Aukeratu zure udalerria","Pick your municipality"],
- ["Seis preguntas sobre España","Sis preguntes sobre Espanya","Seis preguntas sobre España","Sei galdera Espainiari buruz","Six questions about Spain"],
- ["Leer →","Llegeix →","Ler →","Irakurri →","Read →"],
- ["Leer","Llegeix","Ler","Irakurri","Read"],
- // pie
- ["Preguntas reales, respuestas con datos públicos","Preguntes reals, respostes amb dades públiques","Preguntas reais, respostas con datos públicos","Benetako galderak, datu publikoekin erantzunak","Real questions, answers from public data"],
- ["datos actualizados","dades actualitzades","datos actualizados","datuak eguneratuta:","data updated"],
- ["Escríbeme","Escriu-me","Escríbeme","Idatzi iezaidazu","Write to me"]
-];
 
 var MONTHS={
  es:["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
@@ -109,7 +36,7 @@ var NOTE={
 };
 
 var MAP={ca:{},gl:{},eu:{},en:{}};
-ROWS.forEach(function(r){ ["ca","gl","eu","en"].forEach(function(l,i){ MAP[l][norm(r[0])]=r[i+1]; }); });
+ROWS.forEach(function(r){ ["ca","gl","eu","en"].forEach(function(l,i){ if(typeof r[i+1]==="string") MAP[l][norm(r[0]).replace(/\d[\d.,]*\d|\d/g,"{#}")]=r[i+1]; }); });
 function norm(s){ return s.replace(/\s+/g," ").trim(); }
 
 var lang="es";
@@ -117,23 +44,44 @@ var origText=new WeakMap(), lastText=new WeakMap(), origAttr=new WeakMap(), last
 var ATTRS=["title","aria-label","placeholder","alt"];
 var observer=null, pending=new Set(), raf=0, titleObs=null;
 
+var NUMRE=/\d[\d.,]*\d|\d/g;
+function fmtNum(l,t){
+  if(l!=="en") return t;
+  if(/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)){ var i=t.lastIndexOf(","); var ip=i<0?t:t.slice(0,i), dp=i<0?"":t.slice(i+1); return ip.replace(/\./g,",")+(dp?"."+dp:""); }
+  if(/^\d+,\d+$/.test(t)) return t.replace(",",".");
+  return t;
+}
+var AND={ca:"i",gl:"e",eu:"eta",en:"and"};
+// «Renta por persona y Paro registrado: r = −0,45»: se traduce cada nombre de variable por separado
+function rel(key){
+  var m=key.match(/^(.+): r = (−?\{#\})$/); if(!m) return;
+  var parts=m[1].split(" y ");
+  for(var i=1;i<parts.length;i++){
+    var a=MAP[lang][parts.slice(0,i).join(" y ")], b=MAP[lang][parts.slice(i).join(" y ")];
+    if(a!==undefined&&b!==undefined) return a+" "+AND[lang]+" "+b+": r = "+m[2];
+  }
+}
 function tr(s){
   if(lang==="es") return s;
   var m=s.match(/^(\s*)([\s\S]*?)(\s*)$/), core=m[2];
   if(!core) return s;
-  var hit=MAP[lang][norm(core)];
-  if(hit===undefined) hit=core.replace(DATE_RE,function(_,d,mo,y){ return fmtDate(lang,d,mo,y); });
+  var nums=core.match(NUMRE)||[], key=norm(core).replace(NUMRE,"{#}"), hit=MAP[lang][key];
+  if(hit===undefined) hit=rel(key);
+  if(hit!==undefined){ var k=0; hit=hit.replace(/\{#\}/g,function(){ return k<nums.length?fmtNum(lang,nums[k++]):"{#}"; }); }
+  else hit=core.replace(DATE_RE,function(_,d,mo,y){ return fmtDate(lang,d,mo,y); });
   return hit===core?s:m[1]+hit+m[3];
 }
 function skip(n){
   var e=n.nodeType===1?n:n.parentElement;
-  return !e||!!e.closest("script,style,svg,[translate=no],option,.langnote");
+  return !e||!!e.closest("script,style,[translate=no],.langnote");
 }
 function doText(n){
   if(skip(n)) return;
   var cur=n.nodeValue;
   if(lastText.has(n)&&cur===lastText.get(n)) return;      // lo escribimos nosotros
   origText.set(n,cur);
+  var pe=n.parentElement;
+  if(pe&&pe.tagName==="OPTION"&&!pe.hasAttribute("value")) pe.setAttribute("value",norm(cur));   // lo que se envía sigue en castellano
   var t=tr(cur);
   if(t!==cur){ lastText.set(n,t); n.nodeValue=t; } else lastText.delete(n);
 }

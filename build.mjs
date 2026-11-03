@@ -9,6 +9,8 @@ import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 import {SITE,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
+import {ROWS as I18N_ROWS} from "./src/i18n-textos.mjs";
+import {faltan as i18nFaltan} from "./scripts/i18n-faltan.mjs";
 import {STUDIES,ALL,HIDDEN,MDBODY} from "./src/analisis.mjs";
 import {ILLUS,TILL,FOCUS} from "./src/illus.mjs";
 
@@ -34,7 +36,7 @@ fs.mkdirSync(OUT,{recursive:true});
 const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.readdirSync(from,{withFileTypes:true})){ const a=path.join(from,e.name), b=path.join(to,e.name); if(e.isDirectory()) copyDir(a,b); else fs.writeFileSync(b,fs.readFileSync(a)); } };
 const css=rd("src/styles.css"), js=rd("src/app.js"), tpl=rd("src/template.html"), body=rd("src/body.html");
 const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
-const i18n=rd("src/i18n.js"), CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js", I18N="/assets/i18n."+h8(i18n)+".js";
+const i18n="var ROWS="+JSON.stringify(I18N_ROWS)+";\n"+rd("src/i18n.js"), CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js", I18N="/assets/i18n."+h8(i18n)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
 fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js); fs.writeFileSync(path.join(OUT,I18N),i18n);
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
@@ -388,4 +390,5 @@ fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, 
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));
 fs.writeFileSync(path.join(OUT,INDEXNOW_KEY+".txt"),INDEXNOW_KEY);
+{ const {cerradas}=i18nFaltan(); if(cerradas) console.log(`i18n: ${cerradas} frases de las páginas ya cerradas siguen sin traducir (npm run i18n:faltan para verlas)`); }
 console.log(`dist/ listo: ${urls.length} páginas + ${nMun} fichas municipales, ${parts.length+1} sitemaps.`);
