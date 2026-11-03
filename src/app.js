@@ -976,13 +976,9 @@ function kpis(box,r,d){
     if(k==="paroReg") return Math.abs(d)<.3?["","Casi el mismo paro que España",vs]:[`${nm} tiene `,`${mas} paro`,` que España${vs}`];
     if(k==="alquiler") return Math.abs(d)<1?["","Casi los mismos hogares de alquiler que España",vs]:[`En ${nm} hay `,`${mas} hogares de alquiler`,` que en España${vs}`];
     return Math.abs(d)<1?["","Se vota casi igual que en España",vs]:[`En ${nm} se vota `,mas,` que en España${vs}`]; };
-  // la pista de cada fila: de menos a más entre los municipios de España (del 1 % al 99 %), con la franja donde está el 80 % de ellos
-  const trk=(k,v,e)=>{ const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length||v==null) return "";
-    const lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99), X=z=>Math.max(0,Math.min(1,(z-lo)/((hi-lo)||1)))*100, b0=X(d3.quantile(vals,.1)), b1=X(d3.quantile(vals,.9));
-    return `<div class="cp-trk" aria-hidden="true"><i class="bd" style="left:${b0}%;width:${b1-b0}%"></i>${e==null?"":`<i class="es" style="left:${X(e)}%"></i>`}<i class="me" style="left:${X(v)}%"></i></div>`; };
   box.innerHTML=`<div class="cp-key"><span><i class="me"></i>${en}</span><span><i class="es"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span></div>`+K.map(([kk,l,v,e,mode,nota])=>{
     const ph=v==null?["","No hay dato de "+nm,"."]:e==null?[`${nm}: `,fmtK(kk)(v),"."]:sent(kk,v,e), f=fmtK(kk);
-    return `<div class="cp-r cp-k"><div class="cp-t"><div class="cp-l">${esc(l)}</div>${nota?`<div class="cp-s">${esc(nota)}</div>`:""}<p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${trk(kk,v,e)||"<div></div>"}<div class="cp-vv"><b>${v==null?"sin dato":f(v)}</b>${e==null?"":`<small>España ${f(e)}</small>`}</div></div>`; }).join("");
+    return `<div class="cp-r cp-k"><div class="cp-t"><div class="cp-l">${esc(l)}</div>${nota?`<div class="cp-s">${esc(nota)}</div>`:""}<p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${cpTrk(kk,[["a",v]],e)}<div class="cp-vv"><b>${v==null?"sin dato":f(v)}</b>${e==null?"":`<small>España ${f(e)}</small>`}</div></div>`; }).join("");
 }
 // ---------- minigráficos de cambio ----------
 function smalls(box,r,d){
@@ -1694,13 +1690,10 @@ function cpBig(k,A,Bm,va,vb){
   if(r>=2) return [z,"Más del doble",`de ${c.n} en ${H}.`,det];
   return [z,`+${nf0.format((r-1)*100)}${NB}%`,`de ${c.n} en ${H}.`,det];
 }
-// barras desde cero; si algún valor es negativo, el cero queda dentro y las negativas van a su izquierda
-function cpBars(k,items){
-  const f=fmtK(k), vs=items.map(x=>x[2]).filter(v=>v!=null), mn=Math.min(0,...vs), mx=Math.max(0,...vs), rg=(mx-mn)||1, S=66, x0=-mn/rg*S;
-  return items.map(([nm,cl,v])=>{ if(v==null) return `<div class="cp-bar ${cl}"><span class="n">${nm}</span><div class="t"><em style="left:0">sin dato</em></div></div>`;
-    const w=Math.max(Math.abs(v)/rg*S,.8), l=v<0?x0-w:x0, p=v<0?x0:x0+w;
-    return `<div class="cp-bar ${cl}"><span class="n">${nm}</span><div class="t">${mn<0?`<i class="z" style="left:${x0}%"></i>`:""}<i class="f" style="left:${l}%;width:${w}%"></i><em style="left:${p}%">${f(v)}</em></div></div>`; }).join("");
-}
+// pista de un dato: de menos a más entre los municipios de España (del 1 % al 99 %), con la franja donde está el 80 % de ellos
+function cpTrk(k,pts,e){ const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length||pts.every(p=>p[1]==null)) return "<div></div>";
+  const lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99), X=z=>Math.max(0,Math.min(1,(z-lo)/((hi-lo)||1)))*100, b0=X(d3.quantile(vals,.1)), b1=X(d3.quantile(vals,.9));
+  return `<div class="cp-trk" aria-hidden="true"><i class="bd" style="left:${b0}%;width:${b1-b0}%"></i>${e==null?"":`<i class="es" style="left:${X(e)}%"></i>`}${pts.map(([c,v])=>v==null?"":`<i class="me ${c}" style="left:${X(v)}%"></i>`).join("")}</div>`; }
 
 async function renderComparar(a,b){
   document.title="Comparar · Indicio";
@@ -1723,11 +1716,11 @@ async function renderComparar(a,b){
   if(big.length) top+=`<section class="finding"><h2>Lo que más llama la atención</h2><div class="cp-big">${big.map(([,n,t,d])=>`<div><div class="n">${n}</div><div class="t">${esc(t)}</div><div class="d">${d}</div></div>`).join("")}</div>${alike.length?`<p class="cp-like"><b>En esto se parecen:</b> ${esc(join(alike))}.</p>`:""}</section>`;
   else top+=`<section class="finding"><h2>Lo que más llama la atención</h2><p class="cp-like">Estos dos municipios se parecen mucho: ninguno de los datos principales los separa de forma clara.${alike.length?" En concreto, "+esc(join(alike))+".":""}</p></section>`;
   // dato a dato: una frase y tres barras desde cero
-  let h=`<p class="cp-intro">Las barras empiezan en cero: cuanto más larga, más grande es el dato. La barra gris es la media de España.</p>`;
+  let h=`<div class="cp-key"><span><i class="me"></i>${eA}</span><span><i class="me b"></i>${eB}</span><span><i class="es"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span></div>`;
   for(const [q,rows] of CP_SECS){ h+=`<div class="cp-g">${q}</div>`;
     for(const [k,l,sub] of rows){ if(F[k]==null||!CATK[k]) continue; const va=val(A,k), vb=val(Bm,k), e=esMean(k), f=fmtK(k);
       let ph; if(va==null||vb==null){ ph=["",va==null&&vb==null?"No hay dato de ninguno de los dos":"No hay dato de "+(va==null?nmA:nmB),"."]; } else ph=cpSentence(k,nmA,nmB,va,vb);
-      h+=`<div class="cp-r"><div class="cp-t"><div class="cp-l">${esc(l)}</div><div class="cp-s">${esc(sub)}</div><p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div><div class="cp-bars">${cpBars(k,[[eA,"a",va],[eB,"b",vb],["España","e",e]])}</div></div>`; } }
+      h+=`<div class="cp-r cp-k2"><div class="cp-t"><div class="cp-l">${esc(l)}</div><div class="cp-s">${esc(sub)}</div><p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${cpTrk(k,[["a",va],["b",vb]],e)}<div class="cp-vv2"><span><i class="me"></i>${eA} <b>${va==null?"sin dato":f(va)}</b></span><span><i class="me b"></i>${eB} <b>${vb==null?"sin dato":f(vb)}</b></span>${e==null?"":`<span class="e"><i class="es"></i>España <b>${f(e)}</b></span>`}</div></div>`; } }
   const t=finding(B,"Dato a dato",""); add(t,"div","cp",h);
   // la tabla completa, plegada: los 24 datos con su fuente
   let tb=`<table class="glance cmptab"><thead><tr><th>Dato</th><th class="r">${eA}</th><th class="r">${eB}</th><th class="r">España</th></tr></thead><tbody>`;

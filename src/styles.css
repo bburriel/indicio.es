@@ -1845,21 +1845,10 @@ details.chk > section{margin-top:18px}
 .cp-big .d{font-size:13px; color:var(--muted); margin-top:6px; font-variant-numeric:tabular-nums}
 @media (max-width:760px){ .cp-big{grid-template-columns:repeat(2,minmax(0,1fr))} .cp-big .t{font-size:14px} }
 .cp-like{margin:20px 0 0; font-size:15.5px; line-height:1.5; color:var(--ink-2)} .cp-like b{color:var(--ink)}
-.cp-intro{font-size:14.5px; line-height:1.5; color:var(--ink-2); margin:0}
 .cp-g{margin-top:30px; padding-bottom:8px; border-bottom:1px solid var(--ink); font-family:'Newsreader',Georgia,serif; font-size:23px; font-weight:500}
 .cp-r{display:grid; grid-template-columns:minmax(0,330px) minmax(0,1fr); gap:10px 36px; align-items:center; padding:20px 0; border-bottom:1px solid var(--rule)}
 .cp-l{font-size:16.5px; font-weight:600} .cp-s{font-size:13px; color:var(--muted); margin-top:1px}
 .cp-t p{font-size:15.5px; line-height:1.4; margin:8px 0 0} .cp-t p b{font-weight:700}
-.cp-bars{display:flex; flex-direction:column; gap:8px}
-.cp-bar{display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:center}
-.cp-bar .n{font-size:14px; overflow-wrap:anywhere}
-.cp-bar .t{position:relative; height:16px}
-.cp-bar .t .f{position:absolute; top:0; height:16px; background:var(--rust)}
-.cp-bar.b .t .f{background:var(--s-b)} .cp-bar.e .t .f{background:var(--rule-2)}
-.cp-bar .t .z{position:absolute; top:-3px; height:22px; width:1px; background:var(--muted)}
-.cp-bar .t em{position:absolute; top:50%; transform:translateY(-50%); margin-left:8px; font-style:normal; font-size:14.5px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap}
-.cp-bar.e .n,.cp-bar.e .t em{color:var(--muted); font-weight:400}
-@media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-bar{grid-template-columns:74px minmax(0,1fr)} .cp-bar .n{font-size:13.5px} .cp-bar .t em{font-size:14px} }
 .cp-all{margin-top:28px; border:1px solid var(--rule-2); border-radius:10px; padding:0 18px}
 .cp-all summary{cursor:pointer; padding:15px 0; font-size:15px; list-style:none; display:flex; justify-content:space-between; gap:12px}
 .cp-all summary::-webkit-details-marker{display:none}
@@ -1878,3 +1867,8 @@ details.chk > section{margin-top:18px}
 .cp-trk .me{position:absolute; top:7px; width:16px; height:16px; margin-left:-8px; border-radius:50%; background:var(--rust); border:2px solid var(--bg); box-sizing:border-box}
 .cp-vv{text-align:right; font-variant-numeric:tabular-nums} .cp-vv b{display:block; font-size:18px; color:var(--rust)} .cp-vv small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
 @media (max-width:760px){ .cp-k{grid-template-columns:minmax(0,1fr) auto; gap:8px 12px} .cp-k .cp-t{grid-column:1/-1} .cp-k .cp-trk{grid-row:2; grid-column:1} .cp-k .cp-vv{grid-row:2; grid-column:2} }
+
+.cp-trk .me.b,.cp-key i.me.b{background:var(--s-b)}
+.cp-k2{grid-template-columns:minmax(0,300px) minmax(0,1fr) 190px}
+.cp-vv2{display:flex; flex-direction:column; gap:3px; font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums} .cp-vv2 b{color:var(--ink); font-weight:600; float:right; margin-left:10px} .cp-vv2 span{display:block} .cp-vv2 i{display:inline-block; vertical-align:-1px; margin-right:7px} .cp-vv2 i.me{width:10px; height:10px; border-radius:50%; background:var(--rust)} .cp-vv2 i.me.b{background:var(--s-b)} .cp-vv2 i.es{width:2px; height:11px; background:var(--ink); margin:0 8px 0 4px}
+@media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-k2 .cp-trk{margin:0 8px} }
