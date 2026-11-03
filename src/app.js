@@ -5911,7 +5911,7 @@ async function studySueldos(B){
 // ---------- vivienda: por qué cuesta tanto pagar una casa ----------
 // El texto está en contenido/analisis/vivienda.md; aquí las cifras (V) y los gráficos (G).
 async function studyVivienda(B){
-  const [D,S,A,PW]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null)]);
+  const [D,S,A,PW,VC]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null),getJSON("/data/vivienda_censo.json")]);
   const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
   const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
@@ -5932,12 +5932,12 @@ async function studyVivienda(B){
   const hpi=geo=>{ const o=(EU[geo]||{}).hpi||{}, y=lastK(o); return o["2015"]&&y?(o[y]/o["2015"]-1)*100:null; };
   // Dos ideas: construir más o que cada casa sea para vivir.
   // Zonas con demanda: municipios de 20.000 habitantes o más que han ganado población desde 2015.
-  // Viviendas de cada municipio ≈ hogares / (1 − % no principal), con hogares ≈ población / personas por hogar de España
-  // (Eurostat): el reparto entre vacías y segundas residencias no se publica por municipio, así que se usa el de España
-  // en el Censo de 2021 (3.837.328 vacías de 8.087.092 no principales; el resto, uso esporádico u otro).
-  const pph=(pob[hY]||pob[pY])/(hog[hY]*1000), VAC_ES=3837328, NOP_ES=26623708-18536616, vacSh=VAC_ES/NOP_ES;
-  const zon=rowsAll().filter(r=>r[F.pop]>=20000&&r[F.varPob]>0&&r[F.noPrincipal]!=null), vivZ=r=>r[F.pop]/pph/(1-r[F.noPrincipal]/100);
-  const npZ=d3.sum(zon,r=>vivZ(r)*r[F.noPrincipal]/100), vtZ=d3.sum(zon.filter(r=>r[F.vt]!=null),r=>vivZ(r)*r[F.vt]/100);
+  // Sus viviendas salen del Censo de 2021 (INE, tablas 59525 y 59531; scripts/datos/vivienda_censo.py): total, principales,
+  // vacías y de uso esporádico según el consumo de electricidad, municipio a municipio. Todos los de 20.000 habitantes o más tienen dato.
+  const CM=VC.censo.mun, cm=r=>CM[r[F.code]];
+  const zon=rowsAll().filter(r=>r[F.pop]>=20000&&r[F.varPob]>0&&cm(r));
+  const vivZtot=d3.sum(zon,r=>cm(r)[0]), npZ=d3.sum(zon,r=>cm(r)[0]-cm(r)[1]), vacZ=d3.sum(zon,r=>cm(r)[2]), espZ=d3.sum(zon,r=>cm(r)[3]);
+  const vtZ=d3.sum(zon.filter(r=>r[F.vt]!=null),r=>cm(r)[0]*r[F.vt]/100);
   const pobZ=d3.sum(zon,r=>r[F.pop])/d3.sum(rowsAll(),r=>r[F.pop])*100;
   // Hogares nuevos y viviendas terminadas desde 2021 (Banco de España: déficit de unas 750.000 en 2021–2025, Informe Anual 2025)
   const hog21=(hog[hY]-hog["2020"])*1000, term21=d3.sum(d3.range(2021,+hY+1),y=>termTot(y)||0), termAño5=term21/(+hY-2020);
@@ -5956,12 +5956,19 @@ async function studyVivienda(B){
     pob19:pob[pY]-pob["2019"], proyAño, term06:termTot(2006), termMax:d3.max(d3.range(2013,2026),y=>termTot(y)),
     prot0009:avg(E.protegidas,2000,2009), prot1925:avg(E.protegidas,2019,2025),
     npPeq:BANDS[0].np, npGr:BANDS[4].np, vpPeq:BANDS[0].vp, vpGr:BANDS[4].vp, vtES,
-    nZ:zon.length, pobZ, npZ, vacZ:npZ*vacSh, vtZ, vac13:npZ*vacSh*.13, hog21, term21, def21:hog21-term21, termAño5, proy10, añoHog21:hY,
+    nZ:zon.length, pobZ, npZ, vacZ, espZ, vtZ, vac13:vacZ*.13, hog21, term21, def21:hog21-term21, termAño5, proy10, añoHog21:hY,
+    // quién acumula y quién compra (Catastro, INE y Registradores; scripts/datos/vivienda_censo.py)
+    ...(()=>{ const U=VC.catastro.urbana, yU=lastK(U), a=U["2015"], z=U[yU], R=VC.catastro.residencial[VC.catastro.ultimo], yR=VC.catastro.ultimo, CP=VC.compras, yC=lastK(CP);
+      const sum2=o=>Object.values(o).reduce((s,v)=>[s[0]+v[0],s[1]+v[1]],[0,0]), pf=R.fisicas, pfM=sum2(Object.fromEntries(Object.entries(pf).filter(([k])=>k!=="1"))), pfT=sum2(pf), pj=sum2(R.juridicas);
+      return {añoCat:yU, t1d:z["1"]-a["1"], t2d:z["2"]-a["2"], t3p:(z["3"]/a["3"]-1)*100, t6p:(z["6a10"]/a["6a10"]-1)*100,
+        añoRes:yR, resInm:R.inmuebles, pfMulti:pfM[0], pfMultiP:pfM[0]/pfT[0]*100, pfMultiInm:pfM[1], pfMultiInmP:pfM[1]/R.inmuebles*100, pjInm:pj[1], pjInmP:pj[1]/R.inmuebles*100,
+        añoCp:yC, cpPJ:CP[yC].compradorPJ, cpPJ15:CP["2015"].compradorPJ,
+        vacES:VC.censo.vacias, espES:VC.censo.esporadico, vacZP:vacZ/vivZtot*100, espZP:espZ/vivZtot*100}; })(),
     // qué ha separado a los municipios donde más subió el alquiler (scripts/datos/vivienda_pesos.py)
     ...(PW?(()=>{ const m=PW.municipios, T=m.todos, pe=(o,g)=>o.pesos.find(x=>x.g===g)||{}, dem=pe(T,"Demanda"), P=PW.provincias;
       return {mN:m.n, mPob:m.pob/m.pobTotal*100, r2m:T.añaden*100, pDem:dem.v, pDemLo:dem.lo, pDemHi:dem.hi, pTur:pe(T,"Pisos turísticos").v, pVac:pe(T,"Vacías o secundarias").v,
         pCom:pe(T,"Compraventas").v, pCon:pe(T,"Construcción nueva").v, pConHi:pe(T,"Construcción nueva").hi, pDemP:pe(m.provincia,"Demanda").v, pDemPr:pe(P,"Demanda").v, pConPr:pe(P,"Construcción nueva").v, nPr:P.n}; })():{}),
-    ...(()=>{ const d0=Math.round((hog21-term21)/50000)*50000, need=d0+Math.max(0,proy10-termAño5)*10, bu=60000*8, mv=npZ*vacSh*.13+vtZ*.25; return {cenNeed:need,cenB:bu,cenM:mv,cenCov:(bu+mv)/need*100,cenRat:bu/mv}; })(),
+    ...(()=>{ const d0=Math.round((hog21-term21)/50000)*50000, need=d0+Math.max(0,proy10-termAño5)*10, bu=60000*8, mv=vacZ*.13+vtZ*.25; return {cenNeed:need,cenB:bu,cenM:mv,cenCov:(bu+mv)/need*100,cenRat:bu/mv}; })(),
     hpiES:hpi("ES"), hpiEU:hpi("EU27_2020"), hpiNL:hpi("NL"), hpiPT:hpi("PT"),
     inv06:(EU.ES.inversionVivienda||{})["2006"], invES:euL("ES","inversionVivienda").v, invEU:euL("EU27_2020","inversionVivienda").v,
     socialES:ten.alqSocial[tenY], socialAT:euL("AT","alquilerReducido").v, socialNL:euL("NL","alquilerReducido").v };
