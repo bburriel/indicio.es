@@ -25,7 +25,7 @@ En {{yAnt}} las pensiones costaban el {{gastoAnt|pct1}} del PIB; hoy, el {{gasto
 
 El salto de 2020 viene sobre todo del PIB, que cayó un {{pibCovid|n0}} % ese año, mientras el gasto en euros solo subió un {{gastoCovid|n0}} %. Al recuperarse la economía, el porcentaje bajó, aunque no volvió al de antes.
 
-En comparación con Europa, España no gasta de más. En la función «vejez» de las cuentas públicas, que cubre sobre todo las pensiones de jubilación, gasta el {{vejES|pct1}} del PIB, casi como la media de la UE ({{vejEU|pct1}}) y por debajo de Francia ({{vejFR|pct1}}) e Italia ({{vejIT|pct1}}). Pero lo hace con menos mayores: {{dep0|n1}} personas de 65 o más por cada 100 de 15 a 64 años, frente a {{depEU0|n1}} en la UE. Con una población más joven, España ya gasta como la media.
+En comparación con Europa, España no gasta de más. El {{gasto0|pct1}} del gráfico anterior suma todas las pensiones: jubilación, viudedad, incapacidad y otras. Eurostat no lo publica igual para todos los países, así que para comparar hay que quedarse solo con la jubilación (la función «vejez» de las cuentas públicas). En ella España gasta el {{vejES|pct1}} del PIB, casi como la media de la UE ({{vejEU|pct1}}) y por debajo de Francia ({{vejFR|pct1}}) e Italia ({{vejIT|pct1}}). Pero lo hace con menos mayores: {{dep0|n1}} personas de 65 o más por cada 100 de 15 a 64 años, frente a {{depEU0|n1}} en la UE. Con una población más joven, España ya gasta como la media.
 
 [[grafico:ue]]
 
@@ -105,7 +105,7 @@ Lo que no se sabe:
 - **La proyección demográfica es un escenario**, no una previsión: depende de cuánta gente llegue y de cuántos nazcan.
 - **La productividad se supone, no se mide.** Solo afecta a cuánto vale la pensión en euros de hoy.
 - **Se supone que quienes llegan trabajan como el resto**, y que más empleo no cambia la productividad.
-- **La comparación con la UE usa la función «vejez»**, una medida más estrecha que el total de pensiones, porque es la que Eurostat publica igual para todos los países.
+- **La comparación con la UE no usa el total de pensiones** ({{gasto0|pct1}} del PIB en España), sino solo la jubilación ({{vejES|pct1}}), porque es lo que Eurostat publica igual para todos los países. Por eso las dos cifras no coinciden.
 
 ## Prueba la tuya
 
