@@ -56,7 +56,7 @@ Promise.all([getJSON("/data/index.json"),getJSON("/data/refs.json"),getJSON("/da
 }).catch(e=>{ console.error(e); view.innerHTML='<p class="loading">No se pudieron cargar los datos. Recarga la página.</p>'; });
 
 const rowsAll=()=>IDX.map(o=>o.row);
-const FMT={int:v=>nf0.format(v),pct:pc,pct_chg:sgn,pts:sgn,eur:eur,years:v=>nf1.format(v)+NB+"años",num1:v=>nf1.format(Math.abs(v)<0.05?0:v),km:v=>nf0.format(v)+NB+"km",dens:v=>(v<10?nf1:nf0).format(v)+NB+"hab./km²"};
+const FMT={int:v=>nf0.format(v),pct:pc,pct_chg:sgn,pts:sgn,eur:eur,years:v=>nf1.format(v)+NB+"años",num1:v=>nf1.format(Math.abs(v)<0.05?0:v),km:v=>nf0.format(v)+NB+"km",veces:v=>Math.abs(v-1)<0.05?"1"+NB+"vez":nf1.format(v)+NB+"veces",pp:v=>nf1.format(v)+NB+"puntos",num:v=>(Math.abs(v)>=1000?nf0:Math.abs(v)>=1?nf1:nf2).format(v),dens:v=>(v<10?nf1:nf0).format(v)+NB+"hab./km²"};
 const fmtK=k=>FMT[(CATK[k]||{}).f]||(v=>nf1.format(v));
 const labK=k=>(CATK[k]||{}).l||k;
 
@@ -1502,7 +1502,7 @@ let MATC=null;
 function renderRelaciones(x,y){
   document.title="Relaciones · Indicio";
   if(x&&CATK[x]) XS.x=x; if(y&&CATK[y]) XS.y=y;
-  const opt=sel=>{ let h="",g=null; CAT.forEach(c=>{ if(c.g!==g){ if(g) h+="</optgroup>"; h+=`<optgroup label="${c.g}">`; g=c.g; } h+=`<option value="${c.k}" ${c.k===sel?"selected":""}>${esc(c.l)}</option>`; }); return h+"</optgroup>"; };
+  const opt=sel=>{ let h="",g=null; CAT.filter(c=>!c.custom).forEach(c=>{ if(c.g!==g){ if(g) h+="</optgroup>"; h+=`<optgroup label="${c.g}">`; g=c.g; } h+=`<option value="${c.k}" ${c.k===sel?"selected":""}>${esc(c.l)}</option>`; }); return h+"</optgroup>"; };
   view.innerHTML=pageHead("¿Van juntos?",`Elige dos datos y mira si se mueven juntos en los municipios de España. Por ejemplo: ¿los municipios con más estudios tienen más renta? ¿Donde hay más pisos turísticos hay más alquiler? Debajo verás cuánto se parecen, qué municipios se salen de la norma y qué relaciones son las más fuertes de todas.`)+
   `<div class="xsug" aria-label="Ejemplos">${SUGG.map(([a,b,l])=>`<a href="#relaciones-${a}-${b}">${l}</a>`).join("")}</div>
   <div class="xform">
@@ -1530,10 +1530,13 @@ function renderRelaciones(x,y){
 
 function niceStep(k,pts){
   const f=(CATK[k]||{}).f, sd=d3.deviation(pts,p=>p.x)||1;
+  if(f==="veces"||f==="num"||f==="pp"||(CATK[k]||{}).un){ const m=Math.pow(10,Math.floor(Math.log10(sd))); return sd/m>=5?5*m:m; }
   if(f==="eur") return sd>4000?5000:1000; if(f==="years") return 5; if(f==="int") return 10000; if(f==="num1") return 5;
   return sd>15?10:sd>4?5:1;
 }
 const unitTxt=(k,v)=>{ const f=(CATK[k]||{}).f; const a=Math.abs(v);
+  if((CATK[k]||{}).un) return (a<1?nf2:a<100?nf1:nf0).format(a)+" "+CATK[k].un;
+  if(f==="veces") return (a<1?nf2:nf1).format(a)+(a===1?" vez":" veces"); if(f==="pp") return (a<1?nf2:nf1).format(a)+(a===1?" punto":" puntos"); if(f==="num") return (a<1?nf2:a<100?nf1:nf0).format(a);
   return f==="eur"?eur(a):f==="years"?nf1.format(a)+" años":f==="int"?nf0.format(a)+" habitantes":f==="num1"?nf1.format(a)+" puntos":(Number.isInteger(a)?nf0.format(a):a<1?nf2.format(a):nf1.format(a))+(a===1?" punto":" puntos"); };
 
 function drawRel(){
@@ -1807,6 +1810,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   const m=h.match(/^explorar(?:\/([a-z]+))?(?:\?(.*))?$/); if(!m) return;
   if(m[1]&&EXVIEWS.some(v=>v[0]===m[1])) EX.v=m[1];
   const q=new URLSearchParams(m[2]||"");
+  q.getAll("dv").forEach(vFromUrl);   // datos propios que trae el enlace: se crean antes de leer «d», «c», etc.
   // «Evolución» ahora es parte de «Series»; «Antes y después» ya no está en el laboratorio
   if(m[1]==="evolucion"){ EX.v="paises"; const E2S={salMed:"sal_mediana",salMedia:"sal_media",ipc:"ipc_general"}, e=q.has("e")?q.get("e").split(","):["salMed","alq","alqNuevo","ipc"];
     const nq=new URLSearchParams(); nq.set("ser",e.filter(k=>EVOK[k]).map(k=>E2S[k]||"ev_"+k).join(",")); if(q.has("b")) nq.set("b",q.get("b")); if(q.has("r")) nq.set("r",q.get("r")); if(q.has("m")){ nq.set("m",q.get("m")); if(q.has("lv")) nq.set("lv",q.get("lv")); }
@@ -1814,7 +1818,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(m[1]==="antes"){ EX.v="mapa"; }
   // la URL manda: lo que no trae vuelve a su valor por defecto (si no, al ir atrás se quedan filtros de antes)
   if(m[2]!=null){ Object.assign(EX,{p:"",t:"",m:null,c:[],o:null,w:1,lx:0,sz:"",col:"",q:0,bv:0,u:""}); if(EX.v==="evolucion"){ ES_.base=null; REAL=false; } }
-  if(q.has("d")) EX.d=q.get("d").split(",").filter(k=>CATK[k]).slice(0,10);
+  if(q.has("d")){ const raw=q.get("d").split(","); EX.d=raw.filter(k=>CATK[k]).slice(0,10); if(raw.some(k=>/^u_/.test(k)&&!CATK[k])) setTimeout(()=>toast("Este enlace usa un dato propio que no se puede recuperar: hemos puesto otro en su lugar.",5500),600); }
   if(q.has("p")) EX.p=PROVS[q.get("p")]?q.get("p"):""; if(q.has("t")) EX.t=EXSIZES.some(s=>s[0]===q.get("t"))?q.get("t"):""; if(q.has("m")&&BYCODE.has(q.get("m"))) EX.m=q.get("m");
   if(q.has("c")) EX.c=q.get("c").split(",").filter(Boolean); if(q.has("gb")) EX.gb=["ccaa","prov","size","q"].includes(q.get("gb"))?q.get("gb"):"ccaa"; if(q.has("o")) EX.o=q.get("o"); if(q.has("w")) EX.w=+q.get("w"); if(q.has("lx")) EX.lx=+q.get("lx"); EX.u=["prov","ccaa","eu"].includes(q.get("u"))?q.get("u"):"";
   if(q.has("sz")&&encOK(q.get("sz"),"sz")) EX.sz=q.get("sz"); if(q.has("col")&&encOK(q.get("col"),"col")) EX.col=q.get("col"); if(q.has("q")) EX.q=+q.get("q")?1:0; if(q.has("bv")) EX.bv=+q.get("bv")?1:0; EX.dg=["ccaa","prov","size","renta"].includes(q.get("dg"))?q.get("dg"):"";
@@ -1840,7 +1844,8 @@ function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParam
   if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); else if(PS.b) q.set("b",PS.b); if(PS.real) q.set("r","1"); if(PS.m&&PS.s.some(k=>/^ev_/.test(k))){ q.set("m",PS.m); if(PS.lev!=="mun") q.set("lv",PS.lev); } } else { q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
     if(!PS.gob) q.set("gob","0"); if(PS.desde) q.set("desde",PS.desde); if(PS.hasta) q.set("hasta",PS.hasta); }
   if(S.v==="antes"){ ["d","p","t","c","m","o"].forEach(k=>q.delete(k)); const A={...AD,...(S.ad||{})}; q.set("ev",A.ev); q.set("oy",A.y); if(ADEV[A.ev].free) q.set("yr",A.yr); if(A.ev==="ccaa"&&A.cc) q.set("cc",A.cc); if(A.ev==="prov"&&A.pv) q.set("pv",A.pv); if(A.ev==="lista"&&A.ms.length) q.set("ms",A.ms.join(",")); { const dmc=ADEV[A.ev].mc||0; if(A.mc!==dmc) q.set("mc",A.mc?"1":"0"); } if(A.mp!==ADEV[A.ev].mp) q.set("mp",A.mp); if(A.mt==="sint") q.set("mt","sint"); }
-  return "/laboratorio/"+S.v+"/"+(q.toString()?"?"+q.toString().replace(/%2C/g,","):""); }
+  vCustomIn([...(q.get("d")||"").split(","),...(q.get("c")||"").split(","),q.get("sz"),q.get("col"),(q.get("o")||"").replace(/^-/,"")]).forEach(k=>q.append("dv",vEnc(VBYK[k])));   // los datos propios viajan con el enlace
+  return "/laboratorio/"+S.v+"/"+(q.toString()?"?"+q.toString().replace(/%2C/g,",").replace(/%7E/g,"~"):""); }
 // enlace desde los informes
 const exLink=(view,o,txt)=>{ const save={...EX}; const h=exHash({v:view,d:o.d||EX.d,p:o.p||"",t:o.t||"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null,e:o.e,lx:o.lx||0}); return `<a class="exlink" href="${h}">${txt||"Ábrelo en el explorador"} →</a>`; };
 function exSync(){ const sz=EXSIZES.find(s=>s[0]===EX.t)||EXSIZES[0]; EXF={prov:EX.p||"",min:sz[2],max:sz[3]}; }
@@ -2148,7 +2153,7 @@ async function loadSeries(){ if(SER) return SER; const [s,e]=await Promise.all([
 const ser=(code,k)=>{ const r=SBY.get(code); return r?r[SF[k]]:null; };
 window.__indicioDebug=()=>({F,rows:rowsAll(),SER,SF,SBY,EXT});
 // columna derivada en el índice (para poder usarla en partialR, scatter, etc.)
-function addCol(k,fn,meta){ if(F[k]!=null) return; const i=Object.keys(F).length; F[k]=i; rowsAll().forEach(r=>{ const v=fn(r,SBY.get(r[F.code])); r[i]=v==null||!isFinite(v)?null:v; }); if(meta){ const c={k,...meta}; CAT.push(c); CATK[k]=c; } }
+function addCol(k,fn,meta){ if(F[k]!=null) return; const i=Object.keys(F).length; F[k]=i; rowsAll().forEach(r=>{ const v=fn(r,SBY.get(r[F.code])); r[i]=v==null||!isFinite(v)?null:v; }); if(meta){ const c={k,...meta,der:1}; CAT.push(c); CATK[k]=c; } }
 const pctg=(a,b)=>a&&b?(b/a-1)*100:null;
 function deriveSeries(){
   const Y=SER.years, P=SER.vtPeriods, PY=SER.paroYears, PD=SER.padYears, IY=SER.ipvaYears;
@@ -2812,7 +2817,7 @@ async function renderGlosario(){
     +`<div class="gl"><div class="gl-bar"><input type="search" id="glq" class="sel" placeholder="¿Qué dato buscas? Por ejemplo: renta, paro, alquiler…" aria-label="Buscar un dato" autocomplete="off"><div class="chipsq" id="glg" role="group" aria-label="Filtrar por tema"></div></div><p class="muted gl-c" id="glc" aria-live="polite"></p><div id="gll"><p class="loading">Cargando…</p></div></div>`;
   try{ await loadRegional(); }catch(e){}
   const box=document.getElementById("gll"); if(!box) return;
-  const items=CAT.filter(c=>c&&c.l&&!c.eu&&c.g&&!/^E_/.test(c.k)).map(c=>{
+  const items=CAT.filter(c=>c&&c.l&&!c.eu&&!c.custom&&c.g&&!/^E_/.test(c.k)).map(c=>{
     const reg=!!c.reg, g=reg?"Provincias y comunidades":c.g, unit=reg?"":(GLUNIT[c.f]||"");
     const scales=reg?[c.np>=40?"provincias":"",c.nc>=10?"comunidades":""].filter(Boolean):[];
     const link=reg?exHash({v:"mapa",d:[c.k],u:c.np>=40?"prov":"ccaa",c:[],p:"",t:""}):exHash({v:"mapa",d:[c.k],u:"",c:[],p:"",t:""});
@@ -3785,7 +3790,7 @@ const nbSet=a=>{ try{ localStorage.setItem(NBKEY,JSON.stringify(a.slice(0,30)));
 
 // los indicadores añadidos desde otras fuentes viven en data/extra.json (columnas alineadas con index.json); solo el laboratorio los necesita
 let EXTRA_P=null;
-function loadExtra(){ return EXTRA_P||(EXTRA_P=getJSON("/data/extra.json").then(ex=>{ const n=IDX[0].row.length; ex.fields.forEach((f,i)=>{ F[f]=n+i; }); IDX.forEach((o,i)=>{ const e=ex.rows[i]; for(let j=0;j<e.length;j++) o.row.push(e[j]); }); for(const k in ESMEAN) delete ESMEAN[k]; for(const k in PCTL) delete PCTL[k]; }).catch(e=>{ console.error(e); EXTRA_P=null; })); }
+function loadExtra(){ return EXTRA_P||(EXTRA_P=getJSON("/data/extra.json").then(ex=>{ const n=IDX[0].row.length; ex.fields.forEach((f,i)=>{ F[f]=n+i; }); IDX.forEach((o,i)=>{ const e=ex.rows[i]; for(let j=0;j<e.length;j++) o.row.push(e[j]); }); for(const k in ESMEAN) delete ESMEAN[k]; for(const k in PCTL) delete PCTL[k]; vInit(); }).catch(e=>{ console.error(e); EXTRA_P=null; })); }
 async function renderExplorar(h){
   if(!EXTRA_P&&!document.querySelector(".lb")) view.innerHTML='<p class="loading">Cargando los datos del laboratorio…</p>';
   // los datos de provincias, comunidades y Europa solo se esperan si el enlace los pide; si no, se cargan por detrás
@@ -3803,6 +3808,7 @@ async function renderExplorar(h){
     <div class="lb-canvas">
       <div class="lb-bar"><div style="min-width:0"><h2 id="lbtitle"></h2><div class="sub" id="lbsub"></div></div>
         <div class="acts ico"><button type="button" class="lbedit" id="lbedit" title="Cambiar gráfico" aria-label="Cambiar gráfico"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button><button type="button" id="lbsave" title="Guardar en mis análisis" aria-label="Guardar en mis análisis" aria-pressed="false"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button><button type="button" id="excopy" title="Copiar enlace para compartir" aria-label="Compartir"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/></svg></button><button type="button" id="lbimg" title="Descargar imagen" aria-label="Descargar imagen"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button><button type="button" id="lbcsv" title="Descargar datos (CSV)" aria-label="Descargar datos en CSV"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M4 10h16M4 14.5h16M10 5v14"/></svg></button></div></div>
+      <div id="vnote"></div>
       <div id="exout" class="lb-out"></div>
       <div class="reading"><div class="say" id="lbsay"></div></div>
       <div id="lbtest"></div>
@@ -3828,8 +3834,126 @@ function nbDraw(){
 
 // ---------- panel lateral ----------
 const SLOTS={matriz:{n:10,l:i=>"Dato "+(i+1),add:"Añadir dato"},burbujas:{n:2,l:["Horizontal ↔","Vertical ↕"]},mapa:{get n(){return EX.bv?2:1},get l(){ return EX.bv?["Primer dato (azul)","Segundo dato (rosa)"]:["Color del mapa"]; }},cruce:{n:2,l:["Horizontal ↔","Vertical ↕"]},tabla:{n:6,l:i=>"Columna "+(i+1),add:"Añadir columna"},grupos:{n:4,l:i=>(EX.gb==="q"&&i===0?"Ordenar por":"Dato "+(i+1)),add:"Añadir dato"},distribucion:{n:1,l:["Dato"]}};
+// =====================================================================
+// DATOS PROPIOS: el lector calcula un dato nuevo con dos que ya existen (sin fórmulas libres)
+// Cada dato propio se define con una operación y una o dos claves del catálogo. Su clave sale de esa definición
+// («u_<operación>_<dato>_<dato>»), así que una misma clave significa siempre lo mismo: las cachés no se quedan viejas
+// y un enlace puede llevar la definición dentro («dv=op~a~b~formato~unidad~nombre») para quien no tenga nada guardado.
+// Se guardan en el navegador (localStorage «indicio.vars»); los que llegan por enlace viven solo en la página (tmp) hasta que se guardan.
+// =====================================================================
+const VKEY="indicio.vars", VMAX=10, VGROUP="Mis datos";
+let VARS=[], VBYK={}, VINIT=false;
+const vLow=s=>/^[A-ZÁÉÍÓÚÑ]{2,}/.test(s)?s:low(s);
+const vShort=k=>((CATK[k]||{}).l||k).replace(/\s*\([^)]*\)/g,"").trim();
+const vUC=f=>/^(pct|pct_chg|pts)$/.test(f)?"pct":f;
+const VFORMS=[["pct","%"],["veces","veces"],["eur","€"],["pp","puntos"],["years","años"],["num","número"]];
+const VOPS={
+  pct:{t:"¿Qué porcentaje de un total supone una parte?",r:["El total","La parte"],div:1,calc:(t,p)=>t?p/t*100:null,
+    say:(A,B)=>`En cada municipio: ${B}, como porcentaje de ${A}.`,name:(A,B)=>`${cap(B)} sobre ${vLow(A)}`,how:(A,B)=>`${vLow(B)} como porcentaje de ${vLow(A)}`},
+  p100:{t:"Una cantidad por cada 100 de otra",r:["Lo que cuentas","Por cada 100 de"],div:1,calc:(a,b)=>b?a/b*100:null,
+    say:(A,B)=>`En cada municipio: ${A} por cada 100 ${B}.`,name:(A,B)=>`${cap(A)} por cada 100 ${vLow(B)}`,how:(A,B)=>`${vLow(A)} por cada 100 ${vLow(B)}`},
+  x:{t:"¿Cuántas veces es un dato respecto a otro?",r:["El dato","Respecto a"],div:1,calc:(a,b)=>b?a/b:null,
+    say:(A,B)=>`En cada municipio: ${A} dividido entre ${B}.`,name:(A,B)=>`${cap(A)} entre ${vLow(B)}`,how:(A,B)=>`${vLow(A)} dividido entre ${vLow(B)}`},
+  res:{t:"Un dato menos otro",r:["El dato","Lo que se le resta"],calc:(a,b)=>a-b,
+    say:(A,B)=>`En cada municipio: ${A} menos ${B}.`,name:(A,B)=>`${cap(A)} menos ${vLow(B)}`,how:(A,B)=>`${vLow(A)} menos ${vLow(B)}`},
+  sum:{t:"Un dato más otro",r:["Primer dato","Segundo dato"],calc:(a,b)=>a+b,
+    say:(A,B)=>`En cada municipio: ${A} más ${B}.`,name:(A,B)=>`${cap(A)} más ${vLow(B)}`,how:(A,B)=>`${vLow(A)} más ${vLow(B)}`},
+  prov:{t:"Un dato frente a la media de su provincia",r:["El dato"],un:1,
+    say:A=>`En cada municipio: ${A}, comparado con la media de su provincia (ponderada por población).`,name:A=>`${cap(A)} frente a la media de su provincia`,how:A=>`${vLow(A)} frente a la media de su provincia`},
+  es:{t:"Un dato frente a la media de España",r:["El dato"],un:1,
+    say:A=>`En cada municipio: ${A}, comparado con la media de España (ponderada por población).`,name:A=>`${cap(A)} frente a la media de España`,how:A=>`${vLow(A)} frente a la media de España`}};
+const VREC=[
+  {t:"Peso de la deuda sobre la renta",d:"Cuánto supone la deuda que le toca a cada vecino frente a la renta de un año.",op:"pct",a:"renta",b:"deudaHab",n:"Deuda del ayuntamiento sobre la renta por persona"},
+  {t:"Índice de envejecimiento",d:"Mayores de 65 años por cada 100 menores de 18.",op:"p100",a:"mayores65",b:"menores18",n:"Mayores de 65 por cada 100 menores de 18"},
+  {t:"Renta frente a la de su provincia",d:"Quién tiene más o menos renta que el resto de su provincia.",op:"prov",a:"renta",n:"Renta por persona frente a la media de su provincia"},
+  {t:"Metros cuadrados que compra la renta de un año",d:"La renta anual de una persona, entre lo que cuesta un metro cuadrado.",op:"x",a:"renta",b:"valorTasado",un:"m²",n:"Metros cuadrados que compra la renta de un año"},
+  {t:"Ingresos que vienen de prestaciones",d:"Prestaciones por desempleo y otras prestaciones, juntas.",op:"sum",a:"ingDesempleo",b:"ingPrestaciones",n:"Ingresos que vienen de prestaciones (desempleo y otras)"},
+  {t:"Crecimiento frente a su provincia",d:"Si el municipio gana o pierde población más que su provincia.",op:"prov",a:"varPob",n:"Crecimiento de la población frente a su provincia"}];
+const vBase=k=>{ const c=CATK[k]; return !!c&&!c.custom&&!c.reg&&!c.eu&&!c.der&&!c.nat&&F[k]!=null; };
+const vKey=d=>"u_"+d.op+"_"+d.a+(d.b?"_"+d.b:"");
+const vYear=k=>{ const m=((CATK[k]||{}).src||"").match(/\b(?:19|20)\d\d\b/g); return m?+m[m.length-1]:null; };
+// ¿el dato es una cantidad que tiene sentido dividir por su media? (los porcentajes y los cambios, no: se restan)
+function vRatio(a){ const f=(CATK[a]||{}).f; if(/^(eur|int|dens|km|years)$/.test(f)) return true; if(f!=="num1") return false; return !rowsAll().some(r=>r[F[a]]!=null&&r[F[a]]<0); }
+function vDefF(d){ const fa=vUC((CATK[d.a]||{}).f||""), fb=d.b?vUC((CATK[d.b]||{}).f||""):"";
+  if(d.op==="pct") return "pct"; if(d.op==="p100") return "num"; if(d.op==="x") return "veces";
+  if(d.op==="prov"||d.op==="es") return vRatio(d.a)?"pct":fa==="pct"?"pp":"num";
+  if(d.op==="res") return fa==="pct"&&fb==="pct"?"pp":fa===fb&&/^(eur|years)$/.test(fa)?fa:"num";
+  return fa===fb&&/^(pct|eur|years)$/.test(fa)?fa:"num"; }
+function vSanit(d){ d.op=String(d.op||""); d.a=String(d.a||""); d.b=VOPS[d.op]&&VOPS[d.op].un?"":String(d.b||""); const clean=t=>String(t||"").replace(/'/g,"’").replace(/"/g,"”").replace(/&/g," y ").replace(/[~<>`\\\u0000-\u001f]/g," ").replace(/\s+/g," ").trim();   // los nombres viajan en enlaces: nada que se pueda colar en el HTML
+  d.n=clean(d.n).slice(0,80); d.un=clean(d.un).slice(0,14); if(d.un) d.f="num"; else if(!VFORMS.some(x=>x[0]===d.f)&&vValid(d)) d.f=vDefF(d); d.f=VFORMS.some(x=>x[0]===d.f)?d.f:"num"; return d; }
+function vValid(d){ return !!d&&!!VOPS[d.op]&&vBase(d.a)&&(VOPS[d.op].un?!d.b:(vBase(d.b)&&d.b!==d.a)); }
+// una columna con el valor de cada municipio (null si no hay dato o no se puede calcular)
+function vValues(d){
+  const rows=rowsAll(), out=new Array(rows.length).fill(null), A=F[d.a], o=VOPS[d.op];
+  if(o.un){ const g=d.op==="prov"?r=>r[F.prov]:()=>"es", sw=new Map(), sx=new Map(), ratio=vRatio(d.a);
+    rows.forEach(r=>{ const v=r[A], w=r[F.pop]; if(v==null||!w) return; const k=g(r); sw.set(k,(sw.get(k)||0)+w); sx.set(k,(sx.get(k)||0)+v*w); });
+    rows.forEach((r,i)=>{ const v=r[A], k=g(r); if(v==null||!sw.get(k)) return; const m=sx.get(k)/sw.get(k), y=ratio?(m?v/m*100:null):v-m; out[i]=y!=null&&isFinite(y)?y:null; }); }
+  else { const B=F[d.b]; rows.forEach((r,i)=>{ const a=r[A], b=r[B]; if(a==null||b==null) return; const y=o.calc(a,b); out[i]=y!=null&&isFinite(y)?y:null; }); }
+  return out;
+}
+const vFmt=(f,un)=>un?v=>FMT.num(v)+NB+un:(FMT[f]||FMT.num);
+// registra la columna en las filas y el dato en el catálogo
+function vDefine(d){
+  const k=vKey(d), rows=rowsAll(), vals=vValues(d), la=vShort(d.a), lb=d.b?vShort(d.b):"", o=VOPS[d.op]; d.key=k;
+  let i=F[k]; if(i==null){ i=IDX[0].row.length; F[k]=i; } rows.forEach((r,j)=>{ r[i]=vals[j]; });
+  const A=CATK[d.a], B=d.b?CATK[d.b]:null, how=o.how(la,lb);
+  const c={k,l:d.n||o.name(la,lb),g:VGROUP,f:d.f,src:`Cálculo propio (${how}) con datos de ${[...new Set([A.src,B&&B.src].filter(Boolean))].join(" y ")}`,how,custom:1,def:d};
+  if(d.un){ c.un=d.un; c.f="un:"+k; FMT[c.f]=vFmt("num",d.un); }
+  const j=CAT.findIndex(x=>x.k===k); if(j>=0) CAT[j]=c; else CAT.push(c); CATK[k]=c; VBYK[k]=d;
+  delete COVER[k]; delete ESMEAN[k]; delete PCTL[k];
+  return c;
+}
+function vStore(){ try{ localStorage.setItem(VKEY,JSON.stringify(VARS.filter(d=>!d.tmp).map(({op,a,b,n,f,un})=>({op,a,b,n,f,un})))); return true; }catch(e){ return false; } }
+function vInit(){ if(VINIT) return; VINIT=true; let raw=[]; try{ const a=JSON.parse(localStorage.getItem(VKEY)||"[]"); if(Array.isArray(a)) raw=a.slice(0,VMAX); }catch(e){}
+  const bad=[]; raw.forEach(d=>{ if(!d||typeof d!=="object"){ return; } vSanit(d); if(vValid(d)){ if(!VBYK[vKey(d)]){ VARS.push(d); vDefine(d); } } else bad.push(d.n||"un dato sin nombre"); });
+  if(bad.length){ vStore(); toast(`${bad.length===1?"Un dato propio":"Algunos datos propios"} (${esc(bad.join(", "))}) ya no se puede calcular porque el dato en el que se basaba ha cambiado: lo hemos quitado.`,7000); } }
+function vRemove(k){ VARS=VARS.filter(d=>vKey(d)!==k); delete VBYK[k]; delete CATK[k]; const j=CAT.findIndex(x=>x.k===k); if(j>=0) CAT.splice(j,1); vStore(); }
+function vDelete(k){ if(typeof EX!=="undefined"){ EX.c=(EX.c||[]).filter(x=>x!==k); if(EX.sz===k) EX.sz=""; if(EX.col===k) EX.col=""; if(EX.o&&EX.o.replace(/^-/,"")===k) EX.o=null; } vRemove(k); }
+function vSwapUse(a,b){ if(typeof EX==="undefined") return; const sw=k=>k===a?b:k; EX.d=EX.d.map(sw); EX.c=(EX.c||[]).map(sw); EX.sz=sw(EX.sz); EX.col=sw(EX.col); if(EX.o){ const m=EX.o.match(/^(-?)(.*)$/); EX.o=m[1]+sw(m[2]); } }
+// enlaces: «dv=op~a~b~formato~unidad~nombre»; lo que no cuadra con los datos de hoy se descarta
+const vEnc=d=>[d.op,d.a,d.b||"",d.f||"",d.un||"",(d.n||"").replace(/~/g,"-")].join("~");
+function vFromUrl(s){ const [op,a,b,f,un,...nm]=String(s).split("~"), d=vSanit({op,a,b,f,un,n:nm.join(" ")});
+  if(!vValid(d)) return null; const k=vKey(d); if(VBYK[k]) return k; if(VARS.length>=2*VMAX) return null; d.tmp=true; VARS.push(d); vDefine(d); return k; }
+const vCustomIn=ks=>[...new Set(ks.filter(k=>k&&VBYK[k]))];
+// los datos propios que lleva el gráfico actual (para el enlace y para los avisos)
+function vUsed(S){ const S2=S||EX, n=EX.v&&SLOTS[EX.v]?SLOTS[EX.v].n:1; return vCustomIn([...(S2.d||[]).slice(0,Math.max(1,n)),...(S2.c||[]),S2.sz,S2.col,(S2.o||"").replace(/^-/,"")]); }
+// qué datos «lleva dentro» un dato: él mismo y los dos con que se calcula
+const vSet=k=>{ const d=VBYK[k], s=new Set([k]); if(d){ s.add(d.a); if(d.b) s.add(d.b); if(d.op==="prov") s.add("prov"); if(/^(pct|p100|x|res|sum)$/.test(d.op)&&(d.a==="pop"||d.b==="pop")) s.add("lpop"); } return s; };
+// controles que no se deben ofrecer para la pareja x, y: ya están dentro de la fórmula de alguno de los dos
+function vForbid(x,y){ const s=new Set(); [x,y].forEach(k=>{ if(VBYK[k]) vSet(k).forEach(c=>{ if(c!==k) s.add(c); }); }); s.delete(x); s.delete(y); return s; }
+// pares que comparten dato (y por eso van juntos por construcción)
+function vForbidNote(x,y){ const vf=vForbid(x,y), hid=CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y&&vf.has(k)); if(!hid.length) return "";
+  const own=[x,y].filter(k=>VBYK[k]).map(k=>`«${esc(vLow(labK(k)))}»`); return `<div class="czn2">No te ofrecemos igualar por ${listY(hid.map(k=>CKNOWN[k]))}: ${hid.length>1?"están":"está"} dentro del cálculo de ${listY(own)} y la relación saldría deformada.</div>`; }
+function vShared(ks){ const out=[]; for(let i=0;i<ks.length;i++) for(let j=i+1;j<ks.length;j++){ const a=ks[i], b=ks[j]; if(!VBYK[a]&&!VBYK[b]) continue; const sa=vSet(a), sb=vSet(b), com=[...sa].filter(k=>sb.has(k)&&k!=="prov"&&k!=="lpop");
+    if(!com.length) continue; const nm=k=>`«${esc(vLow(vShort(k)))}»`;
+    out.push(com.includes(a)||com.includes(b)?`${nm(com.includes(a)?b:a)} se calcula con ${nm(com.includes(a)?a:b)}`:`${nm(a)} y ${nm(b)} se calculan con ${listY(com.map(k=>vLow(vShort(k))).map(t=>"«"+esc(t)+"»"))}`); }
+  return out; }
+// estadísticas de un dato propio: cobertura, rango, histograma, ejemplos y lo que conviene avisar
+const VEXM=["28079","08019","46250","41091","50297","29067","48020","07040"];
+function vStats(d){
+  const vals=vValues(d), rows=rowsAll(), o=VOPS[d.op], A=F[d.a], B=d.b?F[d.b]:-1, arr=[];
+  let nA=0, nB=0, pop=0, zero=0; const popAll=d3.sum(rows,r=>r[F.pop]||0);
+  rows.forEach((r,i)=>{ const a=r[A], b=B>=0?r[B]:null; if(a!=null) nA++; if(b!=null) nB++; if(o.div&&a!=null&&b!=null&&(d.op==="pct"?a:b)===0) zero++; const v=vals[i]; if(v!=null){ arr.push({v,i}); pop+=r[F.pop]||0; } });
+  const n=arr.length; if(!n) return {n:0,nA,nB,zero,popShare:0};
+  arr.sort((p,q)=>p.v-q.v); const q=p=>d3.quantileSorted(arr.map(a=>a.v),p), who=a=>{ const r=rows[a.i]; return {v:a.v,name:dispName(r[F.name]),pop:r[F.pop]||0}; };
+  const lim=5*Math.max(Math.abs(q(.99)),Math.abs(q(.01))), oHi=o.div&&lim>0?arr.filter(a=>a.v>lim):[], oLo=o.div&&lim>0?arr.filter(a=>a.v<-lim):[];
+  const lo=q(.01), hi=q(.99), nb=24, hist=new Array(nb).fill(0), span=(hi-lo)||1; arr.forEach(a=>{ if(a.v<lo||a.v>hi) return; hist[Math.min(nb-1,Math.floor((a.v-lo)/span*nb))]++; });
+  const ex=[], tryEx=c=>{ const i=IDX.findIndex(x=>x.row[F.code]===c); if(i<0||vals[i]==null||ex.some(e=>e.i===i)) return; const r=rows[i]; ex.push({i,name:dispName(r[F.name]),v:vals[i],a:r[A],b:B>=0?r[B]:null,mine:c===lastMun}); };
+  if(myOk(lastMun)) tryEx(lastMun); VEXM.forEach(c=>{ if(ex.length<3) tryEx(c); });
+  return {n,nA,nB,zero,popShare:popAll?pop/popAll:0,min:who(arr[0]),max:who(arr[n-1]),med:q(.5),hist,lo,hi,ex,out:oHi.length+oLo.length,outTop:oHi.length?who(oHi[oHi.length-1]):oLo.length?who(oLo[0]):null,total:rows.length};
+}
+// avisos de método, en palabras llanas; no bloquean nada
+function vWarns(d,st){
+  const w=[], o=VOPS[d.op], f=vFmt(d.un?"num":d.f,d.un), la=esc(vLow(vShort(d.a))), lb=d.b?esc(vLow(vShort(d.b))):"";
+  if(d.b){ const ya=vYear(d.a), yb=vYear(d.b); if(ya&&yb&&Math.abs(ya-yb)>=2) w.push(`«${la}» es de ${ya} y «${lb}» de ${yb}. Si el municipio ha cambiado mucho en esos años, la cifra mezcla dos momentos distintos.`);
+    const ca=vUC(CATK[d.a].f), cb=vUC(CATK[d.b].f); if(/^(res|sum)$/.test(d.op)&&ca!==cb&&!(/^(num1|int)$/.test(ca)&&/^(num1|int)$/.test(cb))) w.push(`Los dos datos no están en la misma unidad: ${d.op==="res"?"restar":"sumar"} «${la}» y «${lb}» tiene poco sentido.`); }
+  if(st&&st.n){ if(st.zero) w.push(`En ${nfG.format(st.zero)} municipio${st.zero===1?"":"s"}, «${d.op==="pct"?la:lb}» vale 0 y no se puede dividir: se quedan sin cifra.`);
+    if(d.b&&st.n<0.8*Math.min(st.nA,st.nB)) w.push(`Se pierden municipios: «${la}» tiene dato en ${nfG.format(st.nA)} y «${lb}» en ${nfG.format(st.nB)}, y solo cuentan los que tienen los dos.`);
+    if(st.out) w.push(`${nfG.format(st.out)} municipio${st.out===1?"":"s"} tiene${st.out===1?"":"n"} cifras desorbitadas (por ejemplo, ${esc(st.outTop.name)}, ${nfG.format(st.outTop.pop)} habitantes, con ${f(st.outTop.v)}). Suele pasar cuando el dato por el que se divide es casi cero, sobre todo en pueblos pequeños. En el gráfico puedes dejarlos fuera con «Qué municipios».`); }
+  return w; }
+
 // ---------- selector de datos: primero el tema, luego el dato (con buscador) ----------
-const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Precios","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa"], COVER={};
+const PICK_ORDER=["Riqueza","Trabajo","Sectores","Población","Hogares","Educación","Vivienda","Precios","Ayuntamiento","Voto","Territorio","Provincias y comunidades","Europa",VGROUP], COVER={};
 const cover=k=>k in COVER?COVER[k]:(COVER[k]=rowsAll().reduce((n,r)=>n+(r[F[k]]!=null?1:0),0));
 let PICK_BTN=null;
 // datos que no son de municipios: series anuales de España (IPC, vivienda, sueldos) y comparación entre países
@@ -3855,10 +3979,11 @@ function closePicker(){ const p=document.getElementById("dpick"); if(p){ p.remov
 function pickKey(e){ if(e.key==="Escape"){ closePicker(); return; }
   if(e.key==="Tab"){ const p=document.getElementById("dpick"); if(!p) return; const f=[...p.querySelectorAll("input,button")].filter(x=>!x.disabled); if(!f.length) return;
     if(e.shiftKey&&document.activeElement===f[0]){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); } else if(!p.contains(document.activeElement)){ e.preventDefault(); f[0].focus(); } } }
-function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,all=false,here=null,jump=true}){
+function openPicker(btn,opts){
+  const {current,excl=[],onPick,extras=null,reg=false,eu=false,all=false,here=null,jump=true,mk=false,noCustom=false}=opts;
   closePicker();
   // los datos de provincias y comunidades solo en «Relación»; en la escala de Europa, solo los de Europa
-  const okC=here?(c=>here(c.k)):(c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg)&&!c.nat));
+  const okC0=here?(c=>here(c.k)):(c=>eu?!!c.eu:(!c.eu&&(reg||!c.reg)&&!c.nat)), okC=c=>okC0(c)&&!(c.custom&&noCustom);
   // con «all», el buscador enseña todos los datos, marcados por nivel; los que no sirven aquí abren la vista que les sirve
   const POOL=all?[...CAT,...natItems()].filter(c=>jump||okC(c)):CAT.filter(okC); let lv="";
   const groups=[...new Set([...PICK_ORDER,...POOL.map(c=>c.g)])].filter(g=>POOL.some(c=>c.g===g));
@@ -3868,18 +3993,28 @@ function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,a
   const avail=c=>(!excl.includes(c.k)||c.k===current)&&(!lv||LVL(c)[0]===lv||(lv==="eu"&&LVL(c)[0]==="pa"));
   const covTxt=c=>c.nat==="es"?"año a año"+(c.yrs?", "+c.yrs:""):c.nat==="pais"?"España y otros países, año a año":c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
   const VIEWN={es:"Series",pa:"Series",eu:"Relación",rg:"Relación",mu:"el mapa"};
-  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${all&&jump?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVLF.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>`;
+  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${all&&jump?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVLF.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>${mk?`<div class="dp-mk"><button type="button" id="dpmk">+ Crear un dato</button><small>Calcula uno nuevo a partir de dos que ya existen</small></div>`:""}`;
+  const openMk=()=>openMaker(btn,{back:()=>openPicker(btn,opts),onDone:k=>onPick(k)});
   const draw=()=>{
     const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k+" "+LVL(c)[1]).includes(nq);
     const vis=tabs.filter(g=>g===EXG||!lv||POOL.some(c=>c.g===g&&avail(c))); if(!vis.includes(tab)) tab=vis[0];
     document.getElementById("dpt").innerHTML=vis.map(g=>`<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${!nq&&g===tab}">${esc(g)}<small>${g===EXG?extras.length:POOL.filter(c=>c.g===g&&avail(c)).length}</small></button>`).join("");
     const ex=extras&&!nq&&tab===EXG?extras.map(([k,l])=>`<li><button type="button" data-k="${k}" class="${k===current?"on":""}"><b>${esc(l)}</b></button></li>`).join(""):"";
     const items=tab===EXG&&!nq?[]:POOL.filter(c=>avail(c)&&(nq?hit(c):c.g===tab)).sort((a,b)=>okC(b)-okC(a));
-    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>{ const [lc,ll]=LVL(c), ok=okC(c); return `<li><button type="button" data-k="${c.k}" class="${c.k===current?"on":""}${ok?"":" far"}"><b>${esc(c.l)}</b><small>${all?`<span class="lv lv-${lc}">${ll}</span>`:""}${nq?`<i>${esc(c.g)}</i> · `:""}${esc(c.src)} · ${covTxt(c)}${ok?"":` · <u>se abre en ${VIEWN[lc]==="el mapa"?"el mapa":"«"+VIEWN[lc]+"»"}</u>`}</small></button></li>`; }).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra.</li>`);
+    document.getElementById("dpl").innerHTML=ex||(items.length?items.map(c=>{ const [lc,ll]=LVL(c), ok=okC(c), mine=!!c.custom;
+      const btnH=`<button type="button" data-k="${c.k}" class="${c.k===current?"on":""}${ok?"":" far"}"><b>${esc(c.l)}</b><small>${all?`<span class="lv lv-${lc}">${ll}</span>`:""}${nq?`<i>${esc(c.g)}</i> · `:""}${mine?esc(c.how)+(VBYK[c.k]&&VBYK[c.k].tmp?" · viene de un enlace":""):esc(c.src)} · ${covTxt(c)}${ok?"":` · <u>${mine?"se pasa a la escala de municipios":`se abre en ${VIEWN[lc]==="el mapa"?"el mapa":"«"+VIEWN[lc]+"»"}`}</u>`}</small></button>`;
+      return mine?`<li class="dp-mine">${btnH}<span class="dp-act">${VBYK[c.k]&&VBYK[c.k].tmp?`<button type="button" data-sv="${c.k}" aria-label="Guardar «${esc(c.l)}» en mis datos">Guardar</button>`:""}<button type="button" data-ed="${c.k}" aria-label="Editar «${esc(c.l)}»">Editar</button><button type="button" data-rm="${c.k}" aria-label="Borrar «${esc(c.l)}»">Borrar</button></span></li>`:`<li>${btnH}</li>`; }).join(""):`<li class="dp-none">Ningún dato se llama así. Prueba con otra palabra${mk?`, o <button type="button" class="dp-lnk" id="dpmk2">crea un dato</button> a partir de otros dos`:""}.</li>`);
     p.querySelectorAll("#dpt button").forEach(b=>b.addEventListener("click",()=>{ tab=b.dataset.g; q=""; document.getElementById("dpq").value=""; draw(); document.getElementById("dpl").scrollTop=0; }));
     p.querySelectorAll("#dpl button[data-k]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.k, c=POOL.find(x=>x.k===k); closePicker(); if(all&&c&&!okC(c)) jumpTo(k); else onPick(k); }));
+    p.querySelectorAll("#dpl button[data-ed]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.ed; openMaker(btn,{edit:k,back:()=>openPicker(btn,opts),onDone:()=>{ if(document.getElementById("exbar")) exUpdate(); }}); }));
+    p.querySelectorAll("#dpl button[data-sv]").forEach(b=>b.addEventListener("click",()=>{ const d=VBYK[b.dataset.sv]; if(!d) return; if(VARS.filter(x=>!x.tmp).length>=VMAX){ toast(`Ya tienes ${VMAX} datos propios: borra alguno para guardar este.`,3500); return; } d.tmp=false; vStore(); draw(); }));
+    p.querySelectorAll("#dpl button[data-rm]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.rm;
+      if(b.dataset.c!=="1"){ b.dataset.c="1"; b.textContent="¿Seguro?"; b.classList.add("ask"); setTimeout(()=>{ if(b.isConnected){ b.dataset.c=""; b.textContent="Borrar"; b.classList.remove("ask"); } },3500); return; }
+      const nm=(CATK[k]||{}).l, used=vUsed().includes(k)||EX.d.includes(k); vDelete(k); toast(`Has borrado «${esc(nm)}».`,2800);
+      if(used&&document.getElementById("exbar")){ closePicker(); fixScale(); exUpdate(); } else draw(); }));
+    const m2=document.getElementById("dpmk2"); if(m2) m2.addEventListener("click",openMk);
   };
-  draw();
+  draw(); { const fb=document.getElementById("dpmk"); if(fb) fb.addEventListener("click",openMk); }
   p.querySelectorAll("#dplv button").forEach(b=>b.addEventListener("click",()=>{ lv=b.dataset.lv; p.querySelectorAll("#dplv button").forEach(x=>x.setAttribute("aria-pressed",x===b)); draw(); }));
   document.getElementById("dpq").addEventListener("input",e=>{ q=e.target.value; draw(); });
   p.querySelector(".dp-x").addEventListener("click",closePicker);
@@ -3889,6 +4024,94 @@ function openPicker(btn,{current,excl=[],onPick,extras=null,reg=false,eu=false,a
   setTimeout(()=>{ const i=document.getElementById("dpq"); if(i&&window.innerWidth>900) i.focus(); else { const x=p.querySelector(".dp-x"); if(x) x.focus({preventScroll:true}); } },20);
 }
 document.addEventListener("pointerdown",e=>{ const p=document.getElementById("dpick"); if(p&&!p.contains(e.target)&&!e.target.closest(".pick")) closePicker(); });
+
+// ---------- «Crear un dato»: recetas listas y modo libre, con vista previa en vivo ----------
+let MK_BTN=null;
+function closeMaker(refocus){ const p=document.getElementById("dmake"); if(p){ p.remove(); document.removeEventListener("keydown",mkKey); } const bd=document.getElementById("dmake-bd"); if(bd) bd.remove(); const b=MK_BTN; MK_BTN=null; if(refocus&&b&&document.body.contains(b)) b.focus(); }
+function mkKey(e){ if(e.key==="Escape"){ e.preventDefault(); closeMaker(true); return; }
+  if(e.key==="Tab"){ const p=document.getElementById("dmake"); if(!p) return; const f=[...p.querySelectorAll("input:not([hidden]),select,button:not([disabled]),summary")].filter(x=>x.offsetParent!==null); if(!f.length) return;
+    if(e.shiftKey&&document.activeElement===f[0]){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); } else if(!p.contains(document.activeElement)){ e.preventDefault(); f[0].focus(); } } }
+const vOptions=sel=>{ const gs=[...new Set([...PICK_ORDER,...CAT.map(c=>c.g)])]; return `<option value="">Elige un dato</option>`+gs.map(g=>{ const it=CAT.filter(c=>c.g===g&&vBase(c.k)); return it.length?`<optgroup label="${esc(g)}">${it.map(c=>`<option value="${c.k}"${c.k===sel?" selected":""}>${esc(c.l)}</option>`).join("")}</optgroup>`:""; }).join(""); };
+function openMaker(btn,o){
+  o=o||{}; closeMaker(false); closePicker(); MK_BTN=btn||null;
+  const edit=o.edit&&VBYK[o.edit]?VBYK[o.edit]:null, atMax=!edit&&VARS.filter(d=>!d.tmp).length>=VMAX;
+  const M={op:edit?edit.op:"",a:edit?edit.a:"",b:edit?edit.b:"",n:edit?edit.n:"",f:edit?(edit.un?"otra":edit.f):"",un:edit?edit.un:"",nT:!!edit&&!!edit.n,fT:!!edit};
+  const recs=VREC.filter(r=>vBase(r.a)&&(!r.b||vBase(r.b)));
+  const bd=el("div","dmake-bd"); bd.id="dmake-bd"; document.body.appendChild(bd);
+  const p=el("div","dmake"); p.id="dmake"; p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-labelledby","mk-t"); document.body.appendChild(p);
+  p.innerHTML=`<div class="mk-h"><div><h2 id="mk-t">${edit?"Cambia este dato":"Crea un dato"}</h2><p>Combina dos datos que ya tenemos para medir lo que buscas. Se guarda en este navegador.</p></div><button type="button" class="dp-x" id="mk-x" aria-label="Cerrar">×</button></div>
+  <div class="mk-b" id="mk-b">${atMax?`<p class="mk-lim">Ya tienes ${VMAX} datos propios, que es el máximo. Borra alguno desde «${VGROUP}» para poder crear otro.</p>`:`
+    ${!edit&&recs.length?`<details class="mk-rec" id="mk-rec" open><summary>Empieza por una idea</summary><div class="mk-recs">${recs.map((r,i)=>`<button type="button" data-r="${i}"><b>${esc(r.t)}</b><small>${esc(r.d)}</small></button>`).join("")}</div></details>`:""}
+    <fieldset class="mk-form"><legend>${edit?"Cómo se calcula":"O hazlo a tu manera"}</legend>
+      <label class="mk-f">Qué quieres calcular<select id="mk-op"><option value="">Elige un cálculo</option>${Object.entries(VOPS).map(([k,v])=>`<option value="${k}"${k===M.op?" selected":""}>${esc(v.t)}</option>`).join("")}</select></label>
+      <label class="mk-f" id="mk-la"><span id="mk-ra">Primer dato</span><select id="mk-a">${vOptions(M.a)}</select></label>
+      <label class="mk-f" id="mk-lb"><span id="mk-rb">Segundo dato</span><select id="mk-b2">${vOptions(M.b)}</select></label>
+      <p class="mk-say" id="mk-say"></p>
+    </fieldset>
+    <section class="mk-prev" id="mk-prev" aria-live="polite" aria-label="Vista previa"></section>
+    <div class="mk-nm"><label class="mk-f">Nombre<input type="text" id="mk-n" maxlength="80" autocomplete="off" value="${esc(M.n)}"></label>
+      <label class="mk-f mk-u">Unidad<select id="mk-f">${VFORMS.map(([k,l])=>`<option value="${k}">${l}</option>`).join("")}<option value="otra">otra…</option></select></label>
+      <label class="mk-f mk-u2" id="mk-lu" hidden>Cómo se llama<input type="text" id="mk-u" maxlength="14" autocomplete="off" placeholder="m², años, €/mes…" value="${esc(M.un)}"></label></div>
+    <div class="mk-w" id="mk-w"></div>`}</div>
+  <div class="mk-ft"><button type="button" class="mk-sec" id="mk-back">${o.back?"Volver a la lista":"Cancelar"}</button>${atMax?"":`<button type="button" class="mk-ok" id="mk-ok" disabled>${edit?"Guardar cambios":"Crear y usar"}</button>`}</div>`;
+  const $=id=>document.getElementById(id), close=()=>closeMaker(!o.back);
+  $("mk-x").addEventListener("click",()=>closeMaker(true)); $("mk-back").addEventListener("click",()=>{ closeMaker(false); if(o.back) o.back(); else if(btn&&document.body.contains(btn)) btn.focus(); });
+  document.addEventListener("keydown",mkKey);
+  const first=$("mk-rec")?$("mk-rec").querySelector("summary"):$("mk-op")||$("mk-back"); setTimeout(()=>{ try{ (window.innerWidth>900?first:$("mk-x")).focus({preventScroll:true}); }catch(e){} },20);
+  if(atMax) return;
+  const cur=()=>{ const d={op:M.op,a:M.a,b:VOPS[M.op]&&VOPS[M.op].un?"":M.b,n:M.n,f:M.f==="otra"?"num":M.f,un:M.f==="otra"?M.un:""}; return vValid(d)?vSanit(d):null; };
+  const fmtOf=d=>vFmt(d.f,d.un);
+  const render=()=>{ const op=VOPS[M.op], d=cur();
+    $("mk-lb").hidden=!op||!!op.un; $("mk-la").hidden=!op; if(op){ $("mk-ra").textContent=op.r[0]; if(op.r[1]) $("mk-rb").textContent=op.r[1]; }
+    const la=M.a?vShort(M.a):"", lb=M.b?vShort(M.b):""; $("mk-say").textContent=op&&M.a&&(op.un||M.b)&&(op.un||M.a!==M.b)?op.say(vLow(la),vLow(lb)):(op&&!op.un&&M.a&&M.a===M.b?"Elige dos datos distintos.":"");
+    if(d){ if(!M.fT) M.f=vDefF(d); const auto=op.name(la,lb); if(!M.nT){ M.n=(auto.length>80?auto.slice(0,79)+"…":auto); $("mk-n").value=M.n; } }
+    $("mk-f").value=M.f||"num"; $("mk-lu").hidden=M.f!=="otra";
+    const d2=cur(), ok=$("mk-ok"), pv=$("mk-prev"), wb=$("mk-w");
+    if(!d2){ pv.innerHTML=`<p class="mk-empty">Cuando elijas el cálculo y los datos, aquí verás en cuántos municipios saldrá cifra, entre qué valores se mueve y algunos ejemplos.</p>`; wb.innerHTML=""; ok.disabled=true; ok.textContent=edit?"Guardar cambios":"Crear y usar"; return; }
+    const st=vStats(d2), f=fmtOf(d2), dup=VBYK[vKey(d2)], same=dup&&(!edit||vKey(edit)!==vKey(d2));
+    if(!st.n){ pv.innerHTML=`<p class="mk-empty">Ningún municipio tiene cifra para los dos datos a la vez, así que no se puede crear.</p>`; wb.innerHTML=""; ok.disabled=true; return; }
+    const hm=Math.sqrt(Math.max(...st.hist,1)), bw=240/st.hist.length;
+    pv.innerHTML=`<p class="mk-cov"><b>${nfG.format(st.n)}</b> municipios tendrán cifra, donde vive el <b>${nf0.format(st.popShare*100)}${NB}%</b> de la población.</p>
+      <dl class="mk-rg"><div><dt>Mínimo</dt><dd>${esc(f(st.min.v))}</dd><small>${esc(st.min.name)}</small></div><div><dt>Mediana</dt><dd>${esc(f(st.med))}</dd><small>la mitad, por debajo</small></div><div><dt>Máximo</dt><dd>${esc(f(st.max.v))}</dd><small>${esc(st.max.name)}</small></div></dl>
+      <svg class="mk-h2" viewBox="0 0 240 44" preserveAspectRatio="none" role="img" aria-label="Cómo se reparten los valores entre municipios, sin contar el 1 % más alto y el 1 % más bajo">${st.hist.map((c,i)=>`<rect x="${(i*bw+.6).toFixed(1)}" y="${(44-Math.sqrt(c)/hm*42).toFixed(1)}" width="${(bw-1.2).toFixed(1)}" height="${(Math.sqrt(c)/hm*42).toFixed(1)}"/>`).join("")}</svg>
+      <p class="mk-hs"><span>${esc(f(st.lo))}</span><span>cómo se reparten los municipios</span><span>${esc(f(st.hi))}</span></p>
+      ${st.ex.length?`<ul class="mk-ex">${st.ex.map(e=>`<li><span>${e.mine?"📍 ":""}<b>${esc(e.name)}</b></span><span class="mk-v">${esc(f(e.v))}</span><small>${esc(vLow(vShort(d2.a)))} ${esc(fmtK(d2.a)(e.a))}${d2.b?` · ${esc(vLow(vShort(d2.b)))} ${esc(fmtK(d2.b)(e.b))}`:""}</small></li>`).join("")}</ul>`:""}
+      ${d2.b?`<p class="mk-cs">«${esc(vLow(vShort(d2.a)))}» tiene dato en ${nfG.format(st.nA)} municipios y «${esc(vLow(vShort(d2.b)))}» en ${nfG.format(st.nB)}. Solo salen cifras donde existen los dos.</p>`:""}`;
+    const W=vWarns(d2,st); if(d2.b) W.push(`Si luego lo comparas con «${esc(vLow(vShort(d2.a)))}» o con «${esc(vLow(vShort(d2.b)))}», irán juntos casi por fuerza, porque los dos están dentro de este dato. Te lo avisaremos en el gráfico.`);
+    if(same) W.unshift(`Ya tienes este cálculo, con el nombre «${esc(dup.n||CATK[vKey(dup)].l)}». Si lo creas, se usa ese.`);
+    wb.innerHTML=W.map(t=>`<p>${t}</p>`).join(""); ok.disabled=false; ok.textContent=same?"Usar el que ya tienes":edit?"Guardar cambios":"Crear y usar"; };
+  $("mk-op").addEventListener("change",e=>{ M.op=e.target.value; if(VOPS[M.op]&&VOPS[M.op].un) M.b=""; if(!M.fT) M.f=""; render(); });
+  $("mk-a").addEventListener("change",e=>{ M.a=e.target.value; if(!M.fT) M.f=""; render(); });
+  $("mk-b2").addEventListener("change",e=>{ M.b=e.target.value; if(!M.fT) M.f=""; render(); });
+  $("mk-n").addEventListener("input",e=>{ M.n=e.target.value; M.nT=true; });
+  $("mk-f").addEventListener("change",e=>{ M.f=e.target.value; M.fT=true; M.un=M.f==="otra"?M.un:""; render(); if(M.f==="otra") $("mk-u").focus(); });
+  $("mk-u").addEventListener("input",e=>{ M.un=e.target.value; M.fT=true; render(); });
+  p.querySelectorAll("[data-r]").forEach(b=>b.addEventListener("click",()=>{ const r=recs[+b.dataset.r]; Object.assign(M,{op:r.op,a:r.a,b:r.b||"",n:r.n,nT:true,f:r.un?"otra":"",un:r.un||"",fT:!!r.un}); $("mk-op").value=M.op; $("mk-a").value=M.a; $("mk-b2").value=M.b; $("mk-n").value=M.n; $("mk-rec").open=false; render(); p.querySelector(".mk-form").scrollIntoView({block:"start",behavior:"smooth"}); }));
+  $("mk-ok").addEventListener("click",()=>{ const d=cur(); if(!d) return; d.n=(M.n||"").trim()||VOPS[d.op].name(vShort(d.a),d.b?vShort(d.b):""); const k=vKey(d); let msg;
+    if(edit){ const old=vKey(edit);
+      if(k===old){ Object.assign(edit,{n:d.n,f:d.f,un:d.un,tmp:false}); vDefine(edit); vStore(); }
+      else { if(!VBYK[k]){ d.tmp=false; VARS.push(d); vDefine(d); } vSwapUse(old,k); vRemove(old); }
+      msg=`Cambios guardados en «${esc(CATK[k].l)}».`; }
+    else if(VBYK[k]) msg=`Ya lo tenías: «${esc(CATK[k].l)}».`;
+    else { VARS.push(d); vDefine(d); msg=vStore()?`Listo: «${esc(CATK[k].l)}». Lo tienes en «${VGROUP}».`:"Creado, pero no se ha podido guardar en este navegador: dura hasta que cierres la página."; }
+    closeMaker(false); toast(msg,3800); if(o.onDone) o.onDone(k,edit?"edit":"new"); });
+  render();
+}
+
+// ---------- avisos bajo el título del gráfico: qué datos son propios, de dónde vienen y qué cuidado pedirles ----------
+const VST={};
+function vNote(){
+  const box=document.getElementById("vnote"); if(!box) return; box.innerHTML="";
+  if(!["mapa","tabla","cruce","grupos","distribucion","matriz"].includes(EX.v)) return;
+  const ks=vUsed(); if(ks.length) exSetHash();   // la barra de direcciones también lleva la definición, para poder copiarla
+  const nn=EX.v==="cruce"||(EX.v==="mapa"&&EX.bv)?2:EX.v==="matriz"?EX.d.length:0;
+  const sh=nn?vShared(EX.d.slice(0,nn)):[]; if(!ks.length&&!sh.length) return;
+  let h=""; ks.forEach(k=>{ const d=VBYK[k], c=CATK[k]; const st=VST[k]||(VST[k]=vStats(d)), W=vWarns(d,st);
+    h+=`<div class="vn"><p><b>«${esc(c.l)}»</b> lo has calculado tú (${esc(c.how)}) y tiene cifra en ${nfG.format(st.n)} municipios.${d.tmp?` <button type="button" class="vn-b" data-vs="${k}">Guardar en mis datos</button>`:""}</p>${W.map(t=>`<p class="vw">${t}</p>`).join("")}</div>`; });
+  if(sh.length) h+=`<div class="vn"><p class="vw">${sh.map(t=>cap(t)).join(". ")}, así que es normal que vayan juntos. Esa relación sale de la fórmula, no de lo que pasa en los municipios.</p></div>`;
+  box.innerHTML=`<div class="vnote" role="note">${h}</div>`;
+  box.querySelectorAll("[data-vs]").forEach(b=>b.addEventListener("click",()=>{ const d=VBYK[b.dataset.vs]; if(!d) return; if(VARS.filter(x=>!x.tmp).length>=VMAX){ toast(`Ya tienes ${VMAX} datos propios: borra alguno para guardar este.`,3500); return; } d.tmp=false; toast(vStore()?"Guardado en «Mis datos».":"No se ha podido guardar en este navegador.",2500); vNote(); }));
+}
 function exBar(){
   const bar=document.getElementById("exbar"); if(!bar) return;
   if(EX.v==="antes"){ adBar(bar); return; }
@@ -3924,8 +4147,8 @@ function exBar(){
   { const bz=bar.querySelector("button[data-bsz]"); if(bz) bz.addEventListener("click",async()=>{ await loadAllCat(); openPicker(bz,{current:EX.sz||null,extras:[["","Habitantes"]],all:true,jump:false,here:k=>BSER.some(x=>x[0]===k)||(isReg(k)&&CATK[k].np>=40),onPick:v=>{ EX.sz=v; exUpdate(); }}); });
     const xb=bar.querySelector("button[data-xbsz]"); if(xb) xb.addEventListener("click",()=>{ EX.sz=""; exUpdate(); }); }
   const regOK=EX.v==="cruce"||isMapAgg, euOK=EX.v==="cruce"&&EX.u==="eu";
-  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); await loadAllCat(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,all:true,...(isB?{here:k=>BSER.some(x=>x[0]===k)||(isReg(k)&&CATK[k].np>=40),jump:false}:isMapAgg?{here:k=>!!CATK[k]&&!isEU(k)&&(!isReg(k)||scaleOK(EX.u,[k])),jump:false}:EX.v==="matriz"?{here:k=>!!CATK[k]&&!isReg(k)&&!isEU(k),jump:false}:{}),onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
-  bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{current:null,excl:EX.d,all:true,...(EX.v==="matriz"?{here:k=>!!CATK[k]&&!isReg(k)&&!isEU(k),jump:false}:{}),onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,Math.max(6,(SLOTS[EX.v]||{}).n||6)); exUpdate(); }}); }));
+  bar.querySelectorAll("button.pick[data-i]").forEach(b=>b.addEventListener("click",async()=>{ const i=+b.dataset.i; if(regOK) await loadRegional(); await loadAllCat(); openPicker(b,{current:EX.d[i],excl:EX.d,reg:regOK,eu:euOK,all:true,mk:!EX.u&&!isB,noCustom:!!EX.u||isB,...(isB?{here:k=>BSER.some(x=>x[0]===k)||(isReg(k)&&CATK[k].np>=40),jump:false}:isMapAgg?{here:k=>!!CATK[k]&&!isEU(k)&&(!isReg(k)||scaleOK(EX.u,[k])),jump:false}:EX.v==="matriz"?{here:k=>!!CATK[k]&&!isReg(k)&&!isEU(k),jump:false}:{}),onPick:v=>{ const j=EX.d.indexOf(v); if(j>=0&&j!==i) EX.d[j]=EX.d[i]; EX.d[i]=v; if(isReg(v)&&!scaleOK(EX.u)) toast("Ese dato solo existe por provincia o comunidad: la relación pasa a compararlas.",3200); fixScale(); exUpdate(); }}); }));
+  bar.querySelectorAll("button.pick[data-add]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{current:null,excl:EX.d,all:true,mk:!EX.u,noCustom:!!EX.u,...(EX.v==="matriz"?{here:k=>!!CATK[k]&&!isReg(k)&&!isEU(k),jump:false}:{}),onPick:v=>{ EX.d=EX.d.filter(k=>k!==v); const n=Math.min(EX.d.length,(SLOTS[EX.v]||{n:6}).n); EX.d.splice(n,0,v); EX.d=EX.d.slice(0,Math.max(6,(SLOTS[EX.v]||{}).n||6)); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-x]").forEach(b=>b.addEventListener("click",()=>{ if(EX.d.length<=1) return; EX.d.splice(+b.dataset.x,1); exUpdate(); }));
   bar.querySelectorAll("button[data-q]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.q; if(EX.v==="cruce"||EX.v==="tabla"||EX.v==="grupos"){ const S=SLOTS[EX.v]; if(EX.d.length<S.n&&EX.v!=="cruce") EX.d.push(k); else { const pos=EX.v==="cruce"?1:Math.min(EX.d.length,S.n)-1; EX.d=EX.d.filter(x=>x!==k); EX.d.splice(pos,1,k); } } else { EX.d=[k,...EX.d.filter(x=>x!==k)]; } EX.d=EX.d.slice(0,6); exUpdate(); }));
   const pv=document.getElementById("exprov"); if(pv) pv.addEventListener("change",e=>{ EX.p=e.target.value; exUpdate(); });
@@ -4001,6 +4224,7 @@ function exDraw(){
   if(BUB_T){ BUB_T.stop(); BUB_T=null; }
   const out=document.getElementById("exout"); if(!out) return; out.innerHTML="";
   { const h0=exHash(); fixScale(); if(exHash()!==h0){ exSetHash(); exBar(); } }
+  try{ vNote(); }catch(e){ console.error(e); }
   ["lbtest","lbcausal","lbmore"].forEach(i=>{ const e=document.getElementById(i); if(e) e.innerHTML=""; });
   const t=document.getElementById("lbtitle"); if(t) t.textContent=lbTitle();
   const sb=document.getElementById("lbsub"); if(sb) sb.textContent=EX.v==="antes"?`${ADY[AD.y].l} · afectados frente a gemelos`:EX.v==="paises"?"Año a año"+(PS.gob?" · con quién gobernaba en España":""):EX.v==="evolucion"?"Series en el tiempo":(EX.v==="cruce"&&EX.d.length>1?labK(EX.d[0])+" ↔ "+low(labK(EX.d[1]))+" · ":"")+lbWhere()+([EX.m,MUN2].filter(c=>c&&BYCODE.has(c)).length?" · Destacado"+(myOk(MUN2)?"s":"")+": "+[EX.m,MUN2].filter(c=>c&&BYCODE.has(c)).map(c=>dispName(BYCODE.get(c)[F.name])).join(" y "):"");
@@ -4261,8 +4485,8 @@ function czSusNote(k){
 function czTip(id){ const [k,t]=id.split("|"), rk=t==="risk"?ctrlRisk(CZ.x,CZ.y,k):null; return t==="risk"?(rk?`<b>Cuidado con igualar ${CNAME[k]}.</b> ${rk.m}`:""):czSusNote(k); }
 // avisos bajo los controles: salen solos al marcar la casilla o al pulsar la «i»
 function czNotes(){
-  const box=document.getElementById("cznotes"), tg=document.getElementById("cztags"); if(!box||!tg||!CZ) return; const {x,y}=CZ, cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]);
-  const ks=[...CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y),...cs.filter(k=>!CKNOWN[k])]; let h="";
+  const box=document.getElementById("cznotes"), tg=document.getElementById("cztags"); if(!box||!tg||!CZ) return; const {x,y}=CZ, vf=vForbid(x,y), cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]&&!vf.has(c));
+  const ks=[...CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y&&!vf.has(k)),...cs.filter(k=>!CKNOWN[k])]; let h=vForbidNote(x,y);
   ks.forEach(k=>{ const on=cs.includes(k), rk=ctrlRisk(x,y,k);
     if(rk&&(on||CZI.has(k+"|risk"))) h+=`<div class="czn2 risk"><b>Cuidado con igualar ${CNAME[k]}.</b> ${rk.m}</div>`;
     if(k===CZ.suspect&&(on||CZI.has(k+"|sus"))) h+=`<div class="czn2 sus">${czSusNote(k)}</div>`; });
@@ -4270,7 +4494,7 @@ function czNotes(){
   tg.querySelectorAll(".czi").forEach(b=>{ const k=b.dataset.i.split("|")[0]; b.setAttribute("aria-expanded",String(cs.includes(k)||CZI.has(b.dataset.i))); });
 }
 function czRefresh(animate){
-  if(!CZ) return; const {x,y,w,base}=CZ, cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]);
+  if(!CZ) return; const {x,y,w,base}=CZ, vf=vForbid(x,y), cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]&&!vf.has(c));
   const tg=document.getElementById("cztags"); if(!tg) return;
   const a0=Math.abs(base.r), sgn=Math.sign(base.r), solo=CZ.solo||{}, foc=document.activeElement&&tg.contains(document.activeElement)?document.activeElement.dataset.k:null;
   // cuánto cambia la relación si se descuenta solo esa variable
@@ -4279,7 +4503,7 @@ function czRefresh(animate){
   const chip=(k,lab,on)=>{ const rk=ctrlRisk(x,y,k), sus=k===CZ.suspect, t=wt(k);
     const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Qué significa «${txt}» en ${esc(lab)}">${IQ_SVG}</button>`;
     return `<span class="czchip${on?" on":""}${sus?" sus":""}${rk?" risk":""}"><button type="button" class="czpick" data-k="${k}" aria-pressed="${on}"${t?` title="${esc(`Si igualas solo esto, la relación cambia un ${t.replace(/^[+−]/,"").replace(NB," ")}${t[0]==="+"?" más":" menos"} (r pasa de ${rFmt(base.r)} a ${rFmt(solo[k])})`)}"`:""}>${esc(cap(lab))}</button>${rk?`<button type="button" class="czwarn2 czi" data-i="${k}|risk" aria-expanded="false" aria-label="Cuidado con igualar ${esc(lab)}">!</button>`:""}${sus?tag("su","la que más pesa","sus"):""}</span>`; };
-  const allK=CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y), lossOf=k=>{ const p=solo[k]; return p==null?0:a0-(Math.sign(p)===sgn?Math.abs(p):0); },
+  const allK=CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y&&!vf.has(k)), lossOf=k=>{ const p=solo[k]; return p==null?0:a0-(Math.sign(p)===sgn?Math.abs(p):0); },
     ranked=[...allK].sort((a,b)=>(b===CZ.suspect)-(a===CZ.suspect)||lossOf(b)-lossOf(a)), topK=new Set(ranked.slice(0,3)),
     shown=ranked.filter(k=>CZMORE||cs.includes(k)||topK.has(k)), nHid=allK.length-shown.length;
   tg.innerHTML=shown.map(k=>chip(k,CSHORT[k],cs.includes(k))).join("")
@@ -4287,7 +4511,7 @@ function czRefresh(animate){
     +(nHid>0||CZMORE?` <button type="button" class="czadd czmorebtn" id="czmorebtn" aria-expanded="${CZMORE}">${CZMORE?"Ver menos ▴":`Ver ${nHid} más ▾`}</button>`:"")
     +` <button type="button" class="czadd" id="czadd">+ otra variable</button>`;
   const mb=document.getElementById("czmorebtn"); if(mb) mb.addEventListener("click",()=>{ CZMORE=!CZMORE; czRefresh(false); });
-  document.getElementById("czadd").addEventListener("click",e=>openPicker(e.currentTarget,{current:null,excl:[x,y,...EX.c],onPick:v=>{ EX.c=[...EX.c.filter(c=>c!==v),v]; exSetHash(); czRefresh(true); }}));
+  document.getElementById("czadd").addEventListener("click",e=>openPicker(e.currentTarget,{current:null,excl:[x,y,...EX.c,...vForbid(x,y)],onPick:v=>{ EX.c=[...EX.c.filter(c=>c!==v),v]; exSetHash(); czRefresh(true); }}));
   tg.querySelectorAll("button.czpick").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.k, on=b.getAttribute("aria-pressed")==="true"; EX.c=on?EX.c.filter(c=>c!==k):[...EX.c.filter(c=>c!==k),k]; exSetHash(); czRefresh(true); }));
   tg.querySelectorAll("button.czi").forEach(b=>{ const show=()=>tipShow(b,czTip(b.dataset.i));
     b.addEventListener("mouseenter",show); b.addEventListener("focus",show); b.addEventListener("mouseleave",tipHide); b.addEventListener("blur",tipHide);
@@ -4338,7 +4562,7 @@ function czEuros(x,y,cs,w){
   rows.forEach(([lab,o,c],i)=>{ const y0=i*P, cy=y0+(e1?28:16), a=o.ci?X(o.ci[0]):X(o.b), b=o.ci?X(o.ci[1]):X(o.b);
     s+=(e1?`<text class="cze-l ${c}" x="${m}" y="${y0+12}">${lab}</text>`:"")+`<rect class="cze-b ${c}" x="${a}" y="${cy-5}" width="${Math.max(2,b-a)}" height="10" rx="5"/><circle class="cze-d ${c}" cx="${X(o.b)}" cy="${cy}" r="7"/>`; });
   s+=`</svg>`;
-  const un=f==="eur"?"euros":f==="years"?"años":f==="int"?"habitantes":"puntos";
+  const un=(CATK[y]||{}).un||(f==="eur"?"euros":f==="years"?"años":f==="int"?"habitantes":f==="veces"?"veces":f==="num"?"unidades":"puntos");
   const nd=e1?e0.n-e1.n:0, nTxt=nd>0?` Faltan datos de ${nf0.format(nd)} municipio${nd===1?"":"s"} en lo que descuentas.`:"";
   const op=box.querySelector("details")?.open;
   const ok=sig(e), vd=document.getElementById("czevd");
@@ -4583,7 +4807,7 @@ function gapChart(parent,G,lab){
 
 // ---------- gemelos: parejas casi iguales que solo se diferencian en x ----------
 function twins(x,y,w,sign){
-  const cs=["lpop","edad","renta"].filter(c=>c!==x&&c!==y);
+  const vf=vForbid(x,y), cs=["lpop","edad","renta"].filter(c=>c!==x&&c!==y&&!vf.has(c)); if(!cs.length) return null;
   const rs=rowsAll().filter(r=>exOK(r)&&(r[F.pop]||0)>=1000&&r[F[x]]!=null&&r[F[y]]!=null&&cs.every(c=>c==="lpop"||r[F[c]]!=null));
   if(rs.length<40) return null;
   const val=(r,c)=>c==="lpop"?Math.log10(r[F.pop]):r[F[c]];
@@ -4622,17 +4846,17 @@ function exCausal(x,y){
   const holds=p=>p&&Math.abs(p.r)>=a0*0.5&&Math.sign(p.r)===sign;
   const how=p=>{ const a=Math.abs(p.r); if(Math.sign(p.r)!==sign&&a>=0.1) return "cambia de sentido"; if(a<0.1) return "casi desaparece"; if(a<a0*0.5) return "se debilita mucho"; if(a<a0*0.85) return "se debilita algo, pero sigue ahí"; if(a>a0*1.15) return "incluso se refuerza"; return "sigue igual"; };
   // principal sospechoso
-  const cand=["lpop","edad","renta","superiores","distCosta","distCiudad","prov"].filter(c=>c!==x&&c!==y).map(c=>({c,p:partialR(x,y,[c],w)})).filter(o=>o.p).map(o=>({...o,drop:a0-Math.abs(o.p.r)*(Math.sign(o.p.r)===sign?1:-1)})).sort((a,b)=>b.drop-a.drop);
+  const vf=vForbid(x,y), cand=["lpop","edad","renta","superiores","distCosta","distCiudad","prov"].filter(c=>c!==x&&c!==y&&!vf.has(c)).map(c=>({c,p:partialR(x,y,[c],w)})).filter(o=>o.p).map(o=>({...o,drop:a0-Math.abs(o.p.r)*(Math.sign(o.p.r)===sign?1:-1)})).sort((a,b)=>b.drop-a.drop);
   const top=cand[0];
   CZ={x,y,w,base,suspect:top&&top.drop>=a0*0.15?top.c:null,solo:Object.fromEntries(cand.map(o=>[o.c,o.p.r])),lev:null};
   if(a0<0.1){ box.innerHTML=`<div class="cz"><h3>A fondo</h3><p class="intro">Aquí no hay mucho que comprobar: entre ${xl} y ${yl} la relación es casi nula (r = ${rFmt(base.r)}). Saber uno no ayuda a adivinar el otro.</p><p style="margin-top:10px;font-size:14px"><a href="/laboratorio/metodo/">Cómo se buscan causas con datos públicos →</a></p></div>`; return; }
-  const others=["lpop","edad","renta"].filter(c=>c!==x&&c!==y), pc=partialR(x,y,others,w), pp=EX.p?null:partialR(x,y,["prov"],w);
+  const others=["lpop","edad","renta"].filter(c=>c!==x&&c!==y&&!vf.has(c)), pc=others.length?partialR(x,y,others,w):null, pp=EX.p||vf.has("prov")?null:partialR(x,y,["prov"],w);
   const cx=CHG[x], cy=CHG[y], cc=cx&&cy&&cx!==cy?wcorr(pairPts(cx,cy,{weighted:w})):null;
-  const TW=twins(x,y,w,sign), BP=byProvince(x,y,w,sign), ST=steps(x,y,w);
+  const TW=twins(x,y,w,sign), BP=vf.has("prov")?null:byProvince(x,y,w,sign), ST=steps(x,y,w);
   const T=[];
   T.push({k:"par",ok:holds(pc),na:!pc,t:"Entre municipios parecidos",d:pc?`Comparando municipios de ${others.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")} parecidos, la relación ${how(pc)} (de ${rFmt(base.r)} a ${rFmt(pc.r)}).`:"No hay datos suficientes.",why:"Si dos cosas solo van juntas porque las dos dependen de una tercera, al comparar entre iguales la relación se esfuma."});
   const bpOk=BP?BP.filter(b=>b.ok).length:0;
-  T.push({k:"prov",ok:holds(pp)&&(!BP||bpOk/BP.length>=0.5),na:!pp,t:"Dentro de cada provincia",d:EX.p?"No aplica: estás mirando una sola provincia.":(BP?`Se cumple en <b>${bpOk} de ${BP.length}</b> provincias. `:"")+(pp?`Comparando solo dentro de la misma provincia, la relación ${how(pp)} (${rFmt(pp.r)}).`:""),why:"Así se quita lo que es común a cada zona: el clima, las leyes autonómicas, la historia o la economía de la región.",extra:BP?`<div class="czmini" id="czprov"></div>`:""});
+  T.push({k:"prov",ok:holds(pp)&&(!BP||bpOk/BP.length>=0.5),na:!pp,t:"Dentro de cada provincia",d:EX.p?"No aplica: estás mirando una sola provincia.":vf.has("prov")?"No se puede hacer: uno de los datos ya está medido frente a la media de su provincia.":(BP?`Se cumple en <b>${bpOk} de ${BP.length}</b> provincias. `:"")+(pp?`Comparando solo dentro de la misma provincia, la relación ${how(pp)} (${rFmt(pp.r)}).`:""),why:"Así se quita lo que es común a cada zona: el clima, las leyes autonómicas, la historia o la economía de la región.",extra:BP?`<div class="czmini" id="czprov"></div>`:""});
   if(cc) T.push({k:"chg",ok:Math.sign(cc.r)===sign&&Math.abs(cc.r)>=0.1,t:"También en los cambios",d:`Comparando cambios en vez de niveles (${low(labK(cx))} frente a ${low(labK(cy))}), la relación ${Math.sign(cc.r)===sign&&Math.abs(cc.r)>=0.1?"se mantiene":"desaparece"} (r = ${rFmt(cc.r)}).`,why:"Comparar cambios en vez de niveles quita todo lo que es fijo en cada lugar."});
   else T.push({k:"chg",na:true,t:"También en los cambios",d:"No tenemos series de cambio para estos dos datos, así que esta prueba no se puede hacer.",why:"Comparar cambios en vez de niveles quita todo lo que es fijo en cada lugar."});
   if(TW&&TW.pairs.length>=15) T.push({k:"tw",ok:TW.share>=0.6,t:"Municipios gemelos",d:`En <b>${nf0.format(TW.share*10)} de cada 10</b> parejas de gemelos (${nf0.format(TW.pairs.length)} parejas), el que tiene más ${xl} tiene ${sign>0?"más":"menos"} ${yl}.`,why:"Es la comparación más limpia: dos pueblos de la misma provincia casi iguales en todo menos en una cosa."});
