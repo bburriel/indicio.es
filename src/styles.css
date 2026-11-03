@@ -1879,8 +1879,8 @@ details.chk > section{margin-top:18px}
 .cp-bar .t .f{position:absolute; top:0; height:16px; background:var(--rust)}
 .cp-bar.b .t .f{background:var(--s-b)} .cp-bar.e .t .f{background:var(--rule-2)}
 .cp-bar .t .z{position:absolute; top:-3px; height:22px; width:1px; background:var(--muted)}
-.cp-bar .t em{position:absolute; top:50%; transform:translateY(-50%); margin-left:8px; font-style:normal; font-size:14.5px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap}
-.cp-bar.e .n,.cp-bar.e .t em{color:var(--muted); font-weight:400}
+.cp-bar .t em{position:absolute; top:50%; transform:translateY(-50%); margin-left:8px; font-style:normal; font-size:14.5px; font-weight:400; font-variant-numeric:tabular-nums; white-space:nowrap}
+.cp-bar .n,.cp-bar .t em{color:var(--muted); font-weight:400}
 @media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-bar{grid-template-columns:74px minmax(0,1fr)} .cp-bar .n{font-size:13.5px} .cp-bar .t em{font-size:14px} }
 .cp-all{margin-top:28px; border:1px solid var(--rule-2); border-radius:10px; padding:0 18px}
 .cp-all summary{cursor:pointer; padding:15px 0; font-size:15px; list-style:none; display:flex; justify-content:space-between; gap:12px}
