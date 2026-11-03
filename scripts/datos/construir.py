@@ -8,7 +8,7 @@ ORIGINALES = {"code", "name", "prov", "pop"}  # además de los 44 indicadores qu
 # claves añadidas que, aun viniendo de otra fuente, van en index.json porque las enseñan la ficha y la comparación,
 # que no cargan extra.json (son 8.139 valores más en el índice que carga toda la web: añade solo lo que se vea fuera del laboratorio)
 AL_INDICE = ["paroCensal"]
-FORMATOS = {"int", "pct", "pct_chg", "pts", "eur", "years", "num1", "km", "dens"}
+FORMATOS = {"int", "pct", "pct_chg", "pts", "eur", "eurm2", "years", "num1", "km", "dens"}
 ix = json.load(open(os.path.join(DATA, "index.json"), encoding="utf-8")); cat = json.load(open(os.path.join(DATA, "indicadores.json"), encoding="utf-8"))
 # los indicadores añadidos viven en data/extra.json (columnas alineadas fila a fila con index.json) para no engordar el índice que carga toda la web;
 # aquí se vuelve a unir todo en una tabla y al final se separa de nuevo
@@ -48,7 +48,7 @@ TEMAS = {
  "Población": "varPob var0525 pobVar20 edad menores18 mayores65 extr migExt migInt arraigo llegados inmigReciente",
  "Hogares": "hogarMedio solos casados divorciados solteros3554",
  "Educación": "superiores estudiantes estudiosBasicos superiores2539 brechaSuperiores",
- "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio compHab compNueva compProtegida compVar valorTasado valorTasadoVar",
+ "Vivienda": "alquiler noPrincipal vt alqVar alqVar20 vtCambio compHab compNueva compProtegida compVar valorTasado valorTasadoVar alqEurM2 alqEurMes alqInmuebles alqEurM2Var esfuerzoAlq",
  "Ayuntamiento": "deudaHab",
  "Voto": "pp psoe vox sumar part part24 salf24",
  "Territorio": "pop densidad superficie distCiudad distCosta",

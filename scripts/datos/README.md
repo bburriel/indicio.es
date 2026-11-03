@@ -13,6 +13,7 @@ Cada fuente tiene su script, que descarga de la web oficial y escribe `cache/out
 | INE · Atlas de distribución de renta de los hogares (por municipio, 2024) | `ine_atlas.py` | las lee en streaming desde INEbase (una tabla por provincia) | mediana de la renta, P80/P20, fuentes de ingreso (salarios, desempleo, otras prestaciones) y tamaño del hogar |
 | SEPE · Paro registrado y contratos por municipios | `sepe.py` | Excel único `ESTADISTICA_MUNICIPIOS.xls` (lo descarga el propio script) | composición del paro (mujeres, jóvenes, mayores de 45, sin empleo anterior) y contratos temporales |
 | Wikidata · superficie de los términos municipales | `wikidata_territorio.py` | consulta SPARQL (límite de una por minuto) | superficie (la altitud se descartó: mezcla criterios) |
+| Ministerio de Vivienda · SERPAVI (alquiler declarado en el IRPF, por municipio, 2011–2024) | `serpavi.py` | Excel único `2026-03_09_bd_SERPAVI_2011-2024 - DEFINITIVO WEB_v2.xlsx` (71 MB) de la página del SERPAVI del Ministerio, guardado a mano como `cache/serpavi/serpavi_2011-2024.xlsx` (el script lo lee en streaming) | alquiler mensual por m² y por vivienda mediana, número de inmuebles, subida desde 2015 y esfuerzo de alquiler (alquiler anual entre renta del hogar) |
 
 Orden: descargar → script de la fuente → `python3 construir.py` → `npm run build`.
 
