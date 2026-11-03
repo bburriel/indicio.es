@@ -231,7 +231,7 @@ const rewind=f=>{ const g=f.geometry; if(g&&d3.geoArea(f)>2*Math.PI){ if(g.type=
 function prepGeo(){ FEATS=topojson.feature(TOPO,TOPO.objects.municipalities).features.map(rewind); }
 
 // ---------- piezas de página ----------
-const LABNAV=cur=>cur==="datos"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Los datos</nav>`:cur==="metodo"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Guía: de la relación a la causa</nav>`:"";
+const LABNAV=cur=>cur==="datos"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Qué significa cada dato</nav>`:cur==="metodo"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Guía: de la relación a la causa</nav>`:"";
 function pageHead(title,dek,extra,after){ return `<header class="phead">${extra||""}<h1>${title}</h1>${dek?`<p class="dek">${dek}</p>`:""}${after||""}</header>`; }
 const TOPICL=id=>({riqueza:"Riqueza",vivienda:"Vivienda",poblacion:"Población",trabajo:"Trabajo",gasto:"Dinero público",voto:"Voto"})[id]||"";
 const fechaES=d=>{ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${+dd} de ${MES[+m]} de ${y}`; };
@@ -2801,34 +2801,41 @@ const MATICES={
 // cómo se escribe la unidad de cada dato
 const GLUNIT={eur:"euros",pct:"%",pct_chg:"% de cambio",pts:"puntos",num1:"número",int:"cifra",years:"años",km:"km",dens:"hab./km²"};
 const GLORD=["Riqueza","Trabajo","Vivienda","Población","Hogares","Educación","Sectores","Voto","Territorio","Ayuntamiento","Provincias y comunidades"];
+const GLSTART=["renta","paroReg","alquiler","pop","gini","pobreza","valorTasado","afilHab"];
+const GLTEMA={Riqueza:"Dinero y desigualdad",Trabajo:"Empleo y paro",Vivienda:"Vivienda",Población:"Población",Hogares:"Hogares",Educación:"Estudios",Sectores:"A qué se dedica la gente",Voto:"Voto",Territorio:"Territorio",Ayuntamiento:"Ayuntamiento","Provincias y comunidades":"Solo por provincia o comunidad"};
+// una frase corta para la lista: la descripción escrita, o lo que va entre paréntesis en la fuente, o la propia fuente
+const glPrev=i=>{ const t=i.desc||((i.src.match(/\(([^)]{12,})\)/)||[])[1])||i.src; const f=t.split(/(?<=[.!?])\s/)[0]; return f.length>150?f.slice(0,147).replace(/\s\S*$/,"")+"…":f; };
 async function renderGlosario(){
-  document.title="Los datos del laboratorio · Indicio";
-  view.innerHTML=LABNAV("datos")+pageHead("Los datos del laboratorio","Qué mide cada dato, de dónde sale y qué conviene tener en cuenta antes de sacar conclusiones.")
-    +`<div class="gl"><div class="gl-bar"><input type="search" id="glq" class="sel" placeholder="Buscar un dato: renta, paro, alquiler…" aria-label="Buscar un dato" autocomplete="off"><div class="chipsq" id="glg" role="group" aria-label="Tema"></div></div><p class="muted gl-c" id="glc" aria-live="polite"></p><div id="gll"><p class="loading">Cargando…</p></div></div>`;
+  document.title="Qué significa cada dato · Indicio";
+  view.innerHTML=LABNAV("datos")+pageHead("Qué significa cada dato","Aquí tienes cada dato del laboratorio explicado en sencillo: qué mide, de dónde sale y qué conviene tener en cuenta antes de sacar conclusiones.")
+    +`<div class="gl"><div class="gl-bar"><input type="search" id="glq" class="sel" placeholder="¿Qué dato buscas? Por ejemplo: renta, paro, alquiler…" aria-label="Buscar un dato" autocomplete="off"><div class="chipsq" id="glg" role="group" aria-label="Filtrar por tema"></div></div><p class="muted gl-c" id="glc" aria-live="polite"></p><div id="gll"><p class="loading">Cargando…</p></div></div>`;
   try{ await loadRegional(); }catch(e){}
   const box=document.getElementById("gll"); if(!box) return;
   const items=CAT.filter(c=>c&&c.l&&!c.eu&&c.g&&!/^E_/.test(c.k)).map(c=>{
     const reg=!!c.reg, g=reg?"Provincias y comunidades":c.g, unit=reg?"":(GLUNIT[c.f]||"");
     const scales=reg?[c.np>=40?"provincias":"",c.nc>=10?"comunidades":""].filter(Boolean):[];
     const link=reg?exHash({v:"mapa",d:[c.k],u:c.np>=40?"prov":"ccaa",c:[],p:"",t:""}):exHash({v:"mapa",d:[c.k],u:"",c:[],p:"",t:""});
-    return {k:c.k,l:c.l,g,unit,desc:QUEMIDE[c.k]||"",matiz:MATICES[c.k]||"",src:c.src||"",scales,link,rel:reg?"":exHash({v:"cruce",d:[c.k,c.k==="renta"?"paroReg":"renta"],c:[],p:"",t:""}),text:norm([c.l,g,c.src,QUEMIDE[c.k]||""].join(" "))};
-  });
+    const o={k:c.k,l:c.l,g,unit,desc:QUEMIDE[c.k]||"",matiz:MATICES[c.k]||"",src:c.src||"",scales,link,rel:reg?"":exHash({v:"cruce",d:[c.k,c.k==="renta"?"paroReg":"renta"],c:[],p:"",t:""})};
+    o.text=norm([c.l,g,GLTEMA[g]||"",c.src,o.desc].join(" ")); o.prev=glPrev(o); return o; });
   const seen=new Set(); const all=items.filter(i=>!seen.has(i.k)&&seen.add(i.k)).sort((a,b)=>{ const ga=GLORD.indexOf(a.g), gb=GLORD.indexOf(b.g); return (ga<0?99:ga)-(gb<0?99:gb)||a.l.localeCompare(b.l,"es"); });
   const gs=[...new Set(all.map(i=>i.g))].sort((a,b)=>{ const ga=GLORD.indexOf(a), gb=GLORD.indexOf(b); return (ga<0?99:ga)-(gb<0?99:gb); });
   let G="";
-  const card=i=>`<details class="gl-i" id="d-${esc(i.k)}"><summary><span class="gl-n">${esc(i.l)}</span>${i.unit?`<span class="gl-u">${esc(i.unit)}</span>`:""}</summary><div class="gl-b">`
-    +(i.desc?`<p><b>Qué mide.</b> ${esc(i.desc)}</p>`:"")
-    +(i.matiz?`<p><b>Matices.</b> ${esc(i.matiz)}</p>`:"")
-    +(i.src?`<p class="muted"><b>${i.desc?"Fuente y año":"Fuente, año y definición"}.</b> ${esc(i.src)}</p>`:"")
-    +(i.scales.length?`<p class="muted"><b>Escalas.</b> Solo por ${i.scales.join(" y ")}: son datos oficiales, no de cada municipio.</p>`:`<p class="muted"><b>Escala.</b> Cada municipio.</p>`)
-    +`<p class="gl-a"><a href="${i.link}">Verlo en el mapa</a>${i.rel?` · <a href="${i.rel}">Cruzarlo con otro dato</a>`:""}</p></div></details>`;
+  const card=i=>`<details class="gl-i" id="d-${esc(i.k)}"><summary><span class="gl-n">${esc(i.l)}</span><span class="gl-p">${esc(i.prev)}</span></summary><div class="gl-b">`
+    +(i.desc?`<p><b>Qué mide</b><br>${esc(i.desc)}</p>`:"")
+    +(i.matiz?`<p class="gl-o"><b>Ojo con esto</b><br>${esc(i.matiz)}</p>`:"")
+    +(i.src?`<p><b>De dónde sale</b><br>${esc(i.src)}</p>`:"")
+    +`<p class="muted"><b>${i.scales.length?"Dónde hay datos":"Dónde hay datos"}</b><br>${i.scales.length?"Solo por "+i.scales.join(" y ")+" (dato oficial de cada una, no de cada municipio).":"Para cada municipio."}${i.unit&&i.unit!=="cifra"?` Se mide en ${esc(i.unit)}.`:""}</p>`
+    +`<p class="gl-a"><a class="gl-btn" href="${i.link}">Verlo en el mapa</a>${i.rel?`<a class="gl-btn" href="${i.rel}">Cruzarlo con otro dato</a>`:""}</p></div></details>`;
   const draw=()=>{ const q=norm(document.getElementById("glq").value.trim()), g=G;
     const rows=all.filter(i=>(!g||i.g===g)&&(!q||q.split(/\s+/).every(w=>i.text.includes(w))));
-    document.getElementById("glc").textContent=`${nf0.format(rows.length)} dato${rows.length===1?"":"s"}${q||g?" que coinciden":""}`;
-    box.innerHTML=rows.length?gs.filter(x=>rows.some(i=>i.g===x)).map(x=>`<section class="gl-g"><h2>${esc(x)}</h2>${rows.filter(i=>i.g===x).map(card).join("")}</section>`).join(""):'<p class="loading">Ningún dato coincide. Prueba con otra palabra.</p>';
+    document.getElementById("glc").textContent=q||g?`${nf0.format(rows.length)} dato${rows.length===1?"":"s"} que coinciden`:`${nf0.format(rows.length)} datos, agrupados por tema. Pulsa en cualquiera para ver el detalle.`;
+    let h="";
+    if(!q&&!g){ const st=GLSTART.map(k=>all.find(i=>i.k===k)).filter(Boolean); if(st.length) h+=`<section class="gl-g gl-s"><h2>Para empezar</h2><p class="muted gl-sd">Los que más se usan, por si no sabes por dónde entrar.</p>${st.map(card).join("")}</section>`; }
+    h+=rows.length?gs.filter(x=>rows.some(i=>i.g===x)).map(x=>`<section class="gl-g"><h2>${esc(GLTEMA[x]||x)}</h2>${rows.filter(i=>i.g===x).map(card).join("")}</section>`).join(""):'<p class="loading">Ningún dato coincide. Prueba con otra palabra, por ejemplo «renta» o «paro».</p>';
+    box.innerHTML=h;
     if(location.hash.startsWith("#d-")){ const t=document.getElementById(decodeURIComponent(location.hash.slice(1))); if(t&&t.tagName==="DETAILS"){ t.open=true; if(!draw._s){ draw._s=1; setTimeout(()=>t.scrollIntoView({block:"start"}),60); } } } };
   const chips=document.getElementById("glg");
-  chips.innerHTML=`<button type="button" data-g="" aria-pressed="true">Todos</button>`+gs.map(x=>`<button type="button" data-g="${esc(x)}" aria-pressed="false">${esc(x)}</button>`).join("");
+  chips.innerHTML=`<button type="button" data-g="" aria-pressed="true">Todos</button>`+gs.map(x=>`<button type="button" data-g="${esc(x)}" aria-pressed="false">${esc(GLTEMA[x]||x)}</button>`).join("");
   chips.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ G=b.dataset.g; chips.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); draw(); }));
   document.getElementById("glq").addEventListener("input",draw);
   draw();
@@ -3813,7 +3820,7 @@ function exBar(){
   const mname=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m)[F.name]:null;
   bar.innerHTML=`
     <div class="lb-step"><h4><i>1</i>Qué quieres saber</h4>${typesHTML(EX.v)}${hintHTML(EX.v)}</div>
-    <div class="lb-step"><h4><i>2</i>Qué datos${lbh("Son indicadores oficiales (paro, renta, población, alquiler…). Pulsa en cada uno para cambiarlo por otro.","Qué son los datos")}</h4><a class="lb-glos" style="margin:0 0 10px" href="/laboratorio/datos/"><span><b>Qué significa cada dato</b><small>Qué mide, de dónde sale y qué matices tiene</small></span><span class="lb-glos-a" aria-hidden="true">→</span></a>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
+    <div class="lb-step"><h4><i>2</i>Qué datos${lbh("Son indicadores oficiales (paro, renta, población, alquiler…). Pulsa en cada uno para cambiarlo por otro.","Qué son los datos")}</h4>${EX.v==="cruce"?"":""}${isB?slots:isEvo?`<p class="hint" style="margin:0 0 8px">Marca hasta seis series. Puedes verlas para España, una provincia o un municipio.</p><div id="lbevo"></div>`:slots}</div>
     ${isEvo||isB||isMapAgg?"":`<div class="lb-step"><h4><i>3</i>Qué municipios${lbh("Puedes limitar el gráfico a una provincia o quitar los municipios más pequeños, cuyas cifras suelen ser poco fiables porque salen de pocos vecinos.","Para qué sirve esto")}</h4>
       <select class="sel" id="exprov" aria-label="Provincia">${`<option value="">Toda España</option>`+Object.keys(PROVS).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es")).map(p=>`<option value="${p}" ${p===EX.p?"selected":""}>${esc(provShort(PROVS[p]))}</option>`).join("")}</select>
       <select class="sel" id="exsize" aria-label="Tamaño">${EXSIZES.map(([k,l])=>`<option value="${k}" ${k===EX.t?"selected":""}>${l}</option>`).join("")}</select>
