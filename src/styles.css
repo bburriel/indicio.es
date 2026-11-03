@@ -1909,3 +1909,25 @@ details.chk > section{margin-top:18px}
 .langsw select:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
 .langnote{margin:0 auto; max-width:var(--wrap,1120px); padding:8px 16px; font-size:13.5px; color:var(--ink-2); background:var(--card,#fff); border-bottom:1px solid var(--rule-2)}
 @media (max-width:860px){ .langsw{order:3} }
+@media (max-width:860px){ .ab-row{grid-template-columns:minmax(0,1fr); gap:18px; padding-top:40px; margin-top:48px} .ab-row h2{font-size:27px} .ab-cols{grid-template-columns:minmax(0,1fr); gap:24px} }
+@media (max-width:640px){ .ab-path{grid-template-columns:minmax(0,1fr)} .ab-path li{padding:0 0 26px 30px} .ab-path li::before{top:5px; bottom:0; left:5px; right:auto; width:1px; height:auto} .ab-path li:last-child::before{display:none} .ab-lead{margin-top:26px} }
+.ab-row + .ab-sec{margin-top:64px; padding-top:56px; border-top:1px solid var(--rule)}
+@media (max-width:860px){ .ab-row + .ab-sec{margin-top:48px; padding-top:40px} }
+
+/* ---- Quién soy: formulario de contacto editorial ---- */
+.ab-contact{margin-bottom:56px}
+.ab-fm{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px 32px}
+.ab-fm .wide{grid-column:1/-1}
+.ab-fm .fld{gap:6px; font-size:12.5px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+.ab-fm .inp,.ab-fm select.sel{border:0!important; border-bottom:1px solid var(--rule-2)!important; border-radius:0!important; background-color:transparent!important; padding:8px 0 10px; font-size:18px; font-weight:400; letter-spacing:0; text-transform:none; color:var(--ink); min-height:0; transition:border-color .15s, box-shadow .15s}
+.ab-fm select.sel{padding-right:28px; background-position:right 2px center}
+.ab-fm .inp:hover,.ab-fm select.sel:hover{border-bottom-color:var(--ink-2)!important}
+.ab-fm .inp:focus,.ab-fm select.sel:focus{outline:none; border-bottom-color:var(--brand)!important; box-shadow:0 1px 0 var(--brand)}
+.ab-fm .inp:focus-visible,.ab-fm select.sel:focus-visible{outline:none}
+.ab-fm textarea.inp{min-height:120px; line-height:1.55; resize:vertical}
+.ab-act{display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin-top:4px}
+.ab-fm .ab-send{border-radius:3px!important; min-height:0; padding:11px 26px!important; font-size:15px; font-weight:600; letter-spacing:.01em}
+.ab-fm .ab-send:focus-visible{outline:2px solid var(--brand); outline-offset:3px}
+#abres{margin:0; font-size:14.5px; color:var(--ink-2)}
+.ab-tips{margin-top:56px}
+@media (max-width:640px){ .ab-fm{grid-template-columns:minmax(0,1fr); gap:22px} .ab-tips{margin-top:40px} }

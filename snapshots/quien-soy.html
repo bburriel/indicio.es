@@ -37,14 +37,21 @@
       </div>
     </section>
 
-    <section class="ab-sec" id="contacto"><h2>Escríbeme</h2>
-      <div class="ab-form"><form id="abform" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="contacto"><p hidden=""><label>No rellenar <input name="bot-field"></label></p>
-        <label class="fld">Nombre<input class="inp" name="nombre" required="" autocomplete="name"></label>
-        <label class="fld">Correo electrónico<input class="inp" type="email" name="email" required="" autocomplete="email"></label>
-        <label class="fld">Sobre qué<select class="sel" name="motivo" id="abmot"><option>Una pregunta sobre los datos</option><option>He visto un error</option><option>Una idea para la web</option><option>Otra cosa</option></select></label>
-        <label class="fld">Mensaje<textarea class="inp" name="mensaje" rows="5" required=""></textarea></label>
-        <button type="submit" class="sel ab-send">Enviar</button><p class="muted" id="abres" style="font-size:14px" role="status"></p>
-      </form>
-      <div class="ab-side"><h3>Antes de escribir</h3><ul class="defs"><li><b>¿Un error en los datos?</b> Dime en qué página y qué dato. Los arreglo y lo cuento en la web.</li><li><b>¿Falta tu pregunta?</b> Muchos análisis nacen de preguntas que me mandan los lectores.</li><li>Uso tu correo solo para responderte.</li></ul></div></div>
+    <section class="ab-row ab-sec ab-contact" id="contacto"><h2>Escríbeme</h2>
+      <div class="ab-body">
+        <p class="ab-intro">Cuéntame una pregunta sobre los datos, un error, una idea o un trabajo a medida. Te contesto yo.</p>
+        <form class="ab-fm" id="abform" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="contacto"><p hidden=""><label>No rellenar <input name="bot-field"></label></p>
+          <label class="fld">Nombre<input class="inp" name="nombre" required="" autocomplete="name"></label>
+          <label class="fld">Correo electrónico<input class="inp" type="email" name="email" required="" autocomplete="email"></label>
+          <label class="fld wide">Sobre qué<select class="sel" name="motivo" id="abmot"><option>Una pregunta sobre los datos</option><option>He visto un error</option><option>Una idea para la web</option><option>Otra cosa</option></select></label>
+          <label class="fld wide">Mensaje<textarea class="inp" name="mensaje" rows="4" required=""></textarea></label>
+          <div class="ab-act wide"><button type="submit" class="sel ab-send">Enviar mensaje</button><p id="abres" role="status"></p></div>
+        </form>
+        <div class="ab-cols ab-tips">
+          <div><h3>¿Un error en los datos?</h3><p>Dime en qué página y qué dato. Lo arreglo y lo cuento en la web.</p></div>
+          <div><h3>¿Falta tu pregunta?</h3><p>Muchos análisis nacen de preguntas que me mandan los lectores.</p></div>
+          <div><h3>Tu correo</h3><p>Lo uso solo para responderte.</p></div>
+        </div>
+      </div>
     </section>
