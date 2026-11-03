@@ -79,6 +79,7 @@ function pctl(k,v){ if(v==null) return null; if(!PCTL[k]){ const s=rowsAll().fil
   const P=PCTL[k]; const i=d3.bisectLeft(P.v,v); return P.c[Math.min(i,P.c.length-1)]; }
 
 // ---------- URLs: rutas reales (y compatibilidad con los antiguos #hash) ----------
+const tHref=id=>id==="vivienda"?"/preguntas/vivienda/":"/temas/"+id+"/"; // vivienda se fusionó con su análisis
 const SLUG=s=>norm(dispName(String(s))).replace(/ /g,"-");
 const munPath=(code,sec)=>{ const r=BYCODE.get(code); return "/municipio/"+code+(r?"-"+SLUG(r[F.name]):"")+"/"+(sec?sec+"/":""); };
 function keyToPath(h){
@@ -93,7 +94,8 @@ function keyToPath(h){
   if((m=h.match(/^estudios?-([\w-]+)$/))) return "/preguntas/"+m[1]+"/";
   if(h==="temas") return "/temas/";
   if((m=h.match(/^(?:riqueza|renta)(?:-(\d{5}))?$/))) return "/temas/riqueza/"+(m[1]?"?m="+m[1]:"");
-  if(/^(vivienda|poblacion|trabajo|gasto|voto)$/.test(h)) return "/temas/"+h+"/";
+  if(h==="vivienda") return "/preguntas/vivienda/";
+  if(/^(poblacion|trabajo|gasto|voto)$/.test(h)) return "/temas/"+h+"/";
   if(h==="municipio") return "/municipio/";
   if(h==="sobre") return "/quien-soy/";
   if(h==="sobre-contacto") return "/quien-soy/contacto/";
@@ -108,6 +110,7 @@ function pathToKey(){
   if(p==="/preguntas") return "preguntas";
   if((m=p.match(/^\/preguntas\/([\w-]+)$/))) return "estudios-"+m[1];
   if(p==="/temas") return "temas";
+  if(p==="/temas/vivienda"){ try{ history.replaceState(null,"","/preguntas/vivienda/"); }catch(e){} return "estudios-vivienda"; } // se fusionó con el análisis
   if((m=p.match(/^\/temas\/([a-z]+)$/))){ if(m[1]==="riqueza"){ const c=new URLSearchParams(q).get("m"); return "riqueza"+(c&&/^\d{5}$/.test(c)?"-"+c:""); } return m[1]; }
   if(p==="/laboratorio") return "explorar";
   if(p==="/laboratorio/metodo") return "estudios-metodo";
@@ -183,7 +186,6 @@ function route(){
   curMun=null; window.scrollTo(0,0); esMap=null;
   const topic=(id,fn)=>{ cur("temas"); Promise.resolve(fn()).then(()=>{ try{ topicDecorate(id); }catch(e){ console.error(e); } }); };
   if(rt) topic("riqueza",()=>renderRiqueza(rt[1]));
-  else if(h==="vivienda") topic("vivienda",renderVivienda);
   else if(h==="poblacion") topic("poblacion",renderPoblacion);
   else if(h==="trabajo") topic("trabajo",renderTrabajo);
   else if(h==="gasto") topic("gasto",renderGasto);
@@ -433,7 +435,7 @@ async function renderSpain(){
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         <input id="q2" type="search" placeholder="Escribe tu municipio: Meliana, Vigo, Teruel…" autocomplete="off" aria-label="Buscar un municipio" aria-autocomplete="list" aria-controls="results2" style="padding:11px 14px 11px 36px;font-size:17px">
         <ul id="results2" class="results" role="listbox" hidden></ul></div>
-        <p style="font-size:14px">O lee los informes: <a href="/temas/riqueza/">Riqueza</a> · <a href="/temas/vivienda/">Vivienda</a> · <a href="/temas/poblacion/">Población</a> · <a href="/temas/trabajo/">Trabajo</a> · <a href="/temas/gasto/">Dinero público</a></p></div>
+        <p style="font-size:14px">O lee los informes: <a href="/temas/riqueza/">Riqueza</a> · <a href="/preguntas/vivienda/">Vivienda</a> · <a href="/temas/poblacion/">Población</a> · <a href="/temas/trabajo/">Trabajo</a> · <a href="/temas/gasto/">Dinero público</a></p></div>
       <div class="door lab"><span class="k">Laboratorio</span><h2>Cruza datos y busca causas</h2><p>Elige tus propios datos, filtra municipios y míralos en mapa, tabla, cruce o evolución. Comprueba si una relación aguanta al comparar entre iguales, y lee estudios que explican el método paso a paso.</p>
         <a class="go" href="/laboratorio/">Entrar en el laboratorio</a>
         <div class="tools"><a href="/laboratorio/mapa/">Mapa</a><a href="/laboratorio/tabla/">Tabla</a><a href="/laboratorio/cruce/">Cruce</a><a href="/laboratorio/evolucion/">Evolución</a><a href="/preguntas/">Estudios</a></div></div>
@@ -465,7 +467,7 @@ async function renderSpain(){
     add(s,"div","txt",`<h2>Alquilar cuesta casi el doble que en 2015; los sueldos solo han seguido a los precios</h2>
       <p>El precio de los pisos que se anuncian para alquilar ha subido un <mark>${nf0.format(G.anuncios)}${NB}%</mark> entre 2015 y 2024. El salario mediano, un ${nf0.format(G.salMed)}${NB}%, prácticamente lo mismo que los precios (${nf0.format(G.ipc)}${NB}%): en poder de compra, el sueldo típico está casi igual que hace diez años.</p>
       <p>Quien lleva años en el mismo piso lo nota menos: el alquiler que se declara a Hacienda, con todos los contratos, ha subido un ${nf0.format(G.declarado)}${NB}%.</p>
-      <p class="more"><a href="/temas/vivienda/">Qué pasa con la vivienda</a></p>`);
+      <p class="more"><a href="/preguntas/vivienda/">Qué pasa con la vivienda</a></p>`);
     const g=add(s,"div"); drawSubidas(g);
   }
   // 3. Población
@@ -748,66 +750,6 @@ function drawSubidas(parent,{compact}={}){
     if(REAL) add(f.body,"p","muted",`Descontada la subida de los precios (${nf0.format(G.ipc)}${NB}%), el salario mediano apenas ha cambiado y los anuncios de alquiler cuestan un ${nf0.format(R(G.anuncios))}${NB}% más.`).style.cssText="font-size:14px;margin-top:8px"; };
   ctl.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ REAL=b.dataset.r==="1"; document.querySelectorAll(".realbox").forEach(x=>x._draw&&x._draw()); }));
   box._draw=draw; draw(); return box;
-}
-
-async function renderVivienda(){
-  document.title="Vivienda · Indicio";
-  const es=REFS.es, ce=REFS.census.es, ia=REFS.ipvaAntig||{es:{},prov:{}};
-  const vt=es.vt, vtp=es.vtp, P=REFS.vtPeriods, iMax=vt.indexOf(d3.max(vt));
-  const per=P.map(p=>p.replace(/^(\d{4})M(\d\d)$/,(m,y,mm)=>MES[+mm].slice(0,3)+". "+y.slice(2)));
-  const G=subidas();
-  view.innerHTML=pageHead("¿Por qué cuesta tanto encontrar casa?",`Los pisos que se anuncian para alquilar cuestan casi el doble que en 2015: un <mark>${nf0.format(G.anuncios)}${NB}%</mark> más. Los sueldos han subido un ${nf0.format(G.salMed)}${NB}%, casi lo mismo que los precios. Quien ya tiene contrato lo nota menos; quien busca piso, mucho más.`)+`<div id="body"></div>${methodNote()}`;
-  const B=document.getElementById("body");
-
-  const s1=finding(B,"El precio de los anuncios ha subido tres veces más que los sueldos",
-    `<p>Cuánto han subido entre 2015 y 2024 los alquileres y los ingresos, según de dónde salga la cifra. Cada medida cuenta una parte:</p>
-     <ul class="defs"><li><b>Anuncios de alquiler:</b> lo que piden los pisos que salen al mercado (idealista, euros por metro cuadrado). Es lo que paga quien busca casa hoy.</li>
-     <li><b>Alquiler declarado:</b> lo que pagan todos los inquilinos según las declaraciones a Hacienda (INE). Incluye contratos de hace años, con subidas limitadas, y deja fuera los alquileres no declarados.</li>
-     <li><b>Salario:</b> lo que cobra un trabajador al año (INE). El mediano es el del trabajador del medio: la mitad cobra menos.</li>
-     <li><b>Renta por persona:</b> todo lo que entra en los hogares dividido entre sus miembros. Sube más que los sueldos porque hoy trabaja más gente por hogar y suben las pensiones.</li></ul>`);
-  drawSubidas(s1);
-
-  const n=ia.es.n||[], i21=YEARS.indexOf(2021), inc=es.net_income_pc, sal=REFS.salarios.media, salM=REFS.salarios.mediana;
-  const ix21=a=>a.slice(i21);
-  const s2=finding(B,"Desde 2021, los contratos nuevos suben más deprisa que los sueldos",
-    `<p>El INE solo separa los contratos nuevos de los antiguos desde 2021. Desde entonces, el alquiler de los contratos nuevos ha subido un ${nf0.format(n[9]/n[6]*100-100)}${NB}% y el salario mediano un ${nf0.format(salM[2024]/salM[2021]*100-100)}${NB}%.</p>`);
-  realChart(s2,{title:"Alquiler de contratos nuevos, salario y renta, 2021 = 100",source:"Fuente: INE, Índice de Precios de Vivienda en Alquiler, Encuesta de Estructura Salarial y Atlas de Renta.",
-    series:[{n:"Alquiler nuevos",v:ix21(n),c:"--rust",main:true},{n:"Renta",v:ix21(inc),c:"--slate"},{n:"Salario mediano",v:ix21(YEARS.map(y=>salM[y])),c:"--mustard"}],
-    xticks:[2021,2022,2023,2024],height:260,years:YEARS.slice(i21),index:true});
-
-  const rowsP=Object.entries(ia.prov||{}).map(([p,v])=>{ const r=REFS.prov[p]; if(!r||!v.n) return null; return {p,n:(v.n[9]/v.n[6]-1)*100,e:(v.e[9]/v.e[6]-1)*100,g:(r.net_income_pc[9]/r.net_income_pc[6]-1)*100}; }).filter(Boolean).sort((a,b)=>(b.n-b.g)-(a.n-a.g));
-  const over=rowsP.filter(r=>r.n>r.g);
-  const s2b=finding(B,`Entre 2021 y 2024, los contratos nuevos subieron más que la renta en ${over.length} provincias`,
-    `<p>Subida entre 2021 y 2024 del alquiler en los contratos nuevos, en los que ya estaban firmados y de la renta por persona. Arriba, las provincias donde el alquiler nuevo más se ha despegado de la renta.</p>`);
-  const mx=d3.max(rowsP,r=>Math.max(r.n,r.g,r.e));
-  const w2=add(s2b,"div","cmp");
-  w2.innerHTML=`<div class="keys"><span><i style="background:var(--rust)"></i>Alquiler, contratos nuevos</span><span><i style="background:var(--mustard)"></i>Alquiler, contratos en vigor</span><span><i style="background:var(--slate)"></i>Renta por persona</span></div>`+
-    rowsP.slice(0,12).map(r=>`<div class="cmp-row"><div class="n">${esc(provShort(PROVS[r.p]))}<small>${r.n>r.g?`el alquiler nuevo sube ${nf1.format(r.n-r.g)} puntos más que la renta`:`la renta sube ${nf1.format(r.g-r.n)} puntos más`}</small></div><div class="bars">${[[r.n,"--rust"],[r.e,"--mustard"],[r.g,"--slate"]].map(([v,c])=>`<div class="b"><span style="width:${Math.max(0,v)/mx*100}%;background:var(${c})"></span><em>${sgn(v)}</em></div>`).join("")}</div></div>`).join("");
-  add(s2b,"figcaption",null,"Euros de cada año. Fuente: INE, Índice de Precios de Vivienda en Alquiler (por antigüedad del contrato) y Atlas de Renta.");
-
-  const rws=rowsAll().filter(r=>r[F.alqVar]!=null&&r[F.rentaVar]!=null), up=rws.filter(r=>r[F.alqVar]>r[F.rentaVar]);
-  const s3=finding(B,"Municipio a municipio: dónde sube más el alquiler declarado",
-    `<p>Cada punto es un municipio de más de 10.000 habitantes. Por encima de la diagonal, el alquiler declarado ha subido más que la renta por persona: pasa en ${up.length} de ${rws.length}. Recuerda que es el alquiler de todos los contratos, no el de los anuncios: sirve para ver <b>dónde</b> sube más, no cuánto le cuesta a quien busca piso.</p>`);
-  scatter(s3,{x:"rentaVar",y:"alqVar",minPop:10000,diag:true,title:"Subida de la renta y del alquiler declarado entre 2015 y 2024",source:"Fuente: INE, Índice de Precios de Vivienda en Alquiler (municipios de más de 10.000 habitantes) y Atlas de Renta."});
-  const g3=add(s3,"div","cols2"); topList(g3,"alqVar",{title:"Donde más ha subido el alquiler",minPop:10000,link:"vivienda"});
-  const gp=rws.filter(r=>(r[F.pop]||0)>=10000).map(r=>[r,r[F.alqVar]-r[F.rentaVar]]).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  add(g3,"div","lista",`<h3>Donde el alquiler más se acerca a la renta</h3><ol>${gp.map(([r,d])=>`<li><span><a href="#m${r[F.code]}-vivienda">${esc(r[F.name])}</a><small>alquiler ${sgn(r[F.alqVar])}, renta ${sgn(r[F.rentaVar])}</small></span><span class="v">${d>0?"+":"−"}${nf1.format(Math.abs(d))} puntos</span></li>`).join("")}</ol>`);
-
-  const s4=finding(B,"Los pisos turísticos se concentran en la costa y en las islas",
-    `<p>En mayo de 2026 había <mark>${nf0.format(vt[vt.length-1])}</mark> viviendas turísticas en España, el ${pc(vtp[vtp.length-1])} de todas. Es poco en el conjunto, pero en algunos municipios de Canarias, Baleares y la Costa del Sol superan una de cada diez viviendas. El máximo se alcanzó en ${MES[8]} de 2024, con ${nf0.format(vt[iMax])}.</p>`);
-  const g4=add(s4,"div","cols2");
-  const fa=fig(g4,{title:"Viviendas turísticas por provincia",sub:"% del total de viviendas, mayo de 2026",source:"Fuente: INE, estadística experimental de viviendas turísticas."});
-  hbars(fa.body,provRows("vt").sort((a,b)=>b.v-a.v).slice(0,15),{fmt:pc,color:"--rust",min:0});
-  topList(g4,"vt",{title:"Municipios con más peso de pisos turísticos",minPop:5000,link:"vivienda"});
-  add(s4,"p",null,exLink("mapa",{d:["vt","alquiler"]},"Ver los pisos turísticos en el mapa del explorador"));
-
-  const s5=finding(B,"Donde hay más pisos turísticos, más gente vive de alquiler",`<p>La relación existe pero es débil: hay muchos municipios turísticos con poco alquiler y al revés. Escala logarítmica en el eje horizontal, para que se vean los municipios con muy pocos pisos turísticos.</p>`);
-  scatter(s5,{x:"vt",y:"alquiler",minPop:10000,logX:true,title:"Viviendas turísticas y hogares de alquiler",source:"Municipios de más de 10.000 habitantes. Fuente: INE, viviendas turísticas (2026) y Censo de 2021."});
-
-  const s6=finding(B,`${cap(deCadaDiez(ce.secondary))} viviendas no son residencia habitual de nadie`,
-    `<p>Según el censo de 2021, el ${pc(ce.secondary)} de las viviendas son segundas residencias o están vacías, y el ${pc(ce.rented)} de los hogares vive de alquiler. Las viviendas sin uso habitual abundan sobre todo en los pueblos que pierden población, lejos de donde más falta hace vivienda.</p>`);
-  scatter(s6,{x:"var0525",y:"noPrincipal",minPop:1000,weighted:false,title:"Crecimiento de la población desde 2005 y viviendas vacías o secundarias",source:"Municipios de 1.000 habitantes o más; cada municipio cuenta igual. Fuente: INE, padrón y Censo de 2021."});
-  panoExtra("vivienda",B);
 }
 
 // =====================================================================
@@ -1215,7 +1157,7 @@ function secVivienda(s,r,d){
   const iy=REFS.ipvaYears, i15=iy.indexOf(2015);
   const b2=block(s,"Alquiler y renta");
   if(d.ipva){ const alq=d.ipva.slice(i15), inc=d.s.net_income_pc, incI=inc.map(v=>v==null||!inc[0]?null:v/inc[0]*100), ga=alq[alq.length-1]-100, gi=incI[incI.length-1]-100;
-    add(b2,"p",null,`Entre 2015 y 2024 el alquiler medio subió aquí un <b>${nf0.format(ga)}${NB}%</b> y la renta por persona un <b>${nf0.format(gi)}${NB}%</b>${ga>gi?": el alquiler ha subido más que la renta, algo que solo pasa en un puñado de municipios.":"."} El alquiler medio incluye contratos antiguos; los nuevos suben bastante más (ver <a href="/temas/vivienda/">Vivienda</a>).`).style.cssText="max-width:var(--medida);color:var(--ink-2);margin-bottom:14px";
+    add(b2,"p",null,`Entre 2015 y 2024 el alquiler medio subió aquí un <b>${nf0.format(ga)}${NB}%</b> y la renta por persona un <b>${nf0.format(gi)}${NB}%</b>${ga>gi?": el alquiler ha subido más que la renta, algo que solo pasa en un puñado de municipios.":"."} El alquiler medio incluye contratos antiguos; los nuevos suben bastante más (ver <a href="/preguntas/vivienda/">el análisis de vivienda</a>).`).style.cssText="max-width:var(--medida);color:var(--ink-2);margin-bottom:14px";
     const g=add(b2,"div","cols2");
     lineChart(g,{title:"Cuánto han subido desde 2015",sub:"2015 = 100",source:"Fuente: INE, Índice de Precios de Vivienda en Alquiler y Atlas de Renta.",series:[{n:"Alquiler aquí",v:alq,c:"--rust",main:true},{n:"Renta aquí",v:incI,c:"--slate"},{n:"Alquiler España",v:es.ipva.slice(i15),c:"--mustard",dash:true}],fmt:v=>nf1.format(v)}); }
   else add(b2,"p","muted","El INE solo publica el índice de alquiler de municipios de más de 10.000 habitantes.");
@@ -3536,13 +3478,6 @@ function panoExtra(id,B){
       const g=add(s2,"div","cols2"), fa=fig(g,{title:"Renta neta por persona",source:"Último año. Fuente: INE, Atlas de Renta."}), fb=fig(g,{title:"Desigualdad (Gini)",source:"Último año. Fuente: INE, Atlas de Renta."});
       hbars(fa.body,BS.map(b=>({l:b.l,v:last(b.s.net_income_pc)[0]})),{fmt:eur,color:"--slate",min:0}); hbars(fb.body,BS.map(b=>({l:b.l,v:last(b.s.gini)[0]})),{fmt:v=>nf1.format(v),color:"--rust",min:20});
     }
-    if(id==="vivienda"){
-      const vt=es.vt, P=REFS.vtPeriods, per=P.map(p=>p.replace(/^(\d{4})M(\d\d)$/,(m,y,mm)=>MES[+mm].slice(0,3)+". "+y.slice(2))), iMax=vt.indexOf(d3.max(vt)), lst=vt[vt.length-1];
-      const s=finding(B,`Los pisos turísticos tocaron techo en ${MES[+P[iMax].slice(5)]} de ${P[iMax].slice(0,4)} y desde entonces bajan`,`<p>El INE cuenta dos veces al año los anuncios de viviendas turísticas en las grandes plataformas. Tras el parón de la pandemia crecieron sin pausa hasta ${per[iMax]} (${nf0.format(vt[iMax])}); desde entonces han bajado un ${pc0((1-lst/vt[iMax])*100)}. Coinciden varias cosas: las prohibiciones municipales, el registro único estatal obligatorio desde julio de 2025, que obliga a cada anuncio a tener un número de registro, y la retirada de anuncios ilegales por parte de las plataformas.</p>`);
-      lineChart(s,{title:"Viviendas turísticas anunciadas en España",source:"Agosto y febrero (o noviembre y mayo) de cada año. Fuente: INE, medición experimental de viviendas turísticas.",series:[{n:"Viviendas turísticas",v:vt,c:"--rust",main:true}],years:per,xticks:[per[0],per[iMax],per[per.length-1]],fmt:v=>nf0.format(v),tickFmt:v=>nf0.format(v/1000)+" mil",height:240});
-      const s2=finding(B,`${cap(deCadaDiez(REFS.census.es.rented))} hogares viven de alquiler, muchos más en las islas y en la costa`,`<p>Según el censo de 2021. El alquiler pesa mucho más en Cataluña, las islas y Ceuta y Melilla, y muy poco en el interior rural, donde casi todo el mundo es propietario. Es una de las razones por las que la subida del alquiler se nota tan distinto según dónde se viva.</p>`);
-      const fa=fig(s2,{title:"Hogares que viven de alquiler, por provincia",source:"% de hogares, 2021. Fuente: INE, Censo de Población y Viviendas."}); hbars(fa.body,provRows("alquiler").sort((a,b)=>b.v-a.v),{fmt:pc,scroll:true,color:"--rust",min:0,ref:REFS.census.es.rented,refLabel:"España"});
-    }
     if(id==="poblacion"){
       const o=lastY(es.pct_over65), o0=firstY(es.pct_over65), u=lastY(es.pct_under18), u0=firstY(es.pct_under18);
       const s=finding(B,`Uno de cada ${nf0.format(100/o.v)} vecinos tiene más de 65 años, y en los pueblos pequeños, uno de cada ${nf0.format(100/last(BS[0].s.pct_over65)[0])}`,`<p>Los mayores de 65 han pasado del ${pc(o0.v)} al ${pc(o.v)} de la población entre ${o0.y} y ${o.y}, y los menores de 18, del ${pc(u0.v)} al ${pc(u.v)}. El envejecimiento es mucho más intenso en los municipios pequeños: en los de menos de 1.000 habitantes, los mayores son el ${pc(last(BS[0].s.pct_over65)[0])}; en las ciudades de más de 100.000, el ${pc(last(BS[BS.length-1].s.pct_over65)[0])}. Es la otra cara de la despoblación: los pueblos no solo pierden gente, pierden a los que tendrían hijos.</p>`);
@@ -3588,7 +3523,7 @@ async function renderInicioV1(){
     <a class="ci-path lab" href="/laboratorio/"><div class="img">${pathImg("lab")}</div><div class="tx"><span class="kk">Investigar</span><h3>Laboratorio</h3><p>Un lienzo en blanco para hacer tus propios gráficos, cruzar datos, ver si una relación aguanta y medir qué pasó antes y después de una ley o un suceso.</p><span class="gol">Abrir el laboratorio →</span></div></a>
   </div>
   <section class="ci-band"><h2>Preguntas que puedes responder aquí</h2><div class="g4" id="ciq">
-    <a class="cardx qcard" href="/temas/vivienda/"><div class="n">+${nf0.format(G.anuncios)}${NB}%</div><div class="t">¿Cuánto ha subido alquilar?</div><div class="s">El precio de los anuncios desde 2015 · Vivienda →</div></a>
+    <a class="cardx qcard" href="/preguntas/vivienda/"><div class="n">+${nf0.format(G.anuncios)}${NB}%</div><div class="t">¿Cuánto ha subido alquilar?</div><div class="s">El precio de los anuncios desde 2015 · Vivienda →</div></a>
     <a class="cardx qcard" href="/temas/trabajo/"><div class="n">${mill(paroNow())}</div><div class="t">¿Cuánta gente está en el paro?</div><div class="s">Paro registrado en ${REFS.paroLast}, frente a ${mill(paro15())} en 2015 · Trabajo →</div></a>
     <a class="cardx qcard" href="/temas/riqueza/" id="ciqr"><div class="n">…</div><div class="t">¿Cuánto cambia la renta de una comunidad a otra?</div><div class="s">Riqueza →</div></a>
     <a class="cardx qcard" href="${exHash({v:"cruce",d:["superiores","renta"],t:"g1",p:"",c:[]})}"><div class="n">r = ${c?rFmt(c.r):"—"}</div><div class="t">¿Más estudios, más renta? ¿Y es causa?</div><div class="s">Compruébalo en el laboratorio →</div></a>
@@ -3688,7 +3623,7 @@ const TMIN={riqueza:[6,6],vivienda:[7,7],poblacion:[5,5],trabajo:[6,6],gasto:[5,
 async function renderTemas(){
   document.title="Temas · Indicio";
   view.innerHTML=pageHead("Seis preguntas sobre España","Cada tema responde a una pregunta con unas pocas ideas clave, cada una con su gráfico. Léelo en cinco minutos o profundiza en el detalle.")+
-    `<div class="g3" style="margin-top:6px">${TOPIC_IDS.map(id=>{ const T=TOPICS[id]; return `<a class="tcard" href="/temas/${id}/"><div class="img">${tIll(id)}</div><div class="tp"><span class="kk">${T.l}</span><h3>${T.q}</h3><div class="n" data-k="${id}">…</div><div class="s" data-s="${id}"></div></div><div class="ft"><span>${TMIN[id][0]} ideas · ${TMIN[id][1]} min</span><span class="gol">Leer →</span></div></a>`; }).join("")}</div>
+    `<div class="g3" style="margin-top:6px">${TOPIC_IDS.map(id=>{ const T=TOPICS[id]; return `<a class="tcard" href="${tHref(id)}"><div class="img">${tIll(id)}</div><div class="tp"><span class="kk">${T.l}</span><h3>${T.q}</h3><div class="n" data-k="${id}">…</div><div class="s" data-s="${id}"></div></div><div class="ft"><span>${TMIN[id][0]} ideas · ${TMIN[id][1]} min</span><span class="gol">Leer →</span></div></a>`; }).join("")}</div>
     <section class="ci-band"><h2>¿Prefieres buscar tu propia respuesta?</h2><p style="color:var(--ink-2);max-width:var(--medida)">En el laboratorio puedes elegir cualquier dato de los temas, verlo en un mapa, ordenarlo, cruzarlo con otro y comprobar si una relación podría ser causa.</p><p style="margin-top:10px"><a class="gol" href="/laboratorio/">Abrir el laboratorio →</a></p></section>${methodNote()}`;
   for(const id of TOPIC_IDS){ TOPICS[id].key().then(([n,s])=>{ const a=view.querySelector(`[data-k="${id}"]`), b=view.querySelector(`[data-s="${id}"]`); if(a) a.innerHTML=n; if(b) b.innerHTML=s; }).catch(()=>{}); }
 }
@@ -3701,11 +3636,6 @@ async function essentials(id){
       [eur(R.median),"La renta de la mitad","","la mitad de la población vive en barrios con menos renta que esto, por persona y año"],
       [pc(pov),"En riesgo de pobreza",miniTen(Math.round(pov/10)),"ingresos por debajo del 60 % de la mediana"],
       [sgn(real),"Renta desde 2015, en euros de 2024",miniLines(deflate(ri),ri,{h:40}),`la línea granate ya descuenta la subida de precios; la gris de puntos es la renta en euros de cada año: ${sgn(gr)}`]]; }
-  if(id==="vivienda"){ const iy=REFS.ipvaYears, i15=iy.indexOf(2015);
-    return [[`+${nf0.format(G.anuncios)}${NB}%`,"Anuncios de alquiler, 2015–2024",miniBars([[G.anuncios,"--rust"],[G.salMed,"--slate"],[G.ipc,"--stone"]],{h:40}),`frente a sueldo mediano ${sgn(G.salMed)} y precios ${sgn(G.ipc)}`],
-      [`+${nf0.format(G.declarado)}${NB}%`,"Alquiler declarado, todos los contratos",miniLines(es.ipva.slice(i15),null,{h:40}),"quien ya tiene contrato lo nota menos que quien busca"],
-      [nf0.format(lastV(es.vt)),"Pisos turísticos",miniLines(es.vt,null,{h:40,index:false}),`el ${pc(lastV(es.vtp))} de las viviendas; mucho más en algunas costas`],
-      [`${Math.round(ce.secondary/10)} de 10`,"Viviendas vacías o secundarias",miniTen(Math.round(ce.secondary/10)),"sobre todo en pueblos que pierden gente"]]; }
   if(id==="poblacion"){ const pad=es.pad, lose=loseShare(), ag=es.mean_age;
     return [[`+${nf1.format((lastV(pad)-pad[0])/1e6)}${NB}M`,"Habitantes desde 1996",miniLines(pad,null,{h:40}),`hoy somos ${nf1.format(lastV(pad)/1e6)} millones`],
       [`${Math.round(lose/10)} de 10`,"Municipios con menos vecinos que en 2005",miniTen(Math.round(lose/10)),"el crecimiento se concentra en ciudades, costa e islas"],
@@ -6237,7 +6167,30 @@ async function studyVivienda(B){
         v.map(x=>{ const r=rowBy.get(x.c); return [`<a href="${munPath(x.c)}">${esc(cName(x.n))}</a><br><small class="muted">${lab[x.tipo]}</small>`,`${nf1.format(x.a08)} → <b>${nf1.format(x.a24)}</b>`,x.hogNue>=0?nf0.format(rd(x.hogNue)):"pierde población",r&&r[F.noPrincipal]!=null?nf0.format(r[F.noPrincipal])+NB+"%":"—",x.alq!=null?nf0.format(x.alq)+NB+"%":"—",x.comp!=null?nf0.format(rd(x.comp)):"—"]; }));
       more.innerHTML=(q||all)?"":`<button type="button" class="btn">Ver las ${CI.length} ciudades</button>`; const b=more.querySelector("button"); if(b) b.onclick=()=>{ all=true; draw(); }; };
     inp.addEventListener("input",draw); draw();
-    add(f.body,"p","pt-cta").innerHTML=`<a class="btn" href="/municipio/">Busca tu municipio →</a>`; };
+  };
+  // del antiguo tema «Vivienda», fusionado aquí: alquiler anunciado y declarado, contratos nuevos, pisos turísticos y hogares de alquiler
+  const SB=subidas(), iaN=REFS.ipvaAntig||{es:{},prov:{}}, ES_=REFS.es, nuevos=iaN.es.n||[], i21=YEARS.indexOf(2021), salM=REFS.salarios.mediana, incP=ES_.net_income_pc;
+  const rowsP=Object.entries(iaN.prov||{}).map(([p,v])=>{ const r=REFS.prov[p]; if(!r||!v.n) return null; return {p,n:(v.n[9]/v.n[6]-1)*100,e:(v.e[9]/v.e[6]-1)*100,g:(r.net_income_pc[9]/r.net_income_pc[6]-1)*100}; }).filter(Boolean).sort((a,b)=>(b.n-b.g)-(a.n-a.g));
+  const overP=rowsP.filter(r=>r.n>r.g), vtS=ES_.vt, vtPer=REFS.vtPeriods, vtMi=vtS.indexOf(d3.max(vtS)), vtLast=vtS[vtS.length-1];
+  const vtPerL=vtPer.map(q=>q.replace(/^(\d{4})M(\d\d)$/,(m,y,mm)=>MES[+mm].slice(0,3)+". "+y.slice(2)));
+  Object.assign(V,{r_anun:SB.anuncios,r_decl:SB.declarado,r_sal:SB.salMed,r_nuevos:nuevos[9]/nuevos[6]*100-100,r_sal21:salM[2024]/salM[2021]*100-100,r_nOver:overP.length,
+    r_p1:provShort(PROVS[rowsP[0].p]),r_p1d:rowsP[0].n-rowsP[0].g,r_p2:provShort(PROVS[rowsP[1].p]),r_p2d:rowsP[1].n-rowsP[1].g,
+    t_max:vtS[vtMi],t_maxMes:MES[+vtPer[vtMi].slice(5)],t_maxAño:vtPer[vtMi].slice(0,4),t_drop:(1-vtLast/vtS[vtMi])*100,alqEs:REFS.census.es.rented});
+  G.subidas=el=>drawSubidas(el);
+  G.contratosNuevos=el=>realChart(el,{title:"Alquiler de contratos nuevos, salario y renta, 2021 = 100",source:"Fuente: INE, Índice de Precios de Vivienda en Alquiler, Encuesta de Estructura Salarial y Atlas de Renta.",
+    series:[{n:"Alquiler nuevos",v:nuevos.slice(i21),c:"--rust",main:true},{n:"Renta",v:incP.slice(i21),c:"--slate"},{n:"Salario mediano",v:YEARS.slice(i21).map(y=>salM[y]),c:"--mustard"}],xticks:[2021,2022,2023,2024],height:260,years:YEARS.slice(i21),index:true});
+  G.provinciasNuevos=el=>{ const f=fig(el,{title:"Alquiler nuevo, alquiler en vigor y renta por persona, 2021–2024",sub:"Las 12 provincias donde el alquiler de los contratos nuevos más se ha despegado de la renta",source:"Euros de cada año. Fuente: INE, Índice de Precios de Vivienda en Alquiler (por antigüedad del contrato) y Atlas de Renta."});
+    const mx=d3.max(rowsP,r=>Math.max(r.n,r.g,r.e)), w2=add(f.body,"div","cmp");
+    w2.innerHTML=`<div class="keys"><span><i style="background:var(--rust)"></i>Alquiler, contratos nuevos</span><span><i style="background:var(--mustard)"></i>Alquiler, contratos en vigor</span><span><i style="background:var(--slate)"></i>Renta por persona</span></div>`+
+      rowsP.slice(0,12).map(r=>`<div class="cmp-row"><div class="n">${esc(provShort(PROVS[r.p]))}<small>${r.n>r.g?`el alquiler nuevo sube ${nf1.format(r.n-r.g)} puntos más que la renta`:`la renta sube ${nf1.format(r.g-r.n)} puntos más`}</small></div><div class="bars">${[[r.n,"--rust"],[r.e,"--mustard"],[r.g,"--slate"]].map(([v,c])=>`<div class="b"><span style="width:${Math.max(0,v)/mx*100}%;background:var(${c})"></span><em>${sgn(v)}</em></div>`).join("")}</div></div>`).join("");
+    add(f.body,"p",null,exLink("mapa",{d:["alqVar","vt"]},"Ver el alquiler y los pisos turísticos, municipio a municipio, en el laboratorio")); };
+  G.alquilerProv=el=>{ const f=fig(el,{title:"Hogares que viven de alquiler, por provincia",source:"% de hogares, 2021. Fuente: INE, Censo de Población y Viviendas."}); hbars(f.body,provRows("alquiler").sort((a,b)=>b.v-a.v),{fmt:pc,scroll:true,color:"--rust",min:0,ref:REFS.census.es.rented,refLabel:"España"}); };
+  G.turisticas=el=>{ const g=add(el,"div","cols2"), fa=fig(g,{title:"Viviendas turísticas por provincia",sub:"% del total de viviendas, mayo de 2026",source:"Fuente: INE, estadística experimental de viviendas turísticas."});
+    hbars(fa.body,provRows("vt").sort((a,b)=>b.v-a.v).slice(0,15),{fmt:pc,color:"--rust",min:0});
+    lineChart(g,{title:"Viviendas turísticas anunciadas en España",source:"Agosto y febrero (o noviembre y mayo) de cada año. Fuente: INE, medición experimental de viviendas turísticas.",series:[{n:"Viviendas turísticas",v:vtS,c:"--rust",main:true}],years:vtPerL,xticks:[vtPerL[0],vtPerL[vtMi],vtPerL[vtPerL.length-1]],fmt:v=>nf0.format(v),tickFmt:v=>nf0.format(v/1000)+" mil",height:240}); };
+  G.miMunicipio=el=>{ el.innerHTML='<div id="mestrip"></div>'; meStrip("vivienda"); add(el,"p","pt-cta").innerHTML=`<a class="btn" href="/municipio/">Abrir la ficha de un municipio →</a>`; };
+  G.relacionados=el=>{ const L=STUDIES.filter(S=>S.tema==="vivienda"&&S.id!=="vivienda"&&!S.href); if(!L.length){ el.remove(); return; }
+    const g=add(el,"div","tstud"); L.forEach(S=>{ const a=add(g,"a"); a.href=`/preguntas/${S.id}/`; const ic=illCard(S.id); if(ic) a.appendChild(ic); a.insertAdjacentHTML("beforeend",`<b>${esc(S.t)}</b><span>${esc(S.a)}</span><em>Leer el análisis →</em>`); }); };
   mdRender(B,"vivienda",V,G);
 }
 
@@ -6924,7 +6877,7 @@ async function renderInicio(){
       <div><i>1</i><span><b>Datos que puedes comprobar</b>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></div>
       <div><i>2</i><span><b>Cada respuesta dice cuánto aguanta</b>Una etiqueta te avisa si los datos solo describen, si comparan casos parecidos o si una ley hizo de experimento.</span></div>
       <div><i>3</i><span><b>Sin bando</b>Si los datos no dan para una conclusión, lo decimos, aunque el titular quede peor.</span></div></div></section>
-  <section class="ed-sec"><div class="ed-k">Por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="/temas/${id}/">${TOPICS[id].l}</a>`).join("")}</div></section>
+  <section class="ed-sec"><div class="ed-k">Por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="${tHref(id)}">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   heroCarBind(view.querySelector(".pt-car"));
   // el gráfico de cabecera de cada análisis (data/covers.json), con su pie; si falta, su ilustración
@@ -7040,7 +6993,7 @@ const labBlock=`<section class="np-lab"><div class="np-lab-t"><div class="kk2">L
   view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">${T?"Análisis · "+esc(T.l):"Análisis"}</div><h1>${T?esc(T.l):"Lo que dicen los datos"}</h1><p>${T?esc(T.q)+" Estas son las preguntas que ya hemos contestado."+` <a href="/temas/${tema}/">Leer el panorama del tema →</a>`:`${all.length} preguntas respondidas con datos públicos, de lo más reciente a lo más antiguo. Cada respuesta dice hasta dónde llega.`}</p>${chips}</header>
     ${T?(L.length?`<section class="np-sec np-all"><div class="np-grid">${L.map(card).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis sobre ${low(T.l)}. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`):leadHTML?`<section class="np-top">${leadHTML}</section>`:`<p class="an-vacio">Todavía no hay análisis sobre ${low(T?T.l:"este tema")}. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`}
     ${!T&&recent.length?`<section class="np-sec"><div class="np-sh"><h2>Más recientes</h2></div><div class="np-grid">${recent.map(card).join("")}</div></section>`:""}
-    ${byTema.map(([id,a])=>`<section class="np-sec"><div class="np-sh"><h2>${TOPICS[id].l}</h2><span>${esc(TOPICS[id].q)}</span>${T?"":`<a href="/temas/${id}/">Panorama del tema →</a>`}</div><div class="np-grid">${a.map(card).join("")}</div></section>`).join("")}
+    ${byTema.map(([id,a])=>`<section class="np-sec"><div class="np-sh"><h2>${TOPICS[id].l}</h2><span>${esc(TOPICS[id].q)}</span>${T||id==="vivienda"?"":`<a href="/temas/${id}/">Panorama del tema →</a>`}</div><div class="np-grid">${a.map(card).join("")}</div></section>`).join("")}
     ${T?"":`<section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/municipio/">Ver el mapa de municipios →</a></p></div></section>`}
     ${labBlock}
     ${otros}</div>`;
