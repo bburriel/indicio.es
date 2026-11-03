@@ -308,8 +308,16 @@ btn.forEach(function(b){b.addEventListener("click",function(){var nk=b.getAttrib
   const L=r=>`<a href="${munPath(r)}">${esc(r[F.name])}</a>`, PL=r=>`<a href="/provincia/${provSlug(r[F.prov])}/">${esc(provShort(PROVS[r[F.prov]]))}</a>`;
   const pick=(R,min,max=1e9)=>rows.filter(r=>r[F[R.k]]!=null&&!(R.k==="paroReg"&&r[F[R.k]]<=0)&&(r[F.pop]||0)>=min&&(r[F.pop]||0)<max).sort((a,b)=>R.desc?b[F[R.k]]-a[F[R.k]]:a[F[R.k]]-b[F[R.k]]);
   const tbl=(list,R,n)=>`<div class="extable"><table class="glance"><thead><tr><th>#</th><th>Municipio</th><th>Provincia</th><th class="r">${esc(cap1(catOf(R.k).l||R.what))}</th><th class="r">Habitantes</th></tr></thead><tbody>${list.slice(0,n).map((r,i)=>`<tr><td class="muted">${i+1}</td><td>${L(r)}</td><td>${PL(r)}</td><td class="r num">${R.f(r[F[R.k]])}</td><td class="r num">${nf0.format(r[F.pop])}</td></tr>`).join("")}</tbody></table></div>`;
+  const RK_ARROW=`<svg class="rk-ar" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+  const RK_GROUPS=[
+    ["Renta y desigualdad",["municipios-mas-ricos","municipios-mas-pobres","municipios-mas-desiguales"],false],
+    ["Empleo y estudios",["municipios-con-mas-paro","municipios-con-menos-paro","municipios-con-mas-universitarios"],false],
+    ["Población",["municipios-que-mas-crecen","municipios-que-mas-poblacion-pierden","municipios-mas-envejecidos","municipios-mas-jovenes","municipios-con-mas-extranjeros"],true],
+    ["Vivienda",["donde-mas-sube-el-alquiler","municipios-con-mas-pisos-turisticos"],true]];
+  const RK_DESDE=new Set(["municipios-que-mas-crecen","municipios-que-mas-poblacion-pierden","donde-mas-sube-el-alquiler"]);
+  const rkGrid=`<div class="rk-grid">${RK_GROUPS.map(([h,ids,wide])=>`<section class="rk-box${wide?" wide":""}"><h2>${h}</h2><div class="rk-rows">${ids.map(id=>{const R=RANKS.find(x=>x.id===id);return `<a class="rk-row" href="/rankings/${R.id}/"><span>${RK_DESDE.has(id)?`<small>Desde 2015</small>`:""}<b>${esc(R.t)}</b></span>${RK_ARROW}</a>`}).join("")}</div></section>`).join("")}</div>`;
   const idx=`<nav class="crumbs"><a href="/municipio/">Municipios</a></nav><header class="phead"><h1>Rankings de municipios de España</h1><p class="dek">Los municipios con más y menos renta, paro, población, edad, alquiler o pisos turísticos, con los datos oficiales más recientes.</p></header>
-    <div class="studies">${RANKS.map(R=>`<a class="study" href="/rankings/${R.id}/"><span>${esc(cap1(catOf(R.k).l||""))}</span><b>${esc(R.t)}</b></a>`).join("")}</div>${sources}`;
+    ${rkGrid}${sources}`;
   page({route:"/rankings/",title:"Rankings de municipios de España · Indicio",desc:"Los municipios más ricos, con más paro, más envejecidos, que más crecen, con más pisos turísticos… con datos oficiales del INE y el SEPE.",main:idx,jsonld:breadcrumb([["Municipios","/municipio/"],["Rankings","/rankings/"]])});
   addUrl("/rankings/",0.8);
   for(const R of RANKS){
