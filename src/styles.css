@@ -1622,3 +1622,19 @@ details.chk > section{margin-top:18px}
 .mymun{border-color:transparent!important; background:none!important; color:var(--muted)!important; font-size:13.5px}
 .mymun:hover,.mymun:focus-visible{border-color:var(--rule-2)!important; background:var(--card)!important; color:var(--ink)!important}
 .mymun .c{opacity:.6}
+/* pensiones: tarjetas de escenario, mapa y simulador */
+.pn-card{border:1px solid var(--rule); border-left:4px solid var(--ko,#b0303f); border-radius:8px; padding:14px 16px 12px; margin:6px 0 14px; max-width:var(--medida)}
+.pn-card.ok{border-left-color:var(--ok,#3f7a4a)}
+.pn-h{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 16px}
+.pn-h b{font:700 17px/1.3 var(--font)}
+.pn-v{font:800 26px/1 var(--font); color:var(--ko,#b0303f)} .pn-card.ok .pn-v{color:var(--ok,#3f7a4a)}
+.pn-v small{font:400 13px var(--font); color:var(--muted); margin-left:4px}
+.pn-c{font-size:14.5px; margin:6px 0 2px; font-weight:600; color:var(--ko,#b0303f)} .pn-c.ok{color:var(--ok,#3f7a4a)}
+.pn-ch figure{margin:6px 0 0}
+.pn-m{font-size:14px; color:var(--ink-2); margin:6px 0 0}
+.pn-map svg{width:100%; height:auto; display:block}
+.pn-map .lab{font:12px var(--font); fill:var(--muted)}
+.pn-note{font-size:14.5px; color:var(--ink-2); margin-top:8px}
+.pn-sim{margin-top:10px}
+.pn-sim small{font-weight:400; color:var(--muted); font-size:12.5px; line-height:1.4}
+.calc .lnk{background:none; border:0; padding:0; color:var(--brand); cursor:pointer; text-decoration:underline; font:inherit}
