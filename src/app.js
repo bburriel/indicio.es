@@ -984,7 +984,10 @@ function drawProvMap(code,P){
   const svg=d3.select(fig.querySelector("svg")).attr("viewBox",`${vx} ${vy} ${vw} ${vh}`);
   const ink=css("--ink"), rust=css("--rust"), card=css("--card"), r2=css("--rule-2");
   svg.append("defs").html(`<pattern id="pmhatch" width="${5*k}" height="${5*k}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${5*k}" height="${5*k}" fill="${card}"/><line x1="0" y1="0" x2="0" y2="${5*k}" stroke="${rust}" stroke-width="${1.5*k}"/></pattern>`);
-  svg.append("g").selectAll("path").data(near).join("path").attr("d",path).attr("fill","none").attr("stroke",r2).attr("stroke-width",.8*k);
+  const gs=TOPO.objects.provinces.geometries, adj=new Set((topojson.neighbors(gs)[gs.findIndex(g=>g.id===P)]||[]).map(i=>gs[i].id));   // solo las que comparten frontera
+  svg.append("g").selectAll("path").data(near).join("path").attr("class",f=>adj.has(f.id)&&PROVS[f.id]?"pm-p":"pm-no").attr("d",path).attr("fill","transparent").attr("stroke",r2).attr("stroke-width",.8*k)
+    .on("click",(e,f)=>{ if(adj.has(f.id)&&PROVS[f.id]) location.assign("/provincia/"+norm(provShort(PROVS[f.id])).replace(/ /g,"-")+"/"); })
+    .filter(f=>adj.has(f.id)&&PROVS[f.id]).append("title").text(f=>"Provincia de "+provShort(PROVS[f.id]));
   svg.append("g").selectAll("path").data(mun).join("path").attr("class","pm-m").attr("d",path).attr("fill",card).attr("stroke",r2).attr("stroke-width",.35*k)
     .on("click",(e,f)=>{ if(BYCODE.has(f.id)&&f.id!==code) go(f.id); }).append("title").text(f=>{ const x=BYCODE.get(f.id); return x?dispName(x[F.name]):f.properties.name; });
   svg.append("path").datum(prov).attr("class","pm-no").attr("d",path).attr("fill","none").attr("stroke",css("--ink-2")).attr("stroke-width",1.3*k).attr("stroke-linejoin","round");
@@ -1014,7 +1017,7 @@ function drawProvMap(code,P){
   svg.append("circle").attr("class","pm-no").attr("cx",x1).attr("cy",y1).attr("r",4.5*k).attr("fill",rust).attr("stroke",card).attr("stroke-width",2*k);
   const pn=provShort(PROVS[P]);
   fig.querySelector("svg").setAttribute("aria-label",`Mapa de la provincia de ${pn}: ${nm} está a ${kmT} en línea recta de ${cn}, su capital.`);
-  fig.querySelector("figcaption").innerHTML=`<b>${esc(nm)} está a ${kmT} de ${esc(cn)}</b>, la capital de la provincia de ${esc(pn)}, medidos en línea recta entre los centros de los dos términos municipales. Por carretera es más. Pulsa otro municipio para ir a su ficha.`;
+  fig.querySelector("figcaption").innerHTML=`<b>${esc(nm)} está a ${kmT} de ${esc(cn)}</b>, la capital de la provincia de ${esc(pn)}, medidos en línea recta entre los centros de los dos términos municipales. Por carretera es más. Pulsa otro municipio para ir a su ficha, o una provincia vecina para ver sus municipios.`;
   fig.hidden=false;
 }
 
