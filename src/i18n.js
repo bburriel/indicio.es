@@ -153,12 +153,24 @@ function start(){
 }
 function stop(){ if(observer){ observer.disconnect(); observer=null; } if(titleObs){ titleObs.disconnect(); titleObs=null; } pending.clear(); }
 
+var LOGO={
+  es:'Indic<span class="lg-i">ı</span>o', gl:'Indic<span class="lg-i">ı</span>o', en:'Indic<span class="lg-i">ı</span>o',
+  ca:'Indic<span class="lg-i">ı</span>', eu:'Zantzu<span class="lg-p"></span>'
+};
+var LOGO_NAME={es:"Indicio",gl:"Indicio",en:"Indicio",ca:"Indici",eu:"Zantzu"};
+var LOGO_HOME={es:"portada",gl:"portada",ca:"portada",eu:"hasiera",en:"home"};
+function setLogo(l){
+  var t=document.getElementById("logotxt"); if(!t) return;
+  var h=LOGO[l]||LOGO.es; if(t.getAttribute("data-l")!==l){ t.innerHTML=h; t.setAttribute("data-l",l); }
+  var a=t.parentElement; if(a) a.setAttribute("aria-label",LOGO_NAME[l]+", "+LOGO_HOME[l]);
+}
 function apply(l,save){
   if(CODES.indexOf(l)<0) l="es";
   var prev=lang; lang=l;
   document.documentElement.setAttribute("lang",l);
   if(save){ try{ localStorage.setItem(KEY,l); }catch(e){} }
   var sel=document.getElementById("langsel"); if(sel&&sel.value!==l) sel.value=l;
+  setLogo(l);
   if(prev!=="es"){ restoreAll(); titleBack(); }
   if(l==="es"){ stop(); noteCheck(); return; }
   start(); walk(document.body); titleTr(); noteCheck();

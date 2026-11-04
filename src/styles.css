@@ -955,6 +955,7 @@ button.sel,.acts button,.chipsq a,.chipsq button,.toc a,.ctag,.ctlnote button,se
 .logo .lg-i{position:relative; display:inline; width:auto; height:auto; padding:0; background:none; border-radius:0}
 .logo .lg-i:after{content:""; position:absolute; left:50%; top:.3em; width:.165em; height:.165em; border-radius:50%; background:var(--brand-2); transform:translateX(-50%)}
 @media (max-width:760px){ .logo{font-size:26px} }
+.logo .lg-p{display:inline-block; width:.165em; height:.165em; border-radius:50%; background:var(--brand-2); margin-left:.06em; vertical-align:baseline}
 /* sin buscador en la cabecera: el botón de tu municipio ocupa su sitio */
 @media (max-width:760px){ .mymun{order:2; margin-left:auto; max-width:55%} }
 
