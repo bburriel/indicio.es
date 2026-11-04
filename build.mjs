@@ -287,7 +287,7 @@ items.forEach(function(it){var a=document.createElement("a");a.href=it.href||"#"
 if(it.p){a.addEventListener("mouseenter",function(){set(it.p,null)});a.addEventListener("focus",function(){set(it.p,null)})}else if(it.c){a.addEventListener("mouseenter",function(){set(null,it.c)});a.addEventListener("focus",function(){set(null,it.c)});if(!it.href)a.addEventListener("click",function(e){e.preventDefault()})}
 R.appendChild(a)})}
 function draw(){var p=cur&&cur.p,c=cur&&cur.c,cc=c?ccById[c]:null;
-Object.keys(by).forEach(function(id){var a=by[id].a,cl=a.getAttribute("class").replace(/ (on|dim)\b/g,"");if(mode==="prov"&&p===id)cl+=" on";if(mode==="ccaa"&&cc&&ccOf[id]!==c)cl+=" dim";a.setAttribute("class",cl)});
+Object.keys(by).forEach(function(id){var a=by[id].a,cl=a.getAttribute("class").replace(/ (on|dim)(?= |$)/g,"");if(mode==="prov"&&p===id)cl+=" on";if(mode==="ccaa"&&cc&&ccOf[id]!==c)cl+=" dim";a.setAttribute("class",cl)});
 G.hidden=true;
 if(mode==="prov"&&p){var x=by[p];K.textContent=cc.name;T.textContent=x.name;S.textContent=w(x.n);G.href=x.a.getAttribute("href");G.hidden=false;
 rows("Provincias de "+cc.name,cc.provs.length>1?cc.provs.map(function(id){return by[id]}).sort(function(a,b){return a.name.localeCompare(b.name,"es")}).map(function(q){return{name:q.name,n:q.n,p:q.id,href:q.a.getAttribute("href")}}):[])}
