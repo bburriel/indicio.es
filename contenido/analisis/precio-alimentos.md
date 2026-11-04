@@ -3,8 +3,8 @@ titulo: ¿Cuánto cuesta llenar el carro y qué parte del sueldo se lleva?
 entradilla: Desde 2019 la comida ha subido bastante más que el sueldo. Calculamos cuánto cuesta hoy llenar el carro, cómo ha cambiado el esfuerzo de pagarlo y a quién le pesa más.
 respuesta: La comida ha subido un 35 % y el sueldo un 20 %: pagar la misma compra cuesta cuatro días más de sueldo al año.
 tema: riqueza
-metodo: Presupuestos Familiares, IPC, Estructura Salarial y triple diferencia del IVA, 2002–2026
-evidencia: natural
+metodo: Presupuestos Familiares, IPC, Estructura Salarial y comparación del IVA con otros países, 2002–2026
+evidencia: desc
 publicado: 2026-10-25
 actualizado: 2026-11-03
 ---
