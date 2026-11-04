@@ -7,6 +7,8 @@ metodo: Eurostat y Banco Mundial, 2015–2025
 evidencia: desc
 publicado: 2026-11-03
 actualizado: 2026-11-03
+oculto: sí
+motivo: fuera de la primera tanda; se revisa y se publica después (4 de noviembre de 2026)
 ---
 
 Los últimos años no han sido iguales en todas partes. Todos los países europeos pasaron por la pandemia y por la crisis de precios, así que compararse con los vecinos es la mejor manera de ver **qué fue de todos y qué fue solo de aquí**. La referencia es la mediana de Alemania, Francia, Italia, Portugal, Países Bajos, Irlanda, Grecia, Bélgica, Austria, Suecia, Dinamarca, Finlandia y Polonia.

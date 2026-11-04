@@ -7,6 +7,8 @@ metodo: INE (IPC, coste laboral, EPA, ECV), 2019–2026
 evidencia: desc
 publicado: 2026-11-03
 actualizado: 2026-11-03
+oculto: sí
+motivo: fuera de la primera tanda; se revisa y se publica después (4 de noviembre de 2026)
 ---
 
 Desde 2019 han pasado la pandemia, la guerra de Ucrania, la crisis energética, la mayor subida de tipos en décadas y una inflación que llegó al **{{ipcPico|pct1}} interanual en {{picoMes}}**. La pregunta que se hace casi todo el mundo es sencilla: **¿con lo que cobro, compro hoy menos que antes?**

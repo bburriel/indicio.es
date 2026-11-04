@@ -8,6 +8,8 @@ evidencia: desc
 publicado: 2026-10-25
 actualizado: 2026-10-25
 orden: -2
+oculto: sí
+motivo: fuera de la primera tanda; se revisa y se publica después (4 de noviembre de 2026)
 ---
 
 En campaña, cada partido elige el dato que le conviene. El paro bajó, la deuda subió, la economía crece más que la de Alemania… Casi todo es verdad y casi nada se entiende sin una pregunta previa: **¿qué estaba pasando a la vez en el resto de Europa?**

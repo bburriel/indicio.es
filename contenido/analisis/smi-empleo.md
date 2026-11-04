@@ -7,6 +7,8 @@ metodo: Banco de España, AIReF, Seguridad Social y EPA, 2019–2026
 evidencia: desc
 publicado: 2026-11-03
 actualizado: 2026-11-03
+oculto: sí
+motivo: fuera de la primera tanda; se revisa y se publica después (4 de noviembre de 2026)
 ---
 
 El salario mínimo interprofesional pasó de **735,9 euros al mes en 2018 a 1.184 euros en 2025**, en catorce pagas: un 61 % más en términos nominales. Descontada la inflación, la AIReF lo deja en torno al 29 %. Es una de las subidas más rápidas de Europa, y la pregunta que se repite desde 2019 es si costó empleo.
