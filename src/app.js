@@ -4525,11 +4525,13 @@ function fixScale(){
   if(EX.v==="mapa"){ if(EX.u==="eu") EX.u=""; EX.d=EX.d.filter(k=>CATK[k]&&!isEU(k)); if(!EX.d.length) EX.d=["renta"]; if(isReg(EX.d[0])&&!EX.u) EX.u=scaleOK("prov",[EX.d[0]])?"prov":"ccaa"; if(EX.u&&isReg(EX.d[0])&&!scaleOK(EX.u,[EX.d[0]])) EX.u=scaleOK("prov",[EX.d[0]])?"prov":"ccaa"; if(EX.u){ EX.bv=0; EX.d=[EX.d[0],...EX.d.slice(1).filter(k=>!isReg(k))]; } else EX.d=EX.d.filter(k=>!isReg(k)).concat([]).length?EX.d.filter(k=>!isReg(k)):["renta"]; return; }
   if(EX.v!=="cruce"&&EX.v!=="burbujas"){ const d=EX.d.filter(k=>CATK[k]&&!isReg(k)&&!isEU(k)); if(d.length!==EX.d.length){ EX.d=d.length?d:["renta","paroReg"]; } return; }
   if(EX.v==="burbujas"){ const ok=k=>BSER.some(b=>b[0]===k)||(isReg(k)&&CATK[k].np>=40); let [a,b]=EX.d; if(!ok(a)) a="renta"; if(!ok(b)||b===a) b=a==="pobreza"?"renta":"pobreza"; EX.d=[a,b]; return; }
-  if(EX.u==="eu"){ if(!EUR) return; const d=EX.d.slice(0,2).filter(isEU); const def=["E_pib_pps","E_paro"].filter(k=>!d.includes(k)); while(d.length<2) d.push(def.shift()); EX.d=[...d,...EX.d.slice(2).filter(isEU)]; EX.c=[]; return; }
+  if(EX.u==="eu"){ EX.u=""; EX.c=[]; }   // enlaces antiguos a la escala de Europa: vuelven a municipios
+  if(false){ if(!EUR) return; const d=EX.d.slice(0,2).filter(isEU); const def=["E_pib_pps","E_paro"].filter(k=>!d.includes(k)); while(d.length<2) d.push(def.shift()); EX.d=[...d,...EX.d.slice(2).filter(isEU)]; EX.c=[]; return; }
   EX.d=EX.d.filter(k=>CATK[k]&&!isEU(k)); { const def=["renta","paroReg","edad"].filter(k=>!EX.d.includes(k)); while(EX.d.length<2) EX.d.push(def.shift()); }
   if(EX.d.slice(0,2).some(isReg)){ if(!scaleOK(EX.u)) EX.u=scaleOK("prov")?"prov":"ccaa"; EX.c=[]; }
 }
-const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"],["eu","Europa"]];
+// la escala «Europa» ya no se ofrece (costaba de entender); el código de sus gráficos queda por si vuelve
+const SCALES=[["","Municipios"],["prov","Provincias"],["ccaa","Comunidades"]];
 // etiquetas de un gráfico de puntos sin que se pisen: prueba a la derecha, a la izquierda, arriba y abajo; si no cabe, no la pone
 function placeLabels(sel,pts,{x,y,r,t,fs=11,W=1e9,fill="var(--ink-2)"}){
   const cw=fs*0.56, boxes=[], ov=(a,b)=>a.x0<b.x1&&b.x0<a.x1&&a.y0<b.y1&&b.y0<a.y1;
