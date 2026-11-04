@@ -2,7 +2,7 @@
 :root{
   --bg:#f6f4ef; --band:#ebeee6; --ink:#1d1c1a; --ink-2:#4a4743; --muted:#7a756c; --rule:#e2e0d8; --rule-2:#cfcbc0; --strong:#2a2826; --card:#ffffff;
   --brand:#6e1423; --brand-2:#8a1c2d; --acc:#a9c9a4; --acc-ink:#3f7a4a;
-  --rust:#b0303f; --mustard:#b07a14; --slate:#2e6fb0; --olive:#5f7a2e; --plum:#7a4f8a; --stone:#a69690; --s-b:#9a6fb0;
+  --rust:#b0303f; --mustard:#b07a14; --slate:#2e6fb0; --olive:#5f7a2e; --plum:#7a4f8a; --stone:#a69690; --s-b:#2e6fb0;
   --s-mun:var(--rust); --s-prov:var(--mustard); --s-es:var(--slate);
   --mark:#d6e7d2; --pos:#b0303f; --neg:#2e6fb0;
   --div-mid:#ebe8e1; --div-neg:#2e6fb0; --div-neg2:#b9cde4;
@@ -16,7 +16,7 @@
 :root[data-theme="dark"]{
   --bg:#191a17; --band:#22241f; --ink:#ecebe6; --ink-2:#c6c3ba; --muted:#959187; --rule:#33352f; --rule-2:#47493f; --strong:#e6e4dd; --card:#20221e;
   --brand:#4a0e18; --brand-2:#5e1520; --acc:#a9c9a4; --acc-ink:#a9c9a4;
-  --rust:#d0505f; --mustard:#a8851f; --slate:#5b8ad6; --olive:#8c9850; --plum:#a882c0; --stone:#6f6260; --s-b:#b894d4;
+  --rust:#d0505f; --mustard:#a8851f; --slate:#5b8ad6; --olive:#8c9850; --plum:#a882c0; --stone:#6f6260; --s-b:#7fb2ee;
   --mark:#33503a; --pos:#e0707c; --neg:#7ea4dc;
   --div-mid:#34352f; --div-neg:#6b93d0; --div-neg2:#34475f;
   --ramp-0:#3a1d22; --ramp-1:#5e2532; --ramp-2:#843342; --ramp-3:#a8505a; --ramp-4:#c97c74; --ramp-5:#e2aa8e; --ramp-6:#f2d6b2;
@@ -1914,7 +1914,12 @@ details.chk > section{margin-top:18px}
 .cp-vv{text-align:right; font-variant-numeric:tabular-nums} .cp-vv b{display:block; font-size:18px; color:var(--rust)} .cp-vv small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
 @media (max-width:760px){ .cp-k{grid-template-columns:minmax(0,1fr) auto; gap:8px 12px} .cp-k .cp-t{grid-column:1/-1} .cp-k .cp-trk{grid-row:2; grid-column:1} .cp-k .cp-vv{grid-row:2; grid-column:2} }
 
-.cp-trk .me.b,.cp-key i.me.b{background:var(--s-b)}
+/* El segundo municipio va en azul y con forma de rombo: se distingue del granate aunque los colores se confundan (daltonismo) */
+.cp-trk .me.b,.cp-key i.me.b,.cp-vv2 i.me.b{background:var(--s-b); border-radius:2px; transform:rotate(45deg)}
+.cp-trk .me.b{top:8px; width:14px; height:14px; margin-left:-7px}
+.cp-key i.me.b{width:9px; height:9px; margin:0 7px 0 2px}
+.cp-vv2 i.me.b{width:8px; height:8px; margin:0 8px 0 1px}
+.cp-nm i.b{width:14px; height:14px; margin:0 1px; border-radius:2px; transform:rotate(45deg)}
 .cp-k2{grid-template-columns:minmax(0,300px) minmax(0,1fr) 190px}
 .cp-vv2{display:flex; flex-direction:column; gap:3px; font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums} .cp-vv2 b{color:var(--ink); font-weight:600; float:right; margin-left:10px} .cp-vv2 span{display:block} .cp-vv2 i{display:inline-block; vertical-align:-1px; margin-right:7px} .cp-vv2 i.me{width:10px; height:10px; border-radius:50%; background:var(--rust)} .cp-vv2 i.me.b{background:var(--s-b)} .cp-vv2 i.es{width:2px; height:11px; background:var(--ink); margin:0 8px 0 4px}
 @media (max-width:760px){ .cp-r{grid-template-columns:minmax(0,1fr); gap:12px; padding:18px 0} .cp-k2 .cp-trk{margin:0 8px} }
