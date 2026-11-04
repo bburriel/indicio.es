@@ -92,7 +92,7 @@ Pero la comida subió un **{{ali19|pct0}}**. Con el sueldo mediano de {{año}} s
 
 [[grafico:compra]]
 
-Lo contamos con más detalle en [¿Cuánta comida compra hoy un sueldo?](/preguntas/precio-alimentos/).
+Lo contamos con más detalle en [¿Cuánto cuesta llenar el carro y qué parte del sueldo se lleva?](/preguntas/precio-alimentos/).
 
 ## Dónde vives y quién eres
 
