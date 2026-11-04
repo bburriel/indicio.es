@@ -870,9 +870,8 @@ async function renderMun(code,sec){
         <p class="dek">${summary(r,d)}</p>
         <div class="chipsq"><span id="mychips" style="display:contents">${myChip(code)}</span><a href="#comparar-${code}">⇄ Comparar con otro</a><a href="${exHash({v:"mapa",d:["renta","paroReg"],p:code.slice(0,2),t:"",m:code,c:[]})}">Verlo en el laboratorio</a><button type="button" id="mshare">Compartir</button><span class="muted" style="font-size:12.5px">Municipio de ${esc(bandLab)} Código INE ${esc(code)}.</span></div>
       </div>
-      <figure class="locator" id="locator"><svg viewBox="0 0 260 200" aria-hidden="true"></svg><figcaption>El término municipal y sus vecinos. Pulsa otro para ir a su ficha.</figcaption></figure>
+      <figure class="provmap" id="provmap" hidden><svg role="img" aria-label=""></svg><figcaption></figcaption></figure>
     </header>
-    <figure class="provmap" id="provmap" hidden><svg role="img" aria-label=""></svg><figcaption></figcaption></figure>
     <h2 class="mf-h2">Las cifras clave</h2>
     <div class="kpis" id="kpis"></div>
     <h2 class="mf-h2">Cómo ha cambiado desde 2015</h2>
@@ -885,7 +884,7 @@ async function renderMun(code,sec){
   document.documentElement.style.setProperty("--toph",document.getElementById("top").offsetHeight+"px");
   myChipBind(code);
   document.getElementById("mshare").addEventListener("click",e=>{ const url=location.href.split("#")[0]+"#m"+code; try{ navigator.clipboard.writeText(url).then(()=>{ e.target.textContent="Enlace copiado"; },()=>prompt("Copia este enlace:",url)); }catch(x){ prompt("Copia este enlace:",url); } });
-  loadTopo().then(()=>{ drawLocator(code,P); drawProvMap(code,P); }).catch(()=>{});
+  loadTopo().then(()=>{ drawProvMap(code,P); }).catch(()=>{});
   try{ kpis(document.getElementById("kpis"),r,d); }catch(e){ console.error(e); }
   try{ smalls(document.getElementById("smalls"),r,d); }catch(e){ console.error(e); }
   try{ destaca(document.getElementById("destaca"),r); }catch(e){ console.error(e); }
@@ -956,22 +955,6 @@ function smalls(box,r,d){
 }
 function scrollSec(k){ const s=document.getElementById("s-"+k); if(!s) return; const off=(document.getElementById("top").offsetHeight||58)+50; window.scrollTo({top:s.getBoundingClientRect().top+window.scrollY-off}); }
 
-function drawLocator(code,P){
-  const box=document.querySelector("#locator svg"); if(!box) return;
-  const me=FEATS.find(f=>f.id===code); if(!me) return;
-  // el término y sus vecinos: encuadre alrededor del municipio, solo contornos, el tuyo rayado y con su nombre
-  const [[x0,y0],[x1,y1]]=d3.geoBounds(me), cx=(x0+x1)/2, cy=(y0+y1)/2, hw=Math.max(.05,(x1-x0)*1.05), hh=Math.max(.04,(y1-y0)*1.05);
-  const near=FEATS.filter(f=>{ const [[a,b],[c,d]]=d3.geoBounds(f); return c>cx-hw*1.6&&a<cx+hw*1.6&&d>cy-hh*1.6&&b<cy+hh*1.6; });
-  const frame={type:"MultiPoint",coordinates:[[cx-hw,cy-hh],[cx+hw,cy+hh]]};
-  const proj=d3.geoMercator().fitExtent([[4,4],[256,196]],frame), path=d3.geoPath(proj), svg=d3.select(box);
-  svg.append("defs").html(`<pattern id="lochatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${css("--card")}"/><line x1="0" y1="0" x2="0" y2="6" stroke="${css("--rust")}" stroke-width="1.6" opacity=".55"/></pattern><clipPath id="locclip"><rect width="260" height="200"/></clipPath>`);
-  const g=svg.append("g").attr("clip-path","url(#locclip)");
-  g.selectAll("path").data(near).join("path").attr("d",path).attr("fill",f=>f.id===code?"url(#lochatch)":"transparent").attr("stroke",f=>f.id===code?css("--rust"):css("--rule-2")).attr("stroke-width",f=>f.id===code?1.8:.8)
-    .style("cursor","pointer").on("click",(e,f)=>{ if(BYCODE.has(f.id)) go(f.id); }).append("title").text(f=>{const x=BYCODE.get(f.id); return x?x[F.name]:f.properties.name;});
-  g.selectAll("path").filter(f=>f.id===code).raise();
-  const [lx,ly]=path.centroid(me), nm=dispName(BYCODE.get(code)[F.name]);
-  svg.append("text").attr("x",lx).attr("y",ly+5).attr("text-anchor","middle").attr("font-weight",700).attr("font-size",14).attr("paint-order","stroke").attr("stroke",css("--card")).attr("stroke-width",4).attr("fill",css("--ink")).attr("pointer-events","none").text(nm.length>22?nm.slice(0,20)+"…":nm);
-}
 
 // ---------- el municipio dentro de su provincia: la capital, el pueblo y la distancia en línea recta ----------
 // Capital de cada provincia (código INE del municipio). Ceuta y Melilla no llevan mapa: la provincia es la ciudad.
@@ -992,25 +975,25 @@ function drawProvMap(code,P){
     const i=part(cMe); if(i>=0&&i===part(cCap)) frame={type:"Feature",geometry:{type:"Polygon",coordinates:prov.geometry.coordinates[i]}};
   }
   const proj=d3.geoMercator().fitSize([W,440],frame), path=d3.geoPath(proj);
-  const [[bx0,by0],[bx1,by1]]=path.bounds(frame), M=20;                  // encuadre justo, con margen para las etiquetas
-  const vx=bx0-M, vy=by0-M, vw=bx1-bx0+2*M, vh=by1-by0+2*M;
+  const [[bx0,by0],[bx1,by1]]=path.bounds(frame), k=(bx1-bx0+40)/380, M=20*k, MX=64*k;                  // encuadre justo, con margen para las etiquetas
+  const vx=bx0-MX, vy=by0-M, vw=bx1-bx0+2*MX, vh=by1-by0+2*M;
   const near=PFEATS.filter(f=>{ if(f.id===P) return false; const [[a,b],[c,d]]=path.bounds(f); return c>vx&&a<vx+vw&&d>vy&&b<vy+vh; });
   const [x1,y1]=proj(cMe), [x2,y2]=proj(cCap), len=Math.hypot(x2-x1,y2-y1);
   const nm=dispName(BYCODE.get(code)[F.name]), cn=dispName(BYCODE.get(capCode)[F.name]);
   const kmT=(km<10?nf1.format(km):nf0.format(km))+NB+"km";
   const svg=d3.select(fig.querySelector("svg")).attr("viewBox",`${vx} ${vy} ${vw} ${vh}`);
   const ink=css("--ink"), rust=css("--rust"), card=css("--card"), r2=css("--rule-2");
-  svg.append("defs").html(`<pattern id="pmhatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="${card}"/><line x1="0" y1="0" x2="0" y2="5" stroke="${rust}" stroke-width="1.5"/></pattern>`);
-  svg.append("g").selectAll("path").data(near).join("path").attr("d",path).attr("fill","none").attr("stroke",r2).attr("stroke-width",.8);
-  svg.append("g").selectAll("path").data(mun).join("path").attr("d",path).attr("fill",card).attr("stroke",r2).attr("stroke-width",.35);
-  svg.append("path").datum(prov).attr("d",path).attr("fill","none").attr("stroke",css("--ink-2")).attr("stroke-width",1.3).attr("stroke-linejoin","round");
-  svg.append("path").datum(me).attr("d",path).attr("fill","url(#pmhatch)").attr("stroke",rust).attr("stroke-width",1.2);
-  svg.append("line").attr("x1",x1).attr("y1",y1).attr("x2",x2).attr("y2",y2).attr("stroke",ink).attr("stroke-width",1.4).attr("stroke-dasharray","5 4");
+  svg.append("defs").html(`<pattern id="pmhatch" width="${5*k}" height="${5*k}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${5*k}" height="${5*k}" fill="${card}"/><line x1="0" y1="0" x2="0" y2="${5*k}" stroke="${rust}" stroke-width="${1.5*k}"/></pattern>`);
+  svg.append("g").selectAll("path").data(near).join("path").attr("d",path).attr("fill","none").attr("stroke",r2).attr("stroke-width",.8*k);
+  svg.append("g").selectAll("path").data(mun).join("path").attr("d",path).attr("fill",card).attr("stroke",r2).attr("stroke-width",.35*k);
+  svg.append("path").datum(prov).attr("d",path).attr("fill","none").attr("stroke",css("--ink-2")).attr("stroke-width",1.3*k).attr("stroke-linejoin","round");
+  svg.append("path").datum(me).attr("d",path).attr("fill","url(#pmhatch)").attr("stroke",rust).attr("stroke-width",1.2*k);
+  svg.append("line").attr("x1",x1).attr("y1",y1).attr("x2",x2).attr("y2",y2).attr("stroke",ink).attr("stroke-width",1.4*k).attr("stroke-dasharray",`${5*k} ${4*k}`);
   // etiquetas con colocación sin choques: prueba posiciones hasta dar con una que cabe en el mapa y no pisa puntos, línea ni otras etiquetas
-  const placed=[[x1-8,y1-8,16,16],[x2-8,y2-8,16,16]], line=Array.from({length:25},(_,i)=>[x1+(x2-x1)*i/24,y1+(y2-y1)*i/24]);
+  const placed=[[x1-8*k,y1-8*k,16*k,16*k],[x2-8*k,y2-8*k,16*k,16*k]], line=Array.from({length:25},(_,i)=>[x1+(x2-x1)*i/24,y1+(y2-y1)*i/24]);
   const hit=(r,pts)=>placed.some(q=>r[0]<q[0]+q[2]&&r[0]+r[2]>q[0]&&r[1]<q[1]+q[3]&&r[1]+r[3]>q[1])||(pts&&line.some(([px,py])=>px>r[0]&&px<r[0]+r[2]&&py>r[1]&&py<r[1]+r[3]));
-  const label=(x,y,t,cands,{size=14,weight=700,onLine=false}={})=>{
-    const tx=svg.append("text").attr("font-size",size).attr("font-weight",weight).attr("paint-order","stroke").attr("stroke",card).attr("stroke-width",4).attr("stroke-linejoin","round").attr("fill",ink).attr("pointer-events","none").text(t);
+  const label=(x,y,t,cands,{size=14,weight=700,onLine=false}={})=>{ size*=k;
+    const tx=svg.append("text").attr("font-size",size).attr("font-weight",weight).attr("paint-order","stroke").attr("stroke",card).attr("stroke-width",4*k).attr("stroke-linejoin","round").attr("fill",ink).attr("pointer-events","none").text(t);
     let w=t.length*size*.6; try{ w=tx.node().getBBox().width; }catch(e){}
     let pick=null;
     for(const [dx,dy,an] of cands){
@@ -1021,13 +1004,13 @@ function drawProvMap(code,P){
     if(!pick){ const [dx,dy,an]=cands[0], left=an==="start"?x+dx:an==="end"?x+dx-w:x+dx-w/2; pick={dx,dy,an,r:[left,y+dy-size*.85,w,size*1.15]}; }
     placed.push(pick.r); tx.attr("x",x+pick.dx).attr("y",y+pick.dy).attr("text-anchor",pick.an);
   };
-  const sg=x1>=x2?1:-1, side=(s,y)=>[[s*11,y,s>0?"start":"end"],[-s*11,y,s>0?"end":"start"]];
-  const short=len<110, cs=(s)=>[...side(s,5),...side(s,-9),...side(s,19),[0,-13,"middle"],[0,26,"middle"]];
+  const sg=x1>=x2?1:-1, side=(s,y)=>[[s*11*k,y*k,s>0?"start":"end"],[-s*11*k,y*k,s>0?"end":"start"]];
+  const short=len<110*k, cs=(s)=>[...side(s,5),...side(s,-9),...side(s,19),[0,-13*k,"middle"],[0,26*k,"middle"],[-3*k,-13*k,"start"],[-3*k,26*k,"start"],[3*k,-13*k,"end"],[3*k,26*k,"end"]];
   label(x1,y1,short?`${nm} · ${kmT}`:nm,cs(sg));
   label(x2,y2,cn,cs(-sg),{weight:600});
-  if(!short) label((x1+x2)/2,(y1+y2)/2,kmT,[[0,5,"middle"]],{size:13,onLine:true});
-  svg.append("circle").attr("cx",x2).attr("cy",y2).attr("r",5.5).attr("fill",ink).attr("stroke",card).attr("stroke-width",2);
-  svg.append("circle").attr("cx",x1).attr("cy",y1).attr("r",4.5).attr("fill",rust).attr("stroke",card).attr("stroke-width",2);
+  if(!short) label((x1+x2)/2,(y1+y2)/2,kmT,[[0,5*k,"middle"]],{size:13,onLine:true});
+  svg.append("circle").attr("cx",x2).attr("cy",y2).attr("r",5.5*k).attr("fill",ink).attr("stroke",card).attr("stroke-width",2*k);
+  svg.append("circle").attr("cx",x1).attr("cy",y1).attr("r",4.5*k).attr("fill",rust).attr("stroke",card).attr("stroke-width",2*k);
   const pn=provShort(PROVS[P]);
   fig.querySelector("svg").setAttribute("aria-label",`Mapa de la provincia de ${pn}: ${nm} está a ${kmT} en línea recta de ${cn}, su capital.`);
   fig.querySelector("figcaption").innerHTML=`<b>${esc(nm)} está a ${kmT} de ${esc(cn)}</b>, la capital de la provincia de ${esc(pn)}, medidos en línea recta entre los centros de los dos términos municipales. Por carretera es más.`;
