@@ -1725,8 +1725,8 @@ async function renderComparar(a,b){
   view.innerHTML=pageHead("Comparar dos municipios",`Elige dos municipios y míralos lado a lado. Desde la ficha de cada municipio puedes comparar directamente con los que más se le parecen.`)+
    `<div class="cp-head">${[["a",A,"--rust"],["b",Bm,"--s-b"]].map(([k,r,c],i)=>`${i?`<div class="cp-vs">frente a</div>`:""}<div class="cp-who"><div class="cp-nm"><i${i?' class="b"':""} style="background:var(${c})"></i><a href="#m${r[F.code]}">${esc(dispName(r[F.name]))}</a></div><div class="cp-sub">Provincia de ${esc(provShort(PROVS[r[F.prov]]))}${r[F.pop]!=null?" · "+nf0.format(r[F.pop])+" habitantes":""}</div><div class="search" id="cs-${k}" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="cq-${k}" type="search" placeholder="Cambiar de municipio" autocomplete="off" aria-label="Cambiar el ${k==="a"?"primer":"segundo"} municipio"><ul id="cr-${k}" class="results" role="listbox" hidden></ul></div></div>`).join("")}</div>
    <div id="cbody"></div>${methodNote()}`;
-  attachSearch(document.getElementById("cq-a"),document.getElementById("cr-a"),document.getElementById("cs-a"),x=>{ navTo("comparar-"+x[F.code]+"-"+b); });
-  attachSearch(document.getElementById("cq-b"),document.getElementById("cr-b"),document.getElementById("cs-b"),x=>{ navTo("comparar-"+a+"-"+x[F.code]); });
+  attachSearch(document.getElementById("cq-a"),document.getElementById("cr-a"),document.getElementById("cs-a"),x=>{ smoothTo("comparar-"+x[F.code]+"-"+b); });
+  attachSearch(document.getElementById("cq-b"),document.getElementById("cr-b"),document.getElementById("cs-b"),x=>{ smoothTo("comparar-"+a+"-"+x[F.code]); });
   const B=document.getElementById("cbody");
   const eA=esc(dispName(A[F.name])), eB=esc(dispName(Bm[F.name])), nmA=dispName(A[F.name]), nmB=dispName(Bm[F.name]);
   const val=(r,k)=>F[k]==null?null:r[F[k]];
@@ -6606,7 +6606,7 @@ function myChip(code){
 }
 function myChipBind(code){
   const a=document.getElementById("mychip"); if(a) a.addEventListener("click",()=>{ if(code===lastMun){ myPop(); return; } const prev=lastMun; setMyMun(code,{silent:true}); refreshChips(code); toast(`📍 <b>${esc(myName(code))}</b> es ahora tu municipio.${prev&&BYCODE.has(prev)?` <button type="button" id="tundo">Deshacer</button>`:""}`); const u=document.getElementById("tundo"); if(u) u.addEventListener("click",()=>{ setMyMun(prev,{silent:true}); refreshChips(code); document.getElementById("toast").remove(); }); });
-  const b=document.getElementById("mychip2"); if(b) b.addEventListener("click",()=>{ navTo("comparar-"+lastMun+"-"+code); });
+  const b=document.getElementById("mychip2"); if(b) b.addEventListener("click",()=>{ smoothTo("comparar-"+lastMun+"-"+code); });
 }
 function refreshChips(code){ const box=document.getElementById("mychips"); if(box){ box.innerHTML=myChip(code); myChipBind(code); } }
 // =====================================================================
@@ -6989,8 +6989,8 @@ function heroHover(ar,key){
   ar.addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse") hide(); });
   ar.addEventListener("click",e=>{ if(e.target===tip||tip.contains(e.target)) return; load().then(()=>{ const h=hit(e);
     if(!h){ hide(); return; }
-    if(e.pointerType==="mouse"||matchMedia("(hover:hover)").matches){ navTo("m"+P.c[h.i]); window.scrollTo(0,0); } else show(h); }); });
-  tip.addEventListener("click",e=>{ if(cur){ e.preventDefault(); navTo("m"+cur); window.scrollTo(0,0); } });
+    if(e.pointerType==="mouse"||matchMedia("(hover:hover)").matches){ smoothTo("m"+P.c[h.i]); } else show(h); }); });
+  tip.addEventListener("click",e=>{ if(cur){ e.preventDefault(); smoothTo("m"+cur); } });
   heroMine(ar,key,load,()=>P);
 }
 // tu municipio, señalado sobre la nube igual que Madrid y Barcelona (solo si lo has guardado)
