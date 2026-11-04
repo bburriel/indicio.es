@@ -138,9 +138,9 @@ function urlInit(){
     const a=e.target.closest("a[href]"); if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
     if(a.target==="_blank"||a.hasAttribute("download")||a.origin!==location.origin) return;
     const href=a.getAttribute("href")||"";
-    if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); navTo(k); return; }
+    if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); smoothTo(k); return; }
     if(/^\/(data|og|provincia|rankings)(\/|$)/.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
-    if(href.startsWith("/")){ e.preventDefault(); if(a.closest(".pt-car")&&/^\/preguntas\/[\w-]+\/?$/.test(href)) ptToStudy(href); else navTo(href); }
+    if(href.startsWith("/")){ e.preventDefault(); if(a.closest(".pt-car")&&/^\/preguntas\/[\w-]+\/?$/.test(href)) ptToStudy(href); else smoothTo(href); }
   });
   // los enlaces #antiguos que generan las plantillas pasan a ruta real (también para el HTML pre-renderizado)
   const fix=root=>root.querySelectorAll('a[href^="#"]').forEach(a=>{ const k=a.getAttribute("href").slice(1); if(k==="inicio"||ROUTE_KEY.test(k)) a.setAttribute("href",keyToPath(k)); });
@@ -165,6 +165,15 @@ function ptToStudy(href){
     // Con setTimeout y no requestAnimationFrame: mientras dura la transición el navegador no pinta y rAF no avanza.
     if(name()) return res(); const t0=Date.now(), poll=()=>{ if(name()||Date.now()-t0>450) res(); else setTimeout(poll,25); }; setTimeout(poll,25); }));
   t.finished.finally(()=>{ document.documentElement.classList.remove("vt-study"); document.querySelectorAll("[style*='view-transition-name']").forEach(e=>e.style.viewTransitionName=""); });
+}
+// Resto de la app: cualquier enlace interno cambia de página con un fundido corto y la cabecera fija (clase vt-fade).
+// Sin soporte, con «reducir movimiento» o a la misma página, navega sin más.
+function smoothTo(key){
+  const same=keyToPath(key)===location.pathname+location.search;
+  if(same||!document.startViewTransition||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){ navTo(key); return; }
+  const de=document.documentElement; de.classList.add("vt-fade");
+  const t=document.startViewTransition(()=>{ navTo(key); });
+  t.finished.finally(()=>de.classList.remove("vt-fade"));
 }
 function render404(){ document.title="Página no encontrada · Indicio"; view.innerHTML=pageHead("No encontramos esa página","Puede que el enlace sea antiguo. Prueba desde la portada o busca tu municipio arriba.")+`<p><a class="ed-go" href="/">Ir a la portada →</a></p>`; }
 
@@ -222,7 +231,7 @@ if(DDS.length){
   document.addEventListener("click",e=>{ if(TOP.classList.contains("mega-open")&&!DDS.some(x=>x.mega.contains(e.target)||x.dd.contains(e.target))) ddClose(); });
   document.addEventListener("keydown",e=>{ if(e.key==="Escape") ddClose(); });
 }
-const go=(code,sec)=>{ navTo("m"+code+(sec?"-"+sec:"")); };
+const go=(code,sec)=>{ smoothTo("m"+code+(sec?"-"+sec:"")); };
 
 // ---------- buscador (cabecera y portada) ----------
 function attachSearch(input,list,combo,onPick){

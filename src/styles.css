@@ -2017,6 +2017,12 @@ details.chk > section{margin-top:18px}
 @keyframes vt-out{to{opacity:0}}
 @keyframes vt-in{from{opacity:0; transform:translateY(8px)}}
 
+/* Resto de la app (smoothTo): fundido corto; la cabecera no se mueve */
+:root.vt-fade #top,:root.vt-study #top{view-transition-name:vt-top}
+:root.vt-fade::view-transition-old(root){animation:vt-out .16s ease both}
+:root.vt-fade::view-transition-new(root){animation:vt-in .3s ease .06s both}
+:root::view-transition-group(vt-top){animation-duration:0s}
+
 /* ficha: el municipio dentro de su provincia */
 .provmap{margin:26px 0 0; max-width:620px}
 .provmap[hidden]{display:none}
