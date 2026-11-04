@@ -6999,15 +6999,15 @@ function heroType(root){
   const live=()=>document.body.contains(root), sleep=ms=>new Promise(r=>setTimeout(r,ms));
   // posición del cursor: al final del texto de la palabra (o al principio de su hueco si está vacía)
   const pos=el=>{ const v=vis.getBoundingClientRect(), fs=parseFloat(getComputedStyle(el).fontSize), h=fs*.78;
-    let x,y; if(el.textContent){ const rg=document.createRange(); rg.selectNodeContents(el); const rs=rg.getClientRects(), r=rs[rs.length-1]; x=r.right; y=r.top+r.height/2; }
-    else { const r=el.getBoundingClientRect(); x=r.left; y=r.top+r.height/2; }
+    let x,y; if(el.textContent){ const rg=document.createRange(); rg.selectNodeContents(el); const rs=rg.getClientRects(), r=rs[rs.length-1]; x=r.right; y=r.top+r.height/2; el._y=y-v.top; }
+    else { x=el.getBoundingClientRect().left; y=el._y!=null?el._y+v.top:el.getBoundingClientRect().top+el.getBoundingClientRect().height/2; }   // vacía: se queda en su línea
     return {x:x-v.left, y:y-v.top-h/2+fs*.06, h}; };
   const put=el=>{ const q=pos(el); cur.style.left=q.x+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; };
   { const v=vis.getBoundingClientRect(), r=cur.getBoundingClientRect(); cur.classList.add("fl"); cur.style.left=(r.left-v.left)+"px"; cur.style.top=(r.top-v.top)+"px"; cur.style.height=r.height+"px"; }
   let at=W; const keep=()=>{ if(live()) put(at); }; addEventListener("resize",keep);
   const busy=on=>cur.classList.toggle("mv",on);
-  const go=async el=>{ at=el; busy(true); put(el); await sleep(560); };
-  const edit=async(el,to)=>{ busy(true); let t=el.textContent;
+  const go=async el=>{ at=el; busy(true); cur.classList.remove("ty"); put(el); await sleep(560); };
+  const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
     while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(45); } await sleep(220);
     while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(90); } };
   (async()=>{ let k=0, oa="o"; await sleep(5000);
@@ -7030,10 +7030,6 @@ async function renderInicio(){
     <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Empieza por una pregunta</a><a class="ho-lk" href="#" data-go=".pt-mun">Mira cómo está tu pueblo</a></p></section>
   ${heroCarHTML(D)}
-  <section class="ed-sec pt-pap"><div class="ed-k">Puesto a prueba</div><h2 class="ed-h2">Lo que se da por hecho, con los datos delante</h2>
-    <p class="pt-lead">Algunas confirman lo que pensabas. Otras, no.</p>
-    <div class="pt-grid">${tira}</div>
-    <p class="pt-more"><a class="ed-go" href="/preguntas/">Ver las ${STUDIES.length} preguntas →</a></p></section>
   <section class="pt-labx"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>¿Crees que lo sabes? <em>Demuéstralo.</em></h2>
       <p class="pt-labx-lead">Cruza dos datos de los ${nMun} municipios y mira si la relación aguanta o solo lo parecía. Sin saber estadística y sin registrarte. Si la respuesta cambia al comparar entre iguales, lo verás tú antes que nadie.</p>
       <div class="pt-labx-h">Empieza por una duda real</div>
@@ -7048,6 +7044,10 @@ async function renderInicio(){
     <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Enfrentar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
+  <section class="ed-sec pt-pap"><div class="ed-k">Puesto a prueba</div><h2 class="ed-h2">Lo que se da por hecho, con los datos delante</h2>
+    <p class="pt-lead">Algunas confirman lo que pensabas. Otras, no.</p>
+    <div class="pt-grid">${tira}</div>
+    <p class="pt-more"><a class="ed-go" href="/preguntas/">Ver las ${STUDIES.length} preguntas →</a></p></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
     <div class="ci-steps" style="padding:0">
       <div><i>1</i><span><b>Datos que puedes comprobar</b>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></div>
