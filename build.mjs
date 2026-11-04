@@ -74,7 +74,9 @@ copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
   const tm=RF.periodos.map((p,i)=>{ let ind=0,tem=0; for(const gr of RF.grupos){ const m=gr.mes[i]; if(m){ ind+=m[0]; tem+=m[1]; } } return ind+tem?100*tem/(ind+tem):null; });
   const tm3=tm.map((v,i)=>{ const w=tm.slice(Math.max(0,i-2),i+1).filter(x=>x!=null); return w.length?r1(mean(w)):null; });
   const antes=tm.filter((v,i)=>/^20(19|20|21)-/.test(RF.periodos[i])&&v!=null);
-  fs.writeFileSync(path.join(OUT,"data","portada.json"),JSON.stringify({cesta,casa,contratos:{meses:RF.periodos,temporales:tm3,antes:r1(mean(antes))}}));
+  // infraestructuras: inversión anual en carreteras y ferrocarril (FIT-OCDE), en miles de millones de euros de 2015
+  const IF=JSON.parse(rd("data/infra.json")).itf, infra={years:IF.years,road:IF.road_q.map(v=>Math.round(v)/1000),rail:IF.rail_q.map(v=>Math.round(v)/1000)};
+  fs.writeFileSync(path.join(OUT,"data","portada.json"),JSON.stringify({cesta,casa,contratos:{meses:RF.periodos,temporales:tm3,antes:r1(mean(antes))},infra}));
 }
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+i18n+CONTENT)).replace("__JS__",JS).replace("__I18N__",I18N).replace("__CSS__",CSS));

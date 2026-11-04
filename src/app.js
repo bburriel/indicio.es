@@ -6860,6 +6860,10 @@ const HEROQ=[
     v:()=>`Frenó la subida, pero no bajó el alquiler.`,
     a:()=>`En 2024 el alquiler siguió subiendo donde hay tope: un 3,1${NB}%. Sin él habría subido en torno a un 3,7${NB}%, así que en un piso de Barcelona la diferencia son unos 7${NB}€ al mes. A la vez se vendieron más pisos de lo esperable, y los datos no dicen si salieron del alquiler.`,
     cap:()=>`Subida del alquiler en 2024 en los municipios con tope, frente a la estimada sin él a partir de municipios parecidos. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
+  {id:"infraestructuras",tab:"Carreteras y trenes",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver cuánto cayó y qué se sabe del mantenimiento →",
+    v:()=>`Sí, y no se ha recuperado.`,
+    a:N=>`En ${N.infPicoY} España invirtió ${N.infPico} mil millones de euros en carreteras y trenes; en ${N.infUltY}, ${N.infUlt}: un ${N.infCaida}${NB}% menos. Hoy destina a las dos cosas menos del 1${NB}% del PIB, por debajo de Francia y Alemania, cuando antes de la crisis invertía casi el doble que Alemania. Del mantenimiento hay menos datos, y los que hay vienen del propio sector.`,
+    cap:()=>`Inversión anual en carreteras (gris) y ferrocarril (granate), en miles de millones de euros de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).`},
 ];
 // «Puesto a prueba»: preguntas que no están en el carrusel, con el veredicto y un párrafo corto que lo explica (en el móvil, solo el veredicto)
 const PTIRA=[
@@ -6914,6 +6918,20 @@ const ptCharts={
       +`<text x="${X(0).toFixed(1)}" y="${(Yv(antes)-12).toFixed(1)}" class="pt-g-n">${nf0.format(antes)}${NB}%</text>`
       +`<circle cx="${X(last).toFixed(1)}" cy="${Yv(T[last]).toFixed(1)}" r="4.5" class="pt-f-br"/><text x="${(X(last)+12).toFixed(1)}" y="${(Yv(T[last])-4).toFixed(1)}" class="pt-g-l br">Hoy</text><text x="${(X(last)+12).toFixed(1)}" y="${(Yv(T[last])+21).toFixed(1)}" class="pt-g-n br">${nf0.format(T[last])}${NB}%</text>`,
       `Antes de 2022, el ${nf0.format(antes)} % de los contratos nuevos eran temporales; hoy, el ${nf0.format(T[last])} %.`); },
+  // infraestructuras: columnas apiladas (carreteras en gris, tren en granate), con el máximo, el último dato y la caída
+  infra(D){ const I=D.infra, Yr=I.years, n=Yr.length, tot=Yr.map((y,i)=>I.road[i]+I.rail[i]), pk=tot.indexOf(Math.max(...tot)), li=n-1;
+    const x0=40,x1=PTW-14,y0=PTH-36,y1=66, w=(x1-x0)/n, Yv=v=>y0-(y0-y1)*v/24, cx=i=>x0+i*w+w/2, caida=Math.round((1-tot[li]/tot[pk])*100), f1=v=>nf1.format(v);
+    let s=[0,10,20].map(g=>`<line x1="${x0}" x2="${x1}" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="${x0-6}" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">${g}</text>`).join("");
+    s+=Yr.map((y,i)=>{ const a=I.road[i], b=I.rail[i], bx=(x0+i*w+w*.12).toFixed(1), bw=(w*.76).toFixed(1);
+      return `<rect x="${bx}" y="${Yv(a).toFixed(1)}" width="${bw}" height="${(y0-Yv(a)).toFixed(1)}" class="pt-f-mu"/><rect x="${bx}" y="${Yv(a+b).toFixed(1)}" width="${bw}" height="${(Yv(a)-Yv(a+b)).toFixed(1)}" class="pt-f-br"/>`; }).join("");
+    s+=`<line x1="${cx(pk).toFixed(1)}" x2="${x1}" y1="${Yv(tot[pk]).toFixed(1)}" y2="${Yv(tot[pk]).toFixed(1)}" class="pt-g-base"/><line x1="${cx(li).toFixed(1)}" x2="${cx(li).toFixed(1)}" y1="${Yv(tot[pk]).toFixed(1)}" y2="${(Yv(tot[li])-4).toFixed(1)}" class="pt-g-tick"/>`;
+    s+=[1995,2005,2015,2024].filter(y=>Yr.includes(y)).map(y=>`<text x="${cx(Yr.indexOf(y)).toFixed(1)}" y="${y0+18}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("");
+    s+=`<text x="8" y="18" class="pt-g-l">Lo que se invierte cada año en carreteras y trenes</text><text x="8" y="35" class="pt-g-t">en miles de millones de euros de 2015; en granate, el tren</text>`;
+    const halo=` style="paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round"`, yp=Yv(tot[pk]);
+    s+=`<text x="${cx(pk).toFixed(1)}" y="${(yp-9).toFixed(1)}" text-anchor="middle" class="pt-g-l br"${halo}>${Yr[pk]}: ${f1(tot[pk])}</text>`
+      +`<text x="${(cx(li)-12).toFixed(1)}" y="${(yp+54).toFixed(1)}" text-anchor="end" class="pt-g-big"${halo}>−${caida}${NB}%</text>`
+      +`<text x="${(cx(li)-12).toFixed(1)}" y="${(yp+76).toFixed(1)}" text-anchor="end" class="pt-g-g"${halo}>en ${Yr[li]}: ${f1(tot[li])}</text>`;
+    return ptSvg(s,`La inversión en carreteras y ferrocarril pasa de ${f1(tot[pk])} mil millones de euros en ${Yr[pk]} a ${f1(tot[li])} en ${Yr[li]}: un ${caida} % menos.`); },
 };
 // cifras de los textos, calculadas con las mismas series que los gráficos
 const ptNums=D=>{ const o={};
@@ -6923,6 +6941,8 @@ const ptNums=D=>{ const o={};
   if(D&&D.casa){ const C=D.casa; Object.assign(o,{compra:nf0.format(C.compra[0]),alquiler:nf0.format(C.alquiler[0]),sueldo:nf0.format(C.sueldo[0]),compraY:C.compra[1],alquilerY:C.alquiler[1]}); }
   if(D&&D.contratos){ const T=D.contratos.temporales.filter(v=>v!=null), hoy=T[T.length-1], dz=["cero","una","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez"];
     Object.assign(o,{antes:D.contratos.antes,antesD:dz[Math.round(D.contratos.antes/10)],hoyD:dz[Math.round(hoy/10)]}); }
+  if(D&&D.infra){ const I=D.infra, t=I.years.map((y,i)=>I.road[i]+I.rail[i]), pk=t.indexOf(Math.max(...t)), li=t.length-1;
+    Object.assign(o,{infPico:nf1.format(t[pk]),infPicoY:I.years[pk],infUlt:nf1.format(t[li]),infUltY:I.years[li],infCaida:nf0.format(Math.round((1-t[li]/t[pk])*100))}); }
   return o; };
 
 function heroCarHTML(D){
