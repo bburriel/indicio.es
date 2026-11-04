@@ -15,7 +15,6 @@ Va al principio, entre dos líneas `---`. Sustituye a lo que haya en `src/conten
 titulo: ¿Cobras mucho o poco?
 entradilla: Una o dos frases debajo del título.
 respuesta: La respuesta corta. Sale en las tarjetas de la portada y como resumen.
-tema: trabajo            (riqueza, vivienda, poblacion, trabajo, gasto, voto)
 metodo: Encuesta de Estructura Salarial, 2008–2024     (la etiqueta pequeña de la tarjeta)
 evidencia: desc          (desc, igual, natural…: ver EVIDENCE en src/content.mjs)
 publicado: 2026-10-25

@@ -2,7 +2,6 @@
 titulo: ¿Son sostenibles las pensiones?
 entradilla: Cada año se gasta más en pensiones y ahora se jubilan las generaciones más numerosas. Repasamos de dónde viene el gasto, qué trae la demografía y cuánto habría que cambiar para que quepa.
 respuesta: Depende de cuánto se quiera gastar. Si solo cambia la demografía, el gasto pasa del 13,2 % al 24,9 % del PIB en 2050 (un ejercicio, no una previsión): no cabe. Con lo previsto tras las reformas (pensiones con el IPC, un año más de trabajo efectivo y un 5 % más de empleo y de población en edad de trabajar) queda en el 16,5 %, a 0,3 puntos del límite del 16,2 % (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea): cabe por poco o se pasa por poco. Para asegurarlo, cada pensión tendría que pesar algo menos frente a lo que produce un trabajador.
-tema: gasto
 metodo: Eurostat, INE y escenarios hasta 2070
 evidencia: desc
 publicado: 2026-10-22

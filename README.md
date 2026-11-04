@@ -10,7 +10,7 @@ src/
   styles.css      estilos
   template.html   esqueleto de cada página (head, metadatos, scripts)
   body.html       cabecera, <main>, pie
-  content.mjs     contenido editorial: preguntas (título, entradilla, método, fecha, respuesta corta), temas, textos de las páginas y datos del autor
+  content.mjs     contenido editorial: preguntas (título, entradilla, método, fecha, respuesta corta), textos de las páginas y datos del autor
   sw.js           service worker (offline)
 data/             los JSON de datos (index.json, refs, provincias, secciones, topojson)
                   estudios.json: series por municipio para los estudios (lo genera scripts/datos/series_estudios.py)
@@ -100,7 +100,7 @@ La fecha `upd` (revisión) se muestra junto a la de publicación si es distinta;
 ## URLs
 
 - `/` portada · `/preguntas/` · `/preguntas/<id>/`
-- `/temas/` · `/temas/<riqueza|vivienda|poblacion|trabajo|gasto|voto>/`
+- `/temas/*` ya no existe: redirige con 301 a `/preguntas/` (los temas se fundieron con los análisis)
 - `/laboratorio/` · `/laboratorio/<cruce|mapa|ranking|evolucion|grupos|reparto|tabla>/?d=…` · `/laboratorio/metodo/`
 - `/municipio/` · `/municipio/<código INE>-<nombre>/` (8.139 páginas) · `/comparar/<a>-<b>/`
 - `/quien-soy/` · `/quien-soy/contacto/`

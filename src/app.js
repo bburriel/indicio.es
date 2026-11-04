@@ -79,7 +79,6 @@ function pctl(k,v){ if(v==null) return null; if(!PCTL[k]){ const s=rowsAll().fil
   const P=PCTL[k]; const i=d3.bisectLeft(P.v,v); return P.c[Math.min(i,P.c.length-1)]; }
 
 // ---------- URLs: rutas reales (y compatibilidad con los antiguos #hash) ----------
-const tHref=id=>id==="vivienda"?"/preguntas/vivienda/":"/temas/"+id+"/"; // vivienda se fusionó con su análisis
 const SLUG=s=>norm(dispName(String(s))).replace(/ /g,"-");
 const munPath=(code,sec)=>{ const r=BYCODE.get(code); return "/municipio/"+code+(r?"-"+SLUG(r[F.name]):"")+"/"+(sec?sec+"/":""); };
 function keyToPath(h){
@@ -92,10 +91,8 @@ function keyToPath(h){
   if(h==="estudios-metodo"||h==="metodo") return "/laboratorio/metodo/";
   if(h==="laboratorio-datos") return "/laboratorio/datos/";
   if((m=h.match(/^estudios?-([\w-]+)$/))) return "/preguntas/"+m[1]+"/";
-  if(h==="temas") return "/temas/";
-  if((m=h.match(/^(?:riqueza|renta)(?:-(\d{5}))?$/))) return "/temas/riqueza/"+(m[1]?"?m="+m[1]:"");
   if(h==="vivienda") return "/preguntas/vivienda/";
-  if(/^(poblacion|trabajo|gasto|voto)$/.test(h)) return "/temas/"+h+"/";
+  if(/^(temas|riqueza|renta|poblacion|trabajo|gasto|voto)(?:-\d{5})?$/.test(h)) return "/preguntas/"; // los temas se fundieron con los análisis
   if(h==="municipio") return "/municipio/";
   if(h==="sobre") return "/quien-soy/";
   if(h==="sobre-contacto") return "/quien-soy/contacto/";
@@ -109,9 +106,7 @@ function pathToKey(){
   if(p==="") return "";
   if(p==="/preguntas") return "preguntas";
   if((m=p.match(/^\/preguntas\/([\w-]+)$/))) return "estudios-"+m[1];
-  if(p==="/temas") return "temas";
-  if(p==="/temas/vivienda"){ try{ history.replaceState(null,"","/preguntas/vivienda/"); }catch(e){} return "estudios-vivienda"; } // se fusionó con el análisis
-  if((m=p.match(/^\/temas\/([a-z]+)$/))){ if(m[1]==="riqueza"){ const c=new URLSearchParams(q).get("m"); return "riqueza"+(c&&/^\d{5}$/.test(c)?"-"+c:""); } return m[1]; }
+  if(/^\/temas(\/[\w-]+)?$/.test(p)){ const viv=p==="/temas/vivienda"; try{ history.replaceState(null,"",viv?"/preguntas/vivienda/":"/preguntas/"); }catch(e){} return viv?"estudios-vivienda":"preguntas"; } // los temas se fundieron con los análisis
   if(p==="/laboratorio") return "explorar";
   if(p==="/laboratorio/metodo") return "estudios-metodo";
   if(p==="/laboratorio/datos") return "laboratorio-datos";
@@ -187,23 +182,16 @@ function route(){
   // bloques estáticos de las fichas (preguntas frecuentes, municipios cercanos): solo en la página para la que se generaron
   document.querySelectorAll(".seo-extra").forEach(e=>{ e.hidden=!(h===e.dataset.key||h.startsWith(e.dataset.key+"-")); });
   if(h==="__static"){ const e=document.getElementById("nav-municipio"); if(e) e.setAttribute("aria-current","page"); return; }   // páginas solo estáticas (provincias, rankings): el HTML ya trae todo
-  const m=h.match(/^m(\d{5})(?:-([a-z]+))?$/), rt=h.match(/^(?:renta|riqueza)(?:-(\d{5}))?$/), cr=h.match(/^(?:cruces|relaciones)(?:-([a-zA-Z0-9]+)-([a-zA-Z0-9]+))?$/);
+  const m=h.match(/^m(\d{5})(?:-([a-z]+))?$/), cr=h.match(/^(?:cruces|relaciones)(?:-([a-zA-Z0-9]+)-([a-zA-Z0-9]+))?$/);
   document.querySelectorAll(".nav a,.nav .ddb").forEach(a=>a.removeAttribute("aria-current")); ddClose();
-  // cuatro entradas: «Preguntas» (preguntas y temas), «Municipios» (fichas, comparar, provincias, rankings), el laboratorio y quién soy
-  const cur=id=>{ id=({temas:"preguntas"})[id]||id; const e=document.getElementById("nav-"+id); if(e) e.setAttribute("aria-current","page"); };
+  // cuatro entradas: «Análisis», «Municipios» (fichas, comparar, provincias, rankings), el laboratorio y quién soy
+  const cur=id=>{ const e=document.getElementById("nav-"+id); if(e) e.setAttribute("aria-current","page"); };
   if(INIT_T){ clearInterval(INIT_T); INIT_T=null; } if(typeof QH_T!=="undefined"&&QH_T){ clearInterval(QH_T); QH_T=null; } if(typeof QSPOT_T!=="undefined"&&QSPOT_T){ clearInterval(QSPOT_T); QSPOT_T=null; }
   if(m && BYCODE.has(m[1])){ cur("municipio"); EXF={prov:"",min:0,max:Infinity}; if(!myOk(lastMun)){ setMyMun(m[1],{silent:true}); setTimeout(()=>{ const t=toast(`📍 Hemos guardado <b>${esc(myName(m[1]))}</b> como tu municipio: lo verás destacado en temas y gráficos. <button type="button" id="tchg">Cambiar</button>`,4500); const c=document.getElementById("tchg"); if(c) c.addEventListener("click",()=>{ t.remove(); myPop(); }); },600); } renderMun(m[1], m[2]); return; }
   if(/^explorar/.test(h)){ cur("lab"); const same=document.querySelector(".lb"); renderExplorar(h); if(!same) window.scrollTo(0,0); return; }
   EXF={prov:"",min:0,max:Infinity};
   curMun=null; window.scrollTo(0,0); esMap=null;
-  const topic=(id,fn)=>{ cur("temas"); Promise.resolve(fn()).then(()=>{ try{ topicDecorate(id); }catch(e){ console.error(e); } }); };
-  if(rt) topic("riqueza",()=>renderRiqueza(rt[1]));
-  else if(h==="poblacion") topic("poblacion",renderPoblacion);
-  else if(h==="trabajo") topic("trabajo",renderTrabajo);
-  else if(h==="gasto") topic("gasto",renderGasto);
-  else if(h==="voto") topic("voto",renderVoto);
-  else if(h==="temas"){ cur("temas"); renderTemas(); }
-  else if(h==="preguntas"){ cur("preguntas"); renderPreguntas(); }
+  if(h==="preguntas"){ cur("preguntas"); renderPreguntas(); }
   else if(h==="municipio"){ cur("municipio"); renderMunLanding(); }
   else if(/^sobre/.test(h)){ cur("sobre"); renderSobre(h==="sobre-contacto"?"contacto":null); }
   else if(cr){ navTo(exHash({v:"cruce",d:cr[1]&&cr[2]?[cr[1],cr[2]]:EX.d}),{replace:true}); return; }
@@ -263,7 +251,6 @@ function prepGeo(){ FEATS=topojson.feature(TOPO,TOPO.objects.municipalities).fea
 // ---------- piezas de página ----------
 const LABNAV=cur=>cur==="datos"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Qué significa cada dato</nav>`:cur==="metodo"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Guía: de la relación a la causa</nav>`:"";
 function pageHead(title,dek,extra,after){ return `<header class="phead">${extra||""}<h1>${title}</h1>${dek?`<p class="dek">${dek}</p>`:""}${after||""}</header>`; }
-const TOPICL=id=>({riqueza:"Riqueza",vivienda:"Vivienda",poblacion:"Población",trabajo:"Trabajo",gasto:"Dinero público",voto:"Voto"})[id]||"";
 const fechaES=d=>{ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${+dd} de ${MES[+m]} de ${y}`; };
 const byline=S=>`<span class="by-who">Por <a href="/quien-soy/">${esc((window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author.name)||"Indicio")}</a></span> · <time datetime="${S.pub||""}">${fechaES(S.pub)}</time>${S.upd&&S.upd!==S.pub?` · <span class="by-upd">Revisado el ${fechaES(S.upd)}</span>`:""} · <span class="by-m">${esc(S.m)}</span>${S.ev&&window.__INDICIO&&window.__INDICIO.evidence?` · <a class="ev ev-${S.ev}" href="/laboratorio/metodo/#evidencia" title="${esc(window.__INDICIO.evidence[S.ev].d)}">${esc(window.__INDICIO.evidence[S.ev].l)}</a>`:""}`;
 function finding(parent,title,text){ const s=add(parent,"section","finding"); if(title) add(s,"h2",null,title); if(text) add(s,"div","txt",text); return s; }
@@ -432,86 +419,6 @@ const MAPLAYERS=[
 let esMetric="varPob", esMap=null;
 const EXPLAIN_RENTA=`<p><b>Qué es la renta neta por persona.</b> Lo que entra en un hogar en un año, después de pagar impuestos y cotizaciones, dividido entre todas las personas que viven en él, niños y jubilados incluidos. No es un sueldo: un hogar de cuatro personas con 60.000${NB}€ netos al año cuenta como 15.000${NB}€ por persona.</p>`;
 
-async function renderSpain(){
-  document.title="Indicio";
-  const R=await loadRenta().catch(()=>null);
-  const es=REFS.es, PY=REFS.padYears, pad=es.pad, i05=PY.indexOf(2005);
-  const rows=rowsAll();
-  view.innerHTML=pageHead("Cómo está España, contado con datos públicos",
-    `Renta, vivienda, población, trabajo y voto de los ${nf0.format(rows.length)} municipios, con las estadísticas del INE, el SEPE y el Ministerio del Interior.`,"")+
-    `<div class="doors">
-      <div class="door"><span class="k">Consultar</span><h2>Mira tu municipio</h2><p>Cómo es, cómo ha cambiado y en qué destaca, comparado con España y con los municipios que más se le parecen.</p>
-        <div class="search" id="bigsearch" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="max-width:none;margin:4px 0 0;flex:none">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <input id="q2" type="search" placeholder="Escribe tu municipio: Meliana, Vigo, Teruel…" autocomplete="off" aria-label="Buscar un municipio" aria-autocomplete="list" aria-controls="results2" style="padding:11px 14px 11px 36px;font-size:17px">
-        <ul id="results2" class="results" role="listbox" hidden></ul></div>
-        <p style="font-size:14px">O lee los informes: <a href="/temas/riqueza/">Riqueza</a> · <a href="/preguntas/vivienda/">Vivienda</a> · <a href="/temas/poblacion/">Población</a> · <a href="/temas/trabajo/">Trabajo</a> · <a href="/temas/gasto/">Dinero público</a></p></div>
-      <div class="door lab"><span class="k">Laboratorio</span><h2>Cruza datos y busca causas</h2><p>Elige tus propios datos, filtra municipios y míralos en mapa, tabla, cruce o evolución. Comprueba si una relación aguanta al comparar entre iguales, y lee estudios que explican el método paso a paso.</p>
-        <a class="go" href="/laboratorio/">Entrar en el laboratorio</a>
-        <div class="tools"><a href="/laboratorio/mapa/">Mapa</a><a href="/laboratorio/tabla/">Tabla</a><a href="/laboratorio/cruce/">Cruce</a><a href="/laboratorio/evolucion/">Evolución</a><a href="/preguntas/">Estudios</a></div></div>
-    </div>
-    <section class="finding" style="padding-top:22px"><h2>Algunas preguntas para empezar en el laboratorio</h2>
-      <div class="homeq">${EXQ.map(([l,v,o],i)=>`<a href="#" data-q="${i}"><span>${EXVIEWS.find(x=>x[0]===v)[1]}</span><b>${l}</b></a>`).join("")}</div></section>
-    <section class="finding" style="padding-bottom:0;border-bottom:0"><h2 style="font-size:clamp(26px,3vw,32px)">Lo que dicen los datos</h2></section>
-    <div id="hall"></div>
-    <section class="finding" id="mapa"></section>
-    ${methodNote()}`;
-  attachSearch(document.getElementById("q2"),document.getElementById("results2"),document.getElementById("bigsearch"));
-  view.querySelectorAll(".homeq a").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const [l,v,o]=EXQ[+x.dataset.q]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null,sz:"",col:"",q:0,bv:0}; if(o.ser){ Object.assign(PS,{s:o.ser.slice(),idx:o.idx===0?0:1,b:o.b||null,desde:null,hasta:null,real:0}); } navTo(exHash()); }));
-  const H=document.getElementById("hall");
-
-  // 1. Riqueza por comunidades
-  if(R){
-    const cc=R.ccaa.filter(c=>!/Ceuta|Melilla/.test(c.n)), top=cc[0], bot=cc[cc.length-1];
-    const s=add(H,"section","finding split");
-    const t=add(s,"div","txt",`<h2>En ${top.n} se ingresa por persona un ${nf0.format((top.renta/bot.renta-1)*100)}${NB}% más que en ${bot.n}</h2>
-      <p>La renta neta media va de <mark>${eur(bot.renta)}</mark> por persona y año en ${bot.n} a <mark>${eur(top.renta)}</mark> en ${top.n}. El mapa de la riqueza en España tiene una frontera clara entre el norte y Madrid, por un lado, y el sur y el Mediterráneo, por otro.</p>
-      <p>Dentro de cada ciudad, la distancia entre barrios es todavía mayor.</p><p class="more"><a href="/temas/riqueza/">Cómo se reparte la riqueza</a></p>`);
-    const g=add(s,"div");
-    const f=fig(g,{title:"Renta neta media por persona, 2024",source:"La línea vertical marca la media de España. Fuente: INE, Atlas de Distribución de Renta de los Hogares."});
-    hbars(f.body,cc.map(c=>({l:c.n,v:c.renta})),{fmt:eur,ref:es.net_income_pc[es.net_income_pc.length-1],refLabel:"España",color:"--brand",min:0});
-  }
-  // 2. Vivienda
-  { const G=subidas();
-    const s=add(H,"section","finding split");
-    add(s,"div","txt",`<h2>Alquilar cuesta casi el doble que en 2015; los sueldos solo han seguido a los precios</h2>
-      <p>El precio de los pisos que se anuncian para alquilar ha subido un <mark>${nf0.format(G.anuncios)}${NB}%</mark> entre 2015 y 2024. El salario mediano, un ${nf0.format(G.salMed)}${NB}%, prácticamente lo mismo que los precios (${nf0.format(G.ipc)}${NB}%): en poder de compra, el sueldo típico está casi igual que hace diez años.</p>
-      <p>Quien lleva años en el mismo piso lo nota menos: el alquiler que se declara a Hacienda, con todos los contratos, ha subido un ${nf0.format(G.declarado)}${NB}%.</p>
-      <p class="more"><a href="/preguntas/vivienda/">Qué pasa con la vivienda</a></p>`);
-    const g=add(s,"div"); drawSubidas(g);
-  }
-  // 3. Población
-  { const rws=rows.filter(r=>r[F.var0525]!=null), lose=rws.filter(r=>r[F.var0525]<0), share=lose.length/rws.length*100, gain=pad[pad.length-1]-pad[i05];
-    const bands=[[0,500,"Menos de 500"],[500,2000,"500 a 2.000"],[2000,10000,"2.000 a 10.000"],[10000,50000,"10.000 a 50.000"],[50000,1e9,"Más de 50.000"]];
-    const br=bands.map(([a,b,l])=>{ const s=rws.filter(r=>(r[F.pop]||0)>=a&&(r[F.pop]||0)<b); return {l:l+" hab.",v:s.filter(r=>r[F.var0525]<0).length/s.length*100,n:s.length}; });
-    const s=add(H,"section","finding split");
-    add(s,"div","txt",`<h2>${cap(deCadaDiez(share))} municipios tienen hoy menos vecinos que en 2005</h2>
-      <p>España ha ganado <mark>${nf1.format(gain/1e6)} millones</mark> de habitantes en veinte años, pero el crecimiento se ha concentrado en las áreas urbanas, la costa y las islas. Entre los pueblos de menos de 500 habitantes, han perdido población <mark>${nf0.format(br[0].v)} de cada 100</mark>.</p>
-      <p class="more"><a href="/temas/poblacion/">Quién llega y quién se va</a></p>`);
-    const g=add(s,"div");
-    const f=fig(g,{title:"Municipios que han perdido población desde 2005, según su tamaño",source:"Tamaño según la población de 2025. Fuente: INE, padrón municipal."});
-    hbars(f.body,br,{fmt:pc0,color:"--slate",min:0,max:100});
-  }
-  // 4. Estudios y renta
-  { const s=add(H,"section","finding split");
-    const t=add(s,"div","txt",`<h2>Donde hay más titulados, hay más renta</h2>
-      <p>De todos los datos que reúne Indicio, la relación más estrecha es la que une los estudios superiores con la renta: los municipios con más adultos con carrera o formación superior son, casi siempre, los de más ingresos.</p>
-      <p>Que dos cosas vayan juntas no quiere decir que una cause la otra. En <a href="#relaciones">Relaciones</a> puedes cruzar cualquier par de datos y ver cuánto se parecen.</p>`);
-    const g=add(s,"div");
-    scatter(g,{x:"superiores",y:"renta",minPop:1000,height:300,compact:true,title:"Estudios superiores y renta por persona",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Censo de 2021 y Atlas de Renta 2024."});
-  }
-  if(R){ const a=add(H,"div","aside"); a.innerHTML=EXPLAIN_RENTA; a.style.marginTop="8px"; }
-
-  // mapa
-  const M=document.getElementById("mapa");
-  M.innerHTML=`<h2>Cómo cambia de un municipio a otro</h2>
-    <div style="display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center"><label class="fld" for="maplayer">Qué mostrar<select id="maplayer" class="sel">${MAPLAYERS.map(([k,,l])=>`<option value="${k}" ${k===esMetric?"selected":""}>${l}</option>`).join("")}</select></label></div>
-    <div class="cols2" style="grid-template-columns:minmax(0,7fr) minmax(0,4fr)"><div><div class="mapbox" id="mapbox"><div class="maploading">Dibujando el mapa…</div></div><div class="legend" id="legend"></div></div><div id="maplists"></div></div>`;
-  document.getElementById("maplayer").addEventListener("change",e=>{ esMetric=e.target.value; colorSpainMap(); mapLists(); });
-  mapLists();
-  loadTopo().then(()=>{ if(document.getElementById("mapbox")) drawSpainMap(); }).catch(()=>{ const mb=document.getElementById("mapbox"); if(mb) mb.innerHTML='<div class="maploading">No se pudo cargar el mapa.</div>'; });
-}
-
 function mapLists(){
   const box=document.getElementById("maplists"); if(!box) return; box.innerHTML="";
   const [k,kind]=MAPLAYERS.find(m=>m[0]===esMetric);
@@ -577,113 +484,10 @@ const loadRenta=()=>RENTA?Promise.resolve(RENTA):getJSON("/data/renta/resumen.js
 const loadSecc=p=>{ if(!seccCache.has(p)) seccCache.set(p,getJSON("/data/secc/"+p+".json").then(t=>topojson.feature(t,t.objects[p]).features.map(rewind))); return seccCache.get(p); };
 const ramp10=()=>d3.quantize(d3.interpolateRgbBasis([0,1,2,3,4,5,6].map(i=>css("--ramp-"+i))),10);
 const decInk=i=>i<=4?css("--on-light"):css("--on-dark");
-const decOf=(v,cuts)=>{ let i=0; while(i<cuts.length&&v>=cuts[i]) i++; return i; };
 function decLegend(parent){
   const cols=ramp10(), d=add(parent,"div","declegend");
   d.innerHTML=`<span>Menos renta</span><span class="bar">${cols.map((c,i)=>`<i style="background:${c};color:${decInk(i)}">${i+1}</i>`).join("")}</span><span>Más renta</span>`;
   return d;
-}
-
-async function renderRiqueza(cityCode){
-  document.title="Riqueza · Indicio";
-  view.innerHTML='<p class="loading">Cargando…</p>';
-  let R; try{ R=await loadRenta(); }catch(e){ view.innerHTML='<p class="loading">No se pudieron cargar los datos de renta.</p>'; return; }
-  view.innerHTML=pageHead("¿Cómo se reparte la riqueza?",`La mitad de los españoles vive en un barrio donde la renta neta no llega a <mark>${eur(R.median)}</mark> por persona al año, unos ${eur(Math.round(R.medianHh/100)*100)} por hogar. Aquí están los ${nf0.format(R.n)} barrios de España, ordenados por lo que ingresan sus vecinos.`)+`<div id="body"></div>${methodNote()}`;
-  const B=document.getElementById("body");
-  const ex=add(B,"div","aside"); ex.style.marginTop="24px"; ex.innerHTML=EXPLAIN_RENTA+`<p>Los datos salen de las declaraciones de la renta de ${R.year} y se publican por <b>sección censal</b>, la unidad más pequeña del INE: zonas de entre 1.000 y 2.500 habitantes. Aquí las llamamos barrios.</p>`;
-
-  // 1. histograma
-  const s1=finding(B,`La mitad de la población vive en barrios con menos de ${eur(R.median)} por persona`,
-    `<p>Cada barra reúne a la gente que vive en barrios con una renta parecida. La mayoría se concentra entre ${eur(R.cuts[0])} y ${eur(R.cuts[8])}; a partir de ahí la cola se alarga hacia unos pocos barrios muy ricos. Puedes verlo por persona o por hogar.</p>`);
-  const ctl=add(s1,"div"); ctl.innerHTML=`<div class="seg" role="group" aria-label="Unidad"><button type="button" id="hp" aria-pressed="true">Por persona</button><button type="button" id="hh" aria-pressed="false">Por hogar</button></div>`;
-  const hbox=add(s1,"div");
-  const drawH=mode=>{ hbox.innerHTML=""; drawHist(hbox,R,mode); document.getElementById("hp").setAttribute("aria-pressed",mode==="p"); document.getElementById("hh").setAttribute("aria-pressed",mode==="h"); };
-  document.getElementById("hp").onclick=()=>drawH("p"); document.getElementById("hh").onclick=()=>drawH("h"); drawH("p");
-
-  // 2. comunidades
-  const cc=R.ccaa;
-  const s2=finding(B,"El norte y Madrid concentran los barrios ricos; el sur, los pobres",
-    `<p>Cada fila reparte la población de una comunidad según el grupo de renta de su barrio. Los colores son los diez grupos de España, cada uno con el 10${NB}% de la población: en ${cc[0].n}, el ${pc0(cc[0].dec[9])} de la gente vive en barrios del grupo más rico; en Andalucía, el ${pc0(cc.find(c=>c.n==="Andalucía").dec[0])} vive en barrios del grupo más pobre.</p>`);
-  decLegend(s2);
-  const cols=ramp10(), w=add(s2,"div","ccaa");
-  w.innerHTML=cc.map(c=>`<div class="row"><span>${esc(c.n)}</span><span class="bar" role="img" aria-label="${esc(c.n)}: ${pc(c.dec[0])} en el grupo más pobre y ${pc(c.dec[9])} en el más rico">${c.dec.map((v,i)=>v>0?`<i style="flex:${v};background:${cols[i]}" title="Grupo ${i+1}: ${pc(v)} de la población"></i>`:"").join("")}</span><em>${eur(c.renta)}</em></div>`).join("");
-  add(s2,"figcaption",null,`A la derecha, la renta media por persona de cada comunidad. Ordenadas de más a menos renta. Fuente: INE, Atlas de Distribución de Renta, ${R.year}.`);
-
-  // 3. ciudades
-  const s3=finding(B,"Dentro de las grandes ciudades, unos barrios ingresan más del doble que otros",
-    `<p>Cada raya es un barrio. La franja gris va del barrio del 10${NB}% más pobre de la ciudad al del 10${NB}% más rico, y la cifra de la derecha dice cuántas veces más ingresa uno que otro. De las 24 más pobladas, ${(c=>dispName(munName(c.code,c.name)))(R.cities.slice(0,24).reduce((m,c)=>c.ratio>m.ratio?c:m))} es la más desigual por dentro.</p>`);
-  drawCities(s3,R);
-
-  // 4. fronteras
-  const s4=finding(B,"A veces basta con cruzar una calle",
-    `<p>Estos son los barrios vecinos, que comparten límite, con más diferencia de renta entre sí.</p>`);
-  drawFronteras(s4,R);
-  add(s2,"p",null,exLink("grupos",{d:["renta","pobreza","gini"],gb:"ccaa"},"Compara comunidades con otros datos en el explorador"));
-
-  // 5. explorador
-  const s5=finding(B,"Tu ciudad, barrio a barrio",`<p>Elige una ciudad. Cada barrio toma el color de su grupo de renta en España. Pasa por encima para ver sus datos y acércate con la rueda o pellizcando.</p>`);
-  s5.id="explorador";
-  const def=cityCode&&BYCODE.has(cityCode)?cityCode:(lastMun&&BYCODE.has(lastMun)?lastMun:R.cities[0].code);
-  seccExplorer(s5,def,{picker:true});
-  if(cityCode) setTimeout(()=>s5.scrollIntoView(),50);
-
-  // 6. relaciones
-  const s6=finding(B,"Qué va con la renta",
-    `<p>La renta de un municipio se parece mucho a su nivel de estudios y, en sentido contrario, a su riesgo de pobreza. En <a href="#relaciones-superiores-renta">Relaciones</a> puedes comprobarlo y cruzar la renta con cualquier otro dato: <a href="#relaciones-renta-pobreza">pobreza</a>, <a href="#relaciones-renta-part">participación electoral</a>, <a href="#relaciones-renta-pensiones">peso de las pensiones</a>.</p>`);
-  panoExtra("riqueza",B);
-}
-
-function drawHist(parent,R,mode){
-  const H0=mode==="h"?R.histHh:R.hist, cuts=mode==="h"?R.cutsHh:R.cuts, med=mode==="h"?R.medianHh:R.median, capV=mode==="h"?R.capHh:R.cap;
-  const f=fig(parent,{title:mode==="h"?"Población según la renta neta media por hogar de su barrio":"Población según la renta neta media por persona de su barrio",
-    source:`Tramos de ${mode==="h"?"2.500":"500"}${NB}€. El INE no publica cifras por encima de ${eur(capV)}${mode==="h"?" por hogar":" por persona"} ${mode==="h"?"":"ni por debajo de "+eur(R.floor)}: los barrios que pasan de ahí se acumulan en la última barra. Fuente: INE, Atlas de Distribución de Renta, ${R.year}.`});
-  const W=Math.max(320,parent.clientWidth||900), H=Math.round(Math.min(340,Math.max(230,W*0.33))), m={t:44,r:14,b:26,l:46};
-  const e=H0.edges, cnt=H0.pop, cols=ramp10();
-  const x=d3.scaleLinear().domain([e[0],e[e.length-1]]).range([m.l,W-m.r]), y=d3.scaleLinear().domain([0,d3.max(cnt)]).nice(4).range([H-m.b,m.t]);
-  const svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label","Histograma de población por renta del barrio");
-  const yf=v=>v>=1e6?nf1.format(v/1e6)+" M":nf0.format(v/1e3)+" mil";
-  // margen izquierdo a la medida de las cifras del eje, y cuadrícula hasta el borde
-  m.l=Math.max(m.l,Math.ceil(txtW(svg,v=>v?yf(v):"0",y.ticks(4),"axis"))+6); x.range([m.l,W-m.r]);
-  svg.append("g").attr("class","grid").selectAll("line").data(y.ticks(4)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",y).attr("y2",y);
-  svg.append("g").attr("class","axis").selectAll("text").data(y.ticks(4)).join("text").attr("x",m.l-6).attr("y",v=>y(v)+4).attr("text-anchor","end").text(v=>v?yf(v):"0");
-  svg.append("text").attr("class","lab").attr("x",m.l-6).attr("y",m.t-30).attr("text-anchor","end").text("Personas");
-  svg.append("g").selectAll("rect").data(cnt).join("rect").attr("x",(c,i)=>x(e[i])+0.5).attr("width",(c,i)=>Math.max(0.5,x(e[i+1])-x(e[i])-1)).attr("y",c=>y(c)).attr("height",c=>y(0)-y(c)).attr("fill",(c,i)=>cols[decOf((e[i]+e[i+1])/2,cuts)])
-    .append("title").text((c,i)=>`${eur(e[i])} a ${eur(e[i+1])}: ${nf0.format(c)} personas en ${nf0.format(H0.counts[i])} barrios`);
-  const nar=W<600, step=(mode==="h"?20000:5000)*(nar?2:1), xt=d3.range(Math.ceil(e[0]/step)*step,e[e.length-1]+1,step);
-  svg.append("g").attr("class","axis").selectAll("text").data(xt).join("text").attr("x",x).attr("y",H-7).attr("text-anchor","middle").text(v=>nf0.format(v/1000)+" mil €");
-  const ann=[[cuts[0],nar?"10 %":"El 10 % con menos",-1],[med,(nar?"Mitad por debajo de ":"La mitad de la gente vive por debajo de ")+eur(med),0],[cuts[8],nar?"10 %":"El 10 % con más",1]];
-  ann.forEach(([v,t,side])=>{ const X=x(v);
-    svg.append("line").attr("x1",X).attr("x2",X).attr("y1",side===0?m.t-26:m.t-8).attr("y2",H-m.b).attr("stroke",css("--ink")).attr("stroke-width",side===0?1.4:1).attr("stroke-dasharray",side===0?null:"3 3");
-    svg.append("text").attr("class","lab"+(side===0?" strong":"")).attr("x",side<0?X-5:X+5).attr("y",side===0?m.t-30:m.t-12).attr("text-anchor",side<0?"end":"start").text(side===0?t:nar?(side<0?"10 % más pobre":"10 % más rico"):`${t}: ${side<0?"menos de":"más de"} ${eur(v)}`); });
-  return f;
-}
-
-function drawCities(parent,R){
-  const cities=R.cities.slice(0,24), cols=ramp10(), cuts=R.cuts;
-  const f=fig(parent,{source:`La línea vertical es la mediana de España. Escala logarítmica: cada salto del eje duplica la renta. Pulsa una ciudad para ver su mapa. Fuente: INE, Atlas de Distribución de Renta, ${R.year}.`});
-  const W=Math.max(320,parent.clientWidth||900), narrow=W<600, rowH=26, m={t:22,r:narrow?44:64,b:6,l:narrow?96:150}, H=m.t+rowH*cities.length+m.b;
-  const x=d3.scaleLog().domain([5000,60000]).range([m.l,W-m.r]).clamp(true);
-  const svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label","Renta de cada barrio en las grandes ciudades");
-  // el margen izquierdo lo marca el nombre de ciudad más largo, para que ninguno se salga
-  m.l=Math.max(m.l,Math.ceil(txtW(svg,c=>dispName(munName(c.code,c.name)),cities,"lab city","12.5px"))+10); x.range([m.l,W-m.r]);
-  svg.append("g").attr("class","axis").selectAll("text").data([5000,10000,20000,40000]).join("text").attr("x",x).attr("y",12).attr("text-anchor","middle").text(v=>nf0.format(v/1000)+" mil €");
-  svg.append("g").attr("class","grid").selectAll("line").data([5000,10000,20000,40000]).join("line").attr("x1",x).attr("x2",x).attr("y1",m.t-4).attr("y2",H-m.b);
-  svg.append("line").attr("x1",x(R.median)).attr("x2",x(R.median)).attr("y1",m.t-4).attr("y2",H-m.b).attr("stroke",css("--ink")).attr("stroke-width",1);
-  const g=svg.append("g").selectAll("g").data(cities).join("g").attr("class","citytip").attr("transform",(c,i)=>`translate(0,${m.t+i*rowH})`).on("click",(ev,c)=>{ navTo("riqueza-"+c.code); });
-  g.append("rect").attr("x",0).attr("y",0).attr("width",W).attr("height",rowH).attr("fill","transparent");
-  g.append("text").attr("class","lab city").attr("x",m.l-10).attr("y",rowH/2+4).attr("text-anchor","end").style("fill",css("--ink")).style("font-size","12.5px").text(c=>dispName(munName(c.code,c.name)));
-  g.append("line").attr("x1",c=>x(c.p10)).attr("x2",c=>x(c.p90)).attr("y1",rowH/2).attr("y2",rowH/2).attr("stroke",css("--rule")).attr("stroke-width",10);
-  g.each(function(c){ d3.select(this).selectAll("line.t").data(c.vals).join("line").attr("class","t").attr("x1",v=>x(v)).attr("x2",v=>x(v)).attr("y1",6).attr("y2",rowH-6).attr("stroke",v=>cols[decOf(v,cuts)]).attr("stroke-width",1.2).attr("opacity",.9); });
-  g.append("text").attr("class","lab").attr("x",W-m.r+8).attr("y",rowH/2+4).style("fill",css("--ink")).text(c=>"×"+nf1.format(c.ratio));
-  g.append("title").text(c=>`${munName(c.code,c.name)}: ${c.n} barrios, de ${eur(c.min)} a ${eur(c.max)} por persona. Pulsa para ver el mapa.`);
-}
-
-function drawFronteras(parent,R){
-  const cols=ramp10(), cuts=R.cuts;
-  const ul=add(parent,"ol","fronteras");
-  ul.innerHTML=R.fronteras.map(f=>{ const same=f.rica.mun===f.pobre.mun;
-    return `<li><span><a href="#riqueza-${f.pobre.mun}">${esc(munName(f.rica.mun,f.rica.name))}${same?"":" y "+esc(munName(f.pobre.mun,f.pobre.name))}</a></span><span class="pair"><i style="background:${cols[decOf(f.rica.renta,cuts)]}"></i>${eur(f.rica.renta)} <span class="muted">frente a</span> <i style="background:${cols[decOf(f.pobre.renta,cuts)]}"></i>${eur(f.pobre.renta)}</span><b class="x">×${nf1.format(f.ratio)}</b></li>`; }).join("");
-  add(parent,"figcaption",null,`Renta neta por persona de cada barrio. El INE no publica cifras por debajo de ${eur(R.floor)}, así que algunos barrios pobres pueden ingresar aún menos. Hay además ${R.islas.rica} barrios ricos rodeados solo de barrios pobres, y ${R.islas.pobre} al revés: se pueden ver en el mapa de cada ciudad.`);
 }
 
 // ---------- explorador de barrios ----------
@@ -762,95 +566,6 @@ function drawSubidas(parent,{compact}={}){
   box._draw=draw; draw(); return box;
 }
 
-// =====================================================================
-// POBLACIÓN
-// =====================================================================
-async function renderPoblacion(){
-  document.title="Población · Indicio";
-  const es=REFS.es, PY=REFS.padYears, pad=es.pad, i05=PY.indexOf(2005);
-  const rws=rowsAll().filter(r=>r[F.var0525]!=null), lose=rws.filter(r=>r[F.var0525]<0), popLose=d3.sum(lose,r=>r[F.pop]||0), popAll=d3.sum(rws,r=>r[F.pop]||0);
-  const [ext]=last(es.pct_foreign), [ext0]=first(es.pct_foreign), [age]=last(es.mean_age), [age0]=first(es.mean_age);
-  view.innerHTML=pageHead("¿Quién llega y quién se va?",`España tiene <mark>${nf1.format(pad[pad.length-1]/1e6)} millones</mark> de habitantes, ${nf1.format((pad[pad.length-1]-pad[0])/1e6)} millones más que en 1996. Pero el crecimiento se reparte muy mal: ${deCadaDiez(lose.length/rws.length*100)} municipios tienen menos vecinos que en 2005, aunque en ellos vive solo el ${pc0(popLose/popAll*100)} de la población.`)+`<div id="body"></div>${methodNote()}`;
-  const B=document.getElementById("body");
-
-  const s1=finding(B,`España ha ganado ${nf1.format((pad[pad.length-1]-pad[0])/1e6)} millones de habitantes desde 1996`,
-    `<p>El crecimiento fue muy rápido hasta 2008, se frenó con la crisis y ha vuelto con fuerza desde 2016, impulsado por la llegada de población extranjera.</p>`);
-  const g1=add(s1,"div","cols2");
-  lineChart(g1,{title:"Habitantes de España",source:"A 1 de enero de cada año. Fuente: INE, padrón municipal.",series:[{n:"España",v:pad,c:"--slate",main:true}],years:PY,xticks:[1996,2008,2025],fmt:v=>nf0.format(v),tickFmt:v=>nf0.format(v/1e6)+" M"});
-  const fb=fig(g1,{title:"Crecimiento desde 2005, por provincia",source:"Fuente: INE, padrón municipal."});
-  hbars(fb.body,provRows("var0525").sort((a,b)=>b.v-a.v),{fmt:sgn,scroll:true,color:"--mustard"});
-
-  const bands=[[0,500,"Menos de 500"],[500,2000,"500 a 2.000"],[2000,10000,"2.000 a 10.000"],[10000,50000,"10.000 a 50.000"],[50000,1e9,"Más de 50.000"]];
-  const br=bands.map(([a,b,l])=>{ const s=rws.filter(r=>(r[F.pop]||0)>=a&&(r[F.pop]||0)<b); return {l:l+" hab.",v:s.filter(r=>r[F.var0525]<0).length/s.length*100}; });
-  const s2=finding(B,"Cuanto más pequeño es el pueblo, más probable es que se vacíe",`<p>Porcentaje de municipios de cada tamaño que tienen hoy menos habitantes que en 2005.</p>`);
-  const f2=fig(s2,{source:"Tamaño según la población de 2025. Fuente: INE, padrón municipal."}); hbars(f2.body,br,{fmt:pc0,color:"--slate",min:0,max:100});
-  const g2=add(s2,"div","cols2"); topList(g2,"var0525",{title:"Los que más crecen desde 2005",link:"crece"}); topList(g2,"var0525",{title:"Los que más pierden desde 2005",asc:true,link:"crece"});
-  add(s2,"figcaption",null,"Municipios de 5.000 habitantes o más.");
-
-  // migraciones
-  { const MR=rowsAll().filter(r=>r[F.migInt]!=null&&r[F.pop]), bands=[[0,1000,"Menos de 1.000"],[1000,5000,"1.000 a 5.000"],[5000,20000,"5.000 a 20.000"],[20000,100000,"20.000 a 100.000"],[100000,1e9,"Más de 100.000"]];
-    const wm=(s,k)=>d3.sum(s,r=>r[F[k]]*r[F.pop])/d3.sum(s,r=>r[F.pop]);
-    const rowsB=bands.map(([a,b,l])=>{ const s=MR.filter(r=>r[F.pop]>=a&&r[F.pop]<b); return {l:l+" hab.",i:wm(s,"migInt"),e:wm(s,"migExt")}; });
-    const MY=REFS.migYears, me=REFS.paro.es.mig;
-    const sm=finding(B,"Las ciudades grandes crecen por quien llega del extranjero; los pueblos ganan vecinos de otras partes de España",
-      `<p>Entre ${MY[0]} y ${MY[MY.length-1]} llegaron a España, en neto, unas ${nf0.format(d3.mean(me,m=>m[1])/1000)} mil personas al año desde el extranjero. Dentro de España, el movimiento va de las ciudades grandes a los municipios de alrededor y a los pueblos: Madrid y Barcelona pierden cada año más gente hacia otros municipios de la que reciben.</p>`);
-    const fm=fig(sm,{title:"Saldo migratorio por cada 1.000 habitantes y año, según el tamaño del municipio",source:`Llegadas menos salidas, media de ${MY[0]}–${MY[MY.length-1]}. Fuente: INE, Estadística de Migraciones y Cambios de Residencia.`});
-    const mx=d3.max(rowsB,r=>Math.max(Math.abs(r.i),Math.abs(r.e)));
-    const w=add(fm.body,"div","cmp");
-    w.innerHTML=`<div class="keys"><span><i style="background:var(--slate)"></i>Con el extranjero</span><span><i style="background:var(--rust)"></i>Con el resto de España</span></div>`+rowsB.map(r=>`<div class="cmp-row"><div class="n">${r.l}</div><div class="bars">${[[r.e,"--slate"],[r.i,"--rust"]].map(([v,c])=>`<div class="b"><span style="width:${Math.abs(v)/mx*100}%;background:var(${c});${v<0?"opacity:.55":""}"></span><em>${v>0?"+":"−"}${nf1.format(Math.abs(v))}</em></div>`).join("")}</div></div>`).join("");
-    const g=add(sm,"div","cols2"); topList(g,"migInt",{title:"Los que más vecinos ganan del resto de España",minPop:5000,link:"crece"}); topList(g,"migInt",{title:"Los que más vecinos pierden hacia el resto de España",minPop:5000,asc:true,link:"crece"});
-    add(sm,"figcaption",null,"Saldo con el resto de España por cada 1.000 habitantes y año. Municipios de 5.000 habitantes o más.");
-    add(sm,"p",null,exLink("mapa",{d:["migInt","migExt","renta"]},"Ver en el mapa del explorador adónde se muda la gente"));
-  }
-
-  const s3=finding(B,"Los municipios que crecen son, sobre todo, los que atraen población de fuera",
-    `<p>La población con nacionalidad extranjera ha pasado del ${pc(ext0)} al ${pc(ext)} entre 2015 y 2023. Donde más ha crecido la población en la última década es, en general, donde más extranjeros viven.</p>`);
-  scatter(s3,{x:"extr",y:"varPob",minPop:1000,title:"Población extranjera y crecimiento desde 2015",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Atlas de Renta (2023) y padrón."});
-
-  const s4=finding(B,"Y los que se vacían son también los más envejecidos",
-    `<p>La edad media de España ha pasado de ${nf1.format(age0)} a ${nf1.format(age)} años entre 2015 y 2023. En los pueblos que pierden habitantes supera con frecuencia los 50.</p>`);
-  scatter(s4,{x:"edad",y:"varPob",minPop:1000,title:"Edad media y crecimiento desde 2015",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Atlas de Renta (2023) y padrón."});
-  panoExtra("poblacion",B);
-}
-
-// =====================================================================
-// TRABAJO
-// =====================================================================
-async function renderTrabajo(){
-  document.title="Trabajo · Indicio";
-  const es=REFS.es, [wage]=last(es.wage), [pen]=last(es.pension), S=REFS.salarios, PR=REFS.paro.es, PY=REFS.paroYears;
-  const G=subidas();
-  const tasa=PR.paro[10]/PR.pob1664*100, caida=(PR.paro[10]/PR.paro[0]-1)*100;
-  view.innerHTML=pageHead("¿De qué vivimos?",`Hay <mark>${nf1.format(PR.last[0]/1e6)} millones</mark> de personas apuntadas al paro, frente a ${nf1.format(PR.paro[0]/1e6)} millones de media en 2015. Pero los sueldos apenas ganan a los precios: el salario mediano ha subido un ${nf0.format(G.salMed)}${NB}% en nueve años y los precios, un ${nf0.format(G.ipc)}${NB}%.`)+`<div id="body"></div>${methodNote()}`;
-  const B=document.getElementById("body");
-
-  const s0=finding(B,"Más gente trabajando, pero con sueldos que apenas ganan a los precios",
-    `<p>El salario medio ha pasado de ${eur(S.media[2015])} a ${eur(S.media[2024])} brutos al año, y el mediano de ${eur(S.mediana[2015])} a ${eur(S.mediana[2024])}. Descontada la inflación, el trabajador típico gana hoy casi lo mismo que en 2015.</p>
-     <p>La renta por persona sí ha subido más, porque hay más gente trabajando en cada hogar y porque las pensiones suben con el IPC. Pulsa «Descontando la inflación» para verlo en euros de 2024.</p>`);
-  realChart(s0,{title:"Salario y renta por persona",source:"Salario bruto anual por trabajador. Renta neta por persona. Fuente: INE, Encuesta de Estructura Salarial, Atlas de Renta e IPC.",
-    series:[{n:"Salario medio",v:YEARS.map(y=>S.media[y]),c:"--slate",main:true},{n:"Salario mediano",v:YEARS.map(y=>S.mediana[y]),c:"--mustard"},{n:"Renta por persona",v:es.net_income_pc,c:"--rust"}],fmt:eur,tickFmt:v=>nf0.format(v/1000)+" mil",height:280});
-  const fs=fig(s0,{title:"Salario mediano por comunidad, 2024",source:"Fuente: INE, Encuesta de Estructura Salarial."});
-  const MC=S.mediana_ccaa; hbars(fs.body,Object.entries(MC).filter(([k])=>k!=="España").map(([k,v])=>({l:k,v:v[2024],me:false})).sort((a,b)=>b.v-a.v),{fmt:eur,ref:MC["España"][2024],refLabel:"España",color:"--slate",min:0});
-
-  const s1=finding(B,`El paro registrado ha caído un ${nf0.format(-caida)}${NB}% desde 2015`,
-    `<p>Personas inscritas como demandantes de empleo en las oficinas públicas (SEPE). Es el dato más reciente que existe por municipio: llega a ${REFS.paroLast}. Para comparar lugares usamos la media de 2025, porque en verano y otoño las zonas turísticas tienen mucho menos paro que el resto del año. En España, el paro registrado equivale al ${pc(tasa)} de la población de 16 a 64 años.</p>`);
-  const g1=add(s1,"div","cols2");
-  lineChart(g1,{title:"Paro registrado en España",source:"Media de cada año; 2026, de enero a septiembre. Fuente: SEPE.",series:[{n:"España",v:PR.paro,c:"--rust",main:true}],years:PY,xticks:[2015,2020,2026],fmt:v=>nf0.format(v),tickFmt:v=>nf1.format(v/1e6)+" M"});
-  const f1=fig(g1,{title:"Paro registrado por provincia, media de 2025",source:"% de la población de 16 a 64 años. Fuente: SEPE y padrón."}); hbars(f1.body,provRows("paroReg").sort((a,b)=>b.v-a.v),{fmt:pc,scroll:true,color:"--rust",min:0});
-  const g1b=add(s1,"div","cols2"); topList(g1b,"paroReg",{title:"Más paro registrado",minPop:10000,link:"vive"}); topList(g1b,"paroReg",{title:"Menos paro registrado",minPop:10000,asc:true,link:"vive"});
-  add(s1,"figcaption",null,"Municipios de 10.000 habitantes o más. El paro registrado no es la tasa de paro de la EPA: cuenta a quien se apunta en la oficina de empleo, en relación con toda la población en edad de trabajar.");
-  add(s1,"p",null,exLink("mapa",{d:["paroReg","renta"]},"Ver el paro registrado en el mapa del explorador"));
-
-  const s2=finding(B,"Donde hay más estudios superiores, hay más renta",`<p>Es la relación más fuerte de todos los datos de Indicio. No dice que estudiar haga rico a un municipio: también puede ser que la gente con estudios se concentre donde hay empleos mejor pagados. Pero muestra hasta qué punto van juntas las dos cosas.</p>`);
-  scatter(s2,{x:"superiores",y:"renta",minPop:1000,title:"Adultos con estudios superiores y renta por persona",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Censo de 2021 y Atlas de Renta 2024."});
-  const s2b=finding(B,"Y donde hay más paro, menos renta",`<p>El paro registrado de hoy frente a la renta por persona de 2024.</p>`);
-  scatter(s2b,{x:"paroReg",y:"renta",minPop:1000,height:360,title:"Paro registrado y renta por persona",source:"Municipios de 1.000 habitantes o más. Fuente: SEPE (media de 2025) y Atlas de Renta (2024)."});
-  const s3=finding(B,"En muchos pueblos se vive, sobre todo, de las pensiones",`<p>De cada 100 euros que declaran los hogares, ${nf0.format(wage)} son salarios y ${nf0.format(pen)} pensiones. En los municipios más envejecidos, las pensiones se acercan a la mitad de todo lo que entra.</p>`);
-  const g3=add(s3,"div","cols2");
-  const sc3=add(g3,"div"); scatter(sc3,{x:"edad",y:"pensiones",minPop:1000,height:340,title:"Edad media y peso de las pensiones",source:"Municipios de 1.000 habitantes o más. Fuente: INE, Atlas de Renta 2023."});
-  topList(g3,"pensiones",{title:"Donde más pesan las pensiones",minPop:5000,link:"vive"});
-  panoExtra("trabajo",B);
-}
 // =====================================================================
 // FICHA DE MUNICIPIO: una sola página con saltos a cada apartado
 // =====================================================================
@@ -1199,7 +914,7 @@ function secTodos(s,r,d){
     cmpRows(b,r[F.name],[["pov_u18","Menores de 18",""],["pov_1864","De 18 a 64",""],["pov_o65","65 y más",""],["pov_es","Nacionalidad española",""],["pov_ext","Nacionalidad extranjera",""]],lastSrc(r,d,["pov_u18","pov_1864","pov_o65","pov_es","pov_ext"])); }
   else lineChart(g1,{title:"Desigualdad (índice de Gini)",source:"Fuente: INE, Atlas de Renta.",series:S3(r,d,"gini"),fmt:v=>nf1.format(v)});
   const b=block(s,"Barrio a barrio");
-  add(b,"p",null,`<span class="muted">Renta por persona en cada sección censal, la zona más pequeña que publica el INE. Los colores son los diez grupos de renta de toda España. Más contexto en <a href="/temas/riqueza/">Riqueza</a>.</span>`).style.marginBottom="10px";
+  add(b,"p",null,`<span class="muted">Renta por persona en cada sección censal, la zona más pequeña que publica el INE. Los colores son los diez grupos de renta de toda España.</span>`).style.marginBottom="10px";
   seccExplorer(b,r[F.code],{});
 }
 
@@ -3023,8 +2738,8 @@ function coverOf(id,{C,D}){
 // el titular de los análisis del carrusel lleva el mismo final en granate que en la portada, para que la transición encaje
 const shTitle=S=>{ const h=(typeof HEROQ!=="undefined"?HEROQ:[]).find(x=>x.id===S.id); return h&&h.em&&S.t.endsWith(h.em)?esc(S.t.slice(0,-h.em.length))+`<em>${esc(h.em)}</em>`:esc(S.t); };
 function studyHead(S){ const {v}=splitA(S.a);
-  return `<nav class="crumbs"><a href="/preguntas/">Preguntas</a> › <a href="/preguntas/?tema=${S.tema}">${esc(TOPICL(S.tema))}</a></nav>`
-    +`<header class="sh"><div class="sh-t"><div class="kk2">${esc(TOPICL(S.tema))}</div><h1 class="sh-q">${shTitle(S)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
+  return `<nav class="crumbs"><a href="/preguntas/">Análisis</a></nav>`
+    +`<header class="sh"><div class="sh-t"><div class="kk2">${esc((EVID[S.ev]||{}).l||"Análisis")}</div><h1 class="sh-q">${shTitle(S)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
     +`<figure class="sh-f" id="shf"><div class="sh-ph"></div></figure></header>`; }
 function studyCover(S){ loadCovers().then(cv=>{ const f=document.getElementById("shf"); if(!f||!document.body.contains(f)) return; const c=coverOf(S.id,cv);
   if(c) f.innerHTML=c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`; else { f.parentNode.classList.add("nofig"); f.remove(); } }); }
@@ -3239,54 +2954,6 @@ let GOV=null;
 const loadGov=()=>GOV?Promise.resolve(GOV):getJSON("/data/gov.json").then(g=>(GOV=g));
 const gy=y=>GOV.years.indexOf(String(y));
 const gv=(code,u,y)=>GOV.fun[code][u][gy(y)];
-
-async function renderGasto(){
-  document.title="Dinero público · Indicio";
-  view.innerHTML='<p class="loading">Cargando…</p>';
-  try{ await loadGov(); }catch(e){ view.innerHTML='<p class="loading">No se pudieron cargar los datos.</p>'; return; }
-  const Y=+GOV.years[GOV.years.length-1], tot=gv("TOTAL","meur",Y), per=v=>v/tot*100;
-  const pop=REFS.es.pad[REFS.es.pad.length-1];
-  view.innerHTML=pageHead("¿En qué se gasta el dinero público?",`Las administraciones públicas (Estado, comunidades, ayuntamientos y Seguridad Social) gastaron en ${Y} <mark>${nf0.format(tot/1000)} mil millones de euros</mark>, el ${pc(gv("TOTAL","pib",Y))} de todo lo que produce la economía: unos ${eur(Math.round(tot*1e6/pop/100)*100)} por habitante. De cada 100 euros, ${nf0.format(per(gv("GF1002","meur",Y)))} van a pensiones de jubilación.`)+`<div id="body"></div>${govNote()}`;
-  const B=document.getElementById("body");
-
-  // 1. cada 100 euros
-  const s1=finding(B,`De cada 100 euros de gasto público, ${nf0.format(per(gv("GF10","meur",Y)))} son protección social`,
-    `<p>La protección social incluye pensiones, paro, bajas por enfermedad e incapacidad, ayudas a familias y contra la exclusión. Le siguen la sanidad, los servicios generales (donde están los intereses de la deuda) y la educación.</p>`);
-  const rows=[["GF1002","GF10"],["GF1001","GF10"],["GF1003","GF10"],["GF1005","GF10"],["GF1004","GF10"],["GF1007","GF10"],["GF07"],["GF09"],["GF0107","GF01"],["GF01x"],["GF04"],["GF03"],["GF02"],["GF06"],["GF08"],["GF05"]];
-  const val=c=>c==="GF01x"?gv("GF01","meur",Y)-gv("GF0107","meur",Y):gv(c,"meur",Y);
-  const nm=c=>c==="GF01x"?"Resto de servicios generales":GOV.fun[c].n;
-  const col=r=>r[1]==="GF10"?"--rust":r[0]==="GF07"?"--slate":r[0]==="GF09"?"--mustard":r[0]==="GF0107"?"--plum":"--stone";
-  const f1=fig(s1,{title:`Cada 100 euros de gasto público, ${Y}`,source:`Los tonos granate son partes de la protección social. Fuente: Eurostat, gasto de las administraciones públicas por funciones (COFOG).`});
-  hbars(f1.body,rows.map(r=>({l:nm(r[0]),v:per(val(r[0])),c:col(r)})).filter(r=>r.v>0.05),{fmt:v=>nf1.format(v)+NB+"€",min:0});
-  f1.body.querySelectorAll(".hb").forEach(h=>h.style.gridTemplateColumns="minmax(150px,240px) minmax(0,1fr) 64px");
-
-  // 2. evolución % PIB
-  const yrs=GOV.years.map(Number), L=[["GF1002","Jubilación","--rust"],["GF07","Sanidad","--slate"],["GF09","Educación","--mustard"],["GF0107","Intereses de la deuda","--plum"],["GF1005","Desempleo","--olive"]];
-  const p0=gv("GF1002","pib",1995), p1=gv("GF1002","pib",Y);
-  const s2=finding(B,`Las pensiones de jubilación han pasado del ${pc(p0)} al ${pc(p1)} del PIB desde 1995`,
-    `<p>Es la partida que más ha crecido, sobre todo entre 2008 y 2014: la crisis hundió el PIB y, a la vez, las nuevas pensiones eran más altas que las que dejaban de pagarse. La sanidad pesa algo más que en 1995 (del ${pc(gv("GF07","pib",1995))} al ${pc(gv("GF07","pib",Y))}) y la educación algo menos (del ${pc(gv("GF09","pib",1995))} al ${pc(gv("GF09","pib",Y))}). Los intereses de la deuda bajaron con la llegada del euro, repuntaron con la crisis y hoy están en el ${pc(gv("GF0107","pib",Y))}. El desempleo sube y baja con las crisis.</p>`);
-  lineChart(s2,{title:"Gasto público en cada función, % del PIB",source:"Fuente: Eurostat, COFOG.",series:L.map(([c,n,k],i)=>({n,v:GOV.fun[c].pib,c:k,main:i===0})),years:yrs,xticks:[1995,2008,Y],fmt:pc,tickFmt:v=>nf0.format(v)+"%",height:300});
-
-  // 3. ingresos, gastos, deuda
-  const TR=GOV.main.TR.pib, TE=GOV.main.TE.pib, B9=GOV.main.B9.pib;
-  const s3=finding(B,`Se gasta más de lo que se ingresa casi todos los años: el déficit de ${Y} fue del ${pc(-B9[gy(Y)])} del PIB`,
-    `<p>Solo entre 2005 y 2007 los ingresos superaron a los gastos. La diferencia se cubre con deuda, que pasó del ${pc(GOV.debt[gy(2007)])} del PIB en 2007 al ${pc(GOV.debt[gy(Y)])} en ${Y}. Los ingresos salen sobre todo de impuestos sobre la renta y el patrimonio (${pc(GOV.main.D5REC.pib[gy(Y)])} del PIB), cotizaciones sociales (${pc(GOV.main.D61REC.pib[gy(Y)])}) e impuestos sobre el consumo como el IVA (${pc(GOV.main.D2REC.pib[gy(Y)])}).</p>`);
-  const g3=add(s3,"div","cols2");
-  lineChart(g3,{title:"Ingresos y gastos públicos, % del PIB",source:"Fuente: Eurostat, cuentas de las administraciones públicas.",series:[{n:"Gastos",v:TE,c:"--rust",main:true},{n:"Ingresos",v:TR,c:"--slate"}],years:yrs,xticks:[1995,2008,Y],fmt:pc,tickFmt:v=>nf0.format(v)+"%"});
-  lineChart(g3,{title:"Deuda pública, % del PIB",source:"Fuente: Eurostat (protocolo de déficit excesivo).",series:[{n:"Deuda",v:GOV.debt,c:"--plum",main:true}],years:yrs,xticks:[1995,2008,Y],fmt:pc,tickFmt:v=>nf0.format(v)+"%"});
-
-  // 4. comparación europea
-  const EU=GOV.eu, cy=[...new Set(Object.values(EU).flatMap(o=>Object.keys(o.TOTAL||{})))].sort().filter(y=>Object.values(EU).every(o=>o.TOTAL&&o.TOTAL[y]!=null)).pop();
-  const ctry=[["ES","España"],["EU27_2020","UE-27"],["FR","Francia"],["DE","Alemania"],["IT","Italia"],["PT","Portugal"],["NL","Países Bajos"],["SE","Suecia"]];
-  const es=c=>gv(c,"pib",+cy)??null;
-  const s4=finding(B,`En el conjunto, España gasta menos que la media europea; en pensiones, lo mismo`,
-    `<p>Gasto público en ${cy} en % del PIB. España gasta en total ${nf1.format(EU.EU27_2020.TOTAL[cy]-es("TOTAL"))} puntos menos que la media de la UE, sobre todo en sanidad y educación, y algo más en intereses de la deuda. En pensiones de jubilación está en la media.</p>`);
-  const items=[["TOTAL","Total"],["GF1002","Jubilación"],["GF07","Sanidad"],["GF09","Educación"],["GF0107","Intereses"],["GF02","Defensa"]];
-  const t=add(s4,"div","extable"); t.innerHTML=`<table class="glance"><thead><tr><th>País</th>${items.map(([c,l])=>`<th class="r">${l}</th>`).join("")}</tr></thead><tbody>${ctry.map(([g,n])=>`<tr${g==="ES"?' class="me"':""}><td>${g==="ES"?"<b>"+n+"</b>":n}</td>${items.map(([c])=>{ const v=g==="ES"?es(c):(EU[g]&&EU[g][c]?EU[g][c][cy]:null); return `<td class="r num">${v==null?"—":pc(v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table>`;
-  add(s4,"figcaption",null,`% del PIB, ${cy}. Fuente: Eurostat, COFOG. Los países gastan distinto también porque se organizan distinto: en algunos, parte de la sanidad o de las pensiones es privada y no aparece aquí.`);
-  const s5=finding(B,"¿Son sostenibles las pensiones?",`<p>En el laboratorio hay un estudio que separa por qué ha crecido el gasto en pensiones y qué pasará cuando se jubilen las generaciones más numerosas, con una calculadora para probar escenarios.</p><p>${exLink("evolucion",{e:["govTot","govJub","govSan","govEdu","govInt","pib"]},"Compara la evolución del gasto con el PIB en el explorador")} · <a class="exlink" href="/preguntas/pensiones/">Leer el estudio →</a></p>`);
-  panoExtra("gasto",B);
-}
 function govNote(){ return `<footer class="method"><details class="srcs"><summary>De dónde salen los datos</summary><p>Eurostat: gasto de las administraciones públicas por funciones (clasificación COFOG, 1995–${GOV.years[GOV.years.length-1]}), cuentas públicas, deuda pública, PIB, gasto y beneficiarios de pensiones, población y proyecciones de población (EUROPOP2023). Las administraciones públicas incluyen Estado, comunidades autónomas, ayuntamientos y Seguridad Social, sin contar dos veces lo que se transfieren entre ellas.</p></details><p><b>Cómo leerlos.</b> «Jubilación» es la función de vejez de COFOG: sobre todo pensiones de jubilación, también servicios para mayores. El gasto total en pensiones (con viudedad, incapacidad y otras) es mayor: en el estudio de pensiones se usa esa cifra.</p></footer>`; }
 
 // ---------- estudio: pensiones ----------
@@ -3506,11 +3173,7 @@ function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
   return api;
 }
 
-// cifras que se repiten en portada, temas y tarjetas
-const loseShare=()=>{ const rws=rowsAll().filter(r=>r[F.var0525]!=null); return rws.filter(r=>r[F.var0525]<0).length/rws.length*100; };
-const paroNow=()=>REFS.paro.es.last[0], paro15=()=>REFS.paro.es.paro[0];
-const mill=v=>nf1.format(v/1e6)+NB+"M";
-const jubShare=()=>{ const Y=+GOV.years[GOV.years.length-1]; return gv("GF1002","meur",Y)/gv("TOTAL","meur",Y)*100; };
+// cifras que se repiten en portada y tarjetas
 const lastV=a=>last(a)[0];
 const VG=()=>VREFS.elections.filter(k=>k.startsWith("02")).pop();
 
@@ -3518,103 +3181,8 @@ const VG=()=>VREFS.elections.filter(k=>k.startsWith("02")).pop();
 // INICIO
 // =====================================================================
 // =====================================================================
-// PANORAMAS: bloques comunes al final de cada tema (más contexto y los análisis del tema)
+// TRAMOS por tamaño de municipio
 // =====================================================================
-const BANDS=()=>Object.keys(REFS.band).sort((a,b)=>+a-+b).map((k,i)=>({k,l:REFS.bandLabels[i].replace(" hab.","").replace("menos de ","< ").replace("más de ","> "),s:REFS.band[k]}));
-function themeStudies(B,tema){
-  const L=STUDIES.filter(S=>S.tema===tema&&!S.href); if(!L.length) return;
-  const s=finding(B,"Para ir más allá: los análisis de este tema",`<p>Cada uno responde a una pregunta concreta con datos y con el método a la vista: qué se compara, con quién, y cuánto aguanta el resultado.</p>`);
-  const g=add(s,"div","tstud");
-  L.forEach(S=>{ const a=add(g,"a"); a.href=`/preguntas/${S.id}/`; const ic=illCard(S.id); if(ic) a.appendChild(ic); a.insertAdjacentHTML("beforeend",`<b>${esc(S.t)}</b><span>${esc(S.a)}</span><em>Leer el análisis →</em>`); });
-}
-function panoExtra(id,B){
-  try{
-    const es=REFS.es, BS=BANDS(), lastY=a=>{ const [v,y]=last(a); return {v,y}; }, firstY=a=>{ const [v,y]=first(a); return {v,y}; };
-    if(id==="riqueza"){
-      const u=lastY(es.pov_u18), u0=firstY(es.pov_u18), o=lastY(es.pov_o65), o0=firstY(es.pov_o65), a=lastY(es.pov_1864);
-      const s=finding(B,`La pobreza tiene cara de niño: ${deCadaDiez(u.v)} menores viven en hogares pobres`,`<p>El riesgo de pobreza (vivir en un hogar con menos del 60${NB}% de la renta mediana) no se reparte igual por edades. En ${u.y} afectaba al ${pc(u.v)} de los menores de 18 años, al ${pc(a.v)} de los adultos de 18 a 64 y al ${pc(o.v)} de los mayores de 65. La pobreza infantil ha bajado desde ${u0.y} (${pc(u0.v)}), pero la de los mayores ha subido (${pc(o0.v)} entonces): el umbral de pobreza sube con la renta mediana, y muchas pensiones bajas se han quedado por debajo de él.</p><p>Por eso las políticas que más pueden mover la pobreza son las que llegan a los hogares con niños: prestaciones por hijo, el Ingreso Mínimo Vital y, sobre todo, el empleo de los padres.</p>`);
-      lineChart(s,{title:"Riesgo de pobreza por edad",sub:"% de personas en hogares con menos del 60 % de la renta mediana",source:"Fuente: INE, Atlas de Distribución de Renta de los Hogares.",series:[{n:"Menores de 18",v:es.pov_u18,c:"--rust",main:true},{n:"18 a 64",v:es.pov_1864,c:"--slate"},{n:"65 y más",v:es.pov_o65,c:"--mustard"}],years:YEARS,xticks:[2015,2019,2023],fmt:pc,tickFmt:v=>nf0.format(v)+" %",height:260});
-      const s2=finding(B,"En los municipios grandes hay más renta, y también más desigualdad",`<p>Renta por persona e índice de Gini (0 = todos igual; 100 = uno lo tiene todo) según el tamaño del municipio. Las ciudades concentran a la vez a los hogares más ricos y a muchos de los más pobres; en los pueblos la renta es más baja, pero más pareja.</p>`);
-      const g=add(s2,"div","cols2"), fa=fig(g,{title:"Renta neta por persona",source:"Último año. Fuente: INE, Atlas de Renta."}), fb=fig(g,{title:"Desigualdad (Gini)",source:"Último año. Fuente: INE, Atlas de Renta."});
-      hbars(fa.body,BS.map(b=>({l:b.l,v:last(b.s.net_income_pc)[0]})),{fmt:eur,color:"--slate",min:0}); hbars(fb.body,BS.map(b=>({l:b.l,v:last(b.s.gini)[0]})),{fmt:v=>nf1.format(v),color:"--rust",min:20});
-    }
-    if(id==="poblacion"){
-      const o=lastY(es.pct_over65), o0=firstY(es.pct_over65), u=lastY(es.pct_under18), u0=firstY(es.pct_under18);
-      const s=finding(B,`Uno de cada ${nf0.format(100/o.v)} vecinos tiene más de 65 años, y en los pueblos pequeños, uno de cada ${nf0.format(100/last(BS[0].s.pct_over65)[0])}`,`<p>Los mayores de 65 han pasado del ${pc(o0.v)} al ${pc(o.v)} de la población entre ${o0.y} y ${o.y}, y los menores de 18, del ${pc(u0.v)} al ${pc(u.v)}. El envejecimiento es mucho más intenso en los municipios pequeños: en los de menos de 1.000 habitantes, los mayores son el ${pc(last(BS[0].s.pct_over65)[0])}; en las ciudades de más de 100.000, el ${pc(last(BS[BS.length-1].s.pct_over65)[0])}. Es la otra cara de la despoblación: los pueblos no solo pierden gente, pierden a los que tendrían hijos.</p>`);
-      const g=add(s,"div","cols2");
-      lineChart(g,{title:"Mayores de 65 y menores de 18",sub:"% de la población",source:"Fuente: INE, Atlas de Renta (indicadores demográficos).",series:[{n:"Mayores de 65",v:es.pct_over65,c:"--mustard",main:true},{n:"Menores de 18",v:es.pct_under18,c:"--slate"}],years:YEARS,xticks:[2015,2019,2023],fmt:pc,tickFmt:v=>nf0.format(v)+" %",height:240});
-      const fb=fig(g,{title:"Mayores de 65 según el tamaño del municipio",source:"% de la población, último año. Fuente: INE, Atlas de Renta."}); hbars(fb.body,BS.map(b=>({l:b.l,v:last(b.s.pct_over65)[0]})),{fmt:pc,color:"--mustard",min:0});
-    }
-    if(id==="trabajo"){
-      const cats=[{k:"wage",l:"Salarios",c:"--slate"},{k:"pension",l:"Pensiones",c:"--mustard"},{k:"unemp_benefit",l:"Paro",c:"--rust"},{k:"other_benefits",l:"Otras prestaciones",c:"--plum"},{k:"other_income",l:"Otros ingresos",c:"--stone"}];
-      const rows=BS.map(b=>({l:b.l,v:Object.fromEntries(cats.map(c=>[c.k,last(b.s[c.k])[0]]))})).concat([{l:"España",me:true,v:Object.fromEntries(cats.map(c=>[c.k,last(es[c.k])[0]]))}]);
-      const b0=rows[0].v, bN=rows[BS.length-1].v;
-      const s=finding(B,`En los pueblos más pequeños, ${nf0.format(b0.pension)} de cada 100 euros son pensiones`,`<p>De dónde sale la renta de los hogares según el tamaño del municipio. En las ciudades de más de 100.000 habitantes, ${nf0.format(bN.wage)} de cada 100 euros son salarios y ${nf0.format(bN.pension)}, pensiones; en los municipios de menos de 1.000, los salarios bajan a ${nf0.format(b0.wage)} y las pensiones suben a ${nf0.format(b0.pension)}. Eso hace a los pueblos más estables cuando llega una crisis (las pensiones no caen) pero también más dependientes de cómo se revaloricen cada año.</p>`);
-      stackBars(s,{rows,cats,note:"% de la renta bruta declarada, último año disponible. Fuente: INE, Atlas de Renta."});
-      const PR=REFS.paro.prov, PY=REFS.paroYears, i19=PY.indexOf(2019), i25=PY.indexOf(2025);
-      if(PR&&i19>=0&&i25>=0){ const rw=Object.entries(PR).map(([p,v])=>v.paro&&v.paro[i19]?{l:provShort(PROVS[p]),v:(v.paro[i25]/v.paro[i19]-1)*100}:null).filter(Boolean).sort((a,b)=>a.v-b.v), esv=(REFS.paro.es.paro[i25]/REFS.paro.es.paro[i19]-1)*100;
-        const s2=finding(B,`Desde 2019 el paro registrado ha bajado un ${pc0(-esv)}, pero mucho más en unas provincias que en otras`,`<p>Cambio del paro registrado entre la media de 2019, antes de la pandemia, y la de 2025. Bajó en todas partes, pero el ritmo varía mucho: han caído más las provincias que partían de más paro (en Extremadura, Castilla-La Mancha o Andalucía) y Baleares; mucho menos las del País Vasco, Navarra y Barcelona, que ya tenían poco.</p>`);
-        const f=fig(s2,{source:"Media anual del paro registrado. Fuente: SEPE."}); hbars(f.body,rw,{fmt:sgn,scroll:true,color:"--slate",ref:esv,refLabel:"España",max:0}); }
-    }
-    themeStudies(B,id);
-  }catch(e){ console.error(e); }
-}
-async function renderInicioV1(){
-  document.title="Indicio · Cómo vive España, municipio a municipio";
-  const G=subidas(), lose=loseShare(), n=rowsAll().length;
-  const c=wcorr(pairPts("superiores","renta",{minPop:1000}));
-  view.innerHTML=`
-  <section class="ci-hero">
-    <div><span class="kk">Datos públicos, sin opinión</span>
-      <h1>Cómo vive España, municipio a municipio</h1>
-      <p class="dek">Renta, vivienda, trabajo, población, voto y dinero público de ${nf0.format(n)} municipios. Para consultar el tuyo, entender un tema o investigar por tu cuenta.</p>
-      ${bigSearchHTML("q2","Escribe tu municipio: Meliana, Vigo, Teruel…")}
-      ${exampleChips()}</div>
-    <div class="ci-viz">
-      <div class="ci-map" id="cimap"><div class="mlab"><span id="cimapl"><b>Renta por persona</b></span><span class="dots" id="cidots"></span></div><div id="cimapb" style="min-height:240px"></div></div>
-      <div class="ci-stat" style="left:-16px;top:44%"><b>+${nf0.format(G.anuncios)}${NB}%</b>sube alquilar desde 2015; el sueldo mediano, +${nf0.format(G.salMed)}${NB}%</div>
-      <div class="ci-stat" style="right:-12px;top:47%"><b>${Math.round(lose/10)} de 10</b>municipios tienen menos vecinos que en 2005</div>
-      <div class="ci-stat" id="cijub" style="right:-12px;bottom:-14px" hidden></div>
-    </div>
-  </section>
-  <div class="ci-paths">
-    <a class="ci-path" href="/municipio/"><div class="img">${pathImg("mun")}</div><div class="tx"><span class="kk">Consultar</span><h3>Tu municipio</h3><p>Cómo es, en qué destaca y cómo ha cambiado, comparado con España y con los que se le parecen. En dos minutos.</p><span class="gol">Buscar mi municipio →</span></div></a>
-    <a class="ci-path" href="/temas/"><div class="img">${pathImg("temas")}</div><div class="tx"><span class="kk">Entender</span><h3>Temas</h3><p>Seis preguntas sobre España, respondidas con datos y explicadas paso a paso.</p><span class="gol">Ver los temas →</span></div></a>
-    <a class="ci-path lab" href="/laboratorio/"><div class="img">${pathImg("lab")}</div><div class="tx"><span class="kk">Investigar</span><h3>Laboratorio</h3><p>Un lienzo en blanco para hacer tus propios gráficos, cruzar datos, ver si una relación aguanta y medir qué pasó antes y después de una ley o un suceso.</p><span class="gol">Abrir el laboratorio →</span></div></a>
-  </div>
-  <section class="ci-band"><h2>Preguntas que puedes responder aquí</h2><div class="g4" id="ciq">
-    <a class="cardx qcard" href="/preguntas/vivienda/"><div class="n">+${nf0.format(G.anuncios)}${NB}%</div><div class="t">¿Cuánto ha subido alquilar?</div><div class="s">El precio de los anuncios desde 2015 · Vivienda →</div></a>
-    <a class="cardx qcard" href="/temas/trabajo/"><div class="n">${mill(paroNow())}</div><div class="t">¿Cuánta gente está en el paro?</div><div class="s">Paro registrado en ${REFS.paroLast}, frente a ${mill(paro15())} en 2015 · Trabajo →</div></a>
-    <a class="cardx qcard" href="/temas/riqueza/" id="ciqr"><div class="n">…</div><div class="t">¿Cuánto cambia la renta de una comunidad a otra?</div><div class="s">Riqueza →</div></a>
-    <a class="cardx qcard" href="${exHash({v:"cruce",d:["superiores","renta"],t:"g1",p:"",c:[]})}"><div class="n">r = ${c?rFmt(c.r):"—"}</div><div class="t">¿Más estudios, más renta? ¿Y es causa?</div><div class="s">Compruébalo en el laboratorio →</div></a>
-  </div></section>
-  <div class="ci-steps"><div><i>1</i><span><b>Datos oficiales</b>INE, SEPE, Ministerio del Interior y Eurostat, con la fuente bajo cada gráfico.</span></div><div><i>2</i><span><b>Explicados en castellano</b>Cada cifra con su contexto: comparada con España y con los municipios que se le parecen.</span></div><div><i>3</i><span><b>Para que saques tus conclusiones</b>El laboratorio te deja cruzar cualquier dato y comprobar si una relación aguanta.</span></div></div>
-  ${methodNote()}`;
-  bindBig("q2");
-  loadRenta().then(R=>{ const cc=R.ccaa.filter(c=>!/Ceuta|Melilla/.test(c.n)), t=cc[0], b=cc[cc.length-1]; const q=document.getElementById("ciqr"); if(q) q.innerHTML=`<div class="n">×${nf1.format(t.renta/b.renta)}</div><div class="t">¿Cuánto cambia la renta de una comunidad a otra?</div><div class="s">${esc(t.n)} frente a ${esc(b.n)}, por persona · Riqueza →</div>`; }).catch(()=>{});
-  loadGov().then(()=>{ const j=document.getElementById("cijub"); if(j){ j.innerHTML=`<b>${nf0.format(jubShare())}${NB}€</b>de cada 100 de gasto público van a pensiones de jubilación`; j.hidden=false; } }).catch(()=>{});
-  // mapa vivo
-  try{ await loadTopo(); }catch(e){ return; }
-  const mb=document.getElementById("cimapb"); if(!mb) return; mb.style.minHeight="";
-  const LAY=[["renta","Renta por persona","más renta"],["paroReg","Paro registrado","más paro"],["alquiler","Hogares de alquiler","más alquiler"],["edad","Edad media","más edad"]];
-  const M=spainMap(mb,{onClick:code=>go(code)}); M.svg.attr("aria-label","Mapa de España por municipios");
-  let i=0; const dots=document.getElementById("cidots");
-  dots.innerHTML=LAY.map((l,j)=>`<button type="button" aria-label="${l[1]}" data-i="${j}"></button>`).join("");
-  const show=(j,dur)=>{ i=j; M.set(LAY[j][0],{dur}); const lb=document.getElementById("cimapl"); if(lb) lb.innerHTML=`<b>${LAY[j][1]}</b> · cuanto ${isDark()?"más claro":"más oscuro"}, ${LAY[j][2]}`; dots.querySelectorAll("button").forEach((b,k)=>b.setAttribute("aria-pressed",k===j)); };
-  show(0,0);
-  dots.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ clearInterval(INIT_T); INIT_T=null; show(+b.dataset.i,500); }));
-  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(!reduce) INIT_T=setInterval(()=>{ if(!document.body.contains(mb)){ clearInterval(INIT_T); INIT_T=null; return; } show((i+1)%LAY.length,1200); },4500);
-}
-// miniaturas de los tres caminos
-function pathImg(k){
-  if(k==="mun") return `<svg viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="22" y="18" width="120" height="12" rx="3" ${st("--ink")}/><rect x="22" y="36" width="80" height="7" rx="3" ${st("--rule-2")}/>
-    ${[0,1,2].map(i=>`<rect x="${22+i*88}" y="56" width="80" height="48" rx="7" ${st("--card")}/><rect x="${30+i*88}" y="64" width="${[44,36,50][i]}" height="10" rx="2" ${st("--ink-2")}/><rect x="${30+i*88}" y="86" width="64" height="5" rx="2.5" ${st("--mark")}/><rect x="${30+[30,46,22][i]+i*88}" y="82" width="4" height="13" rx="1" ${st("--rust")}/>`).join("")}</svg>`;
-  if(k==="temas") return `<svg viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${[0,1,2].map(i=>`<rect x="${22+i*88}" y="16" width="80" height="90" rx="8" ${st("--card")}/><rect x="${22+i*88}" y="16" width="80" height="30" rx="8" ${st(["--mark","--ramp-1","--band"][i])}/><rect x="${30+i*88}" y="54" width="50" height="7" rx="2" ${st("--ink-2")}/><rect x="${30+i*88}" y="68" width="34" height="13" rx="2" ${st("--rust")}/><rect x="${30+i*88}" y="88" width="60" height="5" rx="2" ${st("--rule-2")}/>`).join("")}</svg>`;
-  return `<svg viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="20" y="14" width="64" height="92" rx="7" style="fill:rgba(255,255,255,.1)"/>${[0,1,2,3].map(i=>`<rect x="28" y="${24+i*20}" width="48" height="12" rx="3" style="fill:rgba(255,255,255,${i===0?.5:.2})"/>`).join("")}
-    <rect x="96" y="14" width="184" height="92" rx="7" style="fill:none;stroke:rgba(255,255,255,.35);stroke-dasharray:4 4"/>${d3.range(26).map(j=>{ const x=108+j*6.4, y=92-j*2.4-Math.sin(j*1.7)*9; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" style="fill:var(--acc)"/>`; }).join("")}<line x1="106" y1="96" x2="270" y2="30" style="stroke:#fff;stroke-width:1.2;stroke-dasharray:4 3"/></svg>`;
-}
-
 // =====================================================================
 // TU MUNICIPIO (portada de la sección)
 // =====================================================================
@@ -3655,121 +3223,17 @@ async function renderMunLanding(){
 }
 const kpiDemo=()=>`<div class="bul" style="margin-top:20px"><span class="es" style="left:52%"></span><span class="me" style="left:38%"></span></div><div class="bul-l"><span>menos</span><span>más</span></div>`;
 
-// =====================================================================
-// TEMAS: índice y plantilla común
-// =====================================================================
-const TOPICS={
-  riqueza:{l:"Riqueza",q:"¿Cómo se reparte la riqueza?",img:()=>miniBars([[1,"--ramp-6"],[.85,"--ramp-5"],[.7,"--ramp-4"],[.6,"--ramp-3"],[.5,"--ramp-2"]],{w:300,h:70}),
-    key:async()=>{ const R=await loadRenta(); const cc=R.ccaa.filter(c=>!/Ceuta|Melilla/.test(c.n)), t=cc[0], b=cc[cc.length-1]; return [`×${nf1.format(t.renta/b.renta)}`,`ingresa por persona ${esc(t.n)} frente a ${esc(b.n)}`]; },
-    me:["renta","pobreza","gini"], next:["¿Dónde se concentra la renta? Míralo en un mapa y fíltralo por provincia.",()=>exHash({v:"mapa",d:["renta","pobreza"],p:"",t:"",c:[]})]},
-  vivienda:{l:"Vivienda",q:"¿Por qué cuesta tanto encontrar casa?",img:()=>miniBars([[90,"--rust"],[26,"--slate"],[23,"--stone"]],{w:300,h:70}),
-    key:async()=>[`+${nf0.format(subidas().anuncios)}${NB}%`,"el precio de los anuncios de alquiler desde 2015"],
-    me:["alquiler","alqVar","vt"], next:["¿Dónde sube más el alquiler? Míralo en un mapa con tus filtros.",()=>exHash({v:"mapa",d:["alqVar","rentaVar"],p:"",t:"",c:[]})]},
-  poblacion:{l:"Población",q:"¿Quién llega y quién se va?",img:()=>miniLines(REFS.es.pad,null,{w:300,h:70,pad:8}),
-    key:async()=>[`${Math.round(loseShare()/10)} de 10`,"municipios tienen menos vecinos que en 2005"],
-    me:["varPob","edad","extr"], next:["¿Qué pueblos pequeños crecen? Ordénalos en una tabla.",()=>exHash({v:"tabla",d:["varPob","migInt","edad"],t:"s2",p:"",o:"varPob",c:[]})]},
-  trabajo:{l:"Trabajo",q:"¿De qué vivimos?",img:()=>miniLines(REFS.paro.es.paro,null,{w:300,h:70,pad:8}),
-    key:async()=>[mill(paroNow()),`personas en el paro registrado, frente a ${mill(paro15())} en 2015`],
-    me:["paroReg","superiores","pensiones"], next:["¿Más paro, menos renta? ¿Y a igual edad? Compruébalo tú.",()=>exHash({v:"cruce",d:["paroReg","renta"],t:"g1",p:"",c:["edad"]})]},
-  gasto:{l:"Dinero público",q:"¿En qué se gasta?",img:()=>miniStack([[23,"--rust"],[14,"--slate"],[9,"--mustard"],[54,"--rule-2"]],{w:300,h:70}),
-    key:async()=>{ await loadGov(); return [`${nf0.format(jubShare())}${NB}€`,"de cada 100 de gasto público van a pensiones de jubilación"]; },
-    me:["edad","mayores65","pensiones"], next:["Lee paso a paso el estudio de las pensiones: por qué crece el gasto y qué lo mueve.",()=>"/preguntas/pensiones/"]},
-  voto:{l:"Voto",q:"¿Cómo vota cada España?",img:()=>miniStack([[33,"#1d84ce"],[32,"#d7322c"],[12,"#5aa62a"],[12,"#d93a7c"],[11,"#a69b8b"]],{w:300,h:70}),
-    key:async()=>{ const k=VG(); return [pc0(VREFS.es[k].turnout),`del censo votó en las ${ELNAME(k)}`]; },
-    me:["part","pp","psoe"], next:["¿Votan más los municipios ricos? Compruébalo en el laboratorio.",()=>exHash({v:"cruce",d:["renta","part"],t:"g1",p:"",c:[]})]}
-};
-// ilustraciones de cada tema (illus/*.svg): escenas, no gráficos, para que sea más fácil entrar
+// ilustraciones (illus/*.svg): escenas, no gráficos, para que sea más fácil entrar
 const tIll=id=>((window.__INDICIO&&window.__INDICIO.till)||{})[id]||`<img src="/illus/${id}.svg" alt="" width="320" height="200" loading="lazy" decoding="async">`;
-const TOPIC_IDS=["riqueza","vivienda","poblacion","trabajo","gasto","voto"];
-const TMIN={riqueza:[6,6],vivienda:[7,7],poblacion:[5,5],trabajo:[6,6],gasto:[5,6],voto:[5,4]};
-
-async function renderTemas(){
-  document.title="Temas · Indicio";
-  view.innerHTML=pageHead("Seis preguntas sobre España","Cada tema responde a una pregunta con unas pocas ideas clave, cada una con su gráfico. Léelo en cinco minutos o profundiza en el detalle.")+
-    `<div class="g3" style="margin-top:6px">${TOPIC_IDS.map(id=>{ const T=TOPICS[id]; return `<a class="tcard" href="${tHref(id)}"><div class="img">${tIll(id)}</div><div class="tp"><span class="kk">${T.l}</span><h3>${T.q}</h3><div class="n" data-k="${id}">…</div><div class="s" data-s="${id}"></div></div><div class="ft"><span>${TMIN[id][0]} ideas · ${TMIN[id][1]} min</span><span class="gol">Leer →</span></div></a>`; }).join("")}</div>
-    <section class="ci-band"><h2>¿Prefieres buscar tu propia respuesta?</h2><p style="color:var(--ink-2);max-width:var(--medida)">En el laboratorio puedes elegir cualquier dato de los temas, verlo en un mapa, ordenarlo, cruzarlo con otro y comprobar si una relación podría ser causa.</p><p style="margin-top:10px"><a class="gol" href="/laboratorio/">Abrir el laboratorio →</a></p></section>${methodNote()}`;
-  for(const id of TOPIC_IDS){ TOPICS[id].key().then(([n,s])=>{ const a=view.querySelector(`[data-k="${id}"]`), b=view.querySelector(`[data-s="${id}"]`); if(a) a.innerHTML=n; if(b) b.innerHTML=s; }).catch(()=>{}); }
-}
-
-// lo esencial de cada tema: [cifra, título, minigráfico, frase]
-async function essentials(id){
-  const es=REFS.es, ce=REFS.census.es, G=subidas(), ipcG=REFS.ipc[2024]/REFS.ipc[2015];
-  if(id==="riqueza"){ const R=await loadRenta(); const cc=R.ccaa.filter(c=>!/Ceuta|Melilla/.test(c.n)), t=cc[0], b=cc[cc.length-1], ri=es.net_income_pc, gr=(lastV(ri)/ri[0]-1)*100, real=((1+gr/100)/ipcG-1)*100, pov=lastV(es.poverty);
-    return [[`×${nf1.format(t.renta/b.renta)}`,`${t.n} frente a ${b.n}`,miniBars(cc.map((c,i)=>[c.renta,i===0||i===cc.length-1?"--rust":"--rule-2"]),{h:44}),"renta neta por persona entre la comunidad más rica y la más pobre"],
-      [eur(R.median),"La renta de la mitad","","la mitad de la población vive en barrios con menos renta que esto, por persona y año"],
-      [pc(pov),"En riesgo de pobreza",miniTen(Math.round(pov/10)),"ingresos por debajo del 60 % de la mediana"],
-      [sgn(real),"Renta desde 2015, en euros de 2024",miniLines(deflate(ri),ri,{h:40}),`la línea granate ya descuenta la subida de precios; la gris de puntos es la renta en euros de cada año: ${sgn(gr)}`]]; }
-  if(id==="poblacion"){ const pad=es.pad, lose=loseShare(), ag=es.mean_age;
-    return [[`+${nf1.format((lastV(pad)-pad[0])/1e6)}${NB}M`,"Habitantes desde 1996",miniLines(pad,null,{h:40}),`hoy somos ${nf1.format(lastV(pad)/1e6)} millones`],
-      [`${Math.round(lose/10)} de 10`,"Municipios con menos vecinos que en 2005",miniTen(Math.round(lose/10)),"el crecimiento se concentra en ciudades, costa e islas"],
-      [pc(lastV(es.pct_foreign)),"Nacionalidad extranjera",miniLines(es.pct_foreign,null,{h:40,index:false}),`${sgn(lastV(es.pct_foreign)-es.pct_foreign[0]).replace(" %"," puntos")} desde 2015`],
-      [nf1.format(lastV(ag))+NB+"años","Edad media",miniLines(ag,null,{h:40,index:false}),`${nf1.format(lastV(ag)-ag[0])} años más que en 2015`]]; }
-  if(id==="trabajo"){ const pe=REFS.paro.es, L=pe.last, sh=[[L[8],"--slate"],[L[6],"--plum"],[L[7],"--mustard"],[L[5],"--olive"],[L[9],"--stone"]];
-    return [[mill(paroNow()),"En el paro registrado",miniLines(pe.paro,null,{h:40}),`frente a ${mill(paro15())} de media en 2015`],
-      [sgn(G.salMed),"Salario mediano, 2015–2024",miniBars([[G.salMed,"--slate"],[G.ipc,"--stone"]],{h:30}),`casi lo mismo que los precios (${sgn(G.ipc)})`],
-      [pc(pe.paro[10]/pe.pob1664*100),"Paro registrado sobre 16–64 años",miniStack(sh,{w:200,h:30}),"la mayoría venía de los servicios (azul)"],
-      [pc(lastV(es.pension)),"De los ingresos son pensiones",miniLines(es.pension,null,{h:40,index:false}),"el peso de las pensiones en lo que entra en los hogares"]]; }
-  if(id==="gasto"){ await loadGov(); const Y=+GOV.years[GOV.years.length-1], P=GOV.pen, d0=P.olddep[2025]??P.olddep[2024];
-    return [[pc(gv("TOTAL","pib",Y)),"Gasto público sobre el PIB",miniLines(GOV.fun.TOTAL.pib,null,{h:40,index:false}),`${nf0.format(gv("TOTAL","meur",Y)/1000)} mil millones de euros en ${Y}`],
-      [`${nf0.format(jubShare())}${NB}€`,"De cada 100, a jubilación",miniStack([[jubShare(),"--rust"],[100-jubShare(),"--rule-2"]],{w:200,h:30}),"la partida más grande del gasto"],
-      [pc(lastV(GOV.debt)),"Deuda sobre el PIB",miniLines(GOV.debt,null,{h:40,index:false}),`era el ${pc(GOV.debt[GOV.years.indexOf("2007")])} en 2007`],
-      [`${nf0.format(d0)} → ${nf0.format(P.proj[2050])}`,"Mayores por cada 100 en edad de trabajar",miniBars([[d0,"--slate"],[P.proj[2050],"--rust"]],{h:30}),"hoy y en 2050, según Eurostat"]]; }
-  if(id==="voto"){ const k=VG(), e=VREFS.es[k], ke=VREFS.elections.filter(x=>x.startsWith("07")).pop(), sh=Object.entries(e.share).filter(([p])=>p!=="Otros").sort((a,b)=>b[1]-a[1]);
-    const c=wcorr(pairPts("renta","part",{minPop:1000}));
-    return [[pc0(e.turnout),`Participación, ${ELSHORT(k)}`,miniBars([[e.turnout,"--slate"],[ke?VREFS.es[ke].turnout:0,"--stone"]],{h:30,max:100}),ke?`frente al ${pc0(VREFS.es[ke].turnout)} en las europeas de 2024`:""],
-      [pc(sh[0][1]),`${sh[0][0]}, el más votado`,miniStack(sh.slice(0,6).map(([p,v])=>[v,pColor(p)]),{w:200,h:30}),`seguido de ${sh[1][0]} (${pc(sh[1][1])})`],
-      [`r = ${c?rFmt(c.r):"—"}`,"Renta y participación",miniScatter("renta","part"),"donde hay más renta, se vota más"],
-      [ke?pc(VREFS.es[ke].share.SALF||0):"—","Se Acabó La Fiesta, europeas 2024","","la candidatura nueva de 2024"]]; }
-  return [];
-}
-const GLOSS={"renta neta":"Lo que entra en un hogar en un año después de impuestos y cotizaciones, dividido entre todas las personas del hogar.",
-  "alquiler declarado":"Lo que pagan todos los inquilinos según las declaraciones a Hacienda, incluidos los contratos antiguos.",
-  "paro registrado":"Personas apuntadas como demandantes de empleo en las oficinas del SEPE. No es lo mismo que la tasa de paro de la EPA.",
-  "riesgo de pobreza":"Ingresos por debajo del 60 % de la mediana de España, ajustados por el tamaño del hogar.",
-  "Gini":"Índice de desigualdad: 0 si todos ingresaran lo mismo, 100 si una sola persona lo ingresara todo.",
-  "mediana":"El valor del medio: la mitad está por debajo y la otra mitad por encima. Los extremos le afectan menos que a la media.",
-  "IPC":"Índice de Precios de Consumo: cuánto suben de media los precios de lo que compran los hogares.",
-  "viviendas turísticas":"Pisos que se alquilan a turistas por días, según la estadística experimental del INE.",
-  "saldo migratorio":"Personas que llegan menos personas que se van.",
-  "PIB":"Producto interior bruto: el valor de todo lo que produce la economía en un año.",
-  "sección censal":"La zona más pequeña para la que el INE publica datos: unas 1.000 a 2.500 personas.",
-  "voto válido":"Votos a candidaturas más votos en blanco; no incluye los nulos.",
-  "COFOG":"Clasificación internacional del gasto público según su finalidad: sanidad, educación, protección social…"};
-function glossify(root){
-  const done=new Set(), terms=Object.keys(GLOSS);
-  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest(".txt p, .txt li, .phead .dek")&&!n.parentElement.closest("a,.gloss,figure,b,mark")?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT});
-  const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
-  for(const n of nodes){ for(const t of terms){ if(done.has(t)) continue; const i=n.nodeValue.toLowerCase().indexOf(t.toLowerCase()); if(i<0) continue;
-      const b=(i===0||/[\s(«"]/.test(n.nodeValue[i-1])), e=!/[a-záéíóúñ]/i.test(n.nodeValue[i+t.length]||" "); if(!b||!e) continue;
-      const after=n.splitText(i); after.splitText(t.length); const sp=el("span","gloss"); sp.tabIndex=0; sp.dataset.g=t; sp.textContent=after.nodeValue; after.replaceWith(sp); done.add(t); break; } }
-  tipBind(root.querySelectorAll(".gloss"),g=>`<b>${esc(cap(g.dataset.g))}:</b> ${esc(GLOSS[g.dataset.g])}`);
-}
-async function topicDecorate(id){
-  const T=TOPICS[id]; if(!T) return; const ph=view.querySelector(".phead"); if(!ph) return;
-  document.title=T.l+" · Indicio";
-  const body=view.querySelector("#body")||view;
-  const hs=[...body.querySelectorAll(":scope > .finding > h2, :scope > section.finding > h2")];
-  const words=[...view.querySelectorAll(".txt, .phead .dek")].map(e=>e.textContent).join(" ").split(/\s+/).length+hs.length*40, mins=Math.max(2,Math.round(words/230));
-  ph.insertAdjacentHTML("afterbegin",`<div class="tp-crumb"><a href="/preguntas/">Preguntas</a> › <a href="/preguntas/?tema=${id}">${T.l}</a> · ${hs.length} ideas · ${mins} minutos de lectura</div>`);
-  const ess=el("section","tp-ess",`<h2>Lo esencial</h2><div class="g4" id="essg"></div><div id="mestrip"></div>`);
-  ph.after(ess);
-  hs.forEach((h,i)=>{ h.id="idea-"+(i+1); });
-  meStrip(id);
-  // siguiente paso y cómo se mide
-  const m=view.querySelector("footer.method");
-  const ns=el("div","nextstep",`<span class="t"><b>Siguiente paso:</b> ${T.next[0]}</span><a class="gol" href="${T.next[1]()}">${T.next[1]().startsWith("/preguntasstudios")?"Leer el estudio":"Abrir en el laboratorio"} →</a>`);
-  if(m){ m.before(ns); const d=el("details","howm"); d.innerHTML="<summary>Cómo se mide: fuentes y notas</summary>"; m.before(d); d.appendChild(m); m.querySelectorAll("details.srcs").forEach(s=>{ s.open=true; }); } else view.appendChild(ns);
-  try{ glossify(view); }catch(e){ console.error(e); }
-  try{ const E=await essentials(id); const g=document.getElementById("essg"); if(g) g.innerHTML=E.map(([n,t,svg,s])=>`<div class="cardx qcard"><div class="n">${n}</div><div class="t">${esc(t)}</div>${svg||""}<div class="s">${s}</div></div>`).join(""); }catch(e){ console.error(e); }
-}
 const esRef=k=>{ const e=VREFS.es[VG()]; if(k==="part") return e.turnout; const P={pp:"PP",psoe:"PSOE",vox:"Vox",sumar:"Sumar"}[k]; return P&&e.share[P]!=null?e.share[P]:esMean(k); };
+const ME_COLS={vivienda:{me:["alquiler","alqVar","vt"]}}; // columnas de «Tu municipio» en cada análisis que lo lleva
 function meStrip(id){
-  const box=document.getElementById("mestrip"); if(!box) return; const T=TOPICS[id];
+  const box=document.getElementById("mestrip"); if(!box) return; const T=ME_COLS[id];
   const r=myOk(lastMun)?BYCODE.get(lastMun):null, r2=r&&myOk(MUN2)?BYCODE.get(MUN2):null;
-  if(!r){ box.innerHTML=`<div class="mestrip"><span class="kk">📍 Tu municipio</span><span style="font-size:14.5px;color:var(--ink-2)">Elige tu municipio y verás aquí sus cifras de este tema, junto a las de España.</span><div class="search" id="msq-s" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="msq" type="search" placeholder="Busca un municipio" autocomplete="off" aria-label="Elegir municipio"><ul id="msq-r" class="results" role="listbox" hidden></ul></div></div>`;
+  if(!r){ box.innerHTML=`<div class="mestrip"><span class="kk">📍 Tu municipio</span><span style="font-size:14.5px;color:var(--ink-2)">Elige tu municipio y verás aquí sus cifras, junto a las de España.</span><div class="search" id="msq-s" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="msq" type="search" placeholder="Busca un municipio" autocomplete="off" aria-label="Elegir municipio"><ul id="msq-r" class="results" role="listbox" hidden></ul></div></div>`;
     attachSearch(document.getElementById("msq"),document.getElementById("msq-r"),document.getElementById("msq-s"),x=>{ setMyMun(x[F.code],{silent:true}); meStrip(id); }); return; }
   const val=(x,k)=>x[F[k]]==null?"—":fmtK(k)(x[F[k]]);
-  box.innerHTML=`<div class="mestrip ms2"><div class="ms-h"><span class="kk">📍 Tu municipio en este tema</span><button type="button" class="sel" id="mschg">${r2?"Cambiar":"Cambiar o comparar con otro"}</button></div>
+  box.innerHTML=`<div class="mestrip ms2"><div class="ms-h"><span class="kk">📍 Tu municipio</span><button type="button" class="sel" id="mschg">${r2?"Cambiar":"Cambiar o comparar con otro"}</button></div>
     <div class="extable"><table class="glance mst"><thead><tr><th></th>${T.me.map(k=>`<th class="r">${esc(labK(k))}</th>`).join("")}</tr></thead><tbody>
     <tr class="me"><td><a href="#m${r[F.code]}"><b>${esc(dispName(r[F.name]))}</b></a></td>${T.me.map(k=>`<td class="r num"><b>${val(r,k)}</b></td>`).join("")}</tr>
     ${r2?`<tr class="m2"><td><a href="#m${r2[F.code]}">${esc(dispName(r2[F.name]))}</a></td>${T.me.map(k=>`<td class="r num">${val(r2,k)}</td>`).join("")}</tr>`:""}
@@ -3778,50 +3242,6 @@ function meStrip(id){
   document.getElementById("mschg").addEventListener("click",e=>{ e.stopPropagation(); myPop(); });
 }
 
-// =====================================================================
-// VOTO
-// =====================================================================
-async function renderVoto(){
-  document.title="Voto · Indicio";
-  const k=VG(), ks=VREFS.elections, e=VREFS.es[k], gens=ks.filter(x=>x.startsWith("02")), prev=gens.length>1?gens[gens.length-2]:null, eu=ks.filter(x=>x.startsWith("07")).pop();
-  const sh=Object.entries(e.share).filter(([p])=>p!=="Otros").sort((a,b)=>b[1]-a[1]);
-  view.innerHTML=pageHead("¿Cómo vota cada España?",`En las ${ELNAME(k)} votó el <mark>${pc(e.turnout)}</mark> del censo y ganó el ${sh[0][0]} con el ${pc(sh[0][1])} de los votos válidos. Pero cada municipio vota a su manera: la renta, la edad y el tamaño del pueblo dicen mucho de cómo y cuánto se vota.`)+`<div id="body"></div>${methodNote()}`;
-  const B=document.getElementById("body"), rows=rowsAll();
-  // 1. resultado
-  const s1=finding(B,`${sh[0][0]} y ${sh[1][0]} sumaron ${nf0.format(sh[0][1]+sh[1][1])} de cada 100 votos en ${k.slice(2,6)}`,`<p>Resultado de las ${ELNAME(k)} en toda España${prev?`, con la raya en el de las ${ELNAME(prev)}`:""}. Cada candidatura se agrupa con su equivalente anterior para poder comparar.</p>`);
-  const f1=fig(s1,{title:`Voto válido, ${ELSHORT(k)}`,source:"% sobre voto válido. Sin el voto de residentes en el extranjero. Fuente: Ministerio del Interior."});
-  const parts=sh.filter(([p,v])=>v>=0.8).slice(0,10), mx=Math.max(...parts.map(([p,v])=>Math.max(v,prev?VREFS.es[prev].share[p]||0:0)));
-  const tb=add(f1.body,"div","vtab"); tb.innerHTML=parts.map(([p,v])=>{ const b=prev?VREFS.es[prev].share[p]:null; return `<div class="vrow"><span class="pn"><i style="background:${pColor(p)}"></i><span>${esc(p)}</span></span><span class="vbar"><span style="width:${v/mx*100}%;background:${pColor(p)}"></span>${b!=null?`<b class="m19" style="left:${b/mx*100}%"></b>`:""}</span><span class="num r">${nf1.format(v)}</span><span class="num r ${b==null?"":v-b>=0?"up":"dn"}">${b==null?"nuevo":pts(v-b)}</span></div>`; }).join("");
-  // 2. mapa
-  const s2=finding(B,"El mapa del partido más votado",`<p>Cada municipio, con el color de la candidatura más votada en ${k.slice(2,6)}. Mucha superficie no quiere decir muchos votos: los municipios pequeños ocupan casi todo el mapa, pero las ciudades reúnen la mayoría de los votantes.</p>`);
-  const mf=fig(s2,{source:"Pulsa un municipio para abrir su ficha. Fuente: Ministerio del Interior."}); mf.body.innerHTML='<div class="maploading">Dibujando el mapa…</div>';
-  const cnt=d3.rollups(rows.filter(r=>r[F.win23]),v=>v.length,r=>r[F.win23]).sort((a,b)=>b[1]-a[1]);
-  loadTopo().then(()=>{ if(!document.body.contains(mf)) return; mf.body.innerHTML=""; const M=spainMap(mf.body,{onClick:c=>go(c),width:640,height:500}); M.setCat("win23",p=>pColor(p)); M.paths.append("title").text(f=>{ const r=BYCODE.get(f.id); return r?`${r[F.name]}: ${r[F.win23]||"sin dato"}`:""; });
-    add(mf.body,"div","stack",`<div class="keys">${cnt.slice(0,7).map(([p,n])=>`<span><i class="sq" style="background:${pColor(p)}"></i>${esc(p)} · ${nf0.format(n)} municipios</span>`).join("")}</div>`); }).catch(()=>{ mf.body.innerHTML=""; });
-  // 3. tamaño y participación
-  const bands=[[0,500,"Menos de 500"],[500,2000,"500 a 2.000"],[2000,10000,"2.000 a 10.000"],[10000,50000,"10.000 a 50.000"],[50000,250000,"50.000 a 250.000"],[250000,1e9,"Más de 250.000"]];
-  const wm=(rs,kk)=>{ const s=rs.filter(r=>r[F[kk]]!=null&&r[F.pop]); const w=d3.sum(s,r=>r[F.pop]); return w?d3.sum(s,r=>r[F[kk]]*r[F.pop])/w:null; };
-  const br=bands.map(([a,b,l])=>{ const s=rows.filter(r=>(r[F.pop]||0)>=a&&(r[F.pop]||0)<b); return {l:l+" hab.",v:wm(s,"part"),e:wm(s,"part24")}; });
-  const s3=finding(B,`En los pueblos pequeños se vota más: hasta un ${pc0(d3.max(br,b=>b.v))}`,`<p>Participación según el tamaño del municipio. En las europeas de 2024 la participación cae en todas partes, pero la distancia entre pueblos y ciudades se mantiene.</p>`);
-  const g3=add(s3,"div","cols2");
-  const fa=fig(g3,{title:`Participación, ${ELSHORT(k)}`,source:"% del censo, media ponderada por población. Fuente: Ministerio del Interior."}); hbars(fa.body,br.map(b=>({l:b.l,v:b.v})),{fmt:pc,color:"--slate",min:0,max:100,ref:e.turnout,refLabel:"España"});
-  if(eu){ const fb=fig(g3,{title:"Participación, europeas de 2024",source:"% del censo. Fuente: Ministerio del Interior."}); hbars(fb.body,br.map(b=>({l:b.l,v:b.e})),{fmt:pc,color:"--stone",min:0,max:100,ref:VREFS.es[eu].turnout,refLabel:"España"}); }
-  // 4. renta y voto
-  const s=rows.filter(r=>r[F.renta]!=null&&r[F.pop]).sort((a,b)=>a[F.renta]-b[F.renta]), tot=d3.sum(s,r=>r[F.pop]); let acc=0; const qs=[[],[],[],[],[]];
-  s.forEach(r=>{ const q=Math.min(4,Math.floor((acc+r[F.pop]/2)/tot*5)); acc+=r[F.pop]; qs[q].push(r); });
-  const PK=[["pp","PP"],["psoe","PSOE"],["vox","Vox"],["sumar","Sumar"],["part","Participación"]];
-  const QN=["20 % con menos renta","Segundo 20 %","20 % central","Cuarto 20 %","20 % con más renta"];
-  const vals=PK.map(([kk])=>qs.map(q=>wm(q,kk)));
-  const s4=finding(B,"Cuanto más renta tiene un municipio, más se vota, y más al PP",`<p>Los municipios ordenados por renta por persona y repartidos en cinco grupos con la misma población. En cada grupo, el voto medio de cada partido en ${k.slice(2,6)}.</p><p>Es una relación entre lugares, no entre personas: que un municipio rico vote más a un partido no dice cómo vota cada vecino rico.</p>`);
-  const f4=fig(s4,{title:"Voto según la renta del municipio",source:"% sobre voto válido (participación: % del censo). Grupos de municipios con la misma población. Fuentes: Ministerio del Interior e INE, Atlas de Renta 2024."});
-  const t4=add(f4.body,"div","extable"); t4.innerHTML=`<table class="glance"><thead><tr><th></th>${QN.map(q=>`<th class="r" style="font-size:12.5px">${q}</th>`).join("")}</tr></thead><tbody>${PK.map(([kk,l],i)=>{ const mxv=d3.max(vals[i]); const col=kk==="part"?"var(--slate)":pColor(l); return `<tr><td class="lab"><b>${l}</b></td>${vals[i].map(v=>`<td class="r num"><span style="display:inline-block;width:${Math.round((v||0)/mxv*36)}px;height:8px;border-radius:2px;background:${col};margin-right:6px;vertical-align:middle"></span>${v==null?"—":nf1.format(v)}</td>`).join("")}</tr>`; }).join("")}</tbody></table>`;
-  add(s4,"p",null,exLink("cruce",{d:["renta","pp"],t:"g1",c:["edad"]},"¿Aguanta a igual edad? Compruébalo en el laboratorio"));
-  // 5. europeas y SALF
-  if(eu&&F.salf24!=null){ const ccaa=d3.rollups(rows.filter(r=>r[F.salf24]!=null&&r[F.pop]),v=>d3.sum(v,r=>r[F.salf24]*r[F.pop])/d3.sum(v,r=>r[F.pop]),r=>CCAA_OF[r[F.prov]]).filter(([c])=>c&&!/Ceuta|Melilla/.test(c)).sort((a,b)=>b[1]-a[1]);
-    const s5=finding(B,`Se Acabó La Fiesta, la sorpresa de las europeas: un ${pc(VREFS.es[eu].share.SALF||0)} de los votos`,`<p>La candidatura nueva de las europeas de 2024 por comunidades. Fue más fuerte en ${esc(ccaa[0][0])} y ${esc(ccaa[1][0])}.</p>`);
-    const f5=fig(s5,{title:"Voto a Se Acabó La Fiesta, europeas de 2024",source:"% sobre voto válido, media ponderada por población. Fuente: Ministerio del Interior."}); hbars(f5.body,ccaa.map(([l,v])=>({l,v})),{fmt:pc,color:"--plum",min:0,ref:VREFS.es[eu].share.SALF,refLabel:"España"}); }
-  panoExtra("voto",B);
-}
 // =====================================================================
 // LABORATORIO: un lienzo con pasos (gráfico, datos, municipios, comprobar)
 // =====================================================================
@@ -6266,7 +5686,7 @@ async function studyVivienda(B){
     hbars(fa.body,provRows("vt").sort((a,b)=>b.v-a.v).slice(0,15),{fmt:pc,color:"--rust",min:0});
     lineChart(g,{title:"Viviendas turísticas anunciadas en España",source:"Agosto y febrero (o noviembre y mayo) de cada año. Fuente: INE, medición experimental de viviendas turísticas.",series:[{n:"Viviendas turísticas",v:vtS,c:"--rust",main:true}],years:vtPerL,xticks:[vtPerL[0],vtPerL[vtMi],vtPerL[vtPerL.length-1]],fmt:v=>nf0.format(v),tickFmt:v=>nf0.format(v/1000)+" mil",height:240}); };
   G.miMunicipio=el=>{ el.innerHTML='<div id="mestrip"></div>'; meStrip("vivienda"); add(el,"p","pt-cta").innerHTML=`<a class="btn" href="/municipio/">Abrir la ficha de un municipio →</a>`; };
-  G.relacionados=el=>{ const L=STUDIES.filter(S=>S.tema==="vivienda"&&S.id!=="vivienda"&&!S.href); if(!L.length){ el.remove(); return; }
+  G.relacionados=el=>{ const L=STUDIES.filter(S=>["tope-cataluna"].includes(S.id)); if(!L.length){ el.remove(); return; }
     const g=add(el,"div","tstud"); L.forEach(S=>{ const a=add(g,"a"); a.href=`/preguntas/${S.id}/`; const ic=illCard(S.id); if(ic) a.appendChild(ic); a.insertAdjacentHTML("beforeend",`<b>${esc(S.t)}</b><span>${esc(S.a)}</span><em>Leer el análisis →</em>`); }); };
   mdRender(B,"vivienda",V,G);
 }
@@ -6624,7 +6044,7 @@ function myHeader(){
   const ok=myOk(lastMun);
   b.classList.toggle("is-set",ok);
   b.innerHTML=ok?`<span class="mm-i" aria-hidden="true">${MM_PIN}</span><span class="t">${esc(myName(lastMun))}${myOk(MUN2)?` <small>y ${esc(myName(MUN2))}</small>`:""}</span>`:`<span class="mm-i" aria-hidden="true">${MM_LUPA}</span>`;
-  b.title=ok?"Tu municipio: se destaca en temas, mapas y gráficos. Pulsa para cambiarlo.":"Elige tu municipio y lo verás destacado en toda la web";
+  b.title=ok?"Tu municipio: se destaca en mapas y gráficos. Pulsa para cambiarlo.":"Elige tu municipio y lo verás destacado en toda la web";
   b.setAttribute("aria-label",ok?"Tu municipio: "+myName(lastMun):"Busca tu municipio");
 }
 function myPop(){
@@ -6632,7 +6052,7 @@ function myPop(){
   p=el("div","mypop"); p.id="mypop"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","Tu municipio"); document.body.appendChild(p);
   const sbox=(id,ph)=>`<div class="search" id="${id}-s" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="${id}" type="search" placeholder="${ph}" autocomplete="off" aria-label="${ph}"><ul id="${id}-r" class="results" role="listbox" hidden></ul></div>`;
   const draw=()=>{ p.innerHTML=`<div class="mp-h"><b>Tu municipio</b><button type="button" class="mp-x" aria-label="Cerrar">×</button></div>
-    <p class="mp-d">Se destaca en los temas, los mapas y los gráficos del laboratorio. Se guarda en este navegador.</p>
+    <p class="mp-d">Se destaca en los mapas y los gráficos del laboratorio. Se guarda en este navegador.</p>
     ${myOk(lastMun)?`<div class="mp-cur"><span class="dot1"></span><b>${esc(myName(lastMun))}</b><small>${esc(provShort(PROVS[BYCODE.get(lastMun)[F.prov]]))}</small><a class="gol" href="#m${lastMun}">Ficha</a><button type="button" data-rm="1">Quitar</button></div>`:""}
     ${sbox("mpq1",myOk(lastMun)?"Cambiar por otro…":"Escribe tu municipio…")}
     <div class="mp-sep"><b>Compararlo con</b> <span class="muted">(opcional)</span></div>
@@ -6824,7 +6244,7 @@ function qList(){
   const ps=wmean(qRows(r=>S.includes(r[F.prov])),"paroReg"), pn=wmean(qRows(r=>N.includes(r[F.prov])),"paroReg");
   L.push({id:"paro-sur",k:"Trabajo",q:"¿De verdad hay más paro en el sur?",
     a:`<b>Sí.</b> En Andalucía y Extremadura el paro registrado es ${ps/pn>1.4&&ps/pn<1.6?"la mitad más alto":`un ${nf0.format((ps/pn-1)*100)}${NB}% más alto`} que en el norte peninsular.`,
-    href:"/temas/trabajo/", art:"bars", hero:true, cap:"Una barra por provincia, ordenadas de norte a sur; más alta y oscura, más paro registrado."});
+    href:"/laboratorio/mapa/?d=paroReg", art:"bars", hero:true, cap:"Una barra por provincia, ordenadas de norte a sur; más alta y oscura, más paro registrado."});
   const pa=qMed(qRows(r=>r[F.part]!=null&&(r[F.pop]||0)<500),"part"), pb=qMed(qRows(r=>r[F.part]!=null&&(r[F.pop]||0)>50000),"part");
   L.push({id:"votar",k:"Voto",q:"¿Se vota más en los pueblos?",
     a:`<b>Sí.</b> En los de menos de 500 habitantes votó el ${nf0.format(pa)}${NB}%; en las ciudades de más de 50.000, el ${nf0.format(pb)}${NB}%. Parte se explica porque allí la población es mayor; el resto, por el tamaño en sí.`,
@@ -7089,7 +6509,6 @@ async function renderInicio(){
       <div><i>1</i><span><b>Datos que puedes comprobar</b>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></div>
       <div><i>2</i><span><b>Cada respuesta dice cuánto aguanta</b>Una etiqueta te avisa si los datos solo describen, si comparan casos parecidos o si una ley hizo de experimento.</span></div>
       <div><i>3</i><span><b>Sin bando</b>Si los datos no dan para una conclusión, lo decimos, aunque el titular quede peor.</span></div></div></section>
-  <section class="ed-sec"><div class="ed-k">Por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="${tHref(id)}">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   heroCarBind(view.querySelector(".pt-car"));
   heroType(view.querySelector(".ho"));
@@ -7101,9 +6520,9 @@ async function renderInicio(){
   if(ar&&ARTS.has("hero-campo")){ const mob=view.clientWidth<700, im=el("img"); im.src="/art/hero-campo"+(mob?"-m":"")+".jpg"; im.width=mob?720:1120; im.height=mob?520:380; im.alt=""; im.decoding="async"; im.loading="lazy"; im.className="qimg"; ar.appendChild(im); heroHover(ar,mob?"m":"d"); }
   else if(ar) ar.closest("figure").remove();
 }
-// ilustración de una pieza de la portada: la del análisis, recortada a 16:9 por su punto de interés, o la de su tema
+// ilustración de una pieza de la portada: la del análisis, recortada a 16:9 por su punto de interés
 const ptIll=S=>{ const I=window.__INDICIO||{}, sv=(I.illus||{})[S.id];
-  if(!sv) return tIll(S.tema);
+  if(!sv) return "";
   const f=(I.focus||{})[S.id]??240, x=Math.max(0,Math.min(100,f/(1200-640)*100)).toFixed(0);
   return sv.startsWith("<img")?sv.replace("<img ",`<img style="object-position:${x}% 50%" `):sv.replace('viewBox="0 0 1200 360"',`viewBox="${f} 0 640 360"`).replace('xMidYMax slice','xMidYMid slice'); };
 
@@ -7187,28 +6606,21 @@ function revealObserve(root){
 new MutationObserver(()=>{ clearTimeout(revealObserve._t); revealObserve._t=setTimeout(()=>revealObserve(view),60); }).observe(view,{childList:true,subtree:true});
 
 // ANÁLISIS: arriba, el mismo carrusel que la portada y, debajo, todos los análisis en una sola lista, de más reciente a más
-// antiguo, cada uno con su gráfico, su titular en forma de pregunta y su veredicto en una frase. Con ?tema=… (los filtros de
-// arriba) muestra solo ese tema, sin carrusel.
+// antiguo, cada uno con su gráfico, su titular en forma de pregunta y su veredicto en una frase.
 async function renderPreguntas(){
-  const tq=new URLSearchParams(location.search).get("tema"), tema=TOPIC_IDS.includes(tq)?tq:"", T=TOPICS[tema];
-  document.title=(T?T.l+" · Preguntas":"Preguntas")+" · Indicio";
+  document.title="Análisis · Indicio";
   // el mismo carrusel que la portada; mientras llega portada.json sigue a la vista la página pre-renderizada
-  const D=T?null:await loadPortada(); if(!/^\/preguntas\/?$/.test(location.pathname)) return;
-  const all=[...STUDIES.map(S=>({id:S.id,href:"/preguntas/"+S.id+"/",t:S.t,d:S.d,tema:S.tema,ev:S.ev,a:S.a||S.d,pub:S.pub||"",upd:S.upd||S.pub||""})),
-    ...QUICKQ.map(Q=>({id:Q.id,href:Q.href,t:Q.t,d:"",tema:Q.tema,ev:Q.ev,a:Q.a,pub:"",upd:""}))]
+  const D=await loadPortada(); if(!/^\/preguntas\/?$/.test(location.pathname)) return;
+  const all=[...STUDIES.map(S=>({id:S.id,href:"/preguntas/"+S.id+"/",t:S.t,d:S.d,ev:S.ev,a:S.a||S.d,pub:S.pub||"",upd:S.upd||S.pub||""})),
+    ...QUICKQ.map(Q=>({id:Q.id,href:Q.href,t:Q.t,d:"",ev:Q.ev,a:Q.a,pub:"",upd:""}))]
     .sort((x,y)=>(y.pub||"").localeCompare(x.pub||"")||(y.upd||"").localeCompare(x.upd||""));
-  const L=all.filter(e=>!T||e.tema===tema);
-  const card=e=>{ const {v,r}=splitA(e.a); return `<a class="np-c" href="${e.href}"><figure class="np-fig" data-cv="${e.id}"></figure><div class="np-k">${esc(TOPICL(e.tema))}${evSpan(e.ev)}</div><h3 class="np-q">${esc(e.t)}</h3><p class="np-v">${esc(v)}</p>${r?`<p class="np-r">${esc(r)}</p>`:""}<span class="np-go">Leer el análisis →${e.pub?`<time datetime="${e.pub}">${fechaES(e.pub)}</time>`:""}</span></a>`; };
-  const cnt=id=>all.filter(e=>e.tema===id).length;
-  const chips=`<nav class="np-chips" aria-label="Temas"><a href="/preguntas/"${T?"":' class="on"'}>Todos<small>${all.length}</small></a>${TOPIC_IDS.filter(id=>cnt(id)>0||id===tema).map(id=>`<a href="/preguntas/?tema=${id}"${id===tema?' class="on"':""}>${TOPICS[id].l}<small>${cnt(id)}</small></a>`).join("")}</nav>`;
-const labBlock=`<section class="np-lab"><div class="np-lab-t"><div class="kk2">Laboratorio</div><h2>${T?`Ya has visto lo de ${low(T.l)}. Ahora haz tu propio análisis.`:"Si tu pregunta no está, pruébala tú"}</h2><p>Elige dos datos, como el paro y la edad o la renta y el voto, y mira si van juntos de verdad en los ${nf0.format(rowsAll().length)} municipios y cuánto aguanta la relación cuando se compara entre iguales. También puedes ver qué pasó antes y después de una ley.</p><p class="np-lab-b"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a> <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><a class="np-lab-i" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a></section>`;
-  const otros=T?`<section class="np-sec"><div class="np-sh"><h2>Otros temas</h2></div><div class="np-tg">${TOPIC_IDS.filter(id=>id!==tema&&cnt(id)>0).map(id=>`<a class="np-t" href="/preguntas/?tema=${id}"><div class="np-ti">${tIll(id)}</div><h3>${TOPICS[id].l}</h3><p>${esc(TOPICS[id].q)}</p><span>${cnt(id)} análisis →</span></a>`).join("")}</div></section>`:"";
-  view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">${T?"Preguntas · "+esc(T.l):"Preguntas"}</div><h1>${T?esc(T.l):"Lo que dicen los datos"}</h1><p>${T?esc(T.q)+" Estas son las preguntas que ya hemos contestado."+` <a href="/temas/${tema}/">Leer el panorama del tema →</a>`:`${all.length} preguntas respondidas con datos públicos. Cada respuesta dice hasta dónde llega.`}</p>${chips}</header>
-    ${T?(L.length?`<section class="np-sec np-all"><div class="np-grid">${L.map(card).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis sobre ${low(T.l)}. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`):`${heroCarHTML(D)}${L.length?`<section class="np-sec"><div class="np-sh"><h2>Más recientes</h2></div><div class="np-grid">${L.map(card).join("")}</div></section>`:""}`}
-    ${T?"":`<section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/municipio/">Ver el mapa de municipios →</a></p></div></section>`}
-    ${labBlock}
-    ${otros}</div>`;
-  if(!T) bindBig("q3");
+  const card=e=>{ const {v,r}=splitA(e.a); return `<a class="np-c" href="${e.href}"><figure class="np-fig" data-cv="${e.id}"></figure><div class="np-k">${evSpan(e.ev).trim()}</div><h3 class="np-q">${esc(e.t)}</h3><p class="np-v">${esc(v)}</p>${r?`<p class="np-r">${esc(r)}</p>`:""}<span class="np-go">Leer el análisis →${e.pub?`<time datetime="${e.pub}">${fechaES(e.pub)}</time>`:""}</span></a>`; };
+  const labBlock=`<section class="np-lab"><div class="np-lab-t"><div class="kk2">Laboratorio</div><h2>Si tu pregunta no está, pruébala tú</h2><p>Elige dos datos, como el paro y la edad o la renta y el voto, y mira si van juntos de verdad en los ${nf0.format(rowsAll().length)} municipios y cuánto aguanta la relación cuando se compara entre iguales. También puedes ver qué pasó antes y después de una ley.</p><p class="np-lab-b"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a> <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><a class="np-lab-i" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a></section>`;
+  view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">Análisis</div><h1>Lo que dicen los datos</h1><p>${all.length} preguntas respondidas con datos públicos. Cada respuesta dice hasta dónde llega.</p></header>
+    ${heroCarHTML(D)}${all.length?`<section class="np-sec"><div class="np-sh"><h2>Más recientes</h2></div><div class="np-grid">${all.map(card).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`}
+    <section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/municipio/">Ver el mapa de municipios →</a></p></div></section>
+    ${labBlock}</div>`;
+  bindBig("q3");
   heroCarBind(view.querySelector(".pt-car"));
   loadCovers().then(cv=>{ view.querySelectorAll("[data-cv]").forEach(f=>{ const c=coverOf(f.dataset.cv,cv); if(c) f.innerHTML=c.svg+(f.dataset.cap?`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`:""); else f.remove(); }); });
 }
