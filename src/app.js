@@ -6860,7 +6860,7 @@ const HEROQ=[
     v:()=>`Frenó la subida, pero no bajó el alquiler.`,
     a:()=>`En 2024 el alquiler siguió subiendo donde hay tope: un 3,1${NB}%. Sin él habría subido en torno a un 3,7${NB}%, así que en un piso de Barcelona la diferencia son unos 7${NB}€ al mes. A la vez se vendieron más pisos de lo esperable, y los datos no dicen si salieron del alquiler.`,
     cap:()=>`Subida del alquiler en 2024 en los municipios con tope, frente a la estimada sin él a partir de municipios parecidos. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
-  {id:"infraestructuras",tab:"Carreteras y trenes",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver cuánto cayó y qué se sabe del mantenimiento →",
+  {id:"infraestructuras",tab:"Transporte",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver cuánto cayó y qué se sabe del mantenimiento →",
     v:()=>`Sí, y no se ha recuperado.`,
     a:N=>`En ${N.infPicoY} España invirtió ${N.infPico} mil millones de euros en carreteras y trenes; en ${N.infUltY}, ${N.infUlt}: un ${N.infCaida}${NB}% menos. Hoy destina a las dos cosas menos del 1${NB}% del PIB, por debajo de Francia y Alemania, cuando antes de la crisis invertía casi el doble que Alemania. Del mantenimiento hay menos datos, y los que hay vienen del propio sector.`,
     cap:()=>`Inversión anual en carreteras (gris) y ferrocarril (granate), en miles de millones de euros de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).`},
@@ -6874,7 +6874,10 @@ const PTIRA=[
   ["ave","Poco, por ahora.","Entre 2021 y 2023 la alta velocidad llegó a Galicia, Extremadura, Burgos, Murcia, Elche y Asturias. Dos o cuatro años después, los pueblos con estación nueva apenas se distinguen de otros casi idénticos que se quedaron sin ella."],
   ["convergencia","Sí, poco a poco, y sobre todo por el trabajo.","Entre 2015 y 2024 la renta subió en casi toda España, pero no igual para todos. Los sitios que partían de abajo han recortado distancia, y lo que más lo explica son los salarios; las pensiones y prestaciones ayudan, pero menos."],
 ];
-let PORTADA_P=null; const loadPortada=()=>PORTADA_P||(PORTADA_P=getJSON("/data/portada.json").catch(()=>{ PORTADA_P=null; return null; }));
+// Quien ya tenía portada.json en caché (navegador o service worker) no trae la serie de infraestructuras: se completa desde infra.json,
+// que es un fichero nuevo y no puede estar viejo. Así la diapositiva no aparece con la portada pre-renderizada y desaparece al pintar.
+const infraDeFit=F=>{ const I=F.itf; return {years:I.years,road:I.road_q.map(v=>Math.round(v)/1000),rail:I.rail_q.map(v=>Math.round(v)/1000)}; };
+let PORTADA_P=null; const loadPortada=()=>PORTADA_P||(PORTADA_P=getJSON("/data/portada.json").then(D=>D&&!D.infra?getJSON("/data/infra.json").then(F=>({...D,infra:infraDeFit(F)})).catch(()=>D):D).catch(()=>{ PORTADA_P=null; return null; }));
 
 // los cuatro gráficos de la cabecera: SVG en un lienzo de 440×300, con los colores por clase (valen en modo oscuro)
 const PTW=440, PTH=300;
