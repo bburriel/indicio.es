@@ -87,7 +87,7 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
     `Han ganado vecinos un ${nf(D[0].v)} % de los pueblos cercanos a una ciudad y un ${nf(D[2].v)} % de los lejanos; y un ${nf(E[0].v)} % de los jóvenes frente a un ${nf(E[2].v)} % de los mayores.`,s); }
 
 // ---------- 5. pensiones: pirámide de España hoy y en 2005 ----------
-{ const sh=a=>{ const t=d3.sum(a); return a.map(v=>v/t); }, h=sh(PIR.es.H), m=sh(PIR.es.M), ph=sh(PIR.pasado.es.H), pm=sh(PIR.pasado.es.M), mx=d3.max([...h,...m,...ph,...pm]);
+{ const sh2=(A,B)=>{ const t=d3.sum(A)+d3.sum(B); return [A.map(v=>v/t),B.map(v=>v/t)]; }, [h,m]=sh2(PIR.es.H,PIR.es.M), [ph,pm]=sh2(PIR.pasado.es.H,PIR.pasado.es.M), mx=d3.max([...h,...m,...ph,...pm]);
   const cx=150, top=26, bh=(H-top-30)/21, X=v=>v/mx*125, o65=d3.sum(h.slice(13))+d3.sum(m.slice(13)), p65=d3.sum(ph.slice(13))+d3.sum(pm.slice(13));
   let s="";
   h.forEach((v,i)=>{ const y=H-30-(i+1)*bh, c=i>=13?"pt-f-br":"pt-f-mu"; s+=R(cx-X(v),y,X(v),bh-1.2,c,0)+R(cx+1,y,X(m[i]),bh-1.2,c,0); });
