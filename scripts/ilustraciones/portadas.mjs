@@ -126,7 +126,8 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-l");
   s+=T(x0,38,`Municipios donde PP y PSOE quedaron a menos de ${MG} puntos`,"pt-g-t");
   G.forEach((g,i)=>{ const y=78+i*80; s+=T(x0,y,g.l,"pt-g-l"+g.cl)+R(x0,y+12,sc(g.v),34,g.c,3)+T(x0+sc(g.v)+10,y+40,(g.v>=0?"+":"−")+nf(Math.abs(g.v),1)+NB+"%","pt-g-n"+g.cl); });
-  s+=T(x0,H-22,"Casi lo mismo: quién gobernó no cambió","pt-g-g")+T(x0,H-4,"cuánto creció el pueblo","pt-g-g");
+  const dif=G[1].v-G[0].v, se=Math.sqrt(d3.variance(sel.filter(d=>d.m>0),d=>d.y)/G[1].n+d3.variance(sel.filter(d=>d.m<0),d=>d.y)/G[0].n), mar=1.96*se;
+  s+=T(x0,H-22,`Diferencia de ${nf(Math.abs(dif),1)} puntos, dentro del margen de error (±${nf(mar,1)})`,"pt-g-g")+T(x0,H-4,"cuánto creció el pueblo","pt-g-g");
   add("quien-gobierna",`Media de los municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en 2019 y quedaron a menos de ${MG} puntos (${G[0].n} donde ganó el PP y ${G[1].n} donde ganó el PSOE). Fuente: Ministerio del Interior e INE (padrón).`,
     `Donde el PP ganó por poco la población creció un ${nf(G[0].v,1)} % de 2019 a 2025, y donde ganó el PSOE por poco, un ${nf(G[1].v,1)} %.`,s); }
 
