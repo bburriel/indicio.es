@@ -985,10 +985,11 @@ function drawProvMap(code,P){
   const ink=css("--ink"), rust=css("--rust"), card=css("--card"), r2=css("--rule-2");
   svg.append("defs").html(`<pattern id="pmhatch" width="${5*k}" height="${5*k}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${5*k}" height="${5*k}" fill="${card}"/><line x1="0" y1="0" x2="0" y2="${5*k}" stroke="${rust}" stroke-width="${1.5*k}"/></pattern>`);
   svg.append("g").selectAll("path").data(near).join("path").attr("d",path).attr("fill","none").attr("stroke",r2).attr("stroke-width",.8*k);
-  svg.append("g").selectAll("path").data(mun).join("path").attr("d",path).attr("fill",card).attr("stroke",r2).attr("stroke-width",.35*k);
-  svg.append("path").datum(prov).attr("d",path).attr("fill","none").attr("stroke",css("--ink-2")).attr("stroke-width",1.3*k).attr("stroke-linejoin","round");
-  svg.append("path").datum(me).attr("d",path).attr("fill","url(#pmhatch)").attr("stroke",rust).attr("stroke-width",1.2*k);
-  svg.append("line").attr("x1",x1).attr("y1",y1).attr("x2",x2).attr("y2",y2).attr("stroke",ink).attr("stroke-width",1.4*k).attr("stroke-dasharray",`${5*k} ${4*k}`);
+  svg.append("g").selectAll("path").data(mun).join("path").attr("class","pm-m").attr("d",path).attr("fill",card).attr("stroke",r2).attr("stroke-width",.35*k)
+    .on("click",(e,f)=>{ if(BYCODE.has(f.id)&&f.id!==code) go(f.id); }).append("title").text(f=>{ const x=BYCODE.get(f.id); return x?dispName(x[F.name]):f.properties.name; });
+  svg.append("path").datum(prov).attr("class","pm-no").attr("d",path).attr("fill","none").attr("stroke",css("--ink-2")).attr("stroke-width",1.3*k).attr("stroke-linejoin","round");
+  svg.append("path").datum(me).attr("class","pm-no").attr("d",path).attr("fill","url(#pmhatch)").attr("stroke",rust).attr("stroke-width",1.2*k);
+  svg.append("line").attr("class","pm-no").attr("x1",x1).attr("y1",y1).attr("x2",x2).attr("y2",y2).attr("stroke",ink).attr("stroke-width",1.4*k).attr("stroke-dasharray",`${5*k} ${4*k}`);
   // etiquetas con colocación sin choques: prueba posiciones hasta dar con una que cabe en el mapa y no pisa puntos, línea ni otras etiquetas
   const placed=[[x1-8*k,y1-8*k,16*k,16*k],[x2-8*k,y2-8*k,16*k,16*k]], line=Array.from({length:25},(_,i)=>[x1+(x2-x1)*i/24,y1+(y2-y1)*i/24]);
   const hit=(r,pts)=>placed.some(q=>r[0]<q[0]+q[2]&&r[0]+r[2]>q[0]&&r[1]<q[1]+q[3]&&r[1]+r[3]>q[1])||(pts&&line.some(([px,py])=>px>r[0]&&px<r[0]+r[2]&&py>r[1]&&py<r[1]+r[3]));
@@ -1009,11 +1010,11 @@ function drawProvMap(code,P){
   label(x1,y1,short?`${nm} · ${kmT}`:nm,cs(sg));
   label(x2,y2,cn,cs(-sg),{weight:600});
   if(!short) label((x1+x2)/2,(y1+y2)/2,kmT,[[0,5*k,"middle"]],{size:13,onLine:true});
-  svg.append("circle").attr("cx",x2).attr("cy",y2).attr("r",5.5*k).attr("fill",ink).attr("stroke",card).attr("stroke-width",2*k);
-  svg.append("circle").attr("cx",x1).attr("cy",y1).attr("r",4.5*k).attr("fill",rust).attr("stroke",card).attr("stroke-width",2*k);
+  svg.append("circle").attr("class","pm-no").attr("cx",x2).attr("cy",y2).attr("r",5.5*k).attr("fill",ink).attr("stroke",card).attr("stroke-width",2*k);
+  svg.append("circle").attr("class","pm-no").attr("cx",x1).attr("cy",y1).attr("r",4.5*k).attr("fill",rust).attr("stroke",card).attr("stroke-width",2*k);
   const pn=provShort(PROVS[P]);
   fig.querySelector("svg").setAttribute("aria-label",`Mapa de la provincia de ${pn}: ${nm} está a ${kmT} en línea recta de ${cn}, su capital.`);
-  fig.querySelector("figcaption").innerHTML=`<b>${esc(nm)} está a ${kmT} de ${esc(cn)}</b>, la capital de la provincia de ${esc(pn)}, medidos en línea recta entre los centros de los dos términos municipales. Por carretera es más.`;
+  fig.querySelector("figcaption").innerHTML=`<b>${esc(nm)} está a ${kmT} de ${esc(cn)}</b>, la capital de la provincia de ${esc(pn)}, medidos en línea recta entre los centros de los dos términos municipales. Por carretera es más. Pulsa otro municipio para ir a su ficha.`;
   fig.hidden=false;
 }
 
