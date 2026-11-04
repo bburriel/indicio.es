@@ -1,6 +1,6 @@
 // Gráficos de cabecera de cada análisis: con rótulos, cifras y una idea por gráfico, como los de la portada.
 // Salen en SVG con las clases pt-g-* de styles.css (así valen en modo oscuro) y se guardan en data/covers.json.
-// Los tres que ya existen en la portada (cesta, contratos, tope) los dibuja app.js con portada.json y no pasan por aquí.
+// Los tres que ya existen en la portada (cesta, contratos, tope, vivienda e infraestructuras) los dibuja app.js con portada.json y no pasan por aquí.
 // Uso: node scripts/ilustraciones/portadas.mjs
 import fs from "fs"; import path from "path"; import vm from "vm"; import {fileURLToPath} from "url";
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../..");
@@ -218,21 +218,6 @@ const short=n=>String(n).replace(/\s*(Alta Velocidad|AV|Guiomar|Miguel Hernánde
   const my=Yr.reduce((a,b)=>ES[b]>ES[a]?b:a); s+=T(X(my),Y(ES[my])-8,`${my}: ${pc(ES[my])}`,"pt-g-l br","middle",true)+T(x1-2,Y(ES[Yr[Yr.length-1]])-10,"España","pt-g-l br","end",true)+T(x1-2,Y(EU[Yr[Yr.length-1]])+16,"Unión Europea","pt-g-l","end",true);
   add("gobiernos","Tasa de paro de España (granate) y de la Unión Europea (negro); de fondo, el presidente que gobernó cada año. Fuente: Eurostat y Banco Mundial.",
     `El paro de España sube y baja más que el de la Unión Europea con cualquier presidente: llega al ${nf(ES[my])} % en ${my}.`,s); }
-
-// ---------- 16. infraestructuras: lo invertido cada año en carreteras y trenes, con el máximo y el último dato ----------
-{ const I=J("infra.json").itf, Yr=I.years, n=Yr.length, tot=Yr.map((y,i)=>(I.road_q[i]+I.rail_q[i])/1000), pk=tot.indexOf(Math.max(...tot)), li=n-1;
-  const x0=40,x1=W-14,y0=H-34,y1=60, w=(x1-x0)/n, Y=d3.scaleLinear().domain([0,24]).range([y0,y1]), cx=i=>x0+i*w+w/2, caida=(1-tot[li]/tot[pk])*100;
-  let s=[0,10,20].map(g=>L(x0,Y(g),x1,Y(g))+T(x0-6,Y(g)+4,String(g),"pt-g-t","end")).join("");
-  Yr.forEach((y,i)=>{ const a=I.road_q[i]/1000, b=I.rail_q[i]/1000; s+=R(x0+i*w+w*.12,Y(a),w*.76,y0-Y(a),"pt-f-mu",0)+R(x0+i*w+w*.12,Y(a+b),w*.76,Y(a)-Y(a+b),"pt-f-br",0); });
-  s+=L(cx(pk),Y(tot[pk]),x1,Y(tot[pk]),"pt-g-base");
-  s+=`<line x1="${r1(cx(li))}" y1="${r1(Y(tot[pk]))}" x2="${r1(cx(li))}" y2="${r1(Y(tot[li])-4)}" class="pt-g-tick"/>`;
-  [1995,2005,2015,2024].filter(y=>Yr.includes(y)).forEach(y=>s+=T(cx(Yr.indexOf(y)),y0+18,String(y),"pt-g-t","middle"));
-  s+=T(8,18,"Lo que se invierte cada año en carreteras y trenes","pt-g-l")+T(8,34,"en miles de millones de euros de 2015; en granate, el tren","pt-g-t");
-  s+=T(cx(pk),Y(tot[pk])-9,`${Yr[pk]}: ${nf(tot[pk],1)}`,"pt-g-l br","middle",true);
-  s+=T(cx(li)-12,Y(tot[pk])+50,"−"+nf(caida)+NB+"%","pt-g-big","end",true).replace("pt-g-big","pt-g-n br").replace('class="pt-g-n br"','class="pt-g-big"')
-    +T(cx(li)-12,Y(tot[pk])+70,`en ${Yr[li]}: ${nf(tot[li],1)}`,"pt-g-g","end",true);
-  add("infraestructuras","Inversión anual en carreteras (gris) y ferrocarril (granate), en euros constantes de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).",
-    `La inversión en carreteras y ferrocarril pasa de ${nf(tot[pk],1)} mil millones de euros en ${Yr[pk]} a ${nf(tot[li],1)} en ${Yr[li]}: un ${nf(caida)} % menos.`,s); }
 
 fs.writeFileSync(path.join(ROOT,"data/covers.json"),JSON.stringify({w:W,h:H,covers:OUT}));
 console.log(Object.keys(OUT).length,"gráficos,",Math.round(JSON.stringify(OUT).length/1024),"KB");
