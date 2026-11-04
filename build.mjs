@@ -10,7 +10,7 @@ import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 import {SITE,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
 import {ROWS as I18N_ROWS} from "./src/i18n-textos.mjs";
-import {faltan as i18nFaltan} from "./scripts/i18n-faltan.mjs";
+import {faltan as i18nFaltan, validar as i18nValidar} from "./scripts/i18n-faltan.mjs";
 import {STUDIES,ALL,HIDDEN,MDBODY} from "./src/analisis.mjs";
 import {ILLUS,TILL,FOCUS} from "./src/illus.mjs";
 
@@ -450,5 +450,5 @@ fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, 
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));
 fs.writeFileSync(path.join(OUT,INDEXNOW_KEY+".txt"),INDEXNOW_KEY);
-{ const {cerradas}=i18nFaltan(); if(cerradas) console.log(`i18n: ${cerradas} frases de las páginas ya cerradas siguen sin traducir (npm run i18n:faltan para verlas)`); }
+{ const pv=i18nValidar(); if(pv.length) console.log(`i18n: ${pv.length} traducciones con las cifras mal (npm run i18n:faltan para verlas)`); const {cerradas}=i18nFaltan(); if(cerradas) console.log(`i18n: ${cerradas} frases de las páginas ya cerradas siguen sin traducir (npm run i18n:faltan para verlas)`); }
 console.log(`dist/ listo: ${urls.length} páginas + ${nMun} fichas municipales, ${parts.length+1} sitemaps.`);

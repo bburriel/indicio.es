@@ -3,7 +3,7 @@
    Los análisis y las fichas siguen en castellano: cuando una página tiene texto sin traducir, avisa con una nota.
    En castellano no hace nada (no observa la página), así que no afecta a quien no cambie de idioma.
    Los textos están en src/i18n-textos.mjs (el build los antepone a este script como la variable ROWS).
-   Para traducir un texto nuevo: añade una fila allí con [castellano exacto, ca, gl, eu, en]; {#} marca una cifra. */
+   Para traducir un texto nuevo: añade una fila allí con [castellano exacto, ca, gl, eu, en]; {#} marca una cifra (con varias, {#1}, {#2}… dicen cuál del castellano). */
 (function(){
 "use strict";
 var LANGS=[["es","Castellano"],["ca","Català"],["gl","Galego"],["eu","Euskara"],["en","English"]];
@@ -67,7 +67,7 @@ function tr(s){
   if(!core) return s;
   var nums=core.match(NUMRE)||[], key=norm(core).replace(NUMRE,"{#}"), hit=MAP[lang][key];
   if(hit===undefined) hit=rel(key);
-  if(hit!==undefined){ var k=0; hit=hit.replace(/\{#\}/g,function(){ return k<nums.length?fmtNum(lang,nums[k++]):"{#}"; }); }
+  if(hit!==undefined){ var k=0; hit=hit.replace(/\{#(\d*)\}/g,function(m,d){ var i=d?(+d)-1:k++; return i>=0&&i<nums.length?fmtNum(lang,nums[i]):m; }); }   // {#1}, {#2}…: la cifra nº n del castellano, en el orden que pida cada idioma; {#} a secas, por orden
   else hit=core.replace(DATE_RE,function(_,d,mo,y){ return fmtDate(lang,d,mo,y); });
   return hit===core?s:m[1]+hit+m[3];
 }

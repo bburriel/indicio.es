@@ -54,6 +54,22 @@ const fuentes=()=>{
   return f;
 };
 
+// Comprueba el diccionario: mismo número de cifras que el castellano y, con varias, cifras numeradas ({#1}, {#2}…)
+export function validar(){
+  const prob=[]; const idiomas=["ca","gl","eu","en"];
+  for(const r of ROWS){
+    const n=(r[0].match(/\{#\}/g)||[]).length;
+    idiomas.forEach((l,i)=>{
+      const t=r[i+1]; if(typeof t!=="string"||t==="") return;
+      const sin=(t.match(/\{#\}/g)||[]).length, num=[...t.matchAll(/\{#(\d+)\}/g)].map(m=>+m[1]);
+      if(num.length){ const set=new Set(num); if(set.size!==n||[...set].some(x=>x<1||x>n)||num.length!==n||sin) prob.push([l,"cifras numeradas mal: "+r[0].slice(0,60)]); }
+      else if(sin!==n) prob.push([l,"distinto número de cifras: "+r[0].slice(0,60)]);
+      else if(n>=2) prob.push([l,"varias cifras sin numerar ({#1}, {#2}…): "+r[0].slice(0,60)]);
+    });
+  }
+  return prob;
+}
+
 export function faltan({todas=false}={}){
   const res=[]; let cerradas=0;
   for(const [nombre,textos,cerrada] of fuentes()){
@@ -74,4 +90,5 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
     if(r.sin.length>(todas?15:60)) console.log(`    … y ${r.sin.length-(todas?15:60)} más`);
   }
   console.log(`\nSin traducir en las páginas cerradas: ${cerradas}`);
+  const pv=validar(); if(pv.length){ console.log(`\nProblemas en el diccionario: ${pv.length}`); for(const [l,m] of pv.slice(0,40)) console.log(`    [${l}] ${m}`); }
 }
