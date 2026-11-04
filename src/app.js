@@ -138,9 +138,9 @@ function urlInit(){
     const a=e.target.closest("a[href]"); if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
     if(a.target==="_blank"||a.hasAttribute("download")||a.origin!==location.origin) return;
     const href=a.getAttribute("href")||"";
-    if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); smoothTo(k); return; }
+    if(href.startsWith("#")){ const k=href.slice(1); if(k===""){ e.preventDefault(); return; } if(!ROUTE_KEY.test(k)) return; e.preventDefault(); smoothTo(k,a); return; }
     if(/^\/(data|og|provincia|rankings)(\/|$)/.test(href)||/\.(json|png|jpg|csv|svg|pdf|xml|txt|webmanifest)(\?|$)/.test(href)) return;
-    if(href.startsWith("/")){ e.preventDefault(); if(a.closest(".pt-car")&&/^\/preguntas\/[\w-]+\/?$/.test(href)) ptToStudy(href); else smoothTo(href); }
+    if(href.startsWith("/")){ e.preventDefault(); if(a.closest(".pt-car")&&/^\/preguntas\/[\w-]+\/?$/.test(href)) ptToStudy(href); else smoothTo(href,a); }
   });
   // los enlaces #antiguos que generan las plantillas pasan a ruta real (también para el HTML pre-renderizado)
   const fix=root=>root.querySelectorAll('a[href^="#"]').forEach(a=>{ const k=a.getAttribute("href").slice(1); if(k==="inicio"||ROUTE_KEY.test(k)) a.setAttribute("href",keyToPath(k)); });
@@ -168,12 +168,15 @@ function ptToStudy(href){
 }
 // Resto de la app: cualquier enlace interno cambia de página con un fundido corto y la cabecera fija (clase vt-fade).
 // Sin soporte, con «reducir movimiento» o a la misma página, navega sin más.
-function smoothTo(key){
+function smoothTo(key,src){
   const same=keyToPath(key)===location.pathname+location.search;
   if(same||!document.startViewTransition||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){ navTo(key); return; }
   const de=document.documentElement; de.classList.add("vt-fade");
-  const t=document.startViewTransition(()=>{ navTo(key); });
-  t.finished.finally(()=>de.classList.remove("vt-fade"));
+  // el título de la tarjeta pulsada viaja hasta el titular de la página nueva (no en el menú, que no tiene tarjetas)
+  const from=src&&!src.closest("#top,footer")?(src.querySelector("h1,h2,h3,b,strong,.t")||(src.textContent.trim().length<90?src:null)):null;
+  if(from) from.style.viewTransitionName="vt-t";
+  const t=document.startViewTransition(()=>{ navTo(key); const h=view.querySelector(".sh-q,h1"); if(from&&h) h.style.viewTransitionName="vt-t"; else if(from) from.style.viewTransitionName=""; });
+  t.finished.finally(()=>{ de.classList.remove("vt-fade"); document.querySelectorAll("[style*='view-transition-name']").forEach(e=>e.style.viewTransitionName=""); });
 }
 function render404(){ document.title="Página no encontrada · Indicio"; view.innerHTML=pageHead("No encontramos esa página","Puede que el enlace sea antiguo. Prueba desde la portada o busca tu municipio arriba.")+`<p><a class="ed-go" href="/">Ir a la portada →</a></p>`; }
 
