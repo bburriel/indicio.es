@@ -6991,7 +6991,7 @@ function heroCarBind(C){
 }
 
 // «Bienvenido/a a tu estudio» ↔ «Indicio»: un único cursor viaja entre las dos palabras y las edita a máquina, como una persona que las
-// va cambiando en bucle. Empieza en «tu estudio»; a los 5 s borra y escribe «Indicio», viaja a la o/a y la cambia, y vuelve. Con
+// va cambiando en bucle. Empieza en «tu estudio»; nada más entrar viaja a la o/a y la cambia, vuelve y cambia «tu estudio» por «Indicio»; y así en bucle. Con
 // «reducir movimiento» se queda quieto (y el cursor se oculta).
 function heroType(root){
   if(!root||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -7008,15 +7008,14 @@ function heroType(root){
   const busy=on=>cur.classList.toggle("mv",on);
   // como el carro de una máquina de escribir: tira hacia atrás hasta el margen izquierdo, salta de línea y avanza hasta la palabra
   const go=async el=>{ at=el; busy(true); cur.classList.remove("ty"); const q=pos(el), set=(o,ms)=>{ cur.style.transitionDuration=ms+"ms"; Object.assign(cur.style,o); return sleep(ms+40); };
-    await set({left:"0px"},340); await set({top:q.y+"px",height:q.h+"px"},220); await set({left:q.x+"px"},460); cur.style.transitionDuration=""; };
+    await set({left:"0px"},520); await set({top:q.y+"px",height:q.h+"px"},340); await set({left:q.x+"px"},700); cur.style.transitionDuration=""; };
   const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
-    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(45); } await sleep(220);
-    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(90); } };
-  (async()=>{ let k=0, oa="o"; await sleep(5000);
+    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(70); } await sleep(220);
+    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(130); } };
+  (async()=>{ let k=0, oa="o"; await sleep(1300);
     while(live()){
-      await edit(W,k?"tu estudio":"Indicio"); k=1-k; busy(false); await sleep(900); if(!live()) break;
-      await go(OA); await sleep(260); oa=oa==="o"?"a":"o"; await edit(OA,oa); busy(false); await sleep(900); if(!live()) break;
-      await go(W); busy(false); await sleep(4200); } })();
+      await go(OA); await sleep(300); oa=oa==="o"?"a":"o"; await edit(OA,oa); busy(false); await sleep(1100); if(!live()) break;
+      await go(W); await sleep(300); await edit(W,k?"tu estudio":"Indicio"); k=1-k; busy(false); await sleep(4500); } })();
 }
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
