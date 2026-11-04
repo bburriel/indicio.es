@@ -20,7 +20,7 @@ fs.mkdirSync(path.join(ROOT,"snapshots"),{recursive:true}); fs.mkdirSync(path.jo
 const routes=["/","/preguntas/","/temas/",...TOPICS.filter(T=>T.id!=="vivienda").map(T=>"/temas/"+T.id+"/"),...STUDIES.map(S=>"/preguntas/"+S.id+"/"),"/laboratorio/","/laboratorio/metodo/","/municipio/","/quien-soy/"];
 const fname=r=>(r==="/"?"index":r.replace(/^\/|\/$/g,"").replace(/\//g,"__"))+".html";
 const browser=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
-const ctx=await browser.newContext({viewport:{width:1280,height:900},deviceScaleFactor:2,reducedMotion:"reduce"});
+const ctx=await browser.newContext({locale:"es-ES",timezoneId:"Europe/Madrid",viewport:{width:1280,height:900},deviceScaleFactor:2,reducedMotion:"reduce"});
 // dibujos de las tarjetas como imagen estática (art/<id>.jpg): aparecen al instante, sin esperar datos ni cálculos
 fs.mkdirSync(path.join(ROOT,"art"),{recursive:true});
 const artPage=await ctx.newPage(); if(process.env.OFFLINE) await artPage.route(/googleapis|gstatic/,r=>r.abort());
