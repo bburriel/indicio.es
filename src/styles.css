@@ -1164,16 +1164,52 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 .seo-extra .faq p{max-width:var(--medida); color:var(--ink-2); line-height:1.55}
 .seo-extra .near{line-height:1.9; max-width:var(--medida)}
 /* índice de provincias: agrupadas por comunidad, título a la izquierda y filas a la derecha */
-.provgroups{margin:6px 0 34px}
-.provgroup{display:grid; grid-template-columns:minmax(150px,230px) minmax(0,1fr); gap:6px 40px; padding:26px 0 22px; border-top:1px solid var(--rule)}
-.provgroup:first-child{border-top:0}
-.provgroup > h2{font-family:var(--serif); font-weight:500; font-size:clamp(20px,2vw,24px); line-height:1.2; letter-spacing:-.01em; color:var(--ink); margin:0; padding-top:5px}
-.provlist{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0 34px; margin:0}
-.provlist a{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px solid var(--rule); text-decoration:none; font-family:var(--serif); font-size:19px; line-height:1.3; color:var(--ink)}
-.provlist a:hover{color:var(--brand); border-bottom-color:var(--brand)}
-.provlist small{font-family:inherit; font-size:15px; color:var(--muted); font-variant-numeric:tabular-nums}
-.vh{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
-@media (max-width:760px){ .provgroup{grid-template-columns:minmax(0,1fr); padding:20px 0 14px} .provgroup > h2{padding-top:0; margin-bottom:6px} .provlist{grid-template-columns:minmax(0,1fr)} }
+/* /provincia/: mapa de provincias con comunidades autónomas; panel a la derecha */
+.pmap{display:flex; flex-wrap:wrap; gap:28px 48px; align-items:flex-start; padding-top:26px; margin:6px 0 24px}
+.pmap-map{flex:1 1 560px; min-width:0}
+.pmap-cta{font-family:var(--serif); font-size:clamp(21px,2.3vw,26px); line-height:1.25; font-weight:500; letter-spacing:-.01em; margin:0 0 18px}
+.pmap-cta b{font-weight:500; color:var(--brand)}
+.pmap-svg{display:block; width:100%; height:auto; aspect-ratio:930/660; overflow:visible}
+.pmap-box{fill:none; stroke:var(--rule-2); stroke-width:1}
+.pmap-lab{font-size:15px; fill:#6b6a66}
+.pm{outline:none; cursor:pointer}
+.pm path,.pm circle{stroke:var(--bg); stroke-width:1.1; stroke-linejoin:round; transition:opacity .12s}
+.pm circle{stroke:#7a1c2b; stroke-width:1.4}
+.pm.on path,.pm.on circle{stroke:var(--ink); stroke-width:2.4}
+.pm.b0 path,.pm.b0 circle,i.pm.b0{fill:#f1e4e4; background:#f1e4e4}
+.pm.b1 path,.pm.b1 circle,i.pm.b1{fill:#e4c4c8; background:#e4c4c8}
+.pm.b2 path,.pm.b2 circle,i.pm.b2{fill:#cf9aa2; background:#cf9aa2}
+.pm.b3 path,.pm.b3 circle,i.pm.b3{fill:#a94d5c; background:#a94d5c}
+.pm.b4 path,.pm.b4 circle,i.pm.b4{fill:#7a1c2b; background:#7a1c2b}
+.pmap[data-mode="ccaa"] .pm.dim{opacity:.28}
+.pmap-reg{fill:none; stroke:var(--ink); stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; opacity:.85; pointer-events:none}
+.pmap-side{flex:0 0 320px; display:flex; flex-direction:column; gap:26px}
+.pmap-seg{display:flex; align-self:flex-start; border:1px solid var(--rule-2); border-radius:3px; overflow:hidden}
+.pmap-seg[hidden],.pmap-go[hidden],.pmap-rh[hidden],.pmap-rows[hidden]{display:none}
+.pmap-seg button{font:inherit; font-size:14px; font-weight:500; cursor:pointer; padding:10px 16px; min-height:44px; box-sizing:border-box; border:0; background:transparent; color:var(--ink)}
+.pmap-seg button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.pmap-read{min-height:132px}
+.pmap-k{font-size:13px; color:#6b6a66; margin-bottom:8px}
+.pmap-t{font-family:var(--serif); font-size:40px; line-height:1.05; font-weight:500; letter-spacing:-.01em}
+.pmap-s{margin-top:10px; font-family:var(--serif); font-size:19px; line-height:1.4; color:var(--ink-2)}
+.pmap-go-w{margin-top:14px; font-size:15px}
+.pmap-go{color:var(--brand); font-weight:500}
+.pmap-rh{font-size:13px; color:#6b6a66; padding-bottom:6px; border-bottom:1px solid var(--ink)}
+.pmap-rows a{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px solid var(--rule); text-decoration:none; font-family:var(--serif); font-size:19px; line-height:1.3; color:var(--ink)}
+.pmap-rows a span+span{font-family:inherit; font-size:15px; color:#6b6a66; font-variant-numeric:tabular-nums}
+.pmap-rows a:hover{color:var(--brand); border-bottom-color:var(--brand)}
+.pmap-go:focus-visible,.pmap-seg button:focus-visible,.pmap-rows a:focus-visible,.pm:focus-visible path,.pm:focus-visible circle{outline:2px solid var(--ink); outline-offset:2px}
+.pmap-key{display:flex; flex-direction:column; gap:7px; font-size:14px; border-top:1px solid var(--rule); padding-top:20px}
+.pmap-kh{font-size:13px; color:#6b6a66; margin-bottom:3px}
+.pmap-key span{display:flex; align-items:center; gap:10px}
+.pmap-key i{width:22px; height:14px; border-radius:2px; border:1px solid var(--rule-2)}
+.pmap-lines{display:flex; flex-direction:column; gap:7px; margin-top:8px}
+.pmap-list{margin:0 0 30px; font-size:15px}
+.pmap-list summary{cursor:pointer; color:var(--ink-2); padding:8px 0}
+.pmap-list ul{list-style:none; margin:10px 0 0; padding:0; column-width:200px; column-gap:34px}
+.pmap-list li{padding:5px 0; break-inside:avoid; font-family:var(--serif); font-size:18px}
+.pmap-list small{color:#6b6a66; margin-left:4px}
+@media (max-width:860px){ .pmap-side{flex-basis:100%} }
 /* laboratorio, mapa: el mapa ocupa todo el ancho y las listas van debajo, en dos columnas */
 .lb-out .exmap, .exmap{grid-template-columns:minmax(0,1fr)}
 .exmap-m .mapbox{max-width:var(--medida); margin:0 auto}
