@@ -6790,7 +6790,7 @@ const HEROQ=[
     cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados, sueldo mediano y resto de precios hasta ${N.alquilerY}. Fuente: INE.`},
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué ha subido más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
-    a:N=>`Desde 2019 la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
+    a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
     cap:N=>`Precio de los alimentos (media de cada año y de los últimos doce meses) y sueldo mediano hasta ${N.añoSueldo}, el último publicado, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
   {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver dónde cambió más →",
     v:N=>`Cambió los contratos. En el empleo, no se ve.`,
@@ -6857,7 +6857,7 @@ const ptCharts={
 };
 // cifras de los textos, calculadas con las mismas series que los gráficos
 const ptNums=D=>{ const o={};
-  if(D&&D.cesta){ const C=D.cesta, fo=C.ult12.v-100, sa=C.sueldo[C.sueldo.length-1][1]-100, loss=-C.poder/100, k=Math.round(1/loss);
+  if(D&&D.cesta){ const C=D.cesta, fy=(C.comida.find(c=>c[0]===C.añoSueldo)||[0,C.ult12.v])[1], fo=fy-100, sa=C.sueldo[C.sueldo.length-1][1]-100, loss=-C.poder/100, k=Math.round(1/loss);
     Object.assign(o,{fo:nf0.format(fo),sa:nf0.format(sa),doble:Math.abs(fo/sa-2)<.15,poder:nf0.format(-C.poder),añoSueldo:C.añoSueldo,
       cada:["","una","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez","once","doce"][k]||nf0.format(k)}); }
   if(D&&D.casa){ const C=D.casa; Object.assign(o,{compra:nf0.format(C.compra[0]),alquiler:nf0.format(C.alquiler[0]),sueldo:nf0.format(C.sueldo[0]),compraY:C.compra[1],alquilerY:C.alquiler[1]}); }
