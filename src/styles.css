@@ -2060,7 +2060,8 @@ details.chk > section{margin-top:18px}
 .lbseg button + button{border-left:0}
 
 /* PORTADA «Bienvenido a tu estudio» (noviembre 2026) */
-.ho{padding:clamp(18px,3vw,40px) 0 clamp(12px,2vw,24px)}
+/* la primera pantalla es solo el héroe: la primera pregunta empieza al hacer scroll */
+.ho{min-height:calc(100vh - var(--ho-top,72px)); min-height:calc(100svh - var(--ho-top,72px)); display:flex; flex-direction:column; justify-content:center; padding:clamp(18px,3vw,40px) 0 clamp(36px,6vw,72px); box-sizing:border-box}
 .ho-h{font-family:var(--serif); font-weight:500; font-size:clamp(42px,8vw,92px); line-height:1.03; letter-spacing:-.022em; margin:0}
 .ho-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 .ho-vis{display:block; position:relative}
