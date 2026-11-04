@@ -4143,13 +4143,15 @@ function openPicker(btn,opts){
   // con «all», el buscador enseña todos los datos, marcados por nivel; los que no sirven aquí abren la vista que les sirve
   const POOL=all?[...CAT,...natItems()].filter(c=>jump||okC(c)):CAT.filter(okC); let lv="";
   const groups=[...new Set([...PICK_ORDER,...POOL.map(c=>c.g)])].filter(g=>POOL.some(c=>c.g===g)||(mk&&g===VGROUP));   // «Mis datos» se ve siempre, aunque esté vacío: así se descubre que se pueden crear
+  // el filtro por nivel (municipios, provincias…) sale siempre que la lista mezcle al menos dos niveles
+  const LVS=all?LVLF.filter(([v])=>!v||POOL.some(c=>LVL(c)[0]===v||(v==="eu"&&LVL(c)[0]==="pa"))):[];
   let tab=extras&&!(CATK[current]||{}).g?"Opciones":(CATK[current]||{}).g||groups[0], q="";
   const EXG="Opciones", tabs=extras?[EXG,...groups]:groups;
   const p=el("div","dpick"); p.id="dpick"; p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-label","Elige un dato"); document.body.appendChild(p); PICK_BTN=btn;
   const avail=c=>(!excl.includes(c.k)||c.k===current)&&(!lv||LVL(c)[0]===lv||(lv==="eu"&&LVL(c)[0]==="pa"));
   const covTxt=c=>c.nat==="es"?"año a año"+(c.yrs?", "+c.yrs:""):c.nat==="pais"?"España y otros países, año a año":c.eu?"regiones de Europa":c.reg?(c.np>=40?"provincias y comunidades":"solo comunidades"):nf0.format(cover(c.k))+" municipios";
   const VIEWN={es:"Series",pa:"Series",eu:"Relación",rg:"Relación",mu:"el mapa"};
-  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${all&&jump?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVLF.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>${opts.note?`<p class="dp-note">${opts.note}</p>`:""}${mk?`<div class="dp-mk"><button type="button" id="dpmk">+ Crear un dato nuevo</button><small>Combina dos datos para responder una pregunta tuya. Por ejemplo: cuánto pesa la deuda sobre la renta.</small></div>`:""}`;
+  p.innerHTML=`<div class="dp-h"><input type="search" id="dpq" placeholder="Busca un dato: paro, alquiler, edad…" autocomplete="off" aria-label="Buscar un dato"><button type="button" class="dp-x" aria-label="Cerrar">×</button></div>${LVS.length>2?`<div class="dp-lv" id="dplv" role="group" aria-label="Nivel">${LVS.map(([v,l])=>`<button type="button" data-lv="${v}" aria-pressed="${v===lv}">${l}</button>`).join("")}</div>`:""}<div class="dp-tabs" role="tablist" id="dpt"></div><ul class="dp-list" id="dpl"></ul>${opts.note?`<p class="dp-note">${opts.note}</p>`:""}${mk?`<div class="dp-mk"><button type="button" id="dpmk">+ Crear un dato nuevo</button><small>Combina dos datos para responder una pregunta tuya. Por ejemplo: cuánto pesa la deuda sobre la renta.</small></div>`:""}`;
   const openMk=()=>openMaker(btn,{back:()=>openPicker(btn,opts),onDone:k=>onPick(k)});
   const draw=()=>{
     const nq=norm(q.trim()), hit=c=>norm(c.l+" "+c.src+" "+c.g+" "+c.k+" "+LVL(c)[1]).includes(nq);
