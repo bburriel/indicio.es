@@ -6844,23 +6844,23 @@ let QH_T=null;
 // con las mismas cuentas que sus análisis. Las del tope (3,1 % y 3,7 %, unos 7 € al mes en Barcelona) son resultados
 // de studyTope, y los 4.100 empleos de la reforma laboral, de studyReforma: si cambian allí, hay que cambiarlas aquí.
 const HEROQ=[
-  {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver cuánto pesa cada idea →",
+  {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver por qué sube →",
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
     cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados, sueldo mediano y resto de precios hasta ${N.alquilerY}. Fuente: INE.`},
-  {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué ha subido más →",
+  {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué se encarece más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
     cap:N=>`Precio de los alimentos (media de cada año y de los últimos doce meses) y sueldo mediano hasta ${N.añoSueldo}, el último publicado, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
-  {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver dónde cambió más →",
+  {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver qué cambió en los contratos →",
     v:N=>`Cambió los contratos. En el empleo, no se ve.`,
     a:N=>`Antes de la reforma, ${N.antes>=90?"más de nueve":"unos "+N.antesD} de cada diez contratos nuevos eran temporales; hoy son ${N.hoyD}, como enseña el gráfico. Se temía que un cambio así costara empleo, pero los sitios que más tiraban del contrato temporal no han perdido más que los demás. Si hubo una pérdida pequeña, de hasta unos 4.100 empleos, los datos no la distinguirían.`,
     cap:()=>`Parte de los contratos nuevos que son temporales, media de tres meses. Fuente: SEPE, contratos iniciales por municipio.`},
-  {id:"tope-cataluna",tab:"Tope al alquiler",kk:"Alquiler",em:"en Cataluña?",chart:"tope",cta:"Ver qué pasó con las ventas de pisos →",
+  {id:"tope-cataluna",tab:"Tope al alquiler",kk:"Alquiler",em:"en Cataluña?",chart:"tope",cta:"Ver qué pasó con el alquiler →",
     v:()=>`Frenó la subida, pero no bajó el alquiler.`,
     a:()=>`En 2024 el alquiler siguió subiendo donde hay tope: un 3,1${NB}%. Sin él habría subido en torno a un 3,7${NB}%, así que en un piso de Barcelona la diferencia son unos 7${NB}€ al mes. A la vez se vendieron más pisos de lo esperable, y los datos no dicen si salieron del alquiler.`,
     cap:()=>`Subida del alquiler en 2024 en los municipios con tope, frente a la estimada sin él a partir de municipios parecidos. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
-  {id:"infraestructuras",tab:"Transporte",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver cuánto cayó y qué se sabe del mantenimiento →",
+  {id:"infraestructuras",tab:"Transporte",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver dónde se dejó de invertir →",
     v:()=>`Sí, y no se ha recuperado.`,
     a:N=>`En ${N.infPicoY} España invirtió ${N.infPico} mil millones de euros en carreteras y trenes; en ${N.infUltY}, ${N.infUlt}: un ${N.infCaida}${NB}% menos. Hoy destina a las dos cosas menos del 1${NB}% del PIB, por debajo de Francia y Alemania, cuando antes de la crisis invertía casi el doble que Alemania. Del mantenimiento hay menos datos, y los que hay vienen del propio sector.`,
     cap:()=>`Inversión anual en carreteras (gris) y ferrocarril (granate), en miles de millones de euros de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).`},
@@ -6952,7 +6952,7 @@ function heroCarHTML(D){
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S])), N=ptNums(D);
   const L=HEROQ.filter(h=>byId[h.id]&&(h.chart==="tope"||(D&&D[h.chart])));
   const tit=(t,em)=>t.endsWith(em)?esc(t.slice(0,-em.length))+`<em>${esc(em)}</em>`:esc(t);
-  const slides=L.map((h,i)=>{ const S=byId[h.id], H=i?"h2":"h1";
+  const slides=L.map((h,i)=>{ const S=byId[h.id], H="h2";
     return `<div class="pt-s${i?"":" on"}" id="pts${i}" role="tabpanel" aria-roledescription="diapositiva" aria-label="${i+1} de ${L.length}"${i?` aria-hidden="true"`:""}>`
       +`<div class="pt-st"><div class="kk2">${esc(h.kk)}</div><${H} class="pt-q">${tit(S.t,h.em)}</${H}><p class="pt-v">${h.v(N)}</p><p class="pt-a">${h.a(N)}</p>`
       +`<p class="pt-cta"><a class="btn" href="/preguntas/${S.id}/"${i?` tabindex="-1"`:""}>${esc(h.cta)}</a></p></div>`
@@ -6990,6 +6990,32 @@ function heroCarBind(C){
   requestAnimationFrame(tick);
 }
 
+// «Bienvenido/a a tu estudio» ↔ «Indicio»: un único cursor viaja entre las dos palabras y las edita a máquina, como una persona que las
+// va cambiando en bucle. Empieza en «tu estudio»; a los 5 s borra y escribe «Indicio», viaja a la o/a y la cambia, y vuelve. Con
+// «reducir movimiento» se queda quieto (y el cursor se oculta).
+function heroType(root){
+  if(!root||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const vis=root.querySelector(".ho-vis"), W=root.querySelector('[data-ho="w"]'), OA=root.querySelector('[data-ho="oa"]'), cur=root.querySelector(".ho-cur"); if(!vis||!W||!OA||!cur) return;
+  const live=()=>document.body.contains(root), sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  // posición del cursor: al final del texto de la palabra (o al principio de su hueco si está vacía)
+  const pos=el=>{ const v=vis.getBoundingClientRect(), fs=parseFloat(getComputedStyle(el).fontSize), h=fs*.78;
+    let x,y; if(el.textContent){ const rg=document.createRange(); rg.selectNodeContents(el); const rs=rg.getClientRects(), r=rs[rs.length-1]; x=r.right; y=r.top+r.height/2; }
+    else { const r=el.getBoundingClientRect(); x=r.left; y=r.top+r.height/2; }
+    return {x:x-v.left, y:y-v.top-h/2+fs*.06, h}; };
+  const put=el=>{ const q=pos(el); cur.style.left=q.x+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; };
+  { const v=vis.getBoundingClientRect(), r=cur.getBoundingClientRect(); cur.classList.add("fl"); cur.style.left=(r.left-v.left)+"px"; cur.style.top=(r.top-v.top)+"px"; cur.style.height=r.height+"px"; }
+  let at=W; const keep=()=>{ if(live()) put(at); }; addEventListener("resize",keep);
+  const busy=on=>cur.classList.toggle("mv",on);
+  const go=async el=>{ at=el; busy(true); put(el); await sleep(560); };
+  const edit=async(el,to)=>{ busy(true); let t=el.textContent;
+    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(45); } await sleep(220);
+    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(90); } };
+  (async()=>{ let k=0, oa="o"; await sleep(5000);
+    while(live()){
+      await edit(W,k?"tu estudio":"Indicio"); k=1-k; busy(false); await sleep(900); if(!live()) break;
+      await go(OA); await sleep(260); oa=oa==="o"?"a":"o"; await edit(OA,oa); busy(false); await sleep(900); if(!live()) break;
+      await go(W); busy(false); await sleep(4200); } })();
+}
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
   // mientras llega portada.json (unos cientos de bytes) sigue a la vista la portada pre-renderizada
@@ -6999,19 +7025,27 @@ async function renderInicio(){
   const tira=PTIRA.filter(([id])=>byId[id]).map(([id,b,t])=>{ const S=byId[id];
     return `<a class="pt-n" href="/preguntas/${id}/"><figure class="pt-fig" data-cv="${id}"></figure><div class="pt-tx"><div class="pt-k">${esc(TOPICL(S.tema))}</div><h3>${esc(S.t)}</h3><p class="pt-vd">${esc(b)}</p><p class="pt-sm">${esc(t)}</p><span class="pt-go">Ver la respuesta →</span></div></a>`; }).join("");
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
-  view.innerHTML=`<div class="pt-lema"><b>Indicio</b> · Preguntas reales. Respuestas con datos públicos.</div>
+  view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio</span><i class="ho-cur"></i></span></span></h1>
+    <p class="ho-sub">Democratizando el acceso al dato público</p>
+    <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
+    <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Empieza por una pregunta</a><a class="ho-lk" href="#" data-go=".pt-mun">Mira cómo está tu pueblo</a></p></section>
   ${heroCarHTML(D)}
   <section class="ed-sec pt-pap"><div class="ed-k">Puesto a prueba</div><h2 class="ed-h2">Lo que se da por hecho, con los datos delante</h2>
     <p class="pt-lead">Algunas confirman lo que pensabas. Otras, no.</p>
     <div class="pt-grid">${tira}</div>
     <p class="pt-more"><a class="ed-go" href="/preguntas/">Ver las ${STUDIES.length} preguntas →</a></p></section>
-  <section class="pt-land pt-lab"><a class="pt-land-im" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a>
-    <div class="pt-land-tx"><div class="ed-k">Laboratorio</div><h2>¿Tienes tu propia teoría? <em>Ponla a prueba.</em></h2>
-      <p class="pt-land-lead">Elige dos datos y mira si de verdad van juntos o solo lo parecen.</p>
-      <p class="pt-land-go"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a></p></div></section>
-  <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>¿Y dónde vives tú? <em>Míralo de un vistazo.</em></h2>
-      <p class="pt-land-lead">Los ${nMun} municipios de España tienen su ficha: quién vive, cuánto se gana y cómo vota.</p></div>
-    <div class="pt-mun-q">${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Comparar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Rankings</a></p></div>
+  <section class="pt-labx"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>¿Crees que lo sabes? <em>Demuéstralo.</em></h2>
+      <p class="pt-labx-lead">Cruza dos datos de los ${nMun} municipios y mira si la relación aguanta o solo lo parecía. Sin saber estadística y sin registrarte. Si la respuesta cambia al comparar entre iguales, lo verás tú antes que nadie.</p>
+      <div class="pt-labx-h">Empieza por una duda real</div>
+      <div class="pt-labx-q">${[0,2,5,8].map(i=>`<a href="#" data-q="${i}">${EXQ[i][0]}</a>`).join("")}</div>
+      <p class="pt-labx-go"><a class="btn" href="/laboratorio/">Hacer mi primera prueba →</a></p></div>
+    <div class="pt-labx-lv"><p>Cada hallazgo sube de nivel solo si supera la prueba. Así sabes cuánto fiarte.</p>
+      <div class="lv"><svg viewBox="0 0 84 64" aria-hidden="true"><g fill="currentColor"><circle cx="8" cy="52" r="3"/><circle cx="18" cy="44" r="3"/><circle cx="26" cy="49" r="3"/><circle cx="36" cy="36" r="3"/><circle cx="45" cy="40" r="3"/><circle cx="54" cy="26" r="3"/><circle cx="63" cy="30" r="3"/><circle cx="74" cy="14" r="3"/></g></svg><div><small>Nivel 1</small><b>Se ve en los datos</b><span>Dos cosas suelen ir juntas. Aún no sabemos por qué.</span></div></div>
+      <div class="lv"><svg viewBox="0 0 84 64" aria-hidden="true"><g class="a"><circle cx="10" cy="44" r="3"/><circle cx="22" cy="38" r="3"/><circle cx="34" cy="31" r="3"/><circle cx="46" cy="24" r="3"/></g><g fill="currentColor" opacity=".55"><circle cx="30" cy="54" r="3"/><circle cx="46" cy="48" r="3"/><circle cx="62" cy="40" r="3"/><circle cx="76" cy="32" r="3"/></g></svg><div><small class="a">Nivel 2</small><b>Aguanta entre iguales</b><span>Sigue ahí al comparar municipios parecidos.</span></div></div>
+      <div class="lv on"><svg viewBox="0 0 84 64" aria-hidden="true" fill="none"><path d="M4 40 L40 34 L80 28" stroke="currentColor" stroke-width="2" stroke-dasharray="3 4" opacity=".5"/><path d="M4 40 L40 34" stroke="currentColor" stroke-width="2.2"/><path d="M40 34 L40 52 L80 46" class="aS" stroke-width="2.4" stroke-linejoin="round"/><path d="M40 8 V60" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3"/></svg><div><small class="a">Nivel 3</small><b>Hay un antes y un después</b><span>Una ley cambió algo y podemos medirlo.</span></div></div></div></div></section>
+  <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">El dato público, a tu alcance</div><h2>Tu pueblo, <em>frente a España entera.</em></h2>
+      <p class="pt-land-lead">Escribe dónde vives y mira en un minuto cuánto se gana, cuánto cuesta el alquiler y qué lo distingue de los demás. Las cifras son de los ${nMun} municipios, desde un pueblo de diez vecinos hasta Madrid.</p></div>
+    <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Enfrentar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
@@ -7022,6 +7056,9 @@ async function renderInicio(){
   <section class="ed-sec"><div class="ed-k">Por tema</div><div class="ed-temas">${TOPIC_IDS.map(id=>`<a href="${tHref(id)}">${TOPICS[id].l}</a>`).join("")}</div></section>
   ${methodNote()}`;
   heroCarBind(view.querySelector(".pt-car"));
+  heroType(view.querySelector(".ho"));
+  view.querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const t=view.querySelector(x.dataset.go); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
+  view.querySelectorAll(".pt-labx-q a").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const [l,v,o]=EXQ[+x.dataset.q]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null,sz:"",col:"",q:0,bv:0}; if(o.ser){ Object.assign(PS,{s:o.ser.slice(),idx:o.idx===0?0:1,b:o.b||null,desde:null,hasta:null,real:0}); } navTo(exHash()); }));
   // el gráfico de cabecera de cada análisis (data/covers.json), con su pie; si falta, su ilustración
   loadCovers().then(cv=>view.querySelectorAll(".pt-fig[data-cv]").forEach(f=>{ const c=coverOf(f.dataset.cv,cv);
     f.innerHTML=c?c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`:`<div class="pt-im">${ptIll(byId[f.dataset.cv])}</div>`; }));
