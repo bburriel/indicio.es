@@ -2030,3 +2030,8 @@ details.chk > section{margin-top:18px}
 .mf-hero .provmap svg{max-height:380px}
 .mf-hero .provmap figcaption{font-size:14px}
 @media (max-width:760px){ .mf-hero{grid-template-columns:minmax(0,1fr)} .mf-hero .provmap{max-width:none} }
+
+/* mapa de la provincia: los municipios son enlaces a su ficha */
+.provmap .pm-no{pointer-events:none}
+.provmap .pm-m{cursor:pointer}
+.provmap .pm-m:hover{fill:color-mix(in srgb,var(--rust) 22%,var(--card))}
