@@ -3454,6 +3454,7 @@ const exampleChips=()=>{ const ex=EXAMPLES.filter(([c])=>BYCODE.has(c)).slice(0,
 function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
   const regions=topojson.feature(TOPO,TOPO.objects.autonomous_regions); regions.features.forEach(rewind);
   const proj=d3.geoConicConformalSpain().fitSize([width,height],regions), path=d3.geoPath(proj);
+  d3.select(box).selectAll(":scope > svg").remove();   // un mapa por caja, aunque se llame dos veces
   const svg=d3.select(box).append("svg").attr("viewBox",`0 0 ${width} ${height}`).attr("role","img").style("display","block").style("width","100%").style("max-width",width+"px").style("height","auto").style("margin","0 auto");
   const g=svg.append("g");
   const ps=g.selectAll("path").data(FEATS).join("path").attr("d",path).attr("stroke",css("--geo-line")).attr("stroke-width",.12).attr("fill",css("--nodata"));
@@ -3607,7 +3608,9 @@ function pathImg(k){
 // =====================================================================
 // TU MUNICIPIO (portada de la sección)
 // =====================================================================
+let MLTOK=0;   // cada render de la portada de municipios lleva su número: si llega otro mientras se descarga el mapa, el anterior no pinta
 async function renderMunLanding(){
+  const tok=++MLTOK;
   document.title="Municipios · Indicio";
   view.innerHTML=`<section class="ci-hero mun-hero">
     <div><span class="kk">Municipios</span><h1>Busca tu municipio y míralo de un vistazo</h1>
@@ -3623,7 +3626,8 @@ async function renderMunLanding(){
   </div></section>${methodNote()}`;
   bindBig("q2");
   try{ await loadTopo(); }catch(e){ return; }
-  const mb=document.getElementById("mlmap"); if(!mb) return; mb.style.minHeight="";
+  if(tok!==MLTOK) return;
+  const mb=document.getElementById("mlmap"); if(!mb) return; mb.style.minHeight=""; mb.querySelectorAll("svg").forEach(s=>s.remove());
   const M=spainMap(mb,{onClick:code=>go(code),refine:true}); const sc=M.set("renta",{dur:0}); if(lastMun&&BYCODE.has(lastMun)) M.mark(lastMun);
   M.svg.attr("aria-label","Mapa de España por municipios, coloreado por la renta neta media por persona");
   M.paths.append("title").text(f=>{ const r=BYCODE.get(f.id); return r?r[F.name]:""; });
