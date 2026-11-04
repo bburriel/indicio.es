@@ -1568,6 +1568,7 @@ details.chk > section{margin-top:18px}
 .np-ld{font:clamp(16.5px,1.6vw,18.5px)/1.5 var(--serif); color:var(--ink-2); margin:12px 0 0; max-width:var(--medida)}
 .np-lgo{display:inline-block; margin-top:20px}
 .np-fig{margin:0; aspect-ratio:440/290; display:flex; flex-direction:column; justify-content:center}
+.np-fig{overflow:hidden}
 .np-fig .pt-g{max-height:100%}
 .np-lf{aspect-ratio:auto; min-height:300px}
 .np-sec{padding-top:34px}
