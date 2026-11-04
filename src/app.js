@@ -7006,7 +7006,9 @@ function heroType(root){
   { const v=vis.getBoundingClientRect(), r=cur.getBoundingClientRect(); cur.classList.add("fl"); cur.style.left=(r.left-v.left)+"px"; cur.style.top=(r.top-v.top)+"px"; cur.style.height=r.height+"px"; }
   let at=W; const keep=()=>{ if(live()) put(at); }; addEventListener("resize",keep);
   const busy=on=>cur.classList.toggle("mv",on);
-  const go=async el=>{ at=el; busy(true); cur.classList.remove("ty"); put(el); await sleep(560); };
+  // como el carro de una máquina de escribir: tira hacia atrás hasta el margen izquierdo, salta de línea y avanza hasta la palabra
+  const go=async el=>{ at=el; busy(true); cur.classList.remove("ty"); const q=pos(el), set=(o,ms)=>{ cur.style.transitionDuration=ms+"ms"; Object.assign(cur.style,o); return sleep(ms+40); };
+    await set({left:"0px"},340); await set({top:q.y+"px",height:q.h+"px"},220); await set({left:q.x+"px"},460); cur.style.transitionDuration=""; };
   const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
     while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(45); } await sleep(220);
     while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(90); } };
