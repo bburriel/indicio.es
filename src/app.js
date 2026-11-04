@@ -7091,26 +7091,24 @@ function revealObserve(root){
 }
 new MutationObserver(()=>{ clearTimeout(revealObserve._t); revealObserve._t=setTimeout(()=>revealObserve(view),60); }).observe(view,{childList:true,subtree:true});
 
-// ANÁLISIS: una portada de periódico. La noticia principal con su gráfico, las tres más recientes y, por temas, el resto;
-// cada una con su gráfico, su titular en forma de pregunta y su veredicto en una frase. Con ?tema=… muestra solo ese tema.
+// ANÁLISIS: una portada de periódico. La noticia principal con su gráfico y, debajo, todas las demás de más reciente a más antigua,
+// sin agrupar por temas: el tema va como subtítulo de cada una. Con ?tema=… (o pulsando un tema) muestra solo ese tema.
 async function renderPreguntas(){
   const tq=new URLSearchParams(location.search).get("tema"), tema=TOPIC_IDS.includes(tq)?tq:"", T=TOPICS[tema];
   document.title=(T?T.l+" · Análisis":"Análisis")+" · Indicio";
   const all=[...STUDIES.map(S=>({id:S.id,href:"/preguntas/"+S.id+"/",t:S.t,d:S.d,tema:S.tema,ev:S.ev,a:S.a||S.d,pub:S.pub||"",upd:S.upd||S.pub||""})),
     ...QUICKQ.map(Q=>({id:Q.id,href:Q.href,t:Q.t,d:"",tema:Q.tema,ev:Q.ev,a:Q.a,pub:"",upd:""}))]
     .sort((x,y)=>(y.pub||"").localeCompare(x.pub||"")||(y.upd||"").localeCompare(x.upd||""));
-  const L=all.filter(e=>!T||e.tema===tema), lead=L[0], recent=L.slice(1,4), rest=L.slice(4);
+  const L=all.filter(e=>!T||e.tema===tema), lead=L[0], rest=L.slice(1);
   const card=e=>{ const {v,r}=splitA(e.a); return `<a class="np-c" href="${e.href}"><figure class="np-fig" data-cv="${e.id}"></figure><div class="np-k">${esc(TOPICL(e.tema))}${evSpan(e.ev)}</div><h3 class="np-q">${esc(e.t)}</h3><p class="np-v">${esc(v)}</p>${r?`<p class="np-r">${esc(r)}</p>`:""}<span class="np-go">Leer el análisis →${e.pub?`<time datetime="${e.pub}">${fechaES(e.pub)}</time>`:""}</span></a>`; };
   const cnt=id=>all.filter(e=>e.tema===id).length;
   const chips=`<nav class="np-chips" aria-label="Temas"><a href="/preguntas/"${T?"":' class="on"'}>Todos<small>${all.length}</small></a>${TOPIC_IDS.filter(id=>cnt(id)>0||id===tema).map(id=>`<a href="/preguntas/?tema=${id}"${id===tema?' class="on"':""}>${TOPICS[id].l}<small>${cnt(id)}</small></a>`).join("")}</nav>`;
   const leadHTML=lead?(()=>{ const {v}=splitA(lead.a); return `<a class="np-lead" href="${lead.href}"><div class="np-lt"><div class="np-k">${lead.pub?"Lo último · ":""}${esc(TOPICL(lead.tema))}${evSpan(lead.ev)}</div><h2 class="np-lq">${esc(lead.t)}</h2><p class="np-lv">${esc(v)}</p>${lead.d?`<p class="np-ld">${esc(lead.d)}</p>`:""}<span class="np-lgo btn">Leer el análisis →</span></div><figure class="np-fig np-lf" data-cv="${lead.id}" data-cap="1"></figure></a>`; })():"";
-  const byTema=T?[]:TOPIC_IDS.map(id=>[id,rest.filter(e=>e.tema===id)]).filter(([,a])=>a.length);
 const labBlock=`<section class="np-lab"><div class="np-lab-t"><div class="kk2">Laboratorio</div><h2>${T?`Ya has visto lo de ${low(T.l)}. Ahora haz tu propio análisis.`:"Si tu pregunta no está, pruébala tú"}</h2><p>Elige dos datos, como el paro y la edad o la renta y el voto, y mira si van juntos de verdad en los ${nf0.format(rowsAll().length)} municipios y cuánto aguanta la relación cuando se compara entre iguales. También puedes ver qué pasó antes y después de una ley.</p><p class="np-lab-b"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a> <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><a class="np-lab-i" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a></section>`;
   const otros=T?`<section class="np-sec"><div class="np-sh"><h2>Otros temas</h2></div><div class="np-tg">${TOPIC_IDS.filter(id=>id!==tema&&cnt(id)>0).map(id=>`<a class="np-t" href="/preguntas/?tema=${id}"><div class="np-ti">${tIll(id)}</div><h3>${TOPICS[id].l}</h3><p>${esc(TOPICS[id].q)}</p><span>${cnt(id)} análisis →</span></a>`).join("")}</div></section>`:"";
   view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">${T?"Análisis · "+esc(T.l):"Análisis"}</div><h1>${T?esc(T.l):"Lo que dicen los datos"}</h1><p>${T?esc(T.q)+" Estas son las preguntas que ya hemos contestado."+` <a href="/temas/${tema}/">Leer el panorama del tema →</a>`:`${all.length} preguntas respondidas con datos públicos, de lo más reciente a lo más antiguo. Cada respuesta dice hasta dónde llega.`}</p>${chips}</header>
     ${T?(L.length?`<section class="np-sec np-all"><div class="np-grid">${L.map(card).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis sobre ${low(T.l)}. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`):leadHTML?`<section class="np-top">${leadHTML}</section>`:`<p class="an-vacio">Todavía no hay análisis sobre ${low(T?T.l:"este tema")}. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`}
-    ${!T&&recent.length?`<section class="np-sec"><div class="np-sh"><h2>Más recientes</h2></div><div class="np-grid">${recent.map(card).join("")}</div></section>`:""}
-    ${byTema.map(([id,a])=>`<section class="np-sec"><div class="np-sh"><h2>${TOPICS[id].l}</h2><span>${esc(TOPICS[id].q)}</span>${T||id==="vivienda"?"":`<a href="/temas/${id}/">Panorama del tema →</a>`}</div><div class="np-grid">${a.map(card).join("")}</div></section>`).join("")}
+    ${!T&&rest.length?`<section class="np-sec"><div class="np-grid">${rest.map(card).join("")}</div></section>`:""}
     ${T?"":`<section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/municipio/">Ver el mapa de municipios →</a></p></div></section>`}
     ${labBlock}
     ${otros}</div>`;
