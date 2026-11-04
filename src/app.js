@@ -872,6 +872,7 @@ async function renderMun(code,sec){
       </div>
       <figure class="locator" id="locator"><svg viewBox="0 0 260 200" aria-hidden="true"></svg><figcaption>El término municipal y sus vecinos. Pulsa otro para ir a su ficha.</figcaption></figure>
     </header>
+    <figure class="provmap" id="provmap" hidden><svg role="img" aria-label=""></svg><figcaption></figcaption></figure>
     <h2 class="mf-h2">Las cifras clave</h2>
     <div class="kpis" id="kpis"></div>
     <h2 class="mf-h2">Cómo ha cambiado desde 2015</h2>
@@ -884,7 +885,7 @@ async function renderMun(code,sec){
   document.documentElement.style.setProperty("--toph",document.getElementById("top").offsetHeight+"px");
   myChipBind(code);
   document.getElementById("mshare").addEventListener("click",e=>{ const url=location.href.split("#")[0]+"#m"+code; try{ navigator.clipboard.writeText(url).then(()=>{ e.target.textContent="Enlace copiado"; },()=>prompt("Copia este enlace:",url)); }catch(x){ prompt("Copia este enlace:",url); } });
-  loadTopo().then(()=>drawLocator(code,P)).catch(()=>{});
+  loadTopo().then(()=>{ drawLocator(code,P); drawProvMap(code,P); }).catch(()=>{});
   try{ kpis(document.getElementById("kpis"),r,d); }catch(e){ console.error(e); }
   try{ smalls(document.getElementById("smalls"),r,d); }catch(e){ console.error(e); }
   try{ destaca(document.getElementById("destaca"),r); }catch(e){ console.error(e); }
@@ -970,6 +971,67 @@ function drawLocator(code,P){
   g.selectAll("path").filter(f=>f.id===code).raise();
   const [lx,ly]=path.centroid(me), nm=dispName(BYCODE.get(code)[F.name]);
   svg.append("text").attr("x",lx).attr("y",ly+5).attr("text-anchor","middle").attr("font-weight",700).attr("font-size",14).attr("paint-order","stroke").attr("stroke",css("--card")).attr("stroke-width",4).attr("fill",css("--ink")).attr("pointer-events","none").text(nm.length>22?nm.slice(0,20)+"…":nm);
+}
+
+// ---------- el municipio dentro de su provincia: la capital, el pueblo y la distancia en línea recta ----------
+// Capital de cada provincia (código INE del municipio). Ceuta y Melilla no llevan mapa: la provincia es la ciudad.
+const CAPS={"01":"01059","02":"02003","03":"03014","04":"04013","05":"05019","06":"06015","07":"07040","08":"08019","09":"09059","10":"10037","11":"11012","12":"12040","13":"13034","14":"14021","15":"15030","16":"16078","17":"17079","18":"18087","19":"19130","20":"20069","21":"21041","22":"22125","23":"23050","24":"24089","25":"25120","26":"26089","27":"27028","28":"28079","29":"29067","30":"30030","31":"31201","32":"32054","33":"33044","34":"34120","35":"35016","36":"36038","37":"37274","38":"38038","39":"39075","40":"40194","41":"41091","42":"42173","43":"43148","44":"44216","45":"45168","46":"46250","47":"47186","48":"48020","49":"49275","50":"50297"};
+let PFEATS=null;
+function drawProvMap(code,P){
+  const fig=document.getElementById("provmap"); if(!fig) return;
+  const capCode=CAPS[P], me=FEATS.find(f=>f.id===code), cap=capCode&&FEATS.find(f=>f.id===capCode);
+  if(!me||!cap||code===capCode||!BYCODE.has(capCode)) return;           // la capital no necesita este mapa
+  if(!PFEATS) PFEATS=topojson.feature(TOPO,TOPO.objects.provinces).features.map(rewind);
+  const prov=PFEATS.find(f=>f.id===P); if(!prov) return;
+  const W=560, mun=FEATS.filter(f=>f.id.slice(0,2)===P);
+  const cMe=d3.geoCentroid(me), cCap=d3.geoCentroid(cap), km=d3.geoDistance(cMe,cCap)*6371;
+  // encuadre: la provincia entera; si el pueblo y la capital están en la misma isla (o masa de tierra) de una provincia con varias, solo esa
+  let frame=prov;
+  if(prov.geometry.type==="MultiPolygon"){
+    const part=c=>prov.geometry.coordinates.findIndex(pc=>d3.geoContains({type:"Polygon",coordinates:pc},c));
+    const i=part(cMe); if(i>=0&&i===part(cCap)) frame={type:"Feature",geometry:{type:"Polygon",coordinates:prov.geometry.coordinates[i]}};
+  }
+  const proj=d3.geoMercator().fitSize([W,440],frame), path=d3.geoPath(proj);
+  const [[bx0,by0],[bx1,by1]]=path.bounds(frame), M=20;                  // encuadre justo, con margen para las etiquetas
+  const vx=bx0-M, vy=by0-M, vw=bx1-bx0+2*M, vh=by1-by0+2*M;
+  const near=PFEATS.filter(f=>{ if(f.id===P) return false; const [[a,b],[c,d]]=path.bounds(f); return c>vx&&a<vx+vw&&d>vy&&b<vy+vh; });
+  const [x1,y1]=proj(cMe), [x2,y2]=proj(cCap), len=Math.hypot(x2-x1,y2-y1);
+  const nm=dispName(BYCODE.get(code)[F.name]), cn=dispName(BYCODE.get(capCode)[F.name]);
+  const kmT=(km<10?nf1.format(km):nf0.format(km))+NB+"km";
+  const svg=d3.select(fig.querySelector("svg")).attr("viewBox",`${vx} ${vy} ${vw} ${vh}`);
+  const ink=css("--ink"), rust=css("--rust"), card=css("--card"), r2=css("--rule-2");
+  svg.append("defs").html(`<pattern id="pmhatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="${card}"/><line x1="0" y1="0" x2="0" y2="5" stroke="${rust}" stroke-width="1.5"/></pattern>`);
+  svg.append("g").selectAll("path").data(near).join("path").attr("d",path).attr("fill","none").attr("stroke",r2).attr("stroke-width",.8);
+  svg.append("g").selectAll("path").data(mun).join("path").attr("d",path).attr("fill",card).attr("stroke",r2).attr("stroke-width",.35);
+  svg.append("path").datum(prov).attr("d",path).attr("fill","none").attr("stroke",css("--ink-2")).attr("stroke-width",1.3).attr("stroke-linejoin","round");
+  svg.append("path").datum(me).attr("d",path).attr("fill","url(#pmhatch)").attr("stroke",rust).attr("stroke-width",1.2);
+  svg.append("line").attr("x1",x1).attr("y1",y1).attr("x2",x2).attr("y2",y2).attr("stroke",ink).attr("stroke-width",1.4).attr("stroke-dasharray","5 4");
+  // etiquetas con colocación sin choques: prueba posiciones hasta dar con una que cabe en el mapa y no pisa puntos, línea ni otras etiquetas
+  const placed=[[x1-8,y1-8,16,16],[x2-8,y2-8,16,16]], line=Array.from({length:25},(_,i)=>[x1+(x2-x1)*i/24,y1+(y2-y1)*i/24]);
+  const hit=(r,pts)=>placed.some(q=>r[0]<q[0]+q[2]&&r[0]+r[2]>q[0]&&r[1]<q[1]+q[3]&&r[1]+r[3]>q[1])||(pts&&line.some(([px,py])=>px>r[0]&&px<r[0]+r[2]&&py>r[1]&&py<r[1]+r[3]));
+  const label=(x,y,t,cands,{size=14,weight=700,onLine=false}={})=>{
+    const tx=svg.append("text").attr("font-size",size).attr("font-weight",weight).attr("paint-order","stroke").attr("stroke",card).attr("stroke-width",4).attr("stroke-linejoin","round").attr("fill",ink).attr("pointer-events","none").text(t);
+    let w=t.length*size*.6; try{ w=tx.node().getBBox().width; }catch(e){}
+    let pick=null;
+    for(const [dx,dy,an] of cands){
+      const left=an==="start"?x+dx:an==="end"?x+dx-w:x+dx-w/2, r=[left,y+dy-size*.85,w,size*1.15];
+      if(r[0]<vx+2||r[0]+r[2]>vx+vw-2||r[1]<vy+2||r[1]+r[3]>vy+vh-2) continue;
+      if(hit(r,!onLine)) continue; pick={dx,dy,an,r}; break;
+    }
+    if(!pick){ const [dx,dy,an]=cands[0], left=an==="start"?x+dx:an==="end"?x+dx-w:x+dx-w/2; pick={dx,dy,an,r:[left,y+dy-size*.85,w,size*1.15]}; }
+    placed.push(pick.r); tx.attr("x",x+pick.dx).attr("y",y+pick.dy).attr("text-anchor",pick.an);
+  };
+  const sg=x1>=x2?1:-1, side=(s,y)=>[[s*11,y,s>0?"start":"end"],[-s*11,y,s>0?"end":"start"]];
+  const short=len<110, cs=(s)=>[...side(s,5),...side(s,-9),...side(s,19),[0,-13,"middle"],[0,26,"middle"]];
+  label(x1,y1,short?`${nm} · ${kmT}`:nm,cs(sg));
+  label(x2,y2,cn,cs(-sg),{weight:600});
+  if(!short) label((x1+x2)/2,(y1+y2)/2,kmT,[[0,5,"middle"]],{size:13,onLine:true});
+  svg.append("circle").attr("cx",x2).attr("cy",y2).attr("r",5.5).attr("fill",ink).attr("stroke",card).attr("stroke-width",2);
+  svg.append("circle").attr("cx",x1).attr("cy",y1).attr("r",4.5).attr("fill",rust).attr("stroke",card).attr("stroke-width",2);
+  const pn=provShort(PROVS[P]);
+  fig.querySelector("svg").setAttribute("aria-label",`Mapa de la provincia de ${pn}: ${nm} está a ${kmT} en línea recta de ${cn}, su capital.`);
+  fig.querySelector("figcaption").innerHTML=`<b>${esc(nm)} está a ${kmT} de ${esc(cn)}</b>, la capital de la provincia de ${esc(pn)}, medidos en línea recta entre los centros de los dos términos municipales. Por carretera es más.`;
+  fig.hidden=false;
 }
 
 // caídas bruscas de un año para otro: segregaciones de municipios o depuraciones del padrón

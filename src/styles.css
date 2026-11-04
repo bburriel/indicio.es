@@ -2016,3 +2016,10 @@ details.chk > section{margin-top:18px}
 :root.vt-study::view-transition-new(vt-v){animation:vt-in .32s ease .2s both}
 @keyframes vt-out{to{opacity:0}}
 @keyframes vt-in{from{opacity:0; transform:translateY(8px)}}
+
+/* ficha: el municipio dentro de su provincia */
+.provmap{margin:26px 0 0; max-width:620px}
+.provmap[hidden]{display:none}
+.provmap svg{display:block; width:100%; height:auto; max-height:460px; overflow:hidden}
+.provmap figcaption{margin-top:8px; font-size:15px; line-height:1.45; color:var(--ink-2); max-width:var(--medida)}
+.provmap figcaption b{color:var(--ink); font-weight:600}
