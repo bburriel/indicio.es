@@ -263,15 +263,71 @@ h.textContent="Los "+n.toLocaleString("es-ES")+" municipios, "+(k==="pop"?(desc?
 btn.forEach(function(b){b.addEventListener("click",function(){var nk=b.getAttribute("data-k");if(nk===k)desc=!desc;else{k=nk;desc=nk!=="name"}draw()})});})();</script>`;
 {
   const plist=Object.keys(byProv).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es"));
-  // Provincias agrupadas por comunidad autónoma (código INE de provincia). Las de una sola provincia y las ciudades autónomas
-  // van juntas al final para no repetir el mismo nombre como título y como enlace.
-  const CCAA=[["Andalucía",["04","11","14","18","21","23","29","41"]],["Aragón",["22","44","50"]],["Canarias",["35","38"]],["Castilla y León",["05","09","24","34","37","40","42","47","49"]],
-    ["Castilla-La Mancha",["02","13","16","19","45"]],["Cataluña",["08","17","25","43"]],["Comunitat Valenciana",["03","12","46"]],["Extremadura",["06","10"]],["Galicia",["15","27","32","36"]],["País Vasco",["01","20","48"]],
-    ["Comunidades de una sola provincia",["33","39","07","26","28","30","31"]],["Ciudades autónomas",["51","52"]]];
-  const provRow=p=>`<a href="/provincia/${provSlug(p)}/"><span>${esc(provShort(PROVS[p]))}</span><small>${nf0.format(byProv[p].length)}<span class="vh"> municipios</span></small></a>`;
-  const grouped=CCAA.map(([n,ps])=>[n,ps.filter(p=>byProv[p]).sort((a,b)=>provShort(PROVS[a]).localeCompare(provShort(PROVS[b]),"es"))]).filter(g=>g[1].length);
+  // Índice: mapa de España por provincias (contornos ya proyectados en data/mapa-provincias.json; los genera
+  // scripts/datos/mapa-provincias.mjs). Cada provincia es un enlace real, así que funciona sin JavaScript. El script
+  // solo añade el panel que cambia al pasar el ratón y el conmutador provincias/comunidades.
+  const MAPA=JSON.parse(rd("data/mapa-provincias.json"));
+  const nfG=new Intl.NumberFormat("es-ES",{useGrouping:"always",maximumFractionDigits:0});
+  const total=plist.reduce((s,p)=>s+byProv[p].length,0);
+  const binOf=n=>n<=60?0:n<=120?1:n<=200?2:n<=260?3:4;
+  const BINS=["Hasta 60","61–120","121–200","201–260","Más de 260"];
+  const ccOf={}; MAPA.ccaa.forEach(c=>c.provs.forEach(id=>{ccOf[id]=c.id;}));
+  const pAttrs=p=>{ const n=byProv[p].length, name=provShort(PROVS[p]); return `class="pm b${binOf(n)}" href="/provincia/${provSlug(p)}/" data-id="${p}" data-cc="${ccOf[p]}" data-name="${esc(name)}" data-n="${n}" aria-label="${esc(name)}: ${n} ${n===1?"municipio":"municipios"}"`; };
+  const provSvg=plist.filter(p=>MAPA.provs[p]).map(p=>`<a ${pAttrs(p)}><path d="${MAPA.provs[p]}"/></a>`).join("");
+  const ptsSvg=plist.filter(p=>MAPA.pts[p]).map(p=>`<a ${pAttrs(p)}><circle cx="${MAPA.pts[p][0]}" cy="${MAPA.pts[p][1]}" r="7"/></a>`).join("");
+  const pmScript=`<script>(function(){var root=document.getElementById("pmap");if(!root)return;
+var CC=${JSON.stringify(MAPA.ccaa)},by={},ccById={},ccOf={},mode="prov",cur=null,nf=function(n){return n.toLocaleString("es-ES",{useGrouping:"always"})},w=function(n){return nf(n)+(n===1?" municipio":" municipios")};
+[].forEach.call(root.querySelectorAll("a.pm"),function(a){by[a.getAttribute("data-id")]={id:a.getAttribute("data-id"),name:a.getAttribute("data-name"),n:+a.getAttribute("data-n"),a:a}});
+CC.forEach(function(c){ccById[c.id]=c;c.provs.forEach(function(id){ccOf[id]=c.id})});
+var K=root.querySelector(".pmap-k"),T=root.querySelector(".pmap-t"),S=root.querySelector(".pmap-s"),G=root.querySelector(".pmap-go"),R=root.querySelector(".pmap-rows"),H=root.querySelector(".pmap-rh"),seg=root.querySelector(".pmap-seg"),btn=seg.querySelectorAll("button");
+var d0={k:K.textContent,t:T.textContent,s:S.textContent};
+function sum(c){return c.provs.reduce(function(s,id){return s+by[id].n},0)}
+var last="";function rows(head,items){var sig=head+"|"+items.map(function(i){return i.name}).join();if(sig===last)return;last=sig;R.textContent="";if(!items.length){R.hidden=true;H.hidden=true;last="";return}H.textContent=head;H.hidden=false;R.hidden=false;
+items.forEach(function(it){var a=document.createElement("a");a.href=it.href||"#";var x=document.createElement("span");x.textContent=it.name;var y=document.createElement("span");y.textContent=it.n;a.appendChild(x);a.appendChild(y);
+if(it.p){a.addEventListener("mouseenter",function(){set(it.p,null)});a.addEventListener("focus",function(){set(it.p,null)})}else if(it.c){a.addEventListener("mouseenter",function(){set(null,it.c)});a.addEventListener("focus",function(){set(null,it.c)});if(!it.href)a.addEventListener("click",function(e){e.preventDefault()})}
+R.appendChild(a)})}
+function draw(){var p=cur&&cur.p,c=cur&&cur.c,cc=c?ccById[c]:null;
+Object.keys(by).forEach(function(id){var a=by[id].a,cl=a.getAttribute("class").replace(/ (on|dim)\b/g,"");if(mode==="prov"&&p===id)cl+=" on";if(mode==="ccaa"&&cc&&ccOf[id]!==c)cl+=" dim";a.setAttribute("class",cl)});
+G.hidden=true;
+if(mode==="prov"&&p){var x=by[p];K.textContent=cc.name;T.textContent=x.name;S.textContent=w(x.n);G.href=x.a.getAttribute("href");G.hidden=false;
+rows("Provincias de "+cc.name,cc.provs.length>1?cc.provs.map(function(id){return by[id]}).sort(function(a,b){return a.name.localeCompare(b.name,"es")}).map(function(q){return{name:q.name,n:q.n,p:q.id,href:q.a.getAttribute("href")}}):[])}
+else if(mode==="ccaa"&&cc){var t=sum(cc),np=cc.provs.length;K.textContent=(cc.id==="ceu"||cc.id==="mel")?"Ciudad autónoma":"Comunidad autónoma";T.textContent=cc.name;S.textContent=w(t)+(np>1?" en "+np+" provincias":"");
+rows("Provincias",np>1?cc.provs.map(function(id){return by[id]}).sort(function(a,b){return a.name.localeCompare(b.name,"es")}).map(function(q){return{name:q.name,n:q.n,c:cc.id,href:q.a.getAttribute("href")}}):[])}
+else{K.textContent=d0.k;T.textContent=d0.t;S.textContent=d0.s;
+rows("Comunidades y ciudades autónomas",mode==="ccaa"?CC.slice().sort(function(a,b){return a.name.localeCompare(b.name,"es")}).map(function(c2){return{name:c2.name,n:nf(sum(c2)),c:c2.id}}):[])}}
+function set(p,c){cur=(p||c)?{p:p,c:p?ccOf[p]:c}:null;draw()}
+Object.keys(by).forEach(function(id){var a=by[id].a;["mouseenter","focus"].forEach(function(ev){a.addEventListener(ev,function(){set(id,null)})});});
+root.addEventListener("mouseleave",function(){set(null,null)});root.addEventListener("focusout",function(e){if(!e.relatedTarget||!root.contains(e.relatedTarget))set(null,null)});
+btn.forEach(function(b){b.addEventListener("click",function(){mode=b.getAttribute("data-m");root.setAttribute("data-mode",mode);[].forEach.call(btn,function(o){o.setAttribute("aria-pressed",o===b?"true":"false")});set(null,null)})});
+seg.hidden=false;})();</script>`;
   const idx=`<header class="phead"><h1>Municipios por provincia</h1><p class="dek">Renta, población, paro y edad de todos los municipios de España, provincia a provincia.</p></header>
-    <div class="provgroups">${grouped.map(([n,ps])=>`<section class="provgroup"><h2>${esc(n)}</h2><div class="provlist">${ps.map(provRow).join("")}</div></section>`).join("")}</div>${sources}`;
+    <div class="pmap" id="pmap" data-mode="prov">
+      <div class="pmap-map">
+        <p class="pmap-cta"><b>Pulsa tu provincia</b> para ver todos sus municipios, con su renta, población, paro y edad.</p>
+        <svg class="pmap-svg" viewBox="${MAPA.viewBox}" role="group" aria-label="Mapa de España por provincias">
+          <path class="pmap-box" d="${MAPA.border}"/>
+          <text class="pmap-lab" x="-18" y="542">Canarias</text><text class="pmap-lab" x="446" y="536">Ceuta</text><text class="pmap-lab" x="573" y="573">Melilla</text>
+          ${provSvg}${ptsSvg}
+          <path class="pmap-reg" d="${MAPA.regions}"/>
+        </svg>
+      </div>
+      <aside class="pmap-side">
+        <div class="pmap-seg" role="group" aria-label="Qué quieres explorar" hidden><button type="button" data-m="prov" aria-pressed="true">Provincias</button><button type="button" data-m="ccaa" aria-pressed="false">Comunidades</button></div>
+        <div class="pmap-read" aria-live="polite">
+          <div class="pmap-k">España</div>
+          <div class="pmap-t">${nfG.format(total)} municipios</div>
+          <div class="pmap-s">repartidos en ${plist.length} provincias, dentro de 17 comunidades autónomas y 2 ciudades autónomas.</div>
+          <div class="pmap-go-w"><a class="pmap-go" href="#" hidden>Ver sus municipios →</a></div>
+        </div>
+        <div><div class="pmap-rh" hidden></div><div class="pmap-rows" hidden></div></div>
+        <div class="pmap-key">
+          <div class="pmap-kh">Municipios de cada provincia</div>
+          ${BINS.map((l,i)=>`<span><i class="pm b${i}"></i>${l}</span>`).join("")}
+          <div class="pmap-lines"><span><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><line x1="0" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="2.4"/></svg>Límite de comunidad autónoma</span><span><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><rect width="22" height="14" fill="#cf9aa2"/><line x1="0" y1="7" x2="22" y2="7" stroke="var(--bg)" stroke-width="1.4"/></svg>Límite de provincia</span></div>
+        </div>
+      </aside>
+    </div>
+    <details class="pmap-list"><summary>Ver la lista de provincias</summary><ul>${plist.map(p=>`<li><a href="/provincia/${provSlug(p)}/">${esc(provShort(PROVS[p]))}</a> <small>${nf0.format(byProv[p].length)}</small></li>`).join("")}</ul></details>${pmScript}${sources}`;
   page({route:"/provincia/",title:"Municipios por provincia: renta, población y paro · Indicio",desc:"Todos los municipios de cada provincia de España con su renta por persona, población, paro registrado y edad media.",main:idx,jsonld:breadcrumb([["Municipios","/municipio/"],["Provincias","/provincia/"]])});
   addUrl("/provincia/",0.7);
   for(const p of plist){
