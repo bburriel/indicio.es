@@ -199,6 +199,12 @@ const mrows=f=>ROWS.filter(f);
   s+=`<path d="${area}" fill="${WASH}"/><path d="${lw}" fill="none" stroke="${DARK}" stroke-width="1.8"/><path d="${lf}" fill="none" stroke="${WINE}" stroke-width="2.4"/>`;
   add("precio-alimentos","El precio de los alimentos (granate) y los sueldos (gris) desde 2008; sombreado, lo que la comida se ha adelantado",s+"</svg>"); }
 
+// 22. Infraestructuras: una columna por año con lo invertido en carreteras (gris) y, encima, en ferrocarril (granate)
+{ const [W,H]=B, I=J("infra.json").itf, Yr=I.years, T=Yr.map((y,i)=>I.road_q[i]+I.rail_q[i]), w=(W-60)/Yr.length, Y=d3.scaleLinear().domain([0,d3.max(T)]).range([0,H-60]);
+  let s=svgOpen(W,H); Yr.forEach((y,i)=>{ const x=30+i*w, hr=Y(I.road_q[i]), hf=Y(I.rail_q[i]); s+=rect(x+w*.12,H-24-hr,w*.76,hr,LIGHT)+rect(x+w*.12,H-24-hr-hf,w*.76,hf,WINE); });
+  s+=line(20,H-24,W-20,H-24,INK,1);
+  add("infraestructuras","Lo invertido cada año en carreteras (gris) y, encima, en ferrocarril (granate), desde 1995: tras 2009 las columnas se desploman",s+"</svg>"); }
+
 // ---------- temas (640×400) ----------
 const TL={};
 const addT=(id,label,svg)=>{ out["t-"+id]=svg; TL[id]=label; };
