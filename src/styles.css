@@ -2058,3 +2058,51 @@ details.chk > section{margin-top:18px}
 .lbseg{flex-wrap:wrap; gap:1px; background:var(--rule-2)}
 .lbseg button{flex:1 1 auto; background:var(--card); white-space:normal; line-height:1.15}
 .lbseg button + button{border-left:0}
+
+/* PORTADA «Bienvenido a tu estudio» (noviembre 2026) */
+.ho{padding:clamp(34px,6vw,72px) 0 clamp(12px,2vw,24px)}
+.ho-h{font-family:var(--serif); font-weight:500; font-size:clamp(42px,8vw,92px); line-height:1.03; letter-spacing:-.022em; margin:0}
+.ho-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.ho-vis{display:block; position:relative}
+.ho-l1,.ho-l2{display:block}
+.ho-oa{display:inline-block; min-width:.56em; text-align:left}
+.ho-l2{font-style:italic; color:var(--brand); white-space:nowrap; min-height:1.05em}
+.ho-cur{display:inline-block; width:.05em; height:.78em; background:var(--brand); margin-left:.06em; vertical-align:-.04em; animation:hocur 1s steps(1) infinite}
+@keyframes hocur{50%{opacity:0}}
+.ho-cur.fl{position:absolute; margin:0; vertical-align:baseline; transition:left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1),height .3s; pointer-events:none}
+.ho-cur.mv{animation:none; opacity:1}
+@media (prefers-reduced-motion:reduce){ .ho-cur{display:none} }
+.ho-sub{font-family:var(--serif); font-size:clamp(20px,2.6vw,30px); line-height:1.25; color:var(--brand); margin:22px 0 0}
+.ho-p{font-family:var(--serif); font-size:clamp(18px,1.9vw,21px); line-height:1.55; color:var(--ink-2); max-width:40em; margin:18px 0 0}
+.ho-go{display:flex; flex-wrap:wrap; gap:12px 22px; align-items:center; margin:28px 0 0}
+.ho-lk{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--brand); padding-bottom:2px; font-size:15px}
+.ho-lk:hover{color:var(--brand)}
+/* las pestañas del carrusel se deslizan con el dedo cuando no caben */
+.pt-tabs{overflow-x:auto; scroll-snap-type:x mandatory}
+.pt-tabs button{scroll-snap-align:start}
+/* laboratorio: banda oscura con la escalera de niveles */
+.pt-labx{background:#1c1b19; color:#fafaf8; margin:clamp(48px,7vw,80px) calc(50% - 50vw) 0; padding:clamp(48px,7vw,96px) 0}
+.pt-labx-in{max-width:1120px; margin:0 auto; padding:0 clamp(16px,4vw,40px); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:48px 72px; align-items:center}
+.pt-labx .ed-k{color:#d6a0a8}
+.pt-labx h2{font-family:var(--serif); font-weight:500; font-size:clamp(36px,5.2vw,64px); line-height:1.03; letter-spacing:-.022em; margin:12px 0 0; text-wrap:balance}
+.pt-labx h2 em{color:#e3b3ba}
+.pt-labx-lead{font-family:var(--serif); font-size:20px; line-height:1.5; color:#d8d6cf; max-width:30em; margin:20px 0 0}
+.pt-labx-h{font-size:14px; color:#a9a8a2; margin-top:26px}
+.pt-labx-q{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+.pt-labx-q a{font-size:14.5px; text-decoration:none; border:1px solid #6a6963; border-radius:999px; padding:9px 16px; color:#fafaf8}
+.pt-labx-q a:hover{border-color:#fafaf8}
+.pt-labx-go{margin:30px 0 0}
+.pt-labx .btn{background:#fafaf8; color:#1c1b19; border-color:#fafaf8}
+.pt-labx .btn:hover{background:#e3b3ba; border-color:#e3b3ba; color:#1c1b19}
+.pt-labx-lv>p{font-size:13.5px; line-height:1.5; color:#a9a8a2; margin:0 0 14px}
+.pt-labx .lv{display:flex; gap:18px; align-items:center; border:1px solid #4c4b48; border-radius:8px; padding:16px 18px; margin-top:14px; color:#a9a8a2}
+.pt-labx .lv.on{border-color:#e3b3ba}
+.pt-labx .lv svg{width:84px; height:64px; flex:none}
+.pt-labx .lv small{display:block; font-size:11.5px; font-weight:600; letter-spacing:.07em; text-transform:uppercase}
+.pt-labx .lv b{display:block; font-family:var(--serif); font-weight:400; font-size:22px; color:#fafaf8; margin-top:2px}
+.pt-labx .lv span{display:block; font-size:14px; line-height:1.45; margin-top:2px}
+.pt-labx .lv .a,.pt-labx .lv small.a{color:#e3b3ba; fill:#e3b3ba}
+.pt-labx .lv .aS{stroke:#e3b3ba}
+:root[data-theme="dark"] .pt-labx{background:#262522}
+@media (max-width:900px){ .pt-labx-in{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:720px){ .ho-l2{white-space:normal} }
