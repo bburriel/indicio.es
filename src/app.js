@@ -290,6 +290,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape") tipHide(); });
 
 // Fuentes: cada estudio lista solo las que usa (methodNote(["atlas","padron"])); sin argumento, todas
 const SRC={
+  fitInfra:"FIT-OCDE (Foro Internacional del Transporte): inversión en carreteras y ferrocarril, 1995–2024, en euros corrientes y constantes de 2015 (actualización de septiembre de 2026)", eurostatInfra:"Eurostat: inversión pública bruta y neta de las administraciones públicas (cuentas nacionales, desde 2000), PIB a precios corrientes y viajeros-kilómetro en ferrocarril", ivieStock:"Fundación BBVA e Ivie: El stock de capital en España y sus comunidades autónomas (1995–2025), marzo de 2026", aecCarr:"Asociación Española de la Carretera: auditoría del estado de las carreteras, febrero de 2026 (a través de la prensa)", adifMant:"Adif: inversión y mantenimiento de la red ferroviaria, comunicado de enero de 2026 (a través de la prensa)",
   atlas:`INE: Atlas de Distribución de Renta de los Hogares 2015–2024 (los años 2015–2023 a través del proyecto abierto <a href="https://github.com/pablogguz/ineAtlas.data" target="_blank" rel="noopener">ineAtlas.data</a>)`,
   padron:"INE: padrón municipal 1996–2025", censo:"INE: Censo de Población y Viviendas 2021 y censos anuales de población 2021–2025", mig:"INE: Estadística de Migraciones y Cambios de Residencia 2021–2024",
   ipva:"INE: Índice de Precios de Vivienda en Alquiler (alquileres declarados a Hacienda), por municipio y, por antigüedad del contrato, por provincia", vt:"INE: medición de viviendas turísticas (agosto de 2020 a mayo de 2026)",
@@ -303,7 +304,7 @@ const SRC={
   mivau:"Ministerio de Vivienda: viviendas protegidas con calificación definitiva (planes estatales y autonómicos, 1991–2025), viviendas libres iniciadas (1991–2025) y transacciones de vivienda de los notarios (2004–2025)"
 };
 function methodNote(keys){
-  const ks=keys||Object.keys(SRC).filter(k=>!["tensionadas","erte","ave","vut","eurostat"].includes(k));
+  const ks=keys||Object.keys(SRC).filter(k=>!["tensionadas","erte","ave","vut","eurostat","fitInfra","eurostatInfra","ivieStock","aecCarr","adifMant"].includes(k));
   return `<footer class="method">
     <details class="srcs"><summary>De dónde salen los datos</summary><p>${ks.map(k=>SRC[k]).join(". ")}.</p></details>
     <p><b>Cómo leerlos.</b> La renta sale de las declaraciones de la renta y no incluye la economía sumergida. Salvo que se indique «descontando la inflación», los euros son de cada año. Las cifras de provincia y de España son medias de sus municipios ponderadas por población. En los municipios muy pequeños el INE no publica todos los datos. El cálculo exacto detrás de cada etiqueta («a igual edad», «entre iguales», «explica») está en <a href="/laboratorio/metodo/">la guía del método</a>, y el código en <a href="https://github.com/bburriel/indicio.es" target="_blank" rel="noopener">GitHub</a>.</p>
@@ -2332,11 +2333,11 @@ function psMandatos(){ const G=(PAIS&&PAIS.gobiernos.ES)||[], now=new Date();
     for(let y=a.getFullYear();y<=b.getFullYear();y++){ const s=new Date(Math.max(a,new Date(y,0,1))), e=new Date(Math.min(b,new Date(y,11,31))); if((e-s)/864e5>=183) ys.push(y); }
     return {...g,a,b,ys,ape:g.p.split(" ").slice(-1)[0].replace("Zapatero","Zapatero")}; }).map(g=>({...g,ape:{"José Luis Rodríguez Zapatero":"Zapatero","Leopoldo Calvo-Sotelo":"Calvo-Sotelo"}[g.p]||g.p.split(" ").slice(-1)[0]})); }
 // ---------- gráfico de líneas por años con los gobiernos de España de fondo (laboratorio «Países» y análisis) ----------
-function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height}){
+function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height,base0=false}){
   const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:138,b:26,l:52};
   const X=d3.scaleLinear().domain(d3.extent(years)).range([m.l,W-m.r]);
   const vals=series.flatMap(s=>years.map(y=>s.v[y])).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(zero?[0]:[])); const pad=(hi-lo)*0.08||1;
-  const Y=d3.scaleLinear().domain([lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
+  const Y=d3.scaleLinear().domain([base0&&lo>=0?0:lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
   const svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",title||"");
   if(gob) psMandatos().forEach((g,i)=>{ const a=Math.max(years[0],g.ys[0])-0.5, b=Math.min(years[years.length-1],g.ys[g.ys.length-1])+0.5, x0=Math.max(m.l,X(a)), x1=Math.min(W-m.r,X(b)); if(!g.ys.length||x1<=x0) return;
     svg.append("rect").attr("x",x0).attr("y",m.t).attr("width",x1-x0).attr("height",H-m.b-m.t).attr("fill",PARTYC[g.partido]||"#999").attr("opacity",i%2?0.07:0.12);
@@ -2950,7 +2951,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","compr","padron","atlas","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo","mig"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas","deuda"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"precio-alimentos":["ipcAlim","epf","ees","hicp"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"gobiernos":["eurostatPaises"],"poder-adquisitivo":["ipcAlim","etcl","epaSal","ecvRenta","ipv","eurostatViv"],"gestion-vecinos":["eurostatPaises","ecvRenta"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
+  "quien-gobierna":["interior","padron","sepe","atlas","deuda"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"precio-alimentos":["ipcAlim","epf","ees","hicp"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"gobiernos":["eurostatPaises"],"infraestructuras":["fitInfra","eurostatInfra","ivieStock","aecCarr","adifMant"],"poder-adquisitivo":["ipcAlim","etcl","epaSal","ecvRenta","ipv","eurostatViv"],"gestion-vecinos":["eurostatPaises","ecvRenta"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -3004,7 +3005,7 @@ function renderEstudios(id){
   view.innerHTML=studyHead(S)+`<div class="sx"><div id="shtoc"></div><div id="sbody"></div></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   studyCover(S);
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"votar-pueblos":studyVotar,
-    "quien-gobierna":studyGobierna,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"precio-alimentos":studyAlimentos,"poder-adquisitivo":studyPoder,"gestion-vecinos":studyGestion,"sueldos":studySueldos,"vivienda":studyVivienda,"gobiernos":studyGobiernos})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
+    "quien-gobierna":studyGobierna,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"precio-alimentos":studyAlimentos,"poder-adquisitivo":studyPoder,"gestion-vecinos":studyGestion,"sueldos":studySueldos,"vivienda":studyVivienda,"gobiernos":studyGobiernos,"infraestructuras":studyInfra})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
   const B=document.getElementById("sbody");
   // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
   const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","votar-pueblos","quien-gobierna","ave","prohibir-pisos-turisticos","precio-alimentos"].includes(S.id);
@@ -6311,6 +6312,47 @@ async function studyGobiernos(B){
       table(f.body,["Presidente","Crecimiento medio","Paro (puntos)","Deuda (puntos)","Déficit medio"],M.filter(g=>SL[g.p]&&V[SL[g.p]+"_crec"]!=null).map(g=>[`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${g.ys[0]}–${g.hasta?g.ys[g.ys.length-1]:"hoy"}</small>`,cell(g,"crecimiento","flujo",sgn),cell(g,"paro","tasa",pts),cell(g,"deuda","tasa",pts),cell(g,"deficit","flujo",dfm)])); })
   };
   mdRender(B,"gobiernos",V,G);
+}
+
+// ---------- infraestructuras: ¿dejó España de invertir en carreteras y trenes? ----------
+let INFRA_P=null; const loadInfra=()=>INFRA_P||(INFRA_P=getJSON("/data/infra.json"));
+async function studyInfra(B){
+  const D=await loadInfra(), I=D.itf, P=D.pib.series, GV=D.gov, PK=D.pkm.v, A=D.adif, Y=I.years, L=Y.length-1, yi=y=>y-Y[0];
+  const argmax=a=>a.reduce((b,v,i)=>v!=null&&(b<0||v>a[b])?i:b,-1), argminFrom=(a,s)=>a.reduce((b,v,i)=>i>=s&&v!=null&&(b<0||v<a[b])?i:b,-1);
+  const obj=(arr,ys,f=v=>v)=>Object.fromEntries(ys.map((y,i)=>[y,arr[i]]).filter(([,v])=>v!=null).map(([y,v])=>[y,f(v)]));
+  const avg=(a,y0,y1)=>d3.mean(a.filter((v,i)=>v!=null&&Y[i]>=y0&&Y[i]<=y1));
+  const road=I.road_q, rail=I.rail_q, iR=argmax(road), jR=argminFrom(road,iR), iF=argmax(rail), jF=argminFrom(rail,iF);
+  const gy=GV.years, gL=gy.length-1, gi=y=>gy.indexOf(y), nEs=GV.ES.neta, iN=argmax(nEs), jN=argminFrom(nEs,iN);
+  const PAL=["cero","una","dos","tres","cuatro","cinco","seis","siete"];
+  const negN=gy.map((y,i)=>[y,nEs[i]]).filter(([y,v])=>y>=2013&&y<=2019&&v<0).length;
+  const ipcR=D.ipc["2025"]/D.ipc["2017"], m17=A.mant["2017"], m25=A.mant["2025"];
+  const pk09=PK[2009], pk24=PK[2024], per=y=>rail[yi(y)]/PK[y]*100;
+  const V={ultY:Y[L], govY:gy[gL],
+    roadMax:road[iR]/1000, roadMaxY:Y[iR], roadMin:road[jR]/1000, roadMinY:Y[jR], roadCaida:(1-road[jR]/road[iR])*100, roadUlt:road[L]/1000, roadUltVs:(road[L]/road[iR]-1)*100,
+    railMax:rail[iF]/1000, railMaxY:Y[iF], railMin:rail[jF]/1000, railMinY:Y[jF], railCaida:(1-rail[jF]/rail[iF])*100, railUlt:rail[L]/1000,
+    pibPico:Math.max(...P.ES), pibPicoY:Y[argmax(P.ES)], pibFR09:P.FR[yi(2009)], pibDE09:P.DE[yi(2009)], pibUlt:P.ES[L],
+    netaPico:nEs[iN], netaMin:nEs[jN], netaMinY:gy[jN], netaNegN:PAL[negN]||String(negN), netaES:nEs[gL], netaEU:GV.EU.neta[gL],
+    pkm09:pk09, pkm24:pk24, pkmCrece:(pk24/pk09-1)*100, perPkm09:per(2009), perPkm24:per(2024), perPkmCaida:(1-per(2024)/per(2009))*100,
+    mantNom:(m25/m17-1)*100, mantReal:(m25/ipcR/m17-1)*100, mantPkmReal:((m25/ipcR/PK[2025])/(m17/PK[2017])-1)*100};
+  for(const g of ["ES","FR","DE","IT"]){ V["media"+g+"0008"]=avg(P[g],2000,2008); V["media"+g+"1523"]=avg(P[g],2015,2023); }
+  const FIT="Fuente: FIT-OCDE (inversión, 1995–2024)", EUS="Eurostat", sg=v=>MDFMT.pcts0(v);
+  const G={
+    modos:el=>govChart(el,{title:"Inversión en ferrocarril y en carreteras",base0:true,sub:"Miles de millones de euros de 2015",source:FIT+". Incluye obra nueva, ampliaciones y renovaciones, con dinero público y privado.",years:Y,gob:false,zero:true,
+      series:[{n:"Ferrocarril",v:obj(rail,Y,v=>v/1000),c:"--rust",main:true},{n:"Carreteras",v:obj(road,Y,v=>v/1000),c:"--slate"}],fmt:v=>nf1.format(v),tick:v=>nf0.format(v)}),
+    pib:el=>govChart(el,{title:"Inversión en carreteras y ferrocarril, en % del PIB",base0:true,sub:"España frente a Francia, Alemania e Italia",source:FIT+" y "+EUS+" (PIB a precios corrientes). Italia no tiene dato de 2024.",years:Y,gob:false,zero:true,
+      series:[{n:"España",v:obj(P.ES,Y),c:"--rust",main:true},{n:"Francia",v:obj(P.FR,Y),c:"--slate"},{n:"Alemania",v:obj(P.DE,Y),c:"--mustard"},{n:"Italia",v:obj(P.IT,Y),c:"--olive"}],fmt:v=>nf2.format(v)+NB+"%",tick:v=>nf1.format(v)+NB+"%"}),
+    neta:el=>govChart(el,{title:"Inversión pública neta, en % del PIB",sub:"Inversión bruta de las administraciones públicas menos el desgaste del capital existente. Por debajo de cero, lo público se encoge",source:EUS+" (cuentas de las administraciones públicas, 2000–"+gy[gL]+").",years:gy,gob:false,zero:true,
+      series:[{n:"España",v:obj(GV.ES.neta,gy),c:"--rust",main:true},{n:"Unión Europea",v:obj(GV.EU.neta,gy),c:"--slate",dash:true}],fmt:v=>nf1.format(v)+NB+"%",tick:v=>nf0.format(v)+NB+"%"}),
+    viajero:el=>{ const ys=d3.range(2005,2025), base=per(2009);
+      govChart(el,{title:"Ferrocarril: inversión, viajeros e inversión por viajero",base0:true,sub:"2009 = 100. Inversión en euros constantes",source:FIT+" y "+EUS+" (viajeros-kilómetro). La caída de 2020 y 2021 es la pandemia.",years:ys,gob:false,zero:true,
+        series:[{n:"Por viajero-km",v:obj(ys.map(y=>per(y)/base*100),ys),c:"--rust",main:true},{n:"Viajeros-km",v:obj(ys.map(y=>PK[y]/pk09*100),ys),c:"--slate"},{n:"Inversión total",v:obj(ys.map(y=>rail[yi(y)]/rail[yi(2009)]*100),ys),c:"--mustard",dash:true}],fmt:v=>nf0.format(v),tick:v=>nf0.format(v)}); },
+    mant:el=>{ const f=fig(el,{title:"Gasto de mantenimiento de Adif",sub:"Millones de euros. «Sin inflación»: euros de 2025, con el IPC del INE",source:"Adif (comunicado de enero de 2026), IPC del INE y viajeros-kilómetro de Eurostat. Las subidas son cálculo propio con esas cifras."});
+      const row=(n,a,b)=>[n,nf0.format(a),nf0.format(b),sg((b/a-1)*100),sg((b/ipcR/a-1)*100)];
+      const c17=m17/PK[2017]*100, c25=m25/PK[2025]*100;
+      table(f.body,["","2017","2025","Cambio","Sin inflación"],[row("Red convencional",A.mantConv["2017"],A.mantConv["2025"]),row("Alta velocidad",A.mantAV["2017"],A.mantAV["2025"]),row("Total",m17,m25),
+        ["Total por viajero-km (céntimos)",nf1.format(c17),nf1.format(c25),sg((c25/c17-1)*100),sg((c25/ipcR/c17-1)*100)]]); }
+  };
+  mdRender(B,"infraestructuras",V,G);
 }
 
 // ---------- vivienda protegida: de 1 de cada 10 viviendas nuevas a casi ninguna ----------
