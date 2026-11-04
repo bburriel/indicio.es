@@ -2055,4 +2055,6 @@ details.chk > section{margin-top:18px}
 .dest-demo .dd-t{display:block; font-size:14px; color:var(--ink-2)}
 .dp-note{margin:0;padding:10px 12px;border-top:1px solid var(--rule-2);color:var(--muted);font-size:13px;line-height:1.4}
 /* los botones de un selector segmentado parten el texto en dos líneas en vez de salirse de su casilla */
-.lbseg button{flex:1 1 auto; min-width:min-content; white-space:normal; line-height:1.15}
+.lbseg{flex-wrap:wrap; gap:1px; background:var(--rule-2)}
+.lbseg button{flex:1 1 auto; background:var(--card); white-space:normal; line-height:1.15}
+.lbseg button + button{border-left:0}
