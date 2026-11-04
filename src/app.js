@@ -6137,7 +6137,7 @@ async function studyVivienda(B){
     vlc15:city("València")["2015"], vlc24:city("València")[aY], mlg15:city("Málaga")["2015"], mlg24:city("Málaga")[aY],
     ciudad1:CIT[0].n, ciudad1v:CIT[0].v, ciudad2:CIT[1].n, ciudad2v:CIT[1].v, ciudad3:CIT[2].n, ciudad3v:CIT[2].v,
     añoT:tYs, precio80:vt[tYs]*80, años80:yrs80(tYs), años80_08:yrs80("2008"), años80_19:yrs80("2019"), ipv19:g(E.ipv,"2019",String(vY)), sal19:g(ees,"2019",String(eY)),
-    vt25:g(vt,String(tYs),lastK(vt)), añoVt:lastK(vt), entrada:vt[tYs]*80*0.3, entradaAños:vt[tYs]*80*0.3/ees[tYs],
+    vt25:g(vt,String(tYs),lastK(vt)), añoVt:lastK(vt), ipv1924:g(E.ipv,"2019",String(tYs)), vt1924:g(vt,"2019",String(tYs)), años80_ipv:yrs80("2019")*(E.ipv[String(tYs)]/E.ipv["2019"])/(ees[String(tYs)]/ees["2019"]), ipv25:g(E.ipv,String(tYs),String(vY)), añoIpv:vY, entrada:vt[tYs]*80*0.3, entradaAños:vt[tYs]*80*0.3/ees[tYs],
     prop08:ten.prop["2008"], propUlt:ten.prop[tenY], alq08:ten.alqMercado["2008"], alqUlt:ten.alqMercado[tenY], añoTen:tenY,
     sobreES:euL("ES","sobrecargaInquilinos").v, sobreEU:euL("EU27_2020","sobrecargaInquilinos").v, añoEU:euL("ES","sobrecargaInquilinos").y, sobreES14:(EU.ES.sobrecargaInquilinos||{})["2014"],
     padresES:euL("ES","conPadres2534").v, padresEU:euL("EU27_2020","conPadres2534").v, edadES:euL("ES","edadEmancipacion").v, edadEU:euL("EU27_2020","edadEmancipacion").v,
