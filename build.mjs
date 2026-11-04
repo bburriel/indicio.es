@@ -41,7 +41,9 @@ const i18n="var ROWS="+JSON.stringify(I18N_ROWS)+";\n"+rd("src/i18n.js"), CSS="/
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
 fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js); fs.writeFileSync(path.join(OUT,I18N),i18n);
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:HIDDEN,md:MDBODY,quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
+// Los análisis con «oculto» no se publican: ni página, ni datos en content.js. Para revisarlos en local: MOSTRAR_OCULTOS=1 npm run build
+const SHOW_HIDDEN=!!process.env.MOSTRAR_OCULTOS;
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:SHOW_HIDDEN?HIDDEN:[],md:SHOW_HIDDEN?MDBODY:Object.fromEntries(Object.entries(MDBODY).filter(([id])=>STUDIES.some(S=>S.id===id))),quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 
@@ -138,7 +140,7 @@ function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
   const main=snapshot("/preguntas/")||`<header class="phead"><h1>Análisis</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
   page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Análisis",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
   addUrl("/preguntas/",0.9);
-  for(const S of ALL){
+  for(const S of (SHOW_HIDDEN?ALL:STUDIES)){
     const route="/preguntas/"+S.id+"/";
     const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p>${ILLUS[S.id]||""}</header>
       <section class="finding"><h2>La respuesta corta</h2><div class="txt"><p>${esc(S.a)}</p><p>La respuesta completa, con los gráficos y el método paso a paso, se calcula con los datos al abrir la página. <a href="/laboratorio/">Ponla a prueba en el laboratorio →</a></p></div></section>${sources}`;
@@ -447,7 +449,7 @@ fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"
 // Netlify: el dominio antiguo redirige al nuevo; las rutas dinámicas que no tienen HTML propio caen en la app
 // Cloudflare Pages: las reglas de _redirects se aplican aunque exista el fichero, así que solo se reescriben rutas que no existen
 // (apartados de la ficha y comparaciones). La redirección de www y del dominio antiguo se hace en Cloudflare (reglas de redirección).
-fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/crecer/ 301","/preguntas/renta-fuentes/ /preguntas/convergencia/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301"].join("\n")+"\n");
+fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301"].join("\n")+"\n");
 fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));
