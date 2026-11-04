@@ -7006,9 +7006,17 @@ function heroType(root){
   { const v=vis.getBoundingClientRect(), r=cur.getBoundingClientRect(); cur.classList.add("fl"); cur.style.left=(r.left-v.left)+"px"; cur.style.top=(r.top-v.top)+"px"; cur.style.height=r.height+"px"; }
   let at=W; const keep=()=>{ if(live()) put(at); }; addEventListener("resize",keep);
   const busy=on=>cur.classList.toggle("mv",on);
-  // como el carro de una máquina de escribir: tira hacia atrás hasta el margen izquierdo, salta de línea y avanza hasta la palabra
-  const go=async el=>{ at=el; busy(true); cur.classList.remove("ty"); const q=pos(el), set=(o,ms)=>{ cur.style.transitionDuration=ms+"ms"; Object.assign(cur.style,o); return sleep(ms+40); };
-    await set({left:"0px"},520); await set({top:q.y+"px",height:q.h+"px"},340); await set({left:q.x+"px"},700); cur.style.transitionDuration=""; };
+  // como las flechas del teclado: el cursor pasa por cada letra hacia atrás hasta el margen, salta de línea y avanza letra a letra
+  const L1=root.querySelector(".ho-l1"), L2=root.querySelector(".ho-l2"), lineOf=el=>el===OA?L1:L2, idx=el=>el===OA?10:W.textContent.length;
+  const cx=(L,i)=>{ const v=vis.getBoundingClientRect(); if(i<=0) return L.getBoundingClientRect().left-v.left;
+    const tw=document.createTreeWalker(L,NodeFilter.SHOW_TEXT); let n, c=0;
+    while((n=tw.nextNode())){ if(c+n.length>=i){ const rg=document.createRange(); rg.setStart(n,i-c-1); rg.setEnd(n,i-c); return rg.getBoundingClientRect().right-v.left; } c+=n.length; }
+    return L.getBoundingClientRect().right-v.left; };
+  const stepTo=async(L,from,to)=>{ const d=to>from?1:-1; for(let i=from;i!==to;){ i+=d; cur.style.left=cx(L,i)+"px"; await sleep(45+Math.random()*40); } };
+  const go=async el=>{ const from=at, Lf=lineOf(from), Lt=lineOf(el), fi=idx(from); at=el; busy(true); cur.classList.add("ty");
+    await stepTo(Lf,fi,0);
+    if(Lf!==Lt){ const q=pos(el); cur.classList.remove("ty"); cur.style.transitionDuration="200ms"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; await sleep(280); cur.style.transitionDuration=""; cur.classList.add("ty"); }
+    await stepTo(Lt,0,idx(el)); };
   const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
     while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(70); } await sleep(220);
     while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(130); } };
