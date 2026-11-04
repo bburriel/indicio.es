@@ -1,7 +1,7 @@
 ---
 titulo: ¿Son sostenibles las pensiones?
 entradilla: Cada año se gasta más en pensiones y ahora se jubilan las generaciones más numerosas. Repasamos de dónde viene el gasto, qué trae la demografía y cuánto habría que cambiar para que quepa.
-respuesta: No, a menos que cada pensión pese menos frente a los sueldos. Si solo cambia la demografía, el gasto pasa del 13,2 % al 24,9 % del PIB en 2050. Para que quepa en el 16,2 % del PIB (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea), incluso con un 10 % más de empleo y de población en edad de trabajar, cada pensión tendría que perder un 0,9 % de peso al año frente a lo que produce un trabajador.
+respuesta: Depende de cuánto se quiera gastar. Si solo cambia la demografía, el gasto pasa del 13,2 % al 24,9 % del PIB en 2050 (un ejercicio, no una previsión): no cabe. Con lo previsto tras las reformas (pensiones con el IPC, un año más de trabajo efectivo y un 5 % más de empleo y de población en edad de trabajar) queda en el 16,5 %, a 0,3 puntos del límite del 16,2 % (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea): cabe por poco o se pasa por poco. Para asegurarlo, cada pensión tendría que pesar algo menos frente a lo que produce un trabajador.
 tema: gasto
 metodo: Eurostat, INE y escenarios hasta 2070
 evidencia: desc
@@ -65,7 +65,7 @@ Hay dos formas de actuar. La primera es **reducir el coste de las pensiones**, c
 
 [[grafico:palancas]]
 
-Un 10 % más de empleo (de 72 a unos 80 de cada 100 personas de 20 a 64 años, por encima de la media europea de {{empUe|n0}}) deja el gasto en el {{soloE|pct1}}. Un 10 % más de población en edad de trabajar, en el {{soloM|pct1}}. Tres años más de jubilación efectiva reducen en torno a un 15 % los pensionistas y lo dejan en el {{sTarde|pct1}}, un cálculo prudente que no cuenta que quien se jubila más tarde también cotiza más años. Actualizar las pensiones solo con el IPC, con una productividad que crece un 1 % al año, hace que cada pensión pese un 1 % menos cada año frente a lo que produce un trabajador: el gasto llega al {{sIpc|pct1}} en 2050 y baja después, hasta el {{sIpc70|pct1}} en 2070. La pensión media se queda igual en euros de hoy ({{sIpcReal|n0}} € al mes), pero los pensionistas no participan de la mejora de la productividad.
+Un 10 % más de empleo (de 72 a unos 80 de cada 100 personas de 20 a 64 años, por encima de la media europea de {{empUe|n0}}) deja el gasto en el {{soloE|pct1}}. Un 10 % más de población en edad de trabajar, en el {{soloM|pct1}}. Tres años más de jubilación efectiva reducen en torno a un 15 % los pensionistas y lo dejan en el {{sTarde|pct1}}, un cálculo prudente que no cuenta que quien se jubila más tarde también cotiza más años. Actualizar las pensiones solo con el IPC, con una productividad que crece un 1 % al año, hace que cada pensión pese un 1 % menos cada año frente a lo que produce un trabajador: el gasto llega al {{sIpc|pct1}} en 2050 y baja después, hasta el {{sIpc70|pct1}} en 2070. El gasto medio por pensión se queda igual en euros de hoy ({{sIpcReal|n0}} € al mes), pero los pensionistas no participan de la mejora de la productividad.
 
 La demografía añade casi el doble de pensionistas por trabajador. Trabajar más compensa una parte, no todo.
 
@@ -89,7 +89,7 @@ Aquí combinamos lo que las reformas buscan: pensiones con el IPC, un año más 
 
 [[grafico:esc_equilibrio]]
 
-Un 10 % más de empleo, un 10 % más de población en edad de trabajar, dos años más de jubilación efectiva y pensiones que pesan un 0,7 % menos cada año frente a lo que produce un ocupado. Resultado: **{{sEq|pct1}}**, que cabe. La pensión media sube, en euros de hoy, hasta {{sEqReal|n0}} € al mes, pero en 2050 pesa un {{sEqPeso|n0}} % menos que hoy frente a lo que produce un trabajador. Ninguna palanca sola lo consigue, y cada una exige un esfuerzo grande. Es una de varias mezclas posibles: la jubilación más tardía se puede cambiar por más empleo o por que las pensiones pesen todavía menos.
+Un 10 % más de empleo, un 10 % más de población en edad de trabajar, dos años más de jubilación efectiva y pensiones que pesan un 0,7 % menos cada año frente a lo que produce un ocupado. Resultado: **{{sEq|pct1}}**, que cabe. El gasto medio por pensión sube, en euros de hoy, hasta {{sEqReal|n0}} € al mes, pero en 2050 pesa un {{sEqPeso|n0}} % menos que hoy frente a lo que produce un trabajador. Ninguna palanca sola lo consigue, y cada una exige un esfuerzo grande. Es una de varias mezclas posibles: la jubilación más tardía se puede cambiar por más empleo o por que las pensiones pesen todavía menos.
 
 Los tres juntos:
 
@@ -99,7 +99,7 @@ Los tres juntos:
 
 Las pensiones no caben si solo cambia la demografía, y tampoco con una única medida. En todas las mezclas que caben con valores razonables, cada pensión pierde peso frente a los sueldos. Un 10 % más de empleo deja el gasto en el {{soloE|pct1}}, un 10 % más de población activa en el {{soloM|pct1}} y tres años más de jubilación en el {{soloD|pct1}}, frente a un límite del {{lim|pct1}}. Solo caben sumando varias a la vez.
 
-Lo que cabe pasa por una combinación: más gente trabajando y que cada pensión crezca algo menos que lo que produce un trabajador. Eso no es gratis. En el futuro que cabe, la pensión media sube en euros, pero los pensionistas ganan menos terreno que quienes trabajan: el reparto de la mejora de la productividad se inclina hacia los que cotizan.
+Lo que cabe pasa por una combinación: más gente trabajando y que cada pensión crezca algo menos que lo que produce un trabajador. Eso no es gratis. En el futuro que cabe, el gasto medio por pensión sube en euros, pero los pensionistas ganan menos terreno que quienes trabajan: el reparto de la mejora de la productividad se inclina hacia los que cotizan.
 
 Y el límite también es una decisión. Cada punto de PIB son unos {{mm1|n0}} mil millones de euros al año. Quien acepte pagar más, con impuestos, cotizaciones o deuda, tiene más margen en las demás palancas. Quien no, necesita las demás.
 
