@@ -181,11 +181,11 @@ function route(){
   const h=pathToKey();
   // bloques estáticos de las fichas (preguntas frecuentes, municipios cercanos): solo en la página para la que se generaron
   document.querySelectorAll(".seo-extra").forEach(e=>{ e.hidden=!(h===e.dataset.key||h.startsWith(e.dataset.key+"-")); });
-  if(h==="__static"){ const e=document.getElementById("nav-municipio"); if(e) e.setAttribute("aria-current","page"); return; }   // páginas solo estáticas (provincias, rankings): el HTML ya trae todo
+  if(h==="__static"){ document.querySelectorAll('[data-nav="municipio"]').forEach(e=>e.setAttribute("aria-current","page")); return; }   // páginas solo estáticas (provincias, rankings): el HTML ya trae todo
   const m=h.match(/^m(\d{5})(?:-([a-z]+))?$/), cr=h.match(/^(?:cruces|relaciones)(?:-([a-zA-Z0-9]+)-([a-zA-Z0-9]+))?$/);
-  document.querySelectorAll(".nav a,.nav .ddb").forEach(a=>a.removeAttribute("aria-current")); ddClose();
+  document.querySelectorAll("[data-nav]").forEach(a=>a.removeAttribute("aria-current")); ddClose();
   // cuatro entradas: «Análisis», «Municipios» (fichas, comparar, provincias, rankings), el laboratorio y quién soy
-  const cur=id=>{ const e=document.getElementById("nav-"+id); if(e) e.setAttribute("aria-current","page"); };
+  const cur=id=>{ document.querySelectorAll('[data-nav="'+id+'"]').forEach(e=>e.setAttribute("aria-current","page")); };
   if(INIT_T){ clearInterval(INIT_T); INIT_T=null; } if(typeof QH_T!=="undefined"&&QH_T){ clearInterval(QH_T); QH_T=null; } if(typeof QSPOT_T!=="undefined"&&QSPOT_T){ clearInterval(QSPOT_T); QSPOT_T=null; }
   if(m && BYCODE.has(m[1])){ cur("municipio"); EXF={prov:"",min:0,max:Infinity}; if(!myOk(lastMun)){ setMyMun(m[1],{silent:true}); setTimeout(()=>{ const t=toast(`📍 Hemos guardado <b>${esc(myName(m[1]))}</b> como tu municipio: lo verás destacado en temas y gráficos. <button type="button" id="tchg">Cambiar</button>`,4500); const c=document.getElementById("tchg"); if(c) c.addEventListener("click",()=>{ t.remove(); myPop(); }); },600); } renderMun(m[1], m[2]); return; }
   if(/^explorar/.test(h)){ cur("lab"); const same=document.querySelector(".lb"); renderExplorar(h); if(!same) window.scrollTo(0,0); return; }
