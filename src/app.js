@@ -6583,8 +6583,8 @@ async function renderInicio(){
         <small>Cada municipio, coloreado por su dato. En gris, sin dato.</small></figcaption></figure></div></section>
   <section class="pt-land pt-mun" id="municipios"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>En España hay ${nMun} municipios. <em>En uno de ellos vives tú.</em></h2>
       <p class="pt-land-lead">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
-    <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a class="btn" href="/comparar/">Comparar dos municipios →</a><a class="btn alt" href="/provincia/">Por provincia</a><a class="btn alt" href="/rankings/">Ver los rankings</a></p></div>
-    <div class="pt-mun-fi" id="munfi" aria-live="polite"></div>
+    <div class="pt-mun-q">${bigSearchHTML("q2","Busca tu municipio…")}${exampleChips()}<p class="pt-tools"><a class="btn" href="/comparar/">Comparar dos municipios →</a></p></div>
+    <div class="mi-que"><p><b>Su ficha</b>Renta, paro, alquiler y edad, frente a España.</p><p><b>Cómo ha cambiado</b>Población, renta, paro y alquiler desde 2015.</p><p><b>A quién se parece</b>Los cinco municipios que más se le parecen.</p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
@@ -6604,34 +6604,9 @@ async function renderInicio(){
   else if(ar) ar.closest("figure").remove();
   if(GOMUN||location.hash==="#municipios"){ GOMUN=false; requestAnimationFrame(()=>scrollToId("municipios")); }
 }
-// «Municipios» de la portada: el buscador enseña aquí mismo una ficha mínima (sin cambiar de página), con el enlace a la ficha completa y a comparar
+// «Municipios» de la portada: la sección explica en tres frases qué hay y el buscador lleva a la ficha
 let GOMUN=false;
-const MINI_KS=[["renta","Renta por persona"],["paroReg","Paro registrado"],["alquiler","Hogares de alquiler"],["edad","Edad media"],["varPob","Población desde 2015"]];
-function munMini(code){
-  const r=BYCODE.get(code); if(!r) return "";
-  const cell=([k,l])=>{ const v=r[F[k]], e=esOff(k); return `<div class="mi-k"><span>${esc(l)}</span><b>${v==null?"—":fmtK(k)(v)}</b><small>${e==null?"":`<span>España</span> ${fmtK(k)(e)}`}</small></div>`; };
-  return `<div class="mi-h"><div><span class="kk">${code===lastMun?"Tu municipio":"Municipio"}</span><h3>${esc(dispName(r[F.name]))}</h3><p>${esc(provShort(PROVS[r[F.prov]]))} · ${nf0.format(r[F.pop]||0)} <span>habitantes</span></p></div>
-    <div class="mi-go"><a class="btn" href="${munPath(code)}">Ver su ficha completa →</a></div></div>
-    <div class="mi-g">${MINI_KS.map(cell).join("")}</div>`;
-}
-// tres cifras de los municipios para el hueco de la ficha, mientras no se elige ninguno
-function munFacts(){
-  const R=rowsAll(), n=R.length, pop=r=>r[F.pop]||0, tot=d3.sum(R,pop);
-  const v=R.filter(r=>r[F.var0525]!=null), pierden=v.filter(r=>r[F.var0525]<0).length/v.length;
-  const peq=R.filter(r=>pop(r)<5000), gr=R.filter(r=>pop(r)>=100000), pc=x=>nf0.format(Math.round(x*100))+NB+"%";
-  return `<div class="mi-facts"><p><b>${pc(pierden)}</b> de los municipios tienen hoy menos vecinos que en 2005.</p>
-    <p><b>${pc(peq.length/n)}</b> tienen menos de 5.000 habitantes, y entre todos suman el ${pc(d3.sum(peq,pop)/tot)} de la población.</p>
-    <p><b>${pc(d3.sum(gr,pop)/tot)}</b> de la población vive en solo ${nf0.format(gr.length)} municipios, los de más de 100.000 habitantes.</p></div>`;
-}
-function munHome(){
-  const box=document.getElementById("munfi"); if(!box) return;
-  const show=code=>{ box.innerHTML=munMini(code); box.classList.add("on"); };
-  try{ box.innerHTML=munFacts(); }catch(e){ console.error(e); }
-  bindBig("q2",r=>show(r[F.code]));
-  // «Seguir con…» y los ejemplos enseñan la ficha mínima en vez de llevar a otra página
-  document.querySelectorAll(".pt-mun-q .chipsq a").forEach(a=>a.addEventListener("click",e=>{ const c=/(\d{5})/.exec(a.getAttribute("href")||""); if(!c||!BYCODE.has(c[1])) return; e.preventDefault(); e.stopPropagation(); show(c[1]); }));
-  if(myOk(lastMun)) show(lastMun);
-}
+function munHome(){ bindBig("q2"); }
 // ilustración de una pieza de la portada: la del análisis, recortada a 16:9 por su punto de interés
 const ptIll=S=>{ const I=window.__INDICIO||{}, sv=(I.illus||{})[S.id];
   if(!sv) return "";
