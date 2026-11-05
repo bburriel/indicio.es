@@ -1289,7 +1289,7 @@ export const ROWS=[
  ["{#} a {#} hab.","De {#1} a {#2} hab.","De {#1} a {#2} hab.","{#1}–{#2} biztanle","{#1} to {#2} inhab."],
  ["Más de {#} hab.", "Més de {#} hab.", "Máis de {#} hab.", "{#} biztanle baino gehiago", "More than {#} inhab."],
  ["{#} hab. o más", "{#} hab. o més", "{#} hab. ou máis", "{#} biztanle edo gehiago", "{#} inhab. or more"],
- ["En España hay {#} municipios, pero solo en uno de ellos vives tú","A Espanya hi ha {#} municipis, però només en un d'ells hi vius tu","En España hai {#} municipios, pero só nun deles vives ti","Espainian {#} udalerri daude, baina horietako batean bakarrik bizi zara zu","Spain has {#} municipalities, but you live in only one of them"],
+ ["En España hay {#} municipios y en uno de ellos vives tú","A Espanya hi ha {#} municipis i en un d'ells hi vius tu","En España hai {#} municipios e nun deles vives ti","Espainian {#} udalerri daude, eta horietako batean zu bizi zara","Spain has {#} municipalities and you live in one of them"],
  ["Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde {#} y a qué municipios se parece.","Cerca el teu i mira com surt en renda, atur i lloguer, què ha canviat des del {#} i a quins municipis s'assembla.","Busca o teu e mira como sae en renda, paro e aluguer, que cambiou desde {#} e a que municipios se parece.","Bilatu zurea eta ikusi nolakoa den errentan, langabezian eta alokairuan, zer aldatu den {#}. urtetik eta zein udalerriren antza duen.","Look yours up and see how it fares on income, unemployment and rent, what has changed since {#} and which municipalities it resembles."],
  ["O prueba:", "O prova:", "Ou proba:", "Edo probatu:", "Or try:"],
  ["Rankings", "Rànquings", "Clasificacións", "Sailkapenak", "Rankings"],
