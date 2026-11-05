@@ -6341,7 +6341,7 @@ const HEROQ=[
   {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver por qué sube →",
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
-    cap:N=>`Lo que ha subido cada cosa desde 2015 (2015 = 100): precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados y sueldo mediano hasta ${N.alquilerY}. Fuente: INE.`},
+    cap:N=>`Lo que ha subido cada cosa desde 2015 (2015 = 100): precio de compra, alquiler medio de los contratos declarados y sueldo mediano, los tres hasta ${N.compraY}. Fuente: INE.`},
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué se encarece más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
