@@ -6486,8 +6486,8 @@ async function renderInicio(){
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio.</span><i class="ho-cur"></i></span></span></h1>
-    <p class="ho-sub">Democratizando el acceso al dato público</p>
-    <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
+    <p class="ho-sub">Los datos públicos, a tu alcance.</p>
+    <p class="ho-p">Indicio parte de preguntas de la calle, como qué pasó con el alquiler o dónde se dejó de invertir, y las contesta con datos públicos. Si dudas, compruébalo tú en el laboratorio.</p>
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Ver las preguntas</a><a class="ho-lk" href="#" data-go=".pt-labx">Abrir el laboratorio</a><a class="ho-lk" href="#" data-go=".pt-mun">Buscar mi municipio</a></p></section>
   <div class="pt-carband">${heroCarHTML(D)}
   <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p></div>
