@@ -17,7 +17,7 @@ const server=spawn(process.execPath,[path.join(ROOT,"serve.mjs")],{env:{...proce
 await new Promise(r=>setTimeout(r,800));
 fs.mkdirSync(path.join(ROOT,"snapshots"),{recursive:true}); fs.mkdirSync(path.join(ROOT,"og"),{recursive:true});
 
-const routes=["/","/preguntas/",...STUDIES.map(S=>"/preguntas/"+S.id+"/"),"/laboratorio/","/laboratorio/metodo/","/quien-soy/"];
+const routes=["/","/preguntas/",...STUDIES.map(S=>"/preguntas/"+S.id+"/"),"/laboratorio/","/laboratorio/metodo/","/municipio/","/quien-soy/"];
 const fname=r=>(r==="/"?"index":r.replace(/^\/|\/$/g,"").replace(/\//g,"__"))+".html";
 const browser=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
 const ctx=await browser.newContext({locale:"es-ES",timezoneId:"Europe/Madrid",viewport:{width:1280,height:900},deviceScaleFactor:2,reducedMotion:"reduce"});
