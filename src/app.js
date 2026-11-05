@@ -6560,7 +6560,7 @@ async function renderInicio(){
         <small>Cada municipio, coloreado por su dato. En gris, sin dato.</small></figcaption></figure></div></section>
   <section class="pt-land pt-mun" id="municipios"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>En España hay ${nMun} municipios. <em>En uno de ellos vives tú.</em></h2>
       <p class="pt-land-lead">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
-    <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/comparar/">Comparar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
+    <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a class="btn" href="/comparar/">Comparar dos municipios →</a><a class="btn alt" href="/provincia/">Por provincia</a><a class="btn alt" href="/rankings/">Ver los rankings</a></p></div>
     <div class="pt-mun-fi" id="munfi" aria-live="polite"></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
