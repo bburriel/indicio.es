@@ -6331,7 +6331,8 @@ async function studyInfra(B){
   const negN=gy.map((y,i)=>[y,nEs[i]]).filter(([y,v])=>y>=2013&&y<=2019&&v<0).length;
   const ipcR=D.ipc["2025"]/D.ipc["2017"], m17=A.mant["2017"], m25=A.mant["2025"];
   const pk09=PK[2009], pk24=PK[2024], per=y=>rail[yi(y)]/PK[y]*100;
-  const V={ultY:Y[L], govY:gy[gL],
+  const tot=road.map((v,i)=>v+rail[i]), iT=argmax(tot);
+  const V={ultY:Y[L], govY:gy[gL], totMax:tot[iT]/1000, totMaxY:Y[iT], totUlt:tot[L]/1000, totCaida:(1-tot[L]/tot[iT])*100,
     roadMax:road[iR]/1000, roadMaxY:Y[iR], roadMin:road[jR]/1000, roadMinY:Y[jR], roadCaida:(1-road[jR]/road[iR])*100, roadUlt:road[L]/1000, roadUltVs:(road[L]/road[iR]-1)*100,
     railMax:rail[iF]/1000, railMaxY:Y[iF], railMin:rail[jF]/1000, railMinY:Y[jF], railCaida:(1-rail[jF]/rail[iF])*100, railUlt:rail[L]/1000,
     pibPico:Math.max(...P.ES), pibPicoY:Y[argmax(P.ES)], pibFR09:P.FR[yi(2009)], pibDE09:P.DE[yi(2009)], pibUlt:P.ES[L],
@@ -6345,16 +6346,16 @@ async function studyInfra(B){
       series:[{n:"Ferrocarril",v:obj(rail,Y,v=>v/1000),c:"--rust",main:true},{n:"Carreteras",v:obj(road,Y,v=>v/1000),c:"--slate"}],fmt:v=>nf1.format(v),tick:v=>nf0.format(v)}),
     pib:el=>govChart(el,{title:"Inversión en carreteras y ferrocarril, en % del PIB",base0:true,sub:"España frente a Francia, Alemania e Italia",source:FIT+" y "+EUS+" (PIB a precios corrientes). Italia no tiene dato de 2024.",years:Y,gob:false,zero:true,
       series:[{n:"España",v:obj(P.ES,Y),c:"--rust",main:true},{n:"Francia",v:obj(P.FR,Y),c:"--slate"},{n:"Alemania",v:obj(P.DE,Y),c:"--mustard"},{n:"Italia",v:obj(P.IT,Y),c:"--olive"}],fmt:v=>nf2.format(v)+NB+"%",tick:v=>nf1.format(v)+NB+"%"}),
-    neta:el=>govChart(el,{title:"Inversión pública neta, en % del PIB",sub:"Inversión bruta de las administraciones públicas menos el desgaste del capital existente. Por debajo de cero, lo público se encoge",source:EUS+" (cuentas de las administraciones públicas, 2000–"+gy[gL]+").",years:gy,gob:false,zero:true,
+    neta:el=>govChart(el,{title:"Inversión pública neta, en % del PIB",sub:"Lo que invierten las administraciones menos lo que se desgasta lo ya construido. Por debajo de cero, el patrimonio público se encoge",source:EUS+" (cuentas de las administraciones públicas, 2000–"+gy[gL]+").",years:gy,gob:false,zero:true,
       series:[{n:"España",v:obj(GV.ES.neta,gy),c:"--rust",main:true},{n:"Unión Europea",v:obj(GV.EU.neta,gy),c:"--slate",dash:true}],fmt:v=>nf1.format(v)+NB+"%",tick:v=>nf0.format(v)+NB+"%"}),
     viajero:el=>{ const ys=d3.range(2005,2025), base=per(2009);
-      govChart(el,{title:"Ferrocarril: inversión, viajeros e inversión por viajero",base0:true,sub:"2009 = 100. Inversión en euros constantes",source:FIT+" y "+EUS+" (viajeros-kilómetro). La caída de 2020 y 2021 es la pandemia.",years:ys,gob:false,zero:true,
-        series:[{n:"Por viajero-km",v:obj(ys.map(y=>per(y)/base*100),ys),c:"--rust",main:true},{n:"Viajeros-km",v:obj(ys.map(y=>PK[y]/pk09*100),ys),c:"--slate"},{n:"Inversión total",v:obj(ys.map(y=>rail[yi(y)]/rail[yi(2009)]*100),ys),c:"--mustard",dash:true}],fmt:v=>nf0.format(v),tick:v=>nf0.format(v)}); },
+      govChart(el,{title:"Ferrocarril: viajeros, inversión y dinero por viajero",base0:true,sub:"Índice, 2009 = 100. La inversión, en euros constantes",source:FIT+" y "+EUS+" (viajeros-kilómetro). La caída de 2020 y 2021 es la pandemia.",years:ys,gob:false,zero:true,
+        series:[{n:"Dinero por viajero",v:obj(ys.map(y=>per(y)/base*100),ys),c:"--rust",main:true},{n:"Viajeros",v:obj(ys.map(y=>PK[y]/pk09*100),ys),c:"--slate"},{n:"Inversión total",v:obj(ys.map(y=>rail[yi(y)]/rail[yi(2009)]*100),ys),c:"--mustard",dash:true}],fmt:v=>nf0.format(v),tick:v=>nf0.format(v)}); },
     mant:el=>{ const f=fig(el,{title:"Gasto de mantenimiento de Adif",sub:"Millones de euros. «Sin inflación»: euros de 2025, con el IPC del INE",source:"Adif (comunicado de enero de 2026), IPC del INE y viajeros-kilómetro de Eurostat. Las subidas son cálculo propio con esas cifras."});
       const row=(n,a,b)=>[n,nf0.format(a),nf0.format(b),sg((b/a-1)*100),sg((b/ipcR/a-1)*100)];
       const c17=m17/PK[2017]*100, c25=m25/PK[2025]*100;
       table(f.body,["","2017","2025","Cambio","Sin inflación"],[row("Red convencional",A.mantConv["2017"],A.mantConv["2025"]),row("Alta velocidad",A.mantAV["2017"],A.mantAV["2025"]),row("Total",m17,m25),
-        ["Total por viajero-km (céntimos)",nf1.format(c17),nf1.format(c25),sg((c25/c17-1)*100),sg((c25/ipcR/c17-1)*100)]]); }
+        ["Total por viajero (céntimos por km)",nf1.format(c17),nf1.format(c25),sg((c25/c17-1)*100),sg((c25/ipcR/c17-1)*100)]]); }
   };
   mdRender(B,"infraestructuras",V,G);
 }
