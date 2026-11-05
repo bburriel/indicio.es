@@ -2355,3 +2355,9 @@ details.chk > section{margin-top:18px}
 .mi-k b{font-family:var(--serif); font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.15}
 .mi-k small{color:var(--muted); font-size:13.5px}
 @media (max-width:900px){ .mi-g{grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:18px} .mi-k:nth-child(odd){padding-left:0; border-left:0} }
+
+/* Municipios en la portada: los tres accesos son botones; «Comparar» va en negro y los otros dos con contorno */
+.pt-mun-q .pt-tools{gap:10px; margin-top:18px}
+.pt-tools .btn{font-size:15.5px; color:var(--bg)}
+.pt-tools .btn:hover{color:#fff; text-decoration:none}
+.pt-tools .btn.alt,.pt-tools .btn.alt:hover{color:var(--ink)}
