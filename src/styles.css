@@ -2236,3 +2236,17 @@ details.chk > section{margin-top:18px}
 .czc .czpar .czc-s .iq{margin-left:4px}
 .czt.su{background:var(--mark,#f3e3e3); color:var(--brand)}
 .czverd{align-items:flex-start} .czverd .m{margin-top:20px}
+
+
+/* Ficha: acciones de la cabecera (noviembre 2026). Una acción principal en granate y el resto como enlaces subrayados, sin cajas ni emojis */
+.mf-acts{display:flex; flex-wrap:wrap; align-items:center; gap:10px 24px; margin-top:20px}
+.mf-acts a,.mf-acts button{display:inline; border:0!important; background:none!important; padding:0!important; min-height:0!important; border-radius:0!important; font:500 15.5px/1.4 var(--font); color:var(--ink)!important; text-decoration:underline; text-decoration-color:color-mix(in srgb, var(--brand) 55%, transparent); text-decoration-thickness:1.5px; text-underline-offset:4px; cursor:pointer; transition:color .15s, text-decoration-color .15s}
+.mf-acts a:hover,.mf-acts button:hover{color:var(--brand)!important; text-decoration-color:var(--brand)}
+.mf-acts #mychip{display:inline-flex; align-items:center; min-height:40px!important; padding:0 18px!important; border-radius:3px!important; background:var(--brand)!important; color:#fff!important; text-decoration:none; font-weight:600; transition:background .15s}
+.mf-acts #mychip:hover{background:var(--brand-2)!important; color:#fff!important}
+.mf-acts #mychip.ismine{background:transparent!important; color:var(--brand)!important; box-shadow:inset 0 0 0 1.5px var(--brand); font-weight:600!important}
+.mf-acts #mychip.ismine:hover{background:color-mix(in srgb, var(--brand) 8%, transparent)!important}
+.mf-acts .muted{flex-basis:100%; font-size:13px!important; margin-top:2px}
+:root[data-theme="dark"] .mf-acts a:hover,:root[data-theme="dark"] .mf-acts button:hover{color:var(--ink)!important}
+:root[data-theme="dark"] .mf-acts #mychip.ismine{color:var(--ink)!important; box-shadow:inset 0 0 0 1.5px var(--ink-2)}
+@media (max-width:860px){ .mf-acts{gap:4px 22px} .mf-acts a,.mf-acts button{padding:9px 0!important} .mf-acts #mychip{padding:0 18px!important; margin-bottom:4px} }
