@@ -7022,14 +7022,14 @@ function heroType(root){
   const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
     while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(rnd(65,115)); } await sleep(rnd(120,330));
     while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(rnd(85,140)); } };
-  // primero la «a» y luego «Indicio»; después elige al azar cuál toca, y se queda parado solo un segundo
-  (async()=>{ let k=0, oa="o", next=OA, first=true; await sleep(1300);
+  // primero la «a» y luego «Indicio», y así alternando (nunca dos cambios seguidos en la misma palabra); el punto se escribe con la palabra. Parado solo un segundo
+  (async()=>{ let k=0, oa="o", next=OA; await sleep(1300);
     while(live()){
       if(at!==next) await go(next);
       await sleep(rnd(150,300));
-      if(next===OA){ oa=oa==="o"?"a":"o"; await edit(OA,oa); } else { await edit(W,k?"tu estudio":"Indicio"); k=1-k; }
+      if(next===OA){ oa=oa==="o"?"a":"o"; await edit(OA,oa); } else { await edit(W,k?"tu estudio.":"Indicio."); k=1-k; }
       busy(false); await sleep(rnd(850,1150)); if(!live()) break;
-      next=first?W:(Math.random()<.5?OA:W); first=false; } })();
+      next=next===OA?W:OA; } })();
 }
 // laboratorio de la portada: un mapa de los municipios que cambia de capa cada 4 s (o cuando se elige una pregunta; al elegirla deja de cambiar solo)
 function heroLab(root){
@@ -7065,7 +7065,7 @@ async function renderInicio(){
   const D=await loadPortada(); if(location.pathname!=="/") return;
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
-  view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio</span><i class="ho-cur"></i><span class="ho-dot">.</span></span></span></h1>
+  view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio.</span><i class="ho-cur"></i></span></span></h1>
     <p class="ho-sub">Democratizando el acceso al dato público</p>
     <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Ver las preguntas</a><a class="ho-lk" href="#" data-go=".pt-labx">Abrir el laboratorio</a><a class="ho-lk" href="#" data-go=".pt-mun">Buscar mi municipio</a></p></section>
