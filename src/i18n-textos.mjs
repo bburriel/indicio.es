@@ -17,6 +17,7 @@ export const ROWS=[
  ["Abrir el menú de Preguntas","Obre el menú de Preguntes","Abrir o menú de Preguntas","Ireki Galderen menua","Open the Questions menu"],
  ["Abrir el menú de Municipios","Obre el menú de Municipis","Abrir o menú de Municipios","Ireki Udalerrien menua","Open the Municipalities menu"],
  ["Abrir el menú del Laboratorio","Obre el menú del Laboratori","Abrir o menú do Laboratorio","Ireki Laborategiaren menua","Open the Lab menu"],
+["Menú","Menú","Menú","Menua","Menu"],
  ["Menú de Preguntas","Menú de Preguntes","Menú de Preguntas","Galderen menua","Questions menu"],
  ["Menú de Municipios","Menú de Municipis","Menú de Municipios","Udalerrien menua","Municipalities menu"],
  ["Menú del Laboratorio","Menú del Laboratori","Menú do Laboratorio","Laborategiaren menua","Lab menu"],

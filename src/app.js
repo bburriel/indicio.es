@@ -216,7 +216,7 @@ function route(){
 }
 let INIT_T=null;
 const saveMun=()=>{ try{ localStorage.setItem("cifrario.mun",lastMun); }catch(e){} };
-// menús desplegables (Preguntas y Municipios): al pasar por encima (o con la flecha, en táctil) se abre su panel
+// botón «Menú»: abre el panel con las secciones solo al pulsar
 const TOP=document.getElementById("top");
 const DDS=[...document.querySelectorAll(".navdd")].map(dd=>({dd, btn:dd.querySelector(".ddb"), mega:document.getElementById(dd.dataset.mega)})).filter(x=>x.btn&&x.mega);
 let MEGA_T=null;
@@ -224,11 +224,8 @@ function megaOpen(x){ clearTimeout(MEGA_T); if(!TOP) return; DDS.forEach(y=>{ co
 function ddClose(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.remove("mega-open"); DDS.forEach(y=>{ y.mega.classList.remove("on"); y.btn.setAttribute("aria-expanded","false"); }); const r=document.getElementById("mq-r"); if(r) r.hidden=true; }
 const megaSoon=()=>{ clearTimeout(MEGA_T); MEGA_T=setTimeout(ddClose,180); };
 if(DDS.length){
-  const HOVER=!!(window.matchMedia&&matchMedia("(hover:hover)").matches);
   DDS.forEach(x=>{
-    // con ratón, el panel ya se abre al pasar por encima: el clic en la flecha lo deja abierto; en táctil alterna
-    x.btn.addEventListener("click",e=>{ e.stopPropagation(); (HOVER||!x.mega.classList.contains("on"))?megaOpen(x):ddClose(); });
-    if(HOVER){ [x.dd,x.mega].forEach(el=>{ el.addEventListener("mouseenter",()=>megaOpen(x)); el.addEventListener("mouseleave",megaSoon); }); }
+    x.btn.addEventListener("click",e=>{ e.stopPropagation(); x.mega.classList.contains("on")?ddClose():megaOpen(x); });
     x.mega.addEventListener("click",e=>{ if(e.target.closest("a")) ddClose(); });
   });
   document.addEventListener("click",e=>{ if(TOP.classList.contains("mega-open")&&!DDS.some(x=>x.mega.contains(e.target)||x.dd.contains(e.target))) ddClose(); });
@@ -6617,12 +6614,18 @@ function setMyMun(code,{which=1,silent=false}={}){
 }
 function rerender(){ const y=window.scrollY; const h=pathToKey(); if(/^explorar/.test(h)&&document.getElementById("exout")){ EX.m=myOk(lastMun)?lastMun:null; exSync(); exSetHash(); exBar(); exDraw(); } else { curMun=null; route(); window.scrollTo(0,y); } }
 // botón de la cabecera
+const MM_LUPA='<svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const MM_PIN='<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 14.6s4.9-4.2 4.9-8.1a4.9 4.9 0 0 0-9.8 0c0 3.9 4.9 8.1 4.9 8.1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="8" cy="6.5" r="1.7" fill="currentColor"/></svg>';
 function myHeader(){
   let b=document.getElementById("mymun");
-  // la cabecera solo tiene este botón: fija tu municipio (y desde su ventana se abre su ficha)
-  if(!b){ const s=document.querySelector(".top-in"); if(!s) return; b=el("button","mymun"); b.id="mymun"; b.type="button"; b.setAttribute("aria-haspopup","dialog"); s.appendChild(b); b.addEventListener("click",e=>{ e.stopPropagation(); myPop(); }); }
-  b.innerHTML=myOk(lastMun)?`<span aria-hidden="true">📍</span><span class="t">${esc(myName(lastMun))}${myOk(MUN2)?` <small>y ${esc(myName(MUN2))}</small>`:""}</span><span class="c" aria-hidden="true">▾</span>`:`<span aria-hidden="true">📍</span><span class="t t-long">Elige tu municipio</span><span class="t t-short" aria-hidden="true">Tu municipio</span>`;
-  b.title=myOk(lastMun)?"Tu municipio: se destaca en temas, mapas y gráficos. Pulsa para cambiarlo.":"Elige tu municipio y lo verás destacado en toda la web";
+  // un solo control en la cabecera: lupa si no hay municipio elegido; pin y nombre si lo hay. Al pulsar se abre su buscador
+  if(!b){ const s=document.querySelector(".top-in"); if(!s) return; b=el("button","mymun"); b.id="mymun"; b.type="button"; b.setAttribute("aria-haspopup","dialog"); s.appendChild(b); }
+  if(!b._on){ b._on=1; b.addEventListener("click",e=>{ e.stopPropagation(); myPop(); }); }
+  const ok=myOk(lastMun);
+  b.classList.toggle("is-set",ok);
+  b.innerHTML=ok?`<span class="mm-i" aria-hidden="true">${MM_PIN}</span><span class="t">${esc(myName(lastMun))}${myOk(MUN2)?` <small>y ${esc(myName(MUN2))}</small>`:""}</span>`:`<span class="mm-i" aria-hidden="true">${MM_LUPA}</span>`;
+  b.title=ok?"Tu municipio: se destaca en temas, mapas y gráficos. Pulsa para cambiarlo.":"Elige tu municipio y lo verás destacado en toda la web";
+  b.setAttribute("aria-label",ok?"Tu municipio: "+myName(lastMun):"Busca tu municipio");
 }
 function myPop(){
   let p=document.getElementById("mypop"); if(p){ p.remove(); return; }
@@ -6639,7 +6642,7 @@ function myPop(){
     p.querySelector(".mp-x").addEventListener("click",()=>p.remove());
     p.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{ setMyMun(null,{which:+b.dataset.rm}); draw(); }));
     p.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>p.remove()));
-    attachSearch(document.getElementById("mpq1"),document.getElementById("mpq1-r"),document.getElementById("mpq1-s"),r=>{ setMyMun(r[F.code]); draw(); });
+    attachSearch(document.getElementById("mpq1"),document.getElementById("mpq1-r"),document.getElementById("mpq1-s"),r=>{ const first=!myOk(lastMun); setMyMun(r[F.code],{silent:first}); if(first){ p.remove(); go(r[F.code]); window.scrollTo(0,0); } else draw(); });
     if(document.getElementById("mpq2")) attachSearch(document.getElementById("mpq2"),document.getElementById("mpq2-r"),document.getElementById("mpq2-s"),r=>{ setMyMun(r[F.code],{which:2}); draw(); });
     const b=document.getElementById("mymun").getBoundingClientRect(); p.style.top=(b.bottom+8)+"px"; p.style.left=Math.max(10,Math.min(window.innerWidth-p.offsetWidth-10,b.right-p.offsetWidth))+"px"; };
   draw(); setTimeout(()=>{ const i=document.getElementById("mpq1"); if(i&&!myOk(lastMun)) i.focus(); },30);
