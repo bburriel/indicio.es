@@ -1654,7 +1654,7 @@ function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParam
   if(S.v==="composicion"){ ["d","o","w","lx","c"].forEach(k=>q.delete(k)); q.set("cf",S.cf||"sector"); q.set("gb",S.gb); if(S.co) q.set("co",S.co); } if(S.v==="distribucion"&&S.dg) q.set("dg",S.dg);
   if(S.v==="cruce"){ if(S.u) q.set("u",S.u); if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ ["d","p","t","c","o","m"].forEach(k=>q.delete(k)); q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es"){ q.set("lv",ES_.lev); if(ES_.mun) q.set("m",ES_.mun); } }
-  if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); else if(PS.b) q.set("b",PS.b); if(PS.real) q.set("r","1"); if(PS.su) q.set("su",PS.su); if(PS.m&&PS.s.some(k=>/^ev_/.test(k))){ q.set("m",PS.m); if(PS.lev!=="mun") q.set("lv",PS.lev); } } else { q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
+  if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); else if(PS.b) q.set("b",PS.b); if(PS.real) q.set("r","1"); if(PS.su) q.set("su",PS.su); if(PS.m&&PS.s.some(k=>/^ev_/.test(k))){ q.set("m",PS.m); if(PS.lev!=="mun") q.set("lv",PS.lev); } } else { if(PS.su) q.set("su",PS.su); q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
     if(!PS.gob) q.set("gob","0"); if(PS.desde) q.set("desde",PS.desde); if(PS.hasta) q.set("hasta",PS.hasta); }
   if(S.v==="antes"){ ["d","p","t","c","m","o"].forEach(k=>q.delete(k)); const A={...AD,...(S.ad||{})}; q.set("ev",A.ev); q.set("oy",A.y); if(ADEV[A.ev].free) q.set("yr",A.yr); if(A.ev==="ccaa"&&A.cc) q.set("cc",A.cc); if(A.ev==="prov"&&A.pv) q.set("pv",A.pv); if(A.ev==="lista"&&A.ms.length) q.set("ms",A.ms.join(",")); { const dmc=ADEV[A.ev].mc||0; if(A.mc!==dmc) q.set("mc",A.mc?"1":"0"); } if(A.mp!==ADEV[A.ev].mp) q.set("mp",A.mp); if(A.mt==="sint") q.set("mt","sint"); }
   vCustomIn([...(q.get("d")||"").split(","),...(q.get("c")||"").split(","),q.get("sz"),q.get("col"),(q.get("o")||"").replace(/^-/,"")]).forEach(k=>q.append("dv",vEnc(VBYK[k])));   // los datos propios viajan con el enlace
@@ -2130,10 +2130,10 @@ function psBar(bar){
           <div class="search" id="ps-s" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="margin:8px 0 0;flex:none;min-width:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="ps-q" type="search" placeholder="${sc.code?"Otro municipio":"Elige un municipio"}" autocomplete="off" aria-label="Elegir municipio"><ul id="ps-r" class="results" role="listbox" hidden></ul></div>
           <p class="hint">Los precios, los sueldos y el gasto público son de toda España.</p></div>`:""}`
         :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
-    ${esMode?`<div class="lb-step"><h4><i>3</i>Un suceso <small class="muted">(opcional)</small></h4>
+    <div class="lb-step"><h4><i>${esMode?3:4}</i>Un suceso <small class="muted">(opcional)</small></h4>
       <select class="sel" id="pssu" aria-label="Marcar un suceso">${psSucesoOpts()}</select>
-      <p class="hint">Márcalo para ver si la serie se sale de la tendencia que traía. No prueba que el suceso sea la causa.</p></div>`:""}
-    <div class="lb-step"><h4><i>4</i>Ajustes</h4>
+      <p class="hint">Márcalo para ver si la serie se sale de la tendencia que traía. No prueba que el suceso sea la causa.</p></div>
+    <div class="lb-step"><h4><i>${esMode?4:5}</i>Ajustes</h4>
       <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
       <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
       ${esMode?`<label class="chk"><input type="checkbox" id="psidx" ${PS.idx?"checked":""}> Como índice, con un año de referencia = 100</label>
@@ -2209,19 +2209,19 @@ function itsFit(v,t0){
   const nOut=rows.filter(r=>r.out).length, dir=d3.mean(rows,r=>r.dev), pre0=pre[0];
   return {ok:true,lg,pre,post,at,rows,nOut,dev:dir,slope:lg?(Math.exp(b)-1)*100:b,pre0,sd,n};
 }
-function psEvent(out,ser,years,{idx,u}){
+function psEvent(out,ser,years,{idx,u,prop,unit=""}){
   const E=psSuceso(); if(!E) return;
   const pc=v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+NB+"%", nm0=s=>s.n.replace(/ \(.*\)$/,"");
   const R=ser.map(s=>({s,r:itsFit(s.v,E.y)}));
   const main=R.find(o=>o.r.ok)||R[0], r=main.r, f=fig(out,{title:`¿Se sale de su tendencia tras ${low(E.l.replace(/ \(.*\)$/,""))}?`,sub:r.ok?`${nm0(main.s)}: lo que marcaba la tendencia de ${r.pre0}–${E.y-1}, frente a lo que ocurrió`:"",source:"Tendencia previa: recta ajustada a los años anteriores al suceso, proyectada hacia delante con su intervalo del 95 %. Medias anuales."});
   f.classList.add("its-fig");
   if(!r.ok){ const why=!r.pre.length||r.pre.length<4?`Hay solo ${r.pre.length} año${r.pre.length===1?"":"s"} con dato antes de ${E.y}; hacen falta cuatro para saber qué tendencia traía.`:`No hay datos de ${nm0(main.s)} desde ${E.y}.`; f.body.innerHTML=`<p class="loading">${why} Prueba con otra serie, otro año o ensancha el periodo.</p>`; return; }
-  const all=Object.keys(main.s.v).map(Number).sort((a,b)=>a-b), last=all[all.length-1], pro=d3.range(E.y-1,last+1).filter(y=>y>=E.y-1).map(y=>r.at(y));
+  const all=Object.keys(main.s.v).map(Number).filter(y=>y>=E.y-16).sort((a,b)=>a-b), last=all[all.length-1], pro=d3.range(E.y-1,last+1).filter(y=>y>=E.y-1).map(y=>r.at(y));
   const W=Math.max(300,f.body.clientWidth||760), H=Math.min(340,Math.max(240,W*.36)), m={t:16,r:20,b:28,l:52};
   const X=d3.scaleLinear().domain([all[0],last]).range([m.l,W-m.r]), vs=all.map(y=>main.s.v[y]).concat(pro.flatMap(p=>[p.lo,p.hi])).filter(v=>v!=null&&isFinite(v)), lo=d3.min(vs), hi=d3.max(vs), pd=(hi-lo)*.08||1;
   const Y=d3.scaleLinear().domain([lo-pd,hi+pd]).nice(5).range([H-m.b,m.t]), svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`${nm0(main.s)}: serie y tendencia previa`);
   svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",Y).attr("y2",Y);
-  svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>idx?nf0.format(v):(u==="€"&&v>=10000?nf0.format(v/1000)+" mil":nf0.format(v)));
+  svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>idx?nf0.format(v):(u==="€"&&v>=5000?nf0.format(v/1000)+" mil":(hi-lo<20?nf1:nf0).format(v)));
   svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/80))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-8).attr("text-anchor","middle").text(String);
   const ys0=d3.range(E.y-1,last+1), pts=ys0.map((y,i)=>({y,...pro[i]}));
   svg.append("path").attr("d",d3.area().x(d=>X(d.y)).y0(d=>Y(d.lo)).y1(d=>Y(d.hi))(pts)).attr("fill",css("--slate")).attr("opacity",.16);
@@ -2230,13 +2230,13 @@ function psEvent(out,ser,years,{idx,u}){
   svg.append("path").attr("d",d3.line().x(d=>X(d.y)).y(d=>Y(d.m))(pts)).attr("fill","none").attr("stroke",css("--slate")).attr("stroke-width",2).attr("stroke-dasharray","6 4");
   const ob=all.map(y=>[y,main.s.v[y]]); svg.append("path").attr("d",d3.line().x(d=>X(d[0])).y(d=>Y(d[1]))(ob)).attr("fill","none").attr("stroke",css("--rust")).attr("stroke-width",2.8);
   svg.append("g").selectAll("circle").data(ob).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",2.8).attr("fill",css("--rust")).append("title").text(d=>`${d[0]}: ${idx?nf1.format(d[1]):nf0.format(d[1])}`);
-  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",Y(ob[ob.length-1][1])-8).attr("text-anchor","end").style("fill",css("--rust")).text("Lo que ocurrió");
-  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",Y(pro[pro.length-1].lo)+15).attr("text-anchor","end").style("fill",css("--slate")).text("Tendencia previa");
+  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",Y(ob[ob.length-1][1])+(ob[ob.length-1][1]<pro[pro.length-1].m?16:-8)).attr("text-anchor","end").style("fill",css("--rust")).text("Lo que ocurrió");
+  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",ob[ob.length-1][1]<pro[pro.length-1].m?Y(pro[pro.length-1].m)-8:Y(pro[pro.length-1].lo)+15).attr("text-anchor","end").style("fill",css("--slate")).text("Tendencia previa");
   // frase
-  const yl=low(nm0(main.s)), pre=r.slope, dirTxt=pre>=0?"subiendo":"bajando", ab=nf1.format(Math.abs(r.dev))+(r.lg?NB+"%":""), where=r.dev>=0?"por encima":"por debajo", un=r.lg?"un ":"";
+  const yl=prop?nm0(main.s):low(nm0(main.s)), pre=r.slope, dirTxt=pre>=0?"subiendo":"bajando", ab=nf1.format(Math.abs(r.dev))+(r.lg?NB+"%":unit), where=r.dev>=0?"por encima":"por debajo", un=r.lg?"un ":"";
   const nP=r.rows.length, ver=r.nOut>=1&&r.nOut>=Math.min(2,nP)?(r.dev>0?"Se sale por arriba":"Se sale por abajo"):"Sigue su tendencia";
   const cls=ver==="Sigue su tendencia"?"mu":"ko";
-  const trend=`Desde ${r.pre0} venía ${dirTxt} ${nf1.format(Math.abs(pre))}${r.lg?NB+"% al año":" al año"}.`;
+  const trend=`Desde ${r.pre0} venía ${dirTxt} ${nf1.format(Math.abs(pre))}${r.lg?NB+"% al año":unit+" al año"}.`;
   const body=ver==="Sigue su tendencia"?`${trend} Tras ${E.y}, ${yl} queda ${un}${ab} ${where} de lo que marcaba esa tendencia, dentro de lo normal en esta serie: no se ve ruptura.`
     :`${trend} Tras ${E.y}, ${yl} queda ${un}${ab} ${where} de lo que marcaba esa tendencia, fuera del rango normal en ${r.nOut} de ${nP} año${nP===1?"":"s"}.`;
   const g=add(out,"div","czout its-out"); g.innerHTML=`<p class="czverd"><span class="m ${cls}" aria-hidden="true"></span><span><span class="czkk">Resultado</span><b>${ver}</b></span></p><p class="czvs">${body}${nP<2?" Solo hay un año de datos tras el suceso: conviene esperar a tener más.":""} Una serie sola no separa el suceso de todo lo demás que pasó a la vez: es una pista, no una prueba.${E.lab?` <a href="/laboratorio/antes/?ev=${E.lab}">Compáralo con municipios que no lo vivieron →</a>`:""}</p>`;
@@ -2279,6 +2279,7 @@ function psDrawPais(out){
     source:`Fuente: Eurostat${years[0]<1995?" (desde 1995) y Banco Mundial (antes)":""}.${PS.gob?" Fondo: presidente del Gobierno de España; cada año se asigna a quien gobernó más de la mitad.":""}`,
     years,series:sel.map((g,i)=>({n:P[g].n,c:PSCOL[i%PSCOL.length],main:g==="ES",v:Object.fromEntries(years.map(y=>[y,val(g,y)]).filter(([,v])=>v!=null))})),fmt,
     tick:v=>PS.rel||I.u!=="€ de 2020"?nf0.format(v):nf0.format(v/1000)+" mil",zero:PS.rel||I.t==="flujo",gob:!!PS.gob});
+  if(PS.su) psEvent(out,sel.map((g,i)=>({n:P[g].n,main:g==="ES",v:Object.fromEntries(years.map(y=>[y,val(g,y)]).filter(([,v])=>v!=null))})),years,{idx:false,prop:true,unit:PS.rel?" puntos":"",u:PS.rel?"":I.u==="€ de 2020"?"€":""});
   if(PS.gob){ const OT=[...new Set([PS.ref,...PS.c.filter(g=>g!=="ES")])].filter(g=>P[g]&&P[g][PS.k]);
     const lab=I.t==="flujo"?"Media anual":I.t==="nivel"?"Crecimiento medio anual":"Cambio en puntos";
     psMandTable(out,[{n:"España",v:P.ES[PS.k]},...OT.map(c=>({n:P[c].n.replace("Unión Europea","UE"),v:P[c][PS.k]}))],I.t,`${I.l} con cada Gobierno`,`${lab} en los años de cada mandato, en España y en los países elegidos`,
