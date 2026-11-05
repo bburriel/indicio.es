@@ -5473,7 +5473,7 @@ async function studyAlimentos(B){
 // ---------- sueldos: dónde estás en la fila y cómo se ha movido cada escalón ----------
 // El texto está en contenido/analisis/sueldos.md. Variables que ofrece (V) y gráficos (G): ver abajo.
 async function studySueldos(B){
-  const D=await getJSON("/data/sueldos.json");   // lleva dentro el IPC anual y los nombres de comunidad: así no se descargan alimentos.json ni regional.json
+  const D=await getJSON("/data/sueldos.json?v=__DV__");   // lleva dentro el IPC anual y los nombres de comunidad: así no se descargan alimentos.json ni regional.json
   const IP=D.ipc, ipc=y=>IP.general[IP.años.indexOf(y)], ali=y=>IP.alimentos[IP.años.indexOf(y)];
   const E=D.ees, EY=E.años.map(Number), eY=EY[EY.length-1], at=(arr,y)=>arr[EY.indexOf(y)];
   const K={p10:"Percentil 10",q1:"Cuartil inferior",med:"Mediana",q3:"Cuartil superior",p90:"Percentil 90",media:"Media"};
