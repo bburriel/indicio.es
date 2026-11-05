@@ -2195,3 +2195,34 @@ details.chk > section{margin-top:18px}
 .srcdef>summary{display:inline; cursor:pointer; color:var(--brand); font-size:13px}
 .srcdef[open]>summary{display:block}
 .srcdef>p{margin:4px 0 0; font-size:13px; color:var(--muted); max-width:var(--medida)}
+
+/* LABORATORIO · lectura simple del cruce (noviembre 2026): fila de tres datos y «¿Y si es por otra cosa?» */
+.czc{border-top:0; padding-top:4px}
+.czstats{display:grid; grid-template-columns:1fr 1.2fr 1fr; background:var(--card); border:1px solid var(--rule); border-radius:12px; margin:0}
+.czstats .czs{padding:14px 20px; border-right:1px solid var(--rule); min-width:0}
+.czstats .czs:last-child{border-right:0}
+.czs .k{font-size:13px; color:var(--muted); line-height:1.35}
+.czs .v{font-family:"Newsreader",var(--serif,Georgia,serif); font-size:24px; line-height:1.2; margin-top:3px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.czs .v small{font:400 13.5px var(--font,sans-serif); color:var(--ink-2)}
+.czs .czdots{margin:0; gap:5px} .czs .czdots i{width:10px; height:10px}
+.czs .czv{color:var(--brand-2,var(--brand)); max-width:none; margin:0; cursor:help; border-bottom:2px dotted var(--brand)}
+.czs .czadj{font-size:12px; color:var(--muted); margin-top:2px}
+.czs #czevd{margin-top:3px; font-size:13px}
+.czs .iq{margin-left:3px}
+.czc .czpar{background:none; border:0; border-top:1px solid var(--ink); border-radius:0; padding:16px 0 0; margin-top:22px}
+.czc .czpar h3{font-size:21px; font-weight:500; margin:0 0 3px}
+.czc .czpar .czlead{font-size:14.5px; margin:0 0 10px}
+.czverd{margin:14px 0 0; font-size:17px; display:flex; align-items:center; gap:9px}
+.czverd .m{width:10px; height:10px; border-radius:50%; flex:none; background:var(--muted)}
+.czverd .m.ok{background:var(--ok)} .czverd .m.mu{background:var(--mustard)} .czverd .m.ko{background:var(--brand)}
+.czout .czvs{margin:2px 0 0 19px; font-size:14px; color:var(--muted); max-width:var(--medida)}
+.czout .czdet2{margin:10px 0 0 19px}
+.czout .czhit,.czout .czlk{margin-left:19px}
+@media(max-width:760px){
+  .czstats{grid-template-columns:1fr}
+  .czstats .czs{border-right:0; border-bottom:1px solid var(--rule); padding:12px 16px}
+  .czstats .czs:last-child{border-bottom:0}
+  .czout .czvs,.czout .czdet2,.czout .czhit,.czout .czlk{margin-left:0}
+}
+.czout .czlk{margin-top:14px}
+.czs .czadj{display:inline-block; font-size:11.5px; padding:0 8px; border-radius:99px}
