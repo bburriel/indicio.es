@@ -6312,12 +6312,14 @@ const ptCharts={
       +[2018,2021,2024].filter(y=>y<=t1).map(y=>`<text x="${X(y).toFixed(1)}" y="${y0+24}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
       +lines+dots+ends.map(lab).join(""),
       `Desde 2015 comprar una vivienda cuesta un ${nf0.format(C.compra[0])} % más, alquilarla un ${nf0.format(C.alquiler[0])} % más, y el sueldo mediano ha subido un ${nf0.format(C.sueldo[0])} %.`); },
-  tope(){ const x0=30,x1=410, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1), y=150;
-    return ptSvg(`<line x1="${x0}" x2="${x1}" y1="${y}" y2="${y}" class="pt-g-gr"/>`
-      +`<circle cx="${a.toFixed(1)}" cy="${y}" r="15" class="pt-g-ghost"/><circle cx="${b.toFixed(1)}" cy="${y}" r="15" class="pt-f-br"/>`
-      +`<text x="${x1}" y="${y-56}" text-anchor="end" class="pt-g-l">Sin el tope (estimado)</text><text x="${x1}" y="${y-28}" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
-      +`<text x="${b.toFixed(1)}" y="${y+58}" text-anchor="middle" class="pt-g-n br">+3,1${NB}%</text><text x="${b.toFixed(1)}" y="${y+80}" text-anchor="middle" class="pt-g-l br">Con el tope</text>`
-      +`<text x="${x0}" y="262" class="pt-g-g">Unos 7${NB}€ al mes en un piso de Barcelona</text>`,
+  // el tope: el gráfico de siempre (barra estimada sin tope, barra real y la diferencia), con trazo más fino
+  tope(){ const x0=40,x1=400, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1), tk=` style="stroke-opacity:.55"`;
+    return ptSvg(`<text x="${x0}" y="66" class="pt-g-l">Sin el tope (estimado)</text><rect x="${x0}" y="78" width="${(a-x0).toFixed(1)}" height="38" rx="3" class="pt-g-ghost" style="stroke-opacity:.6"/>`
+      +`<text x="${(a-12).toFixed(1)}" y="105" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
+      +`<text x="${x0}" y="162" class="pt-g-l br">Con el tope (lo que pasó)</text><rect x="${x0}" y="174" width="${(b-x0).toFixed(1)}" height="38" rx="3" class="pt-f-br"/>`
+      +`<text x="${(b-12).toFixed(1)}" y="200" text-anchor="end" class="pt-g-n on">+3,1${NB}%</text>`
+      +`<line x1="${b.toFixed(1)}" x2="${b.toFixed(1)}" y1="222" y2="246" class="pt-g-tick"${tk}/><line x1="${a.toFixed(1)}" x2="${a.toFixed(1)}" y1="120" y2="246" class="pt-g-tick dash"${tk}/><line x1="${b.toFixed(1)}" x2="${a.toFixed(1)}" y1="242" y2="242" class="pt-g-tick"${tk}/>`
+      +`<text x="${((a+b)/2).toFixed(1)}" y="270" text-anchor="middle" class="pt-g-g">unos 7${NB}€ al mes</text>`,
       "Sin el tope el alquiler habría subido un 3,7 %; subió un 3,1 %."); },
   contratos(D){ const {meses:M,temporales:T,antes}=D.contratos, idx=T.map((v,i)=>i).filter(i=>T[i]!=null), n=M.length, last=idx[idx.length-1];
     const X=i=>40+(330-40)*i/(n-1), Yv=v=>262-(262-26)*(v-40)/(100-40), ir=M.indexOf("2022-04");
