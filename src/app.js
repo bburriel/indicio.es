@@ -40,7 +40,9 @@ const loadProv=p=>{ if(!provCache.has(p)) provCache.set(p, getJSON("/data/prov/"
 let topoP=null;
 const loadTopo=()=>{ if(!topoP) topoP=getJSON("/data/municipios.topo.json").then(t=>{ TOPO=t; prepGeo(); return t; }); return topoP; };
 
-loadTopo().catch(()=>{}); // el mapa se descarga en paralelo con el índice, no después
+// El mapa (1,8 MB) se descarga en paralelo con el índice, no después. En un análisis (/preguntas/<id>/) se
+// aplaza unos segundos para que no compita con lo que sí hace falta para leerlo; quien lo necesite lo espera con loadTopo().
+if(/^\/preguntas\/[^/]+\/?$/.test(location.pathname)) setTimeout(()=>loadTopo().catch(()=>{}),4000); else loadTopo().catch(()=>{});
 Promise.all([getJSON("/data/index.json"),getJSON("/data/refs.json"),getJSON("/data/vote_refs.json"),getJSON("/data/indicadores.json")]).then(([ix,refs,vrefs,cat])=>{
   REFS=refs; VREFS=vrefs; PROVS=ix.provs; CAT=cat; cat.forEach(c=>CATK[c.k]=c);
   ix.fields.forEach((f,i)=>F[f]=i);
@@ -5524,10 +5526,8 @@ async function studyAlimentos(B){
 // ---------- sueldos: dónde estás en la fila y cómo se ha movido cada escalón ----------
 // El texto está en contenido/analisis/sueldos.md. Variables que ofrece (V) y gráficos (G): ver abajo.
 async function studySueldos(B){
-  await loadRegional();
-  const [D,A]=await Promise.all([getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json")]);
-  const P=A.meses, yav=(v,y)=>{ const x=P.map((p,i)=>p.startsWith(String(y))?v[i]:null).filter(z=>z!=null); return x.length?d3.mean(x):null; };
-  const ipc=y=>yav(A.ipc.es.general,y), ali=y=>yav(A.ipc.es.alimentos,y);
+  const D=await getJSON("/data/sueldos.json");   // lleva dentro el IPC anual y los nombres de comunidad: así no se descargan alimentos.json ni regional.json
+  const IP=D.ipc, ipc=y=>IP.general[IP.años.indexOf(y)], ali=y=>IP.alimentos[IP.años.indexOf(y)];
   const E=D.ees, EY=E.años.map(Number), eY=EY[EY.length-1], at=(arr,y)=>arr[EY.indexOf(y)];
   const K={p10:"Percentil 10",q1:"Cuartil inferior",med:"Mediana",q3:"Cuartil superior",p90:"Percentil 90",media:"Media"};
   const es=Object.fromEntries(Object.entries(K).map(([k,n])=>[k,E.es[n]]));
@@ -5538,7 +5538,7 @@ async function studySueldos(B){
   const C=D.ecv, CY=C.años.map(Number), cv=(arr,y)=>arr[CY.indexOf(y)], cLast=CY[CY.length-1];
   const creal=(arr,y,b)=>cv(arr,y)/cv(arr,b)/(ipc(y-1)/ipc(b-1))*100-100;   // la ECV de cada año recoge ingresos del anterior
   const ratio=EY.map((y,i)=>es.p90[i]/es.p10[i]), iMax=d3.maxIndex(ratio);
-  const CC=Object.entries(E.ccaa).map(([c,o])=>({c,n:(REG&&REG.ccaa[c])||c,v:at(o.Mediana,eY),g:real(o.Mediana,eY,2019)})).filter(x=>x.v).sort((a,b)=>b.v-a.v);
+  const CC=Object.entries(E.ccaa).map(([c,o])=>({c,n:D.ccaaNombres[c]||c,v:at(o.Mediana,eY),g:real(o.Mediana,eY,2019)})).filter(x=>x.v).sort((a,b)=>b.v-a.v);
   const AG=Object.entries(EP.edad).filter(([g])=>g!=="Total").map(([g,o])=>({l:g.replace(/^De /,"").replace(" y más años"," o más").replace(" años",""),v:preal(o["0"],eY,2008)}));
   const ageTot=preal(EP.edad.Total["0"],eY,2008);
   const V={

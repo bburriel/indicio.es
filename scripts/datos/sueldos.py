@@ -77,6 +77,20 @@ out["ecv"] = ecv
 # salario mínimo (euros al mes, 14 pagas; BOE) y revalorización general de las pensiones (%), para comparar
 out["smiLegal"] = {"2008": 600, "2009": 624, "2010": 633.3, "2011": 641.4, "2012": 641.4, "2013": 645.3, "2014": 645.3, "2015": 648.6, "2016": 655.2, "2017": 707.7,
                    "2018": 735.9, "2019": 900, "2020": 950, "2021": 950, "2022": 1000, "2023": 1080, "2024": 1134, "2025": 1184}
+# IPC anual (media de los doce meses) e nombres de comunidad, para que el análisis no tenga que descargar
+# data/alimentos.json (435 KB) ni data/regional.json (850 KB) solo por esto. Hay que haber ejecutado antes alimentos.py y regional.py.
+DATA = f"{HERE}/../../data"
+_A = json.load(open(f"{DATA}/alimentos.json")); _R = json.load(open(f"{DATA}/regional.json"))
+def _anual(v):
+    r = {}
+    for m, x in zip(_A["meses"], v):
+        if x is not None: r.setdefault(m[:4], []).append(x)
+    return {y: sum(a) / len(a) for y, a in r.items() if len(a) == 12}
+_g, _al = _anual(_A["ipc"]["es"]["general"]), _anual(_A["ipc"]["es"]["alimentos"])
+_ys = sorted(set(_g) & set(_al))
+out["ipc"] = {"años": [int(y) for y in _ys], "general": [round(_g[y], 4) for y in _ys], "alimentos": [round(_al[y], 4) for y in _ys],
+              "fuente": "INE, IPC: media anual de los índices mensuales (data/alimentos.json)"}
+out["ccaaNombres"] = {c: _R["ccaa"][c] for c in ees["ccaa"] if c in _R["ccaa"]}
 json.dump(out, open(f"{HERE}/../../data/sueldos.json", "w"), ensure_ascii=False, separators=(",", ":"))
 print(epa["años"][0], epa["años"][-1], list(epa["edad"]), list(epa["contrato"]), len(cc), ees["años"][-1], list(ees["es"]), list(smi), ecv["años"][-1], list(ecv["limite"]), list(edadD))
 print(os.path.getsize(f"{HERE}/../../data/sueldos.json") // 1024, "KB")
