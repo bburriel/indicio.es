@@ -2,6 +2,8 @@
 titulo: ¿Por qué cuesta tanto pagar una casa?
 entradilla: El alquiler sube más que los sueldos casi en todas partes. ¿Es la gente que llega, los pisos turísticos, las casas vacías? Lo miramos en ciudades, en la costa y en los pueblos.
 respuesta: Porque llega más gente de la que se construye para alojarla. En los cinco tipos de municipio que separamos el alquiler declarado ha subido entre un 35 % (pueblos) y un 47 % (costa), y en todos lo que más distingue a unos sitios de otros es cuánta gente ha llegado. Las viviendas vacías y los pisos turísticos pesan bastante menos; la costa, con más compradores de fuera y más casas que no son hogar de nadie, es donde más sube. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
+cifra: +40 %
+cifra_texto: el alquiler desde 2015; el sueldo, +26 %
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
 publicado: 2026-10-25
