@@ -1,6 +1,6 @@
 ---
 titulo: ¿Cobras mucho o poco?
-entradilla: Dónde está tu sueldo en la fila de todos los asalariados de España, cómo se ha movido cada escalón desde 2008 y qué se puede comprar hoy con él.
+entradilla: Dónde está tu sueldo entre todos los asalariados de España y cómo se ha movido desde 2008.
 respuesta: Con más de 24.500 euros brutos al año cobras más que la mitad de los asalariados. Descontada la inflación, el sueldo mediano es casi el mismo que en 2008. Lo que sí ha subido es el suelo: el 10 % que menos cobra gana un 13 % más que en 2019, empujado por el salario mínimo.
 metodo: Estructura Salarial, EPA y ECV, 2008–2025
 evidencia: desc

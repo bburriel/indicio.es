@@ -252,7 +252,7 @@ function prepGeo(){ FEATS=topojson.feature(TOPO,TOPO.objects.municipalities).fea
 const LABNAV=cur=>cur==="datos"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Qué significa cada dato</nav>`:cur==="metodo"?`<nav class="crumbs" aria-label="Ruta"><a href="/laboratorio/">Laboratorio</a> › Guía: de la relación a la causa</nav>`:"";
 function pageHead(title,dek,extra,after){ return `<header class="phead">${extra||""}<h1>${title}</h1>${dek?`<p class="dek">${dek}</p>`:""}${after||""}</header>`; }
 const fechaES=d=>{ if(!d) return ""; const [y,m,dd]=d.split("-"); return `${+dd} de ${MES[+m]} de ${y}`; };
-const byline=S=>`<span class="by-who">Por <a href="/quien-soy/">${esc((window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author.name)||"Indicio")}</a></span> · <time datetime="${S.pub||""}">${fechaES(S.pub)}</time>${S.upd&&S.upd!==S.pub?` · <span class="by-upd">Revisado el ${fechaES(S.upd)}</span>`:""} · <span class="by-m">${esc(S.m)}</span>${S.ev&&window.__INDICIO&&window.__INDICIO.evidence?` · <a class="ev ev-${S.ev}" href="/laboratorio/metodo/#evidencia" title="${esc(window.__INDICIO.evidence[S.ev].d)}">${esc(window.__INDICIO.evidence[S.ev].l)}</a>`:""}`;
+const byline=S=>`<span class="by-who">Por <a href="/quien-soy/">${esc((window.__INDICIO&&window.__INDICIO.site&&window.__INDICIO.site.author.name)||"Indicio")}</a></span> · <time datetime="${S.pub||""}">${fechaES(S.pub)}</time>${S.upd&&S.upd!==S.pub?` · <span class="by-upd">Revisado el ${fechaES(S.upd)}</span>`:""}${S.ev&&window.__INDICIO&&window.__INDICIO.evidence?` · <a class="ev ev-${S.ev}" href="/laboratorio/metodo/#evidencia" title="${esc(window.__INDICIO.evidence[S.ev].d)}">${esc(window.__INDICIO.evidence[S.ev].l)}</a>`:""}`;
 function finding(parent,title,text){ const s=add(parent,"section","finding"); if(title) add(s,"h2",null,title); if(text) add(s,"div","txt",text); return s; }
 function fig(parent,{title,sub,source}={}){ const f=add(parent,"figure"); if(title) add(f,"div","ct",title); if(sub) add(f,"div","cs",sub); const body=add(f,"div"); if(source){ const c=add(f,"figcaption",null,source); f._cap=c; } f.body=body; return f; }
 // burbuja de ayuda: la comparten el glosario de los textos y los iconos «i» de las tablas de datos.
@@ -2737,9 +2737,8 @@ function coverOf(id,{C,D}){
   const c=C[id]; return c?{svg:c.svg,cap:c.cap}:null; }
 // el titular de los análisis del carrusel lleva el mismo final en granate que en la portada, para que la transición encaje
 const shTitle=S=>{ const h=(typeof HEROQ!=="undefined"?HEROQ:[]).find(x=>x.id===S.id); return h&&h.em&&S.t.endsWith(h.em)?esc(S.t.slice(0,-h.em.length))+`<em>${esc(h.em)}</em>`:esc(S.t); };
-function studyHead(S){ const {v}=splitA(S.a);
-  return `<nav class="crumbs"><a href="/preguntas/">Análisis</a></nav>`
-    +`<header class="sh"><div class="sh-t"><div class="kk2">${esc((EVID[S.ev]||{}).l||"Análisis")}</div><h1 class="sh-q">${shTitle(S)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
+function studyHead(S){
+  return `<header class="sh"><div class="sh-t"><h1 class="sh-q">${shTitle(S)}</h1><p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
     +`<figure class="sh-f" id="shf"><div class="sh-ph"></div></figure></header>`; }
 function studyCover(S){ loadCovers().then(cv=>{ const f=document.getElementById("shf"); if(!f||!document.body.contains(f)) return; const c=coverOf(S.id,cv);
   if(c) f.innerHTML=c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`; else { f.parentNode.classList.add("nofig"); f.remove(); } }); }
@@ -2750,8 +2749,9 @@ function studyToc(){ const B=document.getElementById("sbody"), T=document.getEle
     if(c.classList.contains("psec")){ const h=c.querySelector("h2"); if(!h) return; c.id="s"+(++n); items.push({id:c.id,t:h.textContent,sub:[]}); }
     else if(c.classList.contains("pres")&&items.length){ const h=c.querySelector("h3"); if(!h) return; c.id="s"+(++n); items[items.length-1].sub.push({id:c.id,t:h.textContent}); } });
   if(items.length<3) return;
-  T.innerHTML=`<nav class="sh-toc" aria-label="En este análisis"><b>En este análisis</b><ol>${items.map(i=>`<li><a href="#${i.id}">${esc(i.t)}</a>${i.sub.length?`<ul>${i.sub.map(x=>`<li><a href="#${x.id}">${esc(x.t)}</a></li>`).join("")}</ul>`:""}</li>`).join("")}</ol></nav>`;
-  T.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); const t=document.getElementById(a.getAttribute("href").slice(1)); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
+  T.innerHTML=`<nav class="sh-toc" aria-label="En este análisis"><details><summary>En este análisis</summary><ol>${items.map(i=>`<li><a href="#${i.id}">${esc(i.t)}</a>${i.sub.length?`<ul>${i.sub.map(x=>`<li><a href="#${x.id}">${esc(x.t)}</a></li>`).join("")}</ul>`:""}</li>`).join("")}</ol></details></nav>`;
+  const dt=T.querySelector("details"), wide=matchMedia("(min-width:1100px)"), fit=()=>{ dt.open=wide.matches; }; fit(); wide.addEventListener?.("change",fit);
+  T.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); if(!wide.matches) dt.open=false; const t=document.getElementById(a.getAttribute("href").slice(1)); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
   // índice lateral: marca dónde estás y se actualiza al hacer scroll
   const secs=[...T.querySelectorAll("a")].map(a=>({a,li:a.closest("li"),el:document.getElementById(a.getAttribute("href").slice(1))})).filter(o=>o.el);
   let tick=false;
