@@ -6583,7 +6583,7 @@ async function renderInicio(){
         <small>Cada municipio, coloreado por su dato. En gris, sin dato.</small></figcaption></figure></div></section>
   <section class="pt-land pt-mun" id="municipios"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>En España hay ${nMun} municipios. <em>En uno de ellos vives tú.</em></h2>
       <p class="pt-land-lead">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
-    <div class="pt-mun-q">${bigSearchHTML("q2","Busca tu municipio…")}${exampleChips()}<p class="pt-tools"><a class="btn" href="/comparar/">Comparar dos municipios →</a></p></div>
+    <div class="pt-mun-q"><p class="pt-tools"><a class="btn" href="/comparar/">Comparar dos municipios →</a></p></div>
     <div class="mi-que"><p><b>Su ficha</b>Renta, paro, alquiler y edad, frente a España.</p><p><b>Cómo ha cambiado</b>Población, renta, paro y alquiler desde 2015.</p><p><b>A quién se parece</b>Los cinco municipios que más se le parecen.</p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
@@ -6606,7 +6606,7 @@ async function renderInicio(){
 }
 // «Municipios» de la portada: la sección explica en tres frases qué hay y el buscador lleva a la ficha
 let GOMUN=false;
-function munHome(){ bindBig("q2"); }
+function munHome(){}
 // ilustración de una pieza de la portada: la del análisis, recortada a 16:9 por su punto de interés
 const ptIll=S=>{ const I=window.__INDICIO||{}, sv=(I.illus||{})[S.id];
   if(!sv) return "";
