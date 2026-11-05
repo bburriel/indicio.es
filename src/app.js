@@ -195,7 +195,7 @@ function route(){
   EXF={prov:"",min:0,max:Infinity};
   curMun=null; window.scrollTo(0,0); esMap=null;
   if(h==="preguntas"){ cur("preguntas"); renderPreguntas(); }
-  else if(h==="municipio"){ GOMUN=true; try{ history.replaceState(null,"","/"); }catch(e){} renderInicio(); }   // la antigua portada de municipios vive ahora en la portada
+  else if(h==="municipio"){ cur("municipio"); renderMunLanding(); }
   else if(/^sobre/.test(h)){ cur("sobre"); renderSobre(h==="sobre-contacto"?"contacto":null); }
   else if(cr){ navTo(exHash({v:"cruce",d:cr[1]&&cr[2]?[cr[1],cr[2]]:EX.d}),{replace:true}); return; }
   else if(h==="laboratorio-datos"){ cur("lab"); renderGlosario(); }
@@ -6604,6 +6604,61 @@ async function renderInicio(){
   else if(ar) ar.closest("figure").remove();
   if(GOMUN||location.hash==="#municipios"){ GOMUN=false; requestAnimationFrame(()=>scrollToId("municipios")); }
 }
+// =====================================================================
+// TU MUNICIPIO (página /municipio/)
+// =====================================================================
+// las dos entradas de la portada de municipios: ver el tuyo (o buscarlo) y comparar
+function munCards(){
+  const lm=lastMun&&BYCODE.has(lastMun)?lastMun:null, nm=lm?esc(dispName(BYCODE.get(lm)[F.name])):"";
+  const mine=lm?`<span class="kk">Tu municipio</span><h3><span>${nm}</span></h3>
+      <p>Sus cifras frente a España, cómo ha cambiado desde 2015 y a qué municipios se parece.</p>
+      <a class="btn" href="#m${lm}">Ver su ficha →</a>
+      <p class="mun-otro">¿Otro municipio?</p>${bigSearchHTML("q2","Búscalo…")}`
+    :`<span class="kk">Tu municipio</span><h3>Búscalo y mira su ficha</h3>${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}`;
+  const cmp=lm?`<span class="kk">Comparar</span><h3><span>${nm}</span> frente a otro</h3>
+      <p>Elige un segundo municipio y míralos lado a lado, dato a dato.</p>
+      <a class="btn alt" href="#comparar-${lm}">Comparar con otro →</a>`
+    :`<span class="kk">Comparar</span><h3>Dos municipios, lado a lado</h3>
+      <p>Elige dos y compáralos dato a dato.</p>
+      <a class="btn" href="#comparar">Comparar dos municipios →</a>`;
+  return `<div class="mun-card">${mine}</div><div class="mun-card">${cmp}</div>`; }
+let MLTOK=0;   // cada render de la portada de municipios lleva su número: si llega otro mientras se descarga el mapa, el anterior no pinta
+async function renderMunLanding(){
+  const tok=++MLTOK;
+  document.title="Municipios · Indicio";
+  view.innerHTML=`<section class="ci-hero mun-hero">
+    <div class="mun-head"><span class="kk">Municipios</span><h1>En España hay 8.139 municipios. <span class="mh-hl">En uno de ellos vives tú.</span></h1>
+      <p class="dek">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
+    <div class="mun-cards">${munCards()}</div>
+    <div class="ci-map"><div id="mlmap" style="min-height:240px"></div><div class="mleg" id="mleg"></div></div>
+    <p class="mun-more">También puedes ver <a href="/provincia/">los municipios por provincia</a> · <a href="/rankings/">los rankings</a></p>
+  </section>
+  <section class="ci-band" style="margin-top:6px"><h2>Qué vas a encontrar en la ficha</h2><div class="g3">
+    <div class="cardx"><span class="kk">1 · Las cifras clave</span><p style="margin-top:6px;font-size:15px;color:var(--ink-2)">Seis datos con una barra que dice dónde queda tu municipio frente a todos los de España. La raya negra es la media.</p>${kpiDemo()}</div>
+    <div class="cardx"><span class="kk">2 · Cómo ha cambiado</span><p style="margin-top:6px;font-size:15px;color:var(--ink-2)">Habitantes, renta, paro y alquiler desde 2015, con España de fondo para comparar.</p><div style="height:46px;margin-top:10px">${miniLines([100,101,103,104,107,109,112],[100,100.5,101,102,103,104,105],{h:46})}</div></div>
+    <div class="cardx"><span class="kk">3 · Lo que destaca</span><p style="margin-top:6px;font-size:15px;color:var(--ink-2)">Los datos en los que más se aleja de lo habitual, y los cinco municipios que más se le parecen.</p><div class="dest-demo"><span class="pct">Top 4 %</span><span class="dd-t">de los municipios con más renta por persona</span></div><div class="bul" style="margin-top:12px"><span class="me" style="left:96%"></span></div><div class="bul-l"><span>menos</span><span>más</span></div></div>
+  </div></section>${methodNote()}`;
+  if(document.getElementById("q2")) bindBig("q2");
+  try{ await loadTopo(); }catch(e){ return; }
+  if(tok!==MLTOK) return;
+  const mb=document.getElementById("mlmap"); if(!mb) return; mb.style.minHeight=""; mb.querySelectorAll("svg").forEach(s=>s.remove());
+  const M=spainMap(mb,{onClick:code=>go(code),refine:true}); const sc=M.set("renta",{dur:0}); if(lastMun&&BYCODE.has(lastMun)) M.mark(lastMun);
+  M.svg.attr("aria-label","Mapa de España por municipios, coloreado por la renta neta media por persona");
+  M.paths.append("title").text(f=>{ const r=BYCODE.get(f.id); return r?r[F.name]:""; });
+  // leyenda: la escala de colores con los cortes en euros (tres de los seis cortes de la escala por cuantiles)
+  const L=document.getElementById("mleg");
+  if(L){ const q=sc.quantiles(), tk=i=>`<span style="left:${(i+1)/7*100}%">${nf0.format(Math.round(q[i]/100)*100)}${NB}€</span>`;
+    L.innerHTML=`<div class="mleg-t"><b>Renta neta media por persona</b><span class="mleg-hint"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l8 4.2-3.4 1L5.6 10z" fill="currentColor"/></svg>Pulsa en un municipio</span></div>
+      <div class="mleg-row"><em>menos</em><div class="mleg-bar" aria-hidden="true">${[0,1,2,3,4,5,6].map(i=>`<i style="background:var(--ramp-${i})"></i>`).join("")}</div><em>más</em></div>
+      <div class="mleg-row"><em></em><div class="mleg-ticks" aria-hidden="true">${[1,3,5].map(tk).join("")}</div><em></em></div>`; }
+  // los ejemplos enseñan en el mapa dónde está cada municipio al pasar el ratón o con el foco
+  const rest=()=>M.mark(lastMun&&BYCODE.has(lastMun)?lastMun:null);
+  document.querySelectorAll(".mun-hero .chipsq a").forEach(a=>{ const c=/(\d{5})/.exec(a.getAttribute("href")||""); if(!c) return;
+    const nm=a.textContent.trim().replace(/^Seguir con\s*/,""), on=()=>M.mark(c[1],nm);
+    a.addEventListener("mouseenter",on); a.addEventListener("focus",on); a.addEventListener("mouseleave",rest); a.addEventListener("blur",rest); });
+}
+const kpiDemo=()=>`<div class="bul" style="margin-top:20px"><span class="es" style="left:52%"></span><span class="me" style="left:38%"></span></div><div class="bul-l"><span>menos</span><span>más</span></div>`;
+
 // «Municipios» de la portada: la sección explica en tres frases qué hay y el buscador lleva a la ficha
 let GOMUN=false;
 function munHome(){ const b=document.getElementById("mi-go"); if(b) b.addEventListener("click",e=>{ e.stopPropagation(); if(myOk(lastMun)){ go(lastMun); } else myPop(); }); }   // con municipio elegido, va a su ficha; si no, abre el selector de la cabecera
