@@ -2392,3 +2392,9 @@ details.chk > section{margin-top:18px}
 .mun-hero .mun-card p.mun-otro{margin:18px 0 2px; font-size:13.5px}
 .mun-hero .mun-card .bigsearch input{font-size:17px!important; padding-top:8px!important; padding-bottom:8px!important}
 @media (max-width:860px){ .mun-hero .mun-card h3{font-size:22px} }
+
+/* herramienta de distribución del sueldo (artículo «sueldos») */
+.calc.dist .distg{grid-column:1/-1}
+.calc.dist .distg svg{width:100%; height:auto; display:block}
+.calc.dist .res{display:flex; flex-direction:column; gap:2px}
+.calc.dist .res .muted{font-size:14px; color:var(--muted)}
