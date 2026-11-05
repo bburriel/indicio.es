@@ -6141,7 +6141,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ const p=document.
 function toast(html,ms){ let t=document.getElementById("toast"); if(t) t.remove(); t=el("div","toast",html); t.id="toast"; t.setAttribute("role","status"); document.body.appendChild(t); setTimeout(()=>{ if(t.isConnected) t.remove(); },ms||6000); return t; }
 // botón «elige / es mi municipio» para una ficha
 function myChip(code){
-  if(code===lastMun) return `<button type="button" class="ismine" id="mychip" aria-pressed="true">Es tu municipio</button>`;
+  if(code===lastMun) return `<span class="ismine" id="mychip-on">${MM_PIN}Es tu municipio</span>`;   // estado, no botón: cambiarlo se hace desde la cabecera
   return `<button type="button" id="mychip" aria-pressed="false">Hacerlo mi municipio</button>${myOk(lastMun)&&code!==MUN2?`<button type="button" id="mychip2">Compararlo con ${esc(myName(lastMun))}</button>`:""}`;
 }
 function myChipBind(code){
