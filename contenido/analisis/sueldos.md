@@ -1,6 +1,6 @@
 ---
 titulo: ¿Cobras mucho o poco?
-entradilla: Dónde está tu sueldo entre los de España, por qué la media sube aunque a casi nadie le paguen más y cómo ingresan más los hogares con sueldos que apenas se mueven.
+entradilla: Dónde cae tu sueldo entre todos los de España, por qué la media sube aunque a casi nadie le paguen más y cómo ingresan más los hogares con sueldos que apenas se mueven.
 respuesta: Con más de 24.500 euros brutos al año cobras más que la mitad de los asalariados. Descontada la inflación, el sueldo de cada grupo de edad está por debajo del de 2008, y aun así la media no baja: cada vez trabajan más mayores, que cobran más. Los hogares sí ingresan más porque hay más gente trabajando en cada casa.
 metodo: Estructura Salarial, EPA y ECV, 2008–2025
 evidencia: desc

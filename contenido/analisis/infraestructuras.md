@@ -1,6 +1,6 @@
 ---
 titulo: ¿Dejó España de invertir en carreteras y trenes?
-entradilla: Cuánto se invierte frente a 2009, cómo se compara con Francia y Alemania y qué hay del mantenimiento.
+entradilla: En 2009 se invertía más del doble que hoy en carreteras y trenes. Lo comparamos con Francia y Alemania y miramos qué hay del mantenimiento, la parte que menos se ve.
 respuesta: Sí, y no se ha recuperado. En 2009 España destinaba a carreteras y trenes el 1,7 % del PIB; en 2024, el 0,64 %, menos que Francia y Alemania. Del mantenimiento hay menos datos: el sector calcula que poner las carreteras al día costaría más de 13.000 millones, y en el tren el gasto ha subido, pero menos que los viajeros.
 metodo: FIT-OCDE, Eurostat, Adif y auditoría de la AEC, 1995–2025
 evidencia: desc
