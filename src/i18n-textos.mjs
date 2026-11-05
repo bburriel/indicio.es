@@ -894,6 +894,8 @@ export const ROWS=[
   ["¿En qué año?","En quin any?","En que ano?","Zein urtetan?","Which year?"],
   ["Con varias series no se puede marcar un suceso. Deja una sola.","Amb diverses sèries no es pot marcar un succés. Deixa'n només una.","Con varias series non se pode marcar un suceso. Deixa só unha.","Serie askorekin ezin da gertaerarik markatu. Utzi bakarra.","With several series you can't mark an event. Keep just one."],
   ["Con un suceso marcado se analiza una sola serie. Pon «Ninguno» en el paso 3 para comparar varias.","Amb un succés marcat només hi cap una sèrie. Posa «Cap» al pas 3 per comparar-ne diverses.","Cun suceso marcado só cabe unha serie. Pon «Ningún» no paso 3 para comparar varias.","Gertaera markatuta, serie bakarra sar daiteke. Jarri «Bat ere ez» 3. urratsean hainbat alderatzeko.","With an event marked only one series fits. Set «None» in step 3 to compare several."],
+  ["Ver el gráfico","Veure el gràfic","Ver o gráfico","Ikusi grafikoa","See the chart"],
+  ["Tendencia","Tendència","Tendencia","Joera","Trend"],
  // bloque «¿Aguanta al comparar?» del laboratorio (noviembre 2026)
  ["¿Aguanta al comparar?","Aguanta quan es compara?","Aguanta ao comparar?","Eutsi egiten al dio konparatzean?","Does it hold up when compared?"],
  ["Se explica por otra cosa.","S'explica per una altra cosa.","Explícase por outra cousa.","Beste zerbaitek azaltzen du.","Something else explains it."],

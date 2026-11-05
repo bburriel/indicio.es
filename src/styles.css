@@ -2392,3 +2392,10 @@ details.chk > section{margin-top:18px}
 .mun-hero .mun-card p.mun-otro{margin:18px 0 2px; font-size:13.5px}
 .mun-hero .mun-card .bigsearch input{font-size:17px!important; padding-top:8px!important; padding-bottom:8px!important}
 @media (max-width:860px){ .mun-hero .mun-card h3{font-size:22px} }
+
+/* Laboratorio en el móvil: botón flotante entre el gráfico y los mandos */
+.lbfab{display:none}
+@media (max-width:860px){
+  .lbfab{display:flex; align-items:center; gap:6px; position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:40; padding:11px 20px; border-radius:999px; border:1px solid var(--rule); background:var(--ink); color:#fff; font:600 14.5px/1 var(--sans,inherit); box-shadow:0 4px 16px rgba(0,0,0,.22); cursor:pointer}
+  .lbfab:active{transform:translateX(-50%) scale(.97)}
+}
