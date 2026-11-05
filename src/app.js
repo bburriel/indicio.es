@@ -5442,7 +5442,7 @@ async function studyAlimentos(B){
   const G={
     olas:el=>{ const i0=P.indexOf("2019M01"), per=P.slice(i0).map(p=>MES[mi(p)].slice(0,3)+". "+my(p)); lineChart(el,{title:"Cuánto suben los precios respecto al mismo mes del año anterior",sub:"España, % mensual",source:SRC,years:per,xticks:per.filter(p=>p.startsWith("ene")),tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>pc(v),
       series:[{n:"Alimentos",v:yF.slice(i0),c:"--rust",main:true},{n:"Todos los precios",v:yG.slice(i0),c:"--slate"}]}); },
-    carrera:el=>{ const Y=d3.range(2015,lastY+1); lineChart(el,{title:"Alimentos, todos los precios y sueldo mediano (2019 = 100)",sub:`España, medias anuales${lastY>LY?`; ${lastY}, hasta ${MES[mi(P[P.length-1])]}`:""}. Sueldos hasta ${eY}`,source:"Fuente: INE, IPC y Encuesta Anual de Estructura Salarial.",years:Y,xticks:[2015,2019,2022,lastY],
+    carrera:el=>{ const Y=d3.range(2015,eY+1); lineChart(el,{title:"Alimentos, todos los precios y sueldo mediano (2019 = 100)",sub:`España, medias anuales hasta ${eY}, el último año con sueldos publicados`,source:"Fuente: INE, IPC y Encuesta Anual de Estructura Salarial.",years:Y,xticks:[2015,2019,2022,eY],
       series:[{n:"Alimentos",v:Y.map(y=>fA(y)/fA(2019)*100),c:"--rust",main:true},{n:"Todos los precios",v:Y.map(y=>fG(y)/fG(2019)*100),c:"--slate"},{n:"Sueldo mediano",v:Y.map(y=>EY.includes(y)?at(E.es.Mediana,y)/at(E.es.Mediana,2019)*100:null),c:"--ink"}]}); },
     compra:el=>{ const f=fig(el,{title:`Cuánta más (o menos) comida compra el sueldo de ${eY} que el de 2019`,sub:"Subida del sueldo comparada con la de los alimentos",source:"Fuente: INE, Encuesta Anual de Estructura Salarial e IPC."});
       table(f.body,["Sueldo","Subida del sueldo","Subida de la comida","Comida que compra"],[["El 10 % que menos cobra",E.es["Percentil 10"]],["El cuarto de abajo",E.es["Cuartil inferior"]],["Mediano",E.es.Mediana],["El cuarto de arriba",E.es["Cuartil superior"]],["El 10 % que más cobra",E.es["Percentil 90"]]].map(([l,a])=>[l,sg((at(a,eY)/at(a,2019)-1)*100),sg((fA(eY)/fA(2019)-1)*100),`<b>${sg(pw(a,eY,2019,fA))}</b>`])); },
@@ -5574,7 +5574,7 @@ async function studyVivienda(B){
   const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
   const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
-  const aY=+lastK(E.alqMes), tY=+lastK(E.valorTasado), vY=+lastK(E.ipv);
+  const aY=+lastK(E.alqMes), tY=+lastK(E.valorTasado), vY=+lastK(E.ipv), cY=Math.min(aY,vY,eY);
   const city=n=>(D.ciudades[n]||{}).alqMes||{}, CN={"Alacant/Alicante":"Alicante","Hospitalet de Llobregat, L'":"L'Hospitalet","Palmas de Gran Canaria, Las":"Las Palmas","Palma de Mallorca":"Palma"}, cn=n=>CN[n]||n;
   const CIT=Object.keys(D.ciudades).map(n=>({n:cn(n),v:g(city(n),"2015",String(aY))})).filter(x=>x.v!=null).sort((a,b)=>b.v-a.v);
   const vt=E.valorTasado, yrs80=y=>vt[y]&&ees[y]?vt[y]*80/ees[y]:null, tYs=Math.min(tY,eY);
@@ -5602,7 +5602,7 @@ async function studyVivienda(B){
   const hog21=(hog[hY]-hog["2020"])*1000, term21=d3.sum(d3.range(2021,+hY+1),y=>termTot(y)||0), termAño5=term21/(+hY-2020);
   const proy10=(proy["2036"]-proy["2026"])/10;
   const V={
-    alq15:g(E.alqMes,"2015",String(aY)), sal15:g(ees,"2015",String(Math.min(aY,eY))), ipv15:g(E.ipv,"2015",String(vY)), ipc15:(ipcY(aY)/ipcY(2015)-1)*100, añoAlq:aY,
+    alq15:g(E.alqMes,"2015",String(cY)), sal15:g(ees,"2015",String(cY)), ipv15:g(E.ipv,"2015",String(cY)), ipc15:(ipcY(cY)/ipcY(2015)-1)*100, añoAlq:aY, añoCom:cY,
     vlc15:city("València")["2015"], vlc24:city("València")[aY], mlg15:city("Málaga")["2015"], mlg24:city("Málaga")[aY],
     ciudad1:CIT[0].n, ciudad1v:CIT[0].v, ciudad2:CIT[1].n, ciudad2v:CIT[1].v, ciudad3:CIT[2].n, ciudad3v:CIT[2].v,
     añoT:tYs, precio80:vt[tYs]*80, años80:yrs80(tYs), años80_08:yrs80("2008"), años80_19:yrs80("2019"), ipv19:g(E.ipv,"2019",String(vY)), sal19:g(ees,"2019",String(eY)),
@@ -5633,8 +5633,8 @@ async function studyVivienda(B){
     socialES:ten.alqSocial[tenY], socialAT:euL("AT","alquilerReducido").v, socialNL:euL("NL","alquilerReducido").v };
   const eur=v=>nf0.format(v)+NB+"€", SRC="Fuente: INE y Ministerio de Vivienda.";
   const G={
-    carrera:el=>{ const Y=d3.range(2015,Math.max(aY,vY)+1), ix=(o,y)=>o&&o[y]&&o["2015"]?o[y]/o["2015"]*100:null;
-      lineChart(el,{title:"Compra, alquiler, sueldos y precios (2015 = 100)",sub:"España, medias anuales",source:"Fuente: INE (IPV, alquiler medio de los contratos declarados, Encuesta de Estructura Salarial, IPC).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
+    carrera:el=>{ const Y=d3.range(2015,cY+1), ix=(o,y)=>o&&o[y]&&o["2015"]?o[y]/o["2015"]*100:null;
+      lineChart(el,{title:"Compra, alquiler, sueldos y precios (2015 = 100)",sub:`España, medias anuales hasta ${cY}`,source:"Fuente: INE (IPV, alquiler medio de los contratos declarados, Encuesta de Estructura Salarial, IPC).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
         series:[{n:"Precio de compra",v:Y.map(y=>ix(E.ipv,y)),c:"--rust",main:true},{n:"Alquiler medio",v:Y.map(y=>ix(E.alqMes,y)),c:"--plum",main:true},{n:"Sueldo mediano",v:Y.map(y=>ix(ees,y)),c:"--ink"},{n:"IPC",v:Y.map(y=>ipcY(y)&&ipcY(2015)?ipcY(y)/ipcY(2015)*100:null),c:"--slate",dash:true}]}); },
     ciudades:el=>{ const f=fig(el,{title:`Subida del alquiler medio, 2015–${aY}`,sub:"Grandes ciudades con datos; la raya es España",source:"Fuente: INE, indicadores urbanos (alquiler mensual medio de los contratos declarados)."});
       hbars(f.body,CIT.map(x=>({l:x.n,v:x.v})),{fmt:v=>sgn(v),ref:V.alq15,refLabel:"España",wide:true}); },
@@ -6345,7 +6345,7 @@ const HEROQ=[
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué se encarece más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
-    cap:N=>`Precio de los alimentos (media de cada año y de los últimos doce meses) y sueldo mediano hasta ${N.añoSueldo}, el último publicado, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
+    cap:N=>`Precio de los alimentos (media de cada año) y sueldo mediano, los dos hasta ${N.añoSueldo}, el último año con sueldos publicados, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
   {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver qué cambió en los contratos →",
     v:N=>`Cambió los contratos. En el empleo, no se ve.`,
     a:N=>`Antes de la reforma, ${N.antes>=90?"más de nueve":"unos "+N.antesD} de cada diez contratos nuevos eran temporales; hoy son ${N.hoyD}, como enseña el gráfico. Se temía que un cambio así costara empleo, pero los sitios que más tiraban del contrato temporal no han perdido más que los demás. Si hubo una pérdida pequeña, de hasta unos 4.100 empleos, los datos no la distinguirían.`,
@@ -6369,8 +6369,8 @@ const PTW=440, PTH=300;
 const ptSvg=(inner,label)=>`<svg viewBox="0 0 ${PTW} ${PTH}" class="pt-g" role="img" aria-label="${esc(label)}">${inner}</svg>`;
 const ptCharts={
   // la cesta: medias anuales en su año (y+0,5) y el último punto, los últimos doce meses, en su centro
-  cesta(D){ const C=D.cesta, fo=[...C.comida.map(([y,v])=>[y+.5,v]),[C.ult12.x,C.ult12.v]], sa=C.sueldo.map(([y,v])=>[y+.5,v]);
-    const t0=2019.5, t1=fo[fo.length-1][0], x0=40,x1=330,y0=262,y1=26, lo=95, hi=Math.max(142,Math.ceil(C.ult12.v/10)*10+2);
+  cesta(D){ const C=D.cesta, cm=C.comida.filter(([y])=>y<=C.añoSueldo), fo=cm.map(([y,v])=>[y+.5,v]), sa=C.sueldo.map(([y,v])=>[y+.5,v]);
+    const t0=2019.5, t1=fo[fo.length-1][0], x0=40,x1=330,y0=262,y1=26, lo=95, hi=Math.max(142,Math.ceil(Math.max(...fo.map(p=>p[1]))/10)*10+2);
     const X=t=>x0+(x1-x0)*(t-t0)/(t1-t0), Yv=v=>y0-(y0-y1)*(v-lo)/(hi-lo), pt=([t,v])=>`${X(t).toFixed(1)},${Yv(v).toFixed(1)}`;
     const ov=fo.filter(([t])=>t<=sa[sa.length-1][0]), area="M"+ov.map(pt).join(" L")+" L"+[...sa].reverse().map(pt).join(" L")+" Z";
     const F=fo[fo.length-1], Sl=sa[sa.length-1]; let yF=Yv(F[1]), yS=Yv(Sl[1]); if(yS-yF<52){ const m=(yF+yS)/2; yF=m-26; yS=m+26; }
@@ -6378,10 +6378,10 @@ const ptCharts={
     const lab=(p,y,name,cl)=>`<text x="${(X(p[0])+12).toFixed(1)}" y="${(y-4).toFixed(1)}" class="pt-g-l${cl}">${name}</text><text x="${(X(p[0])+12).toFixed(1)}" y="${(y+21).toFixed(1)}" class="pt-g-n${cl}">+${nf0.format(p[1]-100)}${NB}%</text>`;
     return ptSvg([120,140].filter(g=>g<hi).map(g=>`<line x1="${x0}" x2="${x1}" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="${x0-8}" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">+${g-100}${NB}%</text>`).join("")
       +`<line x1="${x0}" x2="${x1}" y1="${Yv(100).toFixed(1)}" y2="${Yv(100).toFixed(1)}" class="pt-g-base"/><text x="${x0-8}" y="${(Yv(100)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">2019</text>`
-      +C.comida.filter(([y])=>y%2).map(([y])=>`<text x="${X(y+.5).toFixed(1)}" y="${y0+24}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
+      +cm.filter(([y])=>y%2).map(([y])=>`<text x="${X(y+.5).toFixed(1)}" y="${y0+24}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
       +`<path d="${area}" class="pt-g-area"/><path d="M${sa.map(pt).join(" L")}" pathLength="1" class="pt-g-ln ink"/><path d="M${fo.map(pt).join(" L")}" pathLength="1" class="pt-g-ln br"/>${dots(sa,"pt-f-ink")}${dots(fo,"pt-f-br")}`
       +lab(F,yF,"La comida"," br")+lab(Sl,yS,"El sueldo",""),
-      `Desde 2019 el precio de la comida ha subido un ${nf0.format(F[1]-100)} % y el sueldo mediano un ${nf0.format(Sl[1]-100)} %.`); },
+      `De 2019 a ${C.añoSueldo} el precio de la comida ha subido un ${nf0.format(F[1]-100)} % y el sueldo mediano un ${nf0.format(Sl[1]-100)} %.`); },
   // la casa: lo que ha subido cada cosa desde 2015 (2015 = 100), como la cesta
   casa(D){ const C=D.casa, S=C.serie||{compra:[[2015,100],[C.compra[1],100+C.compra[0]]],alquiler:[[2015,100],[C.alquiler[1],100+C.alquiler[0]]],sueldo:[[2015,100],[C.sueldo[1],100+C.sueldo[0]]]};
     const R=[["Comprar",S.compra,"br"],["Alquilar",S.alquiler,"lt"],["El sueldo",S.sueldo,"ink"]], all=R.flatMap(r=>r[1].map(p=>p[1]));

@@ -15,7 +15,7 @@ Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aq
 
 ## Lo que ha subido
 
-Pon el año 2015 como punto de partida. Desde entonces, el precio de compra de la vivienda ha subido un {{ipv15|pct0}}, el alquiler medio un {{alq15|pct0}}, el sueldo mediano un {{sal15|pct0}} y el resto de precios, un {{ipc15|pct0}}.
+Pon el año 2015 como punto de partida. Desde entonces y hasta {{añoCom}}, el precio de compra de la vivienda ha subido un {{ipv15|pct0}}, el alquiler medio un {{alq15|pct0}}, el sueldo mediano un {{sal15|pct0}} y el resto de precios, un {{ipc15|pct0}}.
 
 [[grafico:carrera]]
 
