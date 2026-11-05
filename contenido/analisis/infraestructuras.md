@@ -1,7 +1,7 @@
 ---
 titulo: ¿Dejó España de invertir en carreteras y trenes?
-entradilla: La inversión en carreteras y ferrocarril se hundió después de 2009 y hoy sigue lejos de aquella cifra. Miramos cuánto cayó, cómo se compara con Francia y Alemania y qué se sabe del mantenimiento, que es lo que nota quien usa una carretera o un tren.
-respuesta: Sí, y no se ha recuperado. En 2009 España destinaba a carreteras y trenes el 1,7 % del PIB; en 2024, el 0,64 %, menos que Francia y Alemania. Del mantenimiento hay menos datos. En las carreteras, el sector calcula un déficit acumulado de más de 13.000 millones; en el tren, el gasto ha subido, pero menos que los viajeros.
+entradilla: Hoy se invierte en carreteras y trenes un tercio de lo que se invertía en 2009. Miramos cuánto ha caído, cómo se compara con Francia y Alemania y qué se sabe de su conservación, que es lo que nota quien usa una carretera o un tren.
+respuesta: Sí, y no se ha recuperado. En 2009 España destinaba a carreteras y trenes el 1,7 % del PIB; en 2024, el 0,64 %, menos que Francia y Alemania. Del mantenimiento hay menos datos: el sector calcula que poner las carreteras al día costaría más de 13.000 millones, y en el tren el gasto ha subido, pero menos que los viajeros.
 tema: gasto
 metodo: FIT-OCDE, Eurostat, Adif y auditoría de la AEC, 1995–2025
 evidencia: desc
@@ -9,79 +9,94 @@ publicado: 2026-11-04
 actualizado: 2026-11-04
 ---
 
-Durante los años del ladrillo, España construyó carreteras y líneas de tren a un ritmo que ningún vecino igualaba. En {{pibPicoY}} destinó a las dos cosas el **{{pibPico|n1}} % del PIB**, frente al {{pibFR09|n1}} % de Francia y el {{pibDE09|n1}} % de Alemania. Después vino el recorte y la inversión no ha vuelto a ese nivel: en {{ultY}} fue del **{{pibUlt|n2}} %**.
+Una carretera no dura para siempre. El asfalto se agrieta, los puentes envejecen y las vías del tren se desgastan con cada convoy. Mantenerlo todo en pie cuesta dinero cada año, y de vez en cuando hay que renovar lo que ya no da más.
 
-Esta página reúne los datos disponibles: cuánto se ha invertido, cómo se compara con Europa y qué se sabe del mantenimiento. Es un análisis descriptivo. Muestra cuánto dinero se movió y qué dicen quienes miden el estado de la red, pero no permite atribuir a esa caída ningún accidente ni ninguna avería concreta.
+Tras los accidentes de Adamuz y Urda, y con el sector alertando del deterioro de las carreteras, ha vuelto una pregunta: ¿dejó España de cuidar lo que construyó? Aquí van los números.
 
-## Del máximo al mínimo: un {{roadCaida|n0}} % menos en carreteras y un {{railCaida|n0}} % menos en trenes
+> [En tres frases] En {{ultY}} se invirtió en carreteras y trenes un tercio de lo que en {{totMaxY}}. Aquel nivel fue excepcional, pero hoy se invierte menos que en Francia o Alemania. Del mantenimiento hay pocos datos, y los que hay vienen del propio sector.
 
-El Foro Internacional del Transporte (FIT), el organismo de la OCDE que compara el gasto en infraestructuras de los países, recoge cuánto se invierte cada año en obra nueva, ampliaciones y renovaciones, con dinero público y privado. En euros constantes de 2015, la inversión en carreteras llegó a **{{roadMax|n1}} mil millones en {{roadMaxY}}** y bajó a {{roadMin|n1}} mil millones en {{roadMinY}}. La del ferrocarril pasó de **{{railMax|n1}} mil millones en {{railMaxY}}** a {{railMin|n1}} en {{railMinY}}.
+## Primero, dos palabras: invertir y mantener
+
+Los datos hablan de dos cosas distintas, y conviene no mezclarlas.
+
+- **Invertir** es construir algo nuevo o renovarlo a fondo: una autovía, una línea de tren, el firme de un tramo entero.
+- **Mantener** es el gasto de cada año para que lo que existe siga funcionando: tapar baches, revisar vías, limpiar cunetas.
+
+Es como una casa. Comprarla o reformarla entera es la inversión; pintar, arreglar goteras y cambiar la caldera cuando toca es el mantenimiento. De lo primero hay series largas y comparables entre países. De lo segundo, casi nada. Por eso la página empieza por la inversión.
+
+## De {{totMax|n1}} a {{totUlt|n1}} mil millones al año
+
+El Foro Internacional del Transporte, un organismo de la OCDE, suma cada año lo que se invierte en carreteras y ferrocarril, con dinero público y privado. Para que la inflación no despiste, las cifras van en euros de 2015.
+
+El máximo fue en {{totMaxY}}: {{totMax|n1}} mil millones en un solo año. En {{ultY}} fueron {{totUlt|n1}}, un **{{totCaida|n0}} % menos**.
 
 [[grafico:modos]]
 
-Desde entonces hay recuperación, pero desigual. El ferrocarril sube desde 2023 y en 2024 invirtió {{railUlt|n1}} mil millones, el doble que en el mínimo. Las carreteras apenas se han movido: {{roadUlt|n1}} mil millones. Aun así, las dos están un {{roadUltVs|abs|n0}} % por debajo de sus máximos.
+Por modos, la caída es aún mayor. Las carreteras llegaron a {{roadMax|n1}} mil millones en {{roadMaxY}} y bajaron a {{roadMin|n1}} en {{roadMinY}}, un {{roadCaida|n0}} % menos. El ferrocarril pasó de {{railMax|n1}} mil millones en {{railMaxY}} a {{railMin|n1}} en {{railMinY}}, un {{railCaida|n0}} % menos.
 
-## Frente a Francia, Alemania e Italia
+Desde entonces hay recuperación, pero desigual. El tren sube desde 2023 y en {{ultY}} invirtió {{railUlt|n1}} mil millones, el doble que en el mínimo. Las carreteras apenas se han movido: {{roadUlt|n1}}.
 
-Que antes se invirtiera mucho no basta para saber si ahora se invierte poco. Para eso hay que comparar con otros países en la misma unidad: la inversión en carreteras y ferrocarril como parte del PIB.
+## ¿Era mucho antes o es poco ahora?
+
+Que se invirtiera mucho en 2009 no dice si hoy se invierte poco. Para saberlo hay que comparar con otros países y medir el esfuerzo en proporción a lo que produce cada economía, su PIB, que es la riqueza que se genera en un año.
 
 [[grafico:pib]]
 
-Entre 2000 y 2008 España invirtió de media el **{{mediaES0008|n2}} % del PIB**, casi el doble que Alemania ({{mediaDE0008|n2}} %) y bastante más que Italia ({{mediaIT0008|n2}} %) y Francia ({{mediaFR0008|n2}} %). Entre 2015 y 2023 la media española fue del **{{mediaES1523|n2}} %**, por debajo de Francia ({{mediaFR1523|n2}} %), Alemania ({{mediaDE1523|n2}} %) e Italia ({{mediaIT1523|n2}} %). De los cuatro países, España pasó de ser el que más invertía a ser el que menos.
+Entre 2000 y 2008, España destinó a carreteras y trenes el **{{mediaES0008|n2}} % del PIB**, casi el doble que Alemania ({{mediaDE0008|n2}} %) y más que Francia ({{mediaFR0008|n2}} %) o Italia ({{mediaIT0008|n2}} %). Entre 2015 y 2023, la media española bajó al **{{mediaES1523|n2}} %**, por debajo de Francia ({{mediaFR1523|n2}} %), Alemania ({{mediaDE1523|n2}} %) e Italia ({{mediaIT1523|n2}} %). De los cuatro países, España pasó de ser el que más invertía a ser el que menos.
 
-> [Un matiz] Parte de la caída es volver a la normalidad: el nivel de 2009 era excepcional. Pero la comparación de los últimos años ya no es con el pasado de España, sino con sus vecinos, y ahí queda por debajo. El FIT mide con el mismo método en todos los países, aunque cada uno recoge los datos a su manera, así que conviene fijarse en la tendencia más que en las décimas.
+> [Un matiz] Parte de la caída es volver a la normalidad: el nivel de 2009 fue excepcional. Pero la comparación de ahora ya no es con el pasado de España, sino con sus vecinos, y ahí sigue por debajo. Cada país recoge los datos a su manera, así que importa más la tendencia que las décimas.
 
-## Cuando se invierte menos de lo que se desgasta
+## ¿Se repone lo que se desgasta?
 
-Una carretera o una vía se desgastan con el uso y con los años. La inversión pública neta mide si el Estado repone ese desgaste: es la inversión bruta menos lo que pierde de valor el capital que ya existe. Si es negativa, lo público se encoge.
+Hay una forma de saber si se cuida lo que ya existe: comparar lo que se invierte con lo que se desgasta. Si un país invierte menos de lo que pierde de valor lo que ya tiene (carreteras, edificios, hospitales), su patrimonio público se encoge. Esa diferencia se llama inversión pública neta. Estos datos son de todas las administraciones y de todo tipo de obra, no solo de transporte.
 
 [[grafico:neta]]
 
-En {{pibPicoY}} la inversión pública neta de España llegó al {{netaPico|n1}} % del PIB, por encima de la media europea. Cuatro años después era negativa, y lo fue en {{netaNegN}} de los siete años entre 2013 y 2019, con un mínimo del {{netaMin|n1}} % en {{netaMinY}}. Desde 2020 ya no es negativa, pero en {{govY}} fue del {{netaES|n1}} % del PIB, frente al {{netaEU|n1}} % de la media de la UE.
+En {{pibPicoY}}, la inversión pública neta de España llegó al {{netaPico|n1}} % del PIB, por encima de la media europea. Cuatro años después era negativa, y lo fue en {{netaNegN}} de los siete años entre 2013 y 2019. Desde 2020 vuelve a ser positiva, pero en {{govY}} fue del {{netaES|n1}} % del PIB, frente al {{netaEU|n1}} % de la UE.
 
-La Fundación BBVA y el Ivie, con datos del INE, encuentran lo mismo en las infraestructuras de transporte: su inversión neta fue negativa en el ferrocarril entre 2016 y 2022 y en las carreteras entre 2017 y 2022. El valor del conjunto de infraestructuras productivas (agua, transporte y urbanas) es hoy un 2,3 % menor que en 2014, unos 11.000 millones de euros. Baja un 19,1 % en aeropuertos, un 4,8 % en obras hidráulicas y un 0,7 % en ferrocarril, mientras que en carreteras se mantiene (+0,2 %).
+La Fundación BBVA y el Ivie lo miden con el valor de lo construido y ven lo mismo en el transporte: la inversión neta fue negativa en el ferrocarril entre 2016 y 2022 y en las carreteras entre 2017 y 2022. Dicho de otro modo, esos años se repuso menos de lo que se gastaba. El valor del conjunto de infraestructuras productivas (agua, transporte y urbanas) es hoy un 2,3 % menor que en 2014, unos 11.000 millones de euros.
 
-> [Un matiz] Que el valor de las carreteras no baje no quiere decir que estén en buen estado. Ese valor se estima a partir de la inversión acumulada y de la vida útil que se supone a cada obra, no de cómo está el firme. Esa diferencia es el mantenimiento.
+> [Un matiz] Que el valor de las carreteras no baje (+0,2 % desde 2014) no quiere decir que estén en buen estado. Ese valor se calcula con lo invertido y con la vida útil que se supone a cada obra, no mirando el firme. Esa diferencia es el mantenimiento.
 
-## Más viajeros con menos dinero por viajero
+## Más viajeros, menos dinero por viajero
 
-Mientras la inversión caía, el uso del tren no. Los viajeros-kilómetro (cuántos viajeros recorren cuántos kilómetros) pasaron de {{pkm09|n0}} millones en 2009 a {{pkm24|n0}} millones en 2024, un {{pkmCrece|n0}} % más según Eurostat. Dividida entre ese uso, la inversión ferroviaria es hoy un **{{perPkmCaida|n0}} % menor** que en 2009: de {{perPkm09|n0}} céntimos de euro de 2015 por viajero-kilómetro a {{perPkm24|n0}}.
+Cada vez viaja más gente en tren. Entre 2009 y 2024 el uso subió un {{pkmCrece|n0}} %, de {{pkm09|n0}} a {{pkm24|n0}} millones de viajeros-kilómetro (cada kilómetro que recorre un viajero cuenta como uno). Si se divide la inversión entre ese uso, hoy hay un **{{perPkmCaida|n0}} % menos** dinero por viajero que en 2009: de {{perPkm09|n0}} céntimos de euro por viajero y kilómetro a {{perPkm24|n0}}.
 
 [[grafico:viajero]]
 
-Esta cifra tiene dos límites. La inversión del FIT mezcla obra nueva y renovación y no las separa, así que no se sabe cuánto de la caída es renovación que se dejó de hacer. Y el tráfico de 2020 y 2021 está hundido por la pandemia, por lo que conviene mirar el antes y el después.
+Esta cifra tiene dos cautelas. La inversión mezcla obra nueva y renovación y no las separa, así que no se sabe cuánto de la caída es renovación que se dejó de hacer. Y el tráfico de 2020 y 2021 está hundido por la pandemia, por lo que conviene mirar el antes y el después.
 
-## Mantenimiento: lo que más se nota y lo que menos se mide
+## Mantenimiento: lo que más se nota y menos se mide
 
-Mantener una carretera o una vía es en buena parte gasto corriente, y por eso no aparece en las estadísticas de inversión. Para España el FIT no publica el mantenimiento de carreteras ni de ferrocarril, así que hay que recurrir a fuentes parciales.
+Aquí hay menos datos. El Foro Internacional del Transporte no publica el mantenimiento de España ni en carreteras ni en ferrocarril, así que hay que acudir a fuentes parciales, y con intereses.
 
 ### Carreteras
 
-La Asociación Española de la Carretera (AEC) agrupa a empresas, administraciones y profesionales del sector y audita cada pocos años el estado de la red. La de febrero de 2026 concluye que el **52 % de la red tiene deterioros graves o muy graves**: unos 34.000 kilómetros necesitan reconstrucción urgente y otros 20.400, una reparación en cuatro años como máximo.
+La Asociación Española de la Carretera (AEC) reúne a empresas, administraciones y profesionales del sector y revisa el estado de la red cada pocos años. En su auditoría de febrero de 2026, el **52 % de la red tiene deterioros graves o muy graves**. Unos 34.000 kilómetros necesitan reconstrucción urgente y otros 20.400, una reparación en cuatro años como máximo.
 
-El déficit acumulado de conservación, lo que costaría poner toda la red al día, es de **13.491 millones de euros**, un 43 % más que en la auditoría de 2022. De ellos, 4.721 millones corresponden a la red del Estado y 8.770 a las de las comunidades autónomas y las diputaciones forales. Aragón es la comunidad en peor estado: el 39 % de su red está en estado muy grave.
+Según la AEC, poner toda la red al día costaría **13.491 millones de euros**, un 43 % más que en la auditoría de 2022. De ellos, 4.721 millones corresponden a las carreteras del Estado y 8.770 a las de las comunidades autónomas y las diputaciones forales. Aragón es la comunidad en peor estado: el 39 % de su red está en estado muy grave.
 
-El ministro de Transportes cifró en 1.910,6 millones la inversión estatal en conservación en 2025. Las asociaciones del sector hablan de una necesidad de unos 5.000 millones al año, aunque no queda claro a qué redes se refiere esa cifra, así que no se pueden restar sin más.
+El ministro de Transportes cifró en 1.910,6 millones lo que el Estado dedicó a conservación en 2025. El sector habla de una necesidad de unos 5.000 millones al año, pero no queda claro a qué redes se refiere, así que no se pueden restar sin más.
 
-> [Un matiz] Quien elabora esta auditoría representa a un sector que vive en parte de la conservación de carreteras. Su método es técnico, pero conviene leer sus cifras como la estimación del sector, no como un dato oficial.
+> [Un matiz] Quien hace esta auditoría representa a un sector que vive en parte de conservar carreteras. Su método es técnico, pero conviene leer sus cifras como la estimación del sector, no como un dato oficial.
 
 ### Ferrocarril
 
-Adif, el gestor de las vías, comunicó en enero de 2026 que su gasto de mantenimiento pasó de 720 millones de euros en 2017 a 1.120 millones en 2025. La tabla lo pone en euros constantes y por viajero.
+Adif, el gestor de las vías, comunicó en enero de 2026 que su gasto de mantenimiento pasó de 720 millones de euros en 2017 a 1.120 millones en 2025. La tabla lo pone en euros de 2025 y por viajero.
 
 [[grafico:mant]]
 
-En euros corrientes la subida es del {{mantNom|n0}} % (Adif la presenta como un 60 %). Descontada la inflación es del **{{mantReal|n0}} %**. Como el tráfico ha crecido más, por cada viajero-kilómetro se gasta hoy un {{mantPkmReal|abs|n0}} % menos que en 2017, también en euros constantes. Según una resolución del portal de transparencia que cita The Objective, Adif ejecutó en 2024 el 89 % de lo presupuestado para conservación: 1.062 de 1.193 millones.
+En euros corrientes la subida es del {{mantNom|n0}} % (Adif la presenta como un 60 %). Descontada la inflación, es del **{{mantReal|n0}} %**. Pero como el tráfico ha crecido más, por cada viajero-kilómetro se gasta hoy un {{mantPkmReal|abs|n0}} % menos que en 2017. Según una resolución del portal de transparencia que cita The Objective, Adif ejecutó en 2024 el 89 % de lo presupuestado para conservación: 1.062 de 1.193 millones.
 
-> [Un matiz] Estos datos los da el propio gestor de la red. Que el mantenimiento haya subido no contradice que la inversión cayera, porque son partidas distintas: la inversión es la que repone lo que se desgasta. Tampoco prueba que el gasto sea suficiente, que depende del estado de partida y de cuánto se usa cada tramo.
+> [Un matiz] Estos datos los da el propio gestor de la red. Que el mantenimiento haya subido no contradice que la inversión cayera, porque son partidas distintas: la inversión repone lo que se desgasta. Tampoco prueba que el gasto sea suficiente, que depende del estado de partida y de cuánto se use cada tramo.
 
 ## Lo que no se puede concluir
 
-- **No hay una relación demostrada con los accidentes.** Los de Adamuz y Urda están en investigación y no se conocen sus causas. Los datos de esta página no sirven para atribuírselas.
-- **La inversión mezcla obra nueva y renovación.** Una parte de la caída puede ser que se dejaron de abrir líneas nuevas, no que se dejaran de cuidar las existentes.
-- **No hay serie larga de mantenimiento.** No sabemos cuánto se gastaba en conservar en 2008, así que no se puede decir si ahora se gasta menos o más.
-- **Hay fuentes interesadas.** El déficit de las carreteras sale de asociaciones del sector y el gasto de mantenimiento del tren, del propio Adif.
-- **Los datos llegan hasta 2024.** La inversión de 2025 por modos todavía no está publicada.
+- **Una relación con los accidentes.** Los de Adamuz y Urda están en investigación y no se conocen sus causas. Los datos de esta página no sirven para atribuírselas.
+- **Cuánto se dejó de cuidar.** La inversión mezcla obra nueva y renovación: parte de la caída puede ser que se dejaron de abrir líneas, no que se dejaran de cuidar las existentes.
+- **Si ahora se mantiene menos o más.** No hay serie larga de mantenimiento, así que no sabemos cuánto se gastaba en 2008.
+- **Todo lo que dice el sector.** El déficit de las carreteras sale de asociaciones del sector y el gasto de mantenimiento del tren, del propio Adif.
+- **Cómo va 2025.** Los datos por modos llegan hasta 2024.
 
 ## Qué significa
 
