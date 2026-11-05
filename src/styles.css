@@ -2071,6 +2071,11 @@ details.chk > section{margin-top:18px}
 .ho-sub{font-family:var(--serif); font-size:clamp(20px,2.6vw,30px); line-height:1.25; color:var(--brand); margin:22px 0 0}
 .ho-p{font-family:var(--serif); font-size:clamp(18px,1.9vw,21px); line-height:1.55; color:var(--ink-2); max-width:40em; margin:18px 0 0}
 .ho-go{display:flex; flex-wrap:wrap; gap:14px 26px; align-items:center; margin:28px 0 0}
+.ho-f{list-style:none; margin:clamp(36px,6vw,64px) 0 0; padding:20px 0 0; border-top:1px solid var(--rule-2); display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px clamp(24px,4vw,56px); max-width:1040px}
+.ho-f li{display:flex; flex-direction:column; gap:6px}
+.ho-f b{font-family:var(--serif); font-weight:500; font-size:clamp(20px,2.1vw,25px); line-height:1.2; color:var(--ink)}
+.ho-f span{font-size:14.5px; line-height:1.5; color:var(--ink-2); max-width:26em}
+@media (max-width:720px){ .ho-f{grid-template-columns:minmax(0,1fr); gap:16px; padding-top:16px} }
 .ho-lk{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--brand); padding-bottom:2px; font-size:15px}
 .ho-lk:hover{color:var(--brand)}
 /* las pestañas del carrusel se deslizan con el dedo cuando no caben */
