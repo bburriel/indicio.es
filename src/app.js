@@ -597,7 +597,7 @@ async function renderMun(code,sec){
         <nav class="tp-crumb" aria-label="Ruta"><a href="/municipio/">Municipios</a> › Provincia de ${esc(provShort(PROVS[P]))}</nav>
         <h1>${esc(r[F.name])}</h1>
         <p class="dek">${summary(r,d)}</p>
-        <div class="chipsq"><span id="mychips" style="display:contents">${myChip(code)}</span><a href="#comparar-${code}">⇄ Comparar con otro</a><a href="${exHash({v:"mapa",d:["renta","paroReg"],p:code.slice(0,2),t:"",m:code,c:[]})}">Verlo en el laboratorio</a><button type="button" id="mshare">Compartir</button><span class="muted" style="font-size:12.5px">Municipio de ${esc(bandLab)} Código INE ${esc(code)}.</span></div>
+        <div class="chipsq mf-acts"><span id="mychips" style="display:contents">${myChip(code)}</span><a href="#comparar-${code}">Comparar con otro</a><a href="${exHash({v:"mapa",d:["renta","paroReg"],p:code.slice(0,2),t:"",m:code,c:[]})}">Verlo en el laboratorio</a><button type="button" id="mshare">Compartir</button><span class="muted" style="font-size:12.5px">Municipio de ${esc(bandLab)} Código INE ${esc(code)}.</span></div>
       </div>
       <figure class="provmap" id="provmap" hidden><svg role="img" aria-label=""></svg><figcaption></figcaption></figure>
     </header>
@@ -3200,7 +3200,7 @@ async function renderMunLanding(){
   const tok=++MLTOK;
   document.title="Municipios · Indicio";
   view.innerHTML=`<section class="ci-hero mun-hero">
-    <div class="mun-head"><span class="kk">Municipios</span><h1>En España hay 8.139 municipios. En uno de ellos vives tú</h1>
+    <div class="mun-head"><span class="kk">Municipios</span><h1>En España hay 8.139 municipios. <span class="mh-hl">En uno de ellos vives tú</span></h1>
       <p class="dek">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
     <div>${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}
       <p class="linkrow"><a href="#comparar">Comparar dos municipios</a> · <a href="/provincia/">Municipios por provincia</a> · <a href="/rankings/">Rankings</a></p></div>
@@ -6058,8 +6058,8 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ const p=document.
 function toast(html,ms){ let t=document.getElementById("toast"); if(t) t.remove(); t=el("div","toast",html); t.id="toast"; t.setAttribute("role","status"); document.body.appendChild(t); setTimeout(()=>{ if(t.isConnected) t.remove(); },ms||6000); return t; }
 // botón «elige / es mi municipio» para una ficha
 function myChip(code){
-  if(code===lastMun) return `<button type="button" class="ismine" id="mychip" aria-pressed="true">📍 Es tu municipio</button>`;
-  return `<button type="button" id="mychip" aria-pressed="false">📍 Hacerlo mi municipio</button>${myOk(lastMun)&&code!==MUN2?`<button type="button" id="mychip2">⇄ Compararlo con ${esc(myName(lastMun))}</button>`:""}`;
+  if(code===lastMun) return `<button type="button" class="ismine" id="mychip" aria-pressed="true">Es tu municipio</button>`;
+  return `<button type="button" id="mychip" aria-pressed="false">Hacerlo mi municipio</button>${myOk(lastMun)&&code!==MUN2?`<button type="button" id="mychip2">Compararlo con ${esc(myName(lastMun))}</button>`:""}`;
 }
 function myChipBind(code){
   const a=document.getElementById("mychip"); if(a) a.addEventListener("click",()=>{ if(code===lastMun){ myPop(); return; } const prev=lastMun; setMyMun(code,{silent:true}); refreshChips(code); toast(`📍 <b>${esc(myName(code))}</b> es ahora tu municipio.${prev&&BYCODE.has(prev)?` <button type="button" id="tundo">Deshacer</button>`:""}`); const u=document.getElementById("tundo"); if(u) u.addEventListener("click",()=>{ setMyMun(prev,{silent:true}); refreshChips(code); document.getElementById("toast").remove(); }); });
