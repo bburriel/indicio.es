@@ -5541,6 +5541,18 @@ async function studySueldos(B){
   const CC=Object.entries(E.ccaa).map(([c,o])=>({c,n:D.ccaaNombres[c]||c,v:at(o.Mediana,eY),g:real(o.Mediana,eY,2019)})).filter(x=>x.v).sort((a,b)=>b.v-a.v);
   const AG=Object.entries(EP.edad).filter(([g])=>g!=="Total").map(([g,o])=>({l:g.replace(/^De /,"").replace(" y más años"," o más").replace(" años",""),v:preal(o["0"],eY,2008)}));
   const ageTot=preal(EP.edad.Total["0"],eY,2008);
+  // paradoja de la edad: sueldo medio de cada grupo (EPA) ponderado por cuántos asalariados hay en cada grupo (EPA, tabla 66203).
+  // La media ponderada reproduce la media total de la EPA en los 19 años; «con las edades de año b» aplica a los sueldos de cada año los pesos de b.
+  const AS=D.asalariados, AY=AS.años, GR=Object.keys(AS.grupos), nAs=(g,y)=>AS.grupos[g][AY.indexOf(y)], nTot=y=>d3.sum(GR,g=>nAs(g,y));
+  const GJ=GR.slice(0,2), GM=GR.slice(2,4), GV=GR.slice(4), shG=(gs,y)=>d3.sum(gs,g=>nAs(g,y))/nTot(y)*100;
+  const mReal=(g,y)=>EP.edad[g]["0"][PY.indexOf(y)]/ipc(y)*ipc(2008);
+  const fijaEd=(y,b)=>d3.sum(GR,g=>nAs(g,b)/nTot(b)*mReal(g,y)), totReal=y=>EP.edad.Total["0"][PY.indexOf(y)]/ipc(y)*ipc(2008);
+  const edadFija=(fijaEd(eY,2008)/fijaEd(2008,2008)-1)*100, edadFija19=(fijaEd(2019,2008)/fijaEd(2008,2008)-1)*100, edadTot19=(totReal(2019)/totReal(2008)-1)*100;
+  const edadFija1924=(fijaEd(eY,2019)/fijaEd(2019,2019)-1)*100, edadTot1924=(totReal(eY)/totReal(2019)-1)*100;
+  // hogares según cuántos ocupados viven en ellos (EPA, tabla 65270)
+  const HG=D.hogares, HY=HG.años, HK=["h0","h1","h2","h3","h4","h5"], hh=(k,y)=>HG[k][HY.indexOf(y)], hTot=y=>d3.sum(HK,k=>hh(k,y));
+  const hOcu=y=>d3.sum(HK,(k,i)=>i*hh(k,y)), hPer=y=>hOcu(y)/hTot(y), hSin=y=>hh("h0",y)/hTot(y)*100, hDos=y=>d3.sum(HK.slice(2),k=>hh(k,y))/hTot(y)*100;
+  const hMin=d3.minIndex(HY,hPer), sMax=d3.maxIndex(HY,hSin), dMin=d3.minIndex(HY,hDos);
   const V={
     año:eY, añoIni:EY[0], ...Object.fromEntries(Object.keys(K).map(k=>[k,at(es[k],eY)])),
     medMes:at(es.med,eY)/14, saltoAbajo:at(es.med,eY)-at(es.p10,eY), saltoArriba:at(es.p90,eY)-at(es.med,eY), mediaSobreMed:(at(es.media,eY)/at(es.med,eY)-1)*100,
@@ -5552,6 +5564,13 @@ async function studySueldos(B){
     ratioMax:ratio[iMax], ratioMaxAño:EY[iMax], ratioUlt:ratio[ratio.length-1],
     d1:preal(EP.media["1"],eY,2019), d2:preal(EP.media["2"],eY,2019), d10:preal(EP.media["10"],eY,2019),
     edadJov:AG[0].v, edadMay:AG[AG.length-1].v, edadTot:ageTot,
+    edadFija, efectoEdad:ageTot-edadFija, edadTot19, edadFija19, edadTot1924, edadFija1924,
+    jov08:shG(GJ,2008), jov24:shG(GJ,eY), med08:shG(GM,2008), med24:shG(GM,eY), may08:shG(GV,2008), may24:shG(GV,eY),
+    menos35M:(d3.sum(GJ,g=>nAs(g,2008))-d3.sum(GJ,g=>nAs(g,eY)))/1000, mas55M:(d3.sum(GV,g=>nAs(g,eY))-d3.sum(GV,g=>nAs(g,2008)))/1000,
+    sueldoJov:EP.edad[GR[0]]["0"][PY.indexOf(eY)], sueldoMay:EP.edad[GR[GR.length-1]]["0"][PY.indexOf(eY)],
+    hog08:hPer(2008), hog19:hPer(2019), hog24:hPer(eY), hogMin:hPer(HY[hMin]), hogMinAño:HY[hMin], hogVar:(hPer(eY)/hPer(2019)-1)*100, hogCaida:(hPer(HY[hMin])/hPer(2008)-1)*100,
+    ocuVar:(hOcu(eY)/hOcu(2019)-1)*100, hogaresVar:(hTot(eY)/hTot(2019)-1)*100,
+    sin08:hSin(2008), sin19:hSin(2019), sin24:hSin(eY), sinMax:hSin(HY[sMax]), sinMaxAño:HY[sMax], dos08:hDos(2008), dos19:hDos(2019), dos24:hDos(eY), dosMin:hDos(HY[dMin]), dosMinAño:HY[dMin],
     rentaMed:creal(C.limite["Sexto decil"],cLast,2019), rentaP10:creal(C.limite["Segundo decil"],cLast,2019), rentaP90:creal(C.limite["Décimo decil"],cLast,2019),
     nomMed19:nom(es.med,eY,2019), ipc19:(ipc(eY)/ipc(2019)-1)*100, ali19:(ali(eY)/ali(2019)-1)*100,
     medAli19:(at(es.med,eY)/at(es.med,2019)/(ali(eY)/ali(2019))-1)*100, p10Ali19:(at(es.p10,eY)/at(es.p10,2019)/(ali(eY)/ali(2019))-1)*100,
@@ -5580,24 +5599,21 @@ async function studySueldos(B){
       draw(); },
     escalones:el=>{ const f=fig(el,{title:`Cuánto hay que cobrar para estar en cada punto de la fila (${eY})`,sub:"Sueldo bruto anual por asalariado",source:SRC});
       hbars(f.body,[["Más que el 10 %",V.p10],["Más que el 25 %",V.q1],["La mitad (mediano)",V.med,"--rust"],["Sueldo medio",V.media,"--slate"],["Más que el 75 %",V.q3],["Más que el 90 %",V.p90]].map(([l,v,c])=>({l,v,c})),{fmt:eur,wide:true}); },
-    tramos:el=>{ const f=fig(el,{title:`Asalariados según cuántas veces cobran el salario mínimo (${eY})`,sub:`Salario mínimo de ${eY}: ${eur(V.smiAño)} al año`,source:"Fuente: INE, Encuesta Anual de Estructura Salarial."});
-      const L=[["De 0 a 1 SMI","Menos de 1 vez"],["De 1 a 2 SMI","De 1 a 2 veces"],["De 2 a 3 SMI","De 2 a 3 veces"],["De 3 a 4 SMI","De 3 a 4 veces"],["De 4 a 5 SMI","De 4 a 5 veces"]];
-      const rows=L.map(([k,l])=>({l,v:tr(k,eY),c:k==="De 1 a 2 SMI"?"--rust":null})); rows.push({l:"5 veces o más",v:d3.sum(Object.keys(T.tramos).filter(n=>/^De [5-7] a|^Más de/.test(n)),n=>tr(n,eY))});
-      hbars(f.body,rows,{fmt:pc,wide:true}); },
     evolucion:el=>{ const yy=EY; lineChart(el,{title:"Cada escalón, descontada la inflación (2008 = 100)",sub:"Sueldo bruto anual en euros constantes",source:SRC+" IPC del INE.",years:yy,index:true,xticks:[2008,2014,2019,eY],
       series:[["El 10 % de abajo",es.p10,"--rust",true],["Cuarto de abajo",es.q1,"--mustard"],["Mediano",es.med,"--ink"],["Cuarto de arriba",es.q3,"--slate"],["El 10 % de arriba",es.p90,"--plum"]].map(([n,a,c,main])=>({n,c,main,v:yy.map(y=>at(a,y)/ipc(y)*ipc(2008))}))}); },
-    brecha:el=>lineChart(el,{title:"Cuántas veces cobra el 10 % de arriba lo del 10 % de abajo",sub:"Percentil 90 entre percentil 10 del sueldo bruto anual",source:SRC,years:EY,xticks:[2008,2014,2019,eY],tickFmt:v=>nf1.format(v),fmt:v=>nf1.format(v)+" veces",
-      series:[{n:"Veces",v:ratio,c:"--rust",main:true}]}),
-    deciles:el=>{ const f=fig(el,{title:`Cuánto ha cambiado el sueldo de cada décimo de asalariados, ${2019}–${eY}`,sub:"Sueldo mensual bruto medio de cada decil, descontada la inflación",source:"Fuente: INE, EPA (salarios por deciles) e IPC."});
-      hbars(f.body,d3.range(1,11).map(k=>({l:k===1?"1.º (el que menos cobra)":k===10?"10.º (el que más)":k+".º",v:preal(EP.media[String(k)],eY,2019),c:k<=2?"--rust":null})),{fmt:v=>sgn(v),wide:true}); },
     edad:el=>{ const f=fig(el,{title:`Sueldo medio por edad, ${2008}–${eY}`,sub:"Cambio descontada la inflación",source:"Fuente: INE, EPA (salarios por deciles) e IPC."});
       hbars(f.body,[...AG.map(a=>({l:a.l,v:a.v})),{l:"Todos",v:ageTot,c:"--rust"}],{fmt:v=>sgn(v),wide:true}); },
+    quien:el=>lineChart(el,{title:"Quién cobra una nómina: reparto de los asalariados por edad",sub:"% de los asalariados de cada año",source:"Fuente: INE, EPA (asalariados por grupo de edad).",years:EY,xticks:[2008,2014,2019,eY],tickFmt:v=>nf0.format(v)+"%",fmt:pc,
+      series:[{n:"55 o más años",v:EY.map(y=>shG(GV,y)),c:"--rust",main:true},{n:"De 35 a 54",v:EY.map(y=>shG(GM,y)),c:"--slate"},{n:"Menos de 35",v:EY.map(y=>shG(GJ,y)),c:"--mustard"}]}),
+    simpson:el=>lineChart(el,{title:"El sueldo medio, con y sin el envejecimiento de quienes trabajan (2008 = 100)",sub:"Sueldo mensual bruto medio, descontada la inflación",source:"Fuente: INE, EPA (salarios por edad y asalariados por edad) e IPC. Cálculo propio.",years:EY,index:true,xticks:[2008,2014,2019,eY],
+      series:[{n:"Sueldo medio",v:EY.map(totReal),c:"--ink",main:true},{n:"Edad de 2008",v:EY.map(y=>fijaEd(y,2008)),c:"--rust",dash:true}]}),
+    hogares:el=>lineChart(el,{title:"Cuántas personas trabajan en cada hogar",sub:"Ocupados por hogar, media de cada año",source:"Fuente: INE, EPA (hogares según el número de ocupados).",years:HY,xticks:[2008,2013,2019,HY[HY.length-1]],tickFmt:v=>nf2.format(v),fmt:v=>nf2.format(v)+" ocupados",
+      series:[{n:"Ocupados por hogar",v:HY.map(hPer),c:"--rust",main:true}]}),
+    reparto:el=>lineChart(el,{title:"Hogares sin ningún ocupado y con dos o más",sub:"% de los hogares de España",source:"Fuente: INE, EPA (hogares según el número de ocupados).",years:HY,xticks:[2008,2013,2019,HY[HY.length-1]],tickFmt:v=>nf0.format(v)+"%",fmt:pc,
+      series:[{n:"Sin ocupados",v:HY.map(hSin),c:"--slate",main:true},{n:"Dos o más ocupados",v:HY.map(hDos),c:"--rust",main:true}]}),
     renta:el=>{ const f=fig(el,{title:`Renta de los hogares: cambio de cada escalón, ingresos de 2018 a ${cLast-1}`,sub:"Límite de cada decil de renta por unidad de consumo, descontada la inflación",source:"Fuente: INE, Encuesta de Condiciones de Vida e IPC."});
       const N=["Segundo decil","Tercer decil","Cuarto decil","Quinto decil","Sexto decil","Septimo decil","Octavo decil","Noveno decil","Décimo decil"];
       hbars(f.body,N.map((n,i)=>({l:i===0?"El 10 % de abajo":i===4?"La mitad":i===8?"El 10 % de arriba":`${(i+1)*10} %`,v:creal(C.limite[n],cLast,2019),c:i===4?"--rust":null})),{fmt:v=>sgn(v),wide:true}); },
-    compra:el=>{ const f=fig(el,{title:`Cuánto más (o menos) compra el sueldo de ${eY} que el de 2019`,sub:"Subida del sueldo comparada con la de los precios",source:"Fuente: INE, Encuesta Anual de Estructura Salarial e IPC."});
-      const g=(a,pr)=>(at(a,eY)/at(a,2019)/pr-1)*100, pI=ipc(eY)/ipc(2019), pA=ali(eY)/ali(2019);
-      table(f.body,["Sueldo","Subida","De todo (IPC)","De comida"],[["El 10 % de abajo",es.p10],["Mediano",es.med],["El 10 % de arriba",es.p90]].map(([l,a])=>[l,sgn(nom(a,eY,2019)),sgn(g(a,pI)),sgn(g(a,pA))])); },
     ccaa:el=>{ const f=fig(el,{title:`Sueldo mediano por comunidad (${eY})`,sub:"Sueldo bruto anual",source:SRC});
       hbars(f.body,CC.map(x=>({l:x.n,v:x.v})),{fmt:eur,ref:V.med,refLabel:"España",wide:true}); }
   };
