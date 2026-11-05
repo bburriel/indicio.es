@@ -1,7 +1,7 @@
 ---
 titulo: ¿Son sostenibles las pensiones?
 entradilla: Cada año se gasta más en pensiones y ahora se jubilan las generaciones más numerosas.
-respuesta: Depende de cuánto se quiera gastar. Si solo cambia la demografía, el gasto pasa del 13,2 % al 24,9 % del PIB en 2050 (un ejercicio, no una previsión): no cabe. Con lo previsto tras las reformas (pensiones con el IPC, un año más de trabajo efectivo y un 5 % más de empleo y de población en edad de trabajar) queda en el 16,5 %, a 0,3 puntos del límite del 16,2 % (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea): cabe por poco o se pasa por poco. Para asegurarlo, cada pensión tendría que pesar algo menos frente a lo que produce un trabajador.
+respuesta: Depende de cuánto se quiera gastar. Si solo cambia la demografía, el gasto pasa del 13,2 % al 24,9 % del PIB en 2050 (un ejercicio, no una previsión): no cuadra. Con lo previsto tras las reformas (pensiones con el IPC, un año más de trabajo efectivo y un 5 % más de empleo y de población en edad de trabajar) queda en el 16,5 %, a 0,3 puntos del límite del 16,2 % (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea): cuadra por poco o se pasa por poco. Para asegurarlo, cada pensión tendría que pesar algo menos frente a lo que produce un trabajador.
 metodo: Eurostat, INE y escenarios hasta 2070
 evidencia: desc
 publicado: 2026-10-22
@@ -14,7 +14,7 @@ En España hay hoy **{{m5064|n1}} millones de personas de 50 a 64 años** y {{p6
 
 Las pensiones cuestan hoy el **{{gasto0|pct1}} del PIB**, unos {{gastoMM|n0}} mil millones de euros al año. Que ese gasto sea sostenible depende de cuánto se considere asumible y de lo que traiga la demografía en las próximas décadas. El análisis repasa de dónde viene el gasto, qué cambiará con la jubilación del baby boom y cuánto habría que mover cada variable para mantenerlo dentro de un límite.
 
-Ese límite es que en 2050, con el baby boom ya jubilado, el gasto no supere el actual en más de {{limP|n0}} puntos de PIB: el **{{lim|pct1}}**, unos {{limMM|n0}} mil millones de euros más al año. Es una cifra próxima a las proyecciones de dos instituciones para el gasto en pensiones en 2050: la Autoridad Independiente de Responsabilidad Fiscal (AIReF), el organismo público que vigila las cuentas públicas, lo sitúa en el {{aireF|pct1}} del PIB, y Fedea, un centro de estudios económicos privado, en el {{fedea|pct1}}. Son estimaciones hechas con modelos más completos que el de este análisis. El límite es un criterio, no un dato, y el simulador del final permite modificarlo. En los gráficos, «cabe» significa que el gasto queda dentro de ese límite.
+Ese límite es que en 2050, con el baby boom ya jubilado, el gasto no supere el actual en más de {{limP|n0}} puntos de PIB: el **{{lim|pct1}}**, unos {{limMM|n0}} mil millones de euros más al año. Es una cifra próxima a las proyecciones de dos instituciones para el gasto en pensiones en 2050: la Autoridad Independiente de Responsabilidad Fiscal (AIReF), el organismo público que vigila las cuentas públicas, lo sitúa en el {{aireF|pct1}} del PIB, y Fedea, un centro de estudios económicos privado, en el {{fedea|pct1}}. Son estimaciones hechas con modelos más completos que el de este análisis. El límite es un criterio, no un dato, y el simulador del final permite modificarlo. En los gráficos, «cuadra» significa que el gasto queda dentro de ese límite.
 
 ## Dónde estamos: del {{gastoAnt|pct1}} al {{gasto0|pct1}} del PIB
 
@@ -38,7 +38,7 @@ En puntos de PIB, el gasto subió de {{sPast|pct1}} a {{gasto0|pct1}}. Más empl
 
 Si cada pensión pesara hoy lo mismo que en {{y13}}, el gasto sería del {{cfG|pct1}} del PIB: unos {{ahorroGMM|n0}} mil millones de euros menos al año. Ese mayor peso no es un error. Entre las razones que suelen darse están que las pensiones se revalorizan y que las que empiezan son más altas que las que se extinguen, porque quienes se jubilan ahora cotizaron más años y con mejores sueldos que quienes ya no están.
 
-Importa porque es lo que más se puede mover. La demografía no se decide. Cuánto pesa cada pensión, sí. Y la deriva de estos años pesa mucho hacia delante: si cada pensión siguiera ganando peso a ese ritmo, el gasto llegaría al **{{sDeriva|pct0}} del PIB** en 2050, algo que no se puede financiar. Esa deriva y la demografía que viene no caben juntas.
+Importa porque es lo que más se puede mover. La demografía no se decide. Cuánto pesa cada pensión, sí. Y la deriva de estos años pesa mucho hacia delante: si cada pensión siguiera ganando peso a ese ritmo, el gasto llegaría al **{{sDeriva|pct0}} del PIB** en 2050, algo que no se puede financiar. Esa deriva y la demografía que viene no son compatibles.
 
 ## Lo que viene: la demografía casi se duplica y se queda quieta
 
@@ -70,11 +70,11 @@ La demografía añade casi el doble de pensionistas por trabajador. Trabajar má
 
 ## ¿Y si probamos todas las combinaciones?
 
-El mapa prueba todas las combinaciones de empleo y de peso de cada pensión, con los otros mandos como los de lo previsto tras las reformas (un 5 % más de población en edad de trabajar y un año más de jubilación). En verde, las que caben.
+El mapa prueba todas las combinaciones de empleo y de peso de cada pensión, con los otros mandos como los de lo previsto tras las reformas (un 5 % más de población en edad de trabajar y un año más de jubilación). En verde, las que cuadran.
 
 [[grafico:mapa]]
 
-La frontera dice algo sencillo. Con la demografía sola, el gasto cabe únicamente si cada pensión pierde un {{gFrontNada|abs|n1}} % de peso cada año. Con un 10 % más de empleo y otro 10 % de población activa, un {{gFrontSinD|abs|n1}} %; con dos años más de jubilación además, un {{gFrontTodo|abs|n1}} %. Con los mandos de las reformas, un {{gFrontRef|abs|n1}} %. Ninguna palanca resuelve el problema: compra margen sobre cuánto tiene que perder peso cada pensión. Y la jubilación más tardía no es imprescindible; es una de las formas de rebajar ese esfuerzo, igual que más empleo o más inmigración.
+La frontera dice algo sencillo. Con la demografía sola, el gasto solo cuadra si cada pensión pierde un {{gFrontNada|abs|n1}} % de peso cada año. Con un 10 % más de empleo y otro 10 % de población activa, un {{gFrontSinD|abs|n1}} %; con dos años más de jubilación además, un {{gFrontTodo|abs|n1}} %. Con los mandos de las reformas, un {{gFrontRef|abs|n1}} %. Ninguna palanca resuelve el problema: compra margen sobre cuánto tiene que perder peso cada pensión. Y la jubilación más tardía no es imprescindible; es una de las formas de rebajar ese esfuerzo, igual que más empleo o más inmigración.
 
 ## Dos futuros para ver el precio
 
@@ -82,13 +82,13 @@ La frontera dice algo sencillo. Con la demografía sola, el gasto cabe únicamen
 
 [[grafico:esc_reformas]]
 
-Aquí combinamos lo que las reformas buscan: pensiones con el IPC, un año más de trabajo efectivo, un 5 % más de empleo y un 5 % más de población en edad de trabajar. El resultado, **{{sRef|pct1}}** en 2050, se queda a {{sRefEx|n1}} puntos del límite: cabe por poco o se pasa por poco, según los supuestos. Cae entre la AIReF ({{aireF|pct1}}) y Fedea ({{fedea|pct1}}). Eso no confirma nada, porque los mandos los hemos elegido nosotros, pero sí dice que el modelo no es absurdo: lo previsto está en la frontera.
+Aquí combinamos lo que las reformas buscan: pensiones con el IPC, un año más de trabajo efectivo, un 5 % más de empleo y un 5 % más de población en edad de trabajar. El resultado, **{{sRef|pct1}}** en 2050, se queda a {{sRefEx|n1}} puntos del límite: cuadra por poco o se pasa por poco, según los supuestos. Cae entre la AIReF ({{aireF|pct1}}) y Fedea ({{fedea|pct1}}). Eso no confirma nada, porque los mandos los hemos elegido nosotros, pero sí dice que el modelo no es absurdo: lo previsto está en la frontera.
 
-### Un futuro que cabe
+### Un futuro que cuadra
 
 [[grafico:esc_equilibrio]]
 
-Un 10 % más de empleo, un 10 % más de población en edad de trabajar, dos años más de jubilación efectiva y pensiones que pesan un 0,7 % menos cada año frente a lo que produce un ocupado. Resultado: **{{sEq|pct1}}**, que cabe. El gasto medio por pensión sube, en euros de hoy, hasta {{sEqReal|n0}} € al mes, pero en 2050 pesa un {{sEqPeso|n0}} % menos que hoy frente a lo que produce un trabajador. Ninguna palanca sola lo consigue, y cada una exige un esfuerzo grande. Es una de varias mezclas posibles: la jubilación más tardía se puede cambiar por más empleo o por que las pensiones pesen todavía menos.
+Un 10 % más de empleo, un 10 % más de población en edad de trabajar, dos años más de jubilación efectiva y pensiones que pesan un 0,7 % menos cada año frente a lo que produce un ocupado. Resultado: **{{sEq|pct1}}**, que cuadra. El gasto medio por pensión sube, en euros de hoy, hasta {{sEqReal|n0}} € al mes, pero en 2050 pesa un {{sEqPeso|n0}} % menos que hoy frente a lo que produce un trabajador. Ninguna palanca sola lo consigue, y cada una exige un esfuerzo grande. Es una de varias mezclas posibles: la jubilación más tardía se puede cambiar por más empleo o por que las pensiones pesen todavía menos.
 
 Los tres juntos:
 
@@ -96,9 +96,9 @@ Los tres juntos:
 
 ## Qué significa
 
-Las pensiones no caben si solo cambia la demografía, y tampoco con una única medida. En todas las mezclas que caben con valores razonables, cada pensión pierde peso frente a los sueldos. Un 10 % más de empleo deja el gasto en el {{soloE|pct1}}, un 10 % más de población activa en el {{soloM|pct1}} y tres años más de jubilación en el {{soloD|pct1}}, frente a un límite del {{lim|pct1}}. Solo caben sumando varias a la vez.
+Las pensiones no cuadran si solo cambia la demografía, y tampoco con una única medida. En todas las mezclas que cuadran con valores razonables, cada pensión pierde peso frente a los sueldos. Un 10 % más de empleo deja el gasto en el {{soloE|pct1}}, un 10 % más de población activa en el {{soloM|pct1}} y tres años más de jubilación en el {{soloD|pct1}}, frente a un límite del {{lim|pct1}}. Solo cuadran sumando varias a la vez.
 
-Lo que cabe pasa por una combinación: más gente trabajando y que cada pensión crezca algo menos que lo que produce un trabajador. Eso no es gratis. En el futuro que cabe, el gasto medio por pensión sube en euros, pero los pensionistas ganan menos terreno que quienes trabajan: el reparto de la mejora de la productividad se inclina hacia los que cotizan.
+Lo que cuadra pasa por una combinación: más gente trabajando y que cada pensión crezca algo menos que lo que produce un trabajador. Eso no es gratis. En el futuro que cuadra, el gasto medio por pensión sube en euros, pero los pensionistas ganan menos terreno que quienes trabajan: el reparto de la mejora de la productividad se inclina hacia los que cotizan.
 
 Y el límite también es una decisión. Cada punto de PIB son unos {{mm1|n0}} mil millones de euros al año. Quien acepte pagar más, con impuestos, cotizaciones o deuda, tiene más margen en las demás palancas. Quien no, necesita las demás.
 

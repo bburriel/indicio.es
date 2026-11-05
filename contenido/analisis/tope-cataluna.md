@@ -52,7 +52,7 @@ Para ponerlo en la misma escala: en los {{tens}} municipios con tope viven unos 
 
 ## Entre el blanco y el negro
 
-Con el mismo dato caben lecturas muy distintas. Depende de cuántos hogares firman contrato nuevo en un año, de cuánto del freno se debe de verdad al tope y de cuántas de las ventas de más salieron del alquiler. Ninguna de las tres cifras la dan estos datos; por eso aquí no hay un número, hay un mapa de lecturas. Empieza por las tres de abajo y mueve lo que no te convenza.
+Con el mismo dato se pueden hacer lecturas muy distintas. Depende de cuántos hogares firman contrato nuevo en un año, de cuánto del freno se debe de verdad al tope y de cuántas de las ventas de más salieron del alquiler. Ninguna de las tres cifras la dan estos datos; por eso aquí no hay un número, hay un mapa de lecturas. Empieza por las tres de abajo y mueve lo que no te convenza.
 
 [[grafico:grises]]
 
