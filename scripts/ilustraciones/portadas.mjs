@@ -118,11 +118,11 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   EST.rows.forEach(r=>{ const m=r[sf.mun]&&r[sf.mun][0], pad=r[sf.pad]; if(!m||!pad||!pad[pi]||!pad[pj]) return; const pp=m.find(l=>l[0]==="PP"), ps=m.find(l=>l[0]==="PSOE"); if(!pp||!ps) return; pts.push({m:ps[1]-pp[1],y:(pad[pj]/pad[pi]-1)*100,pop:pad[pj]}); });
   const MG=5, sel=pts.filter(d=>d.pop>=250&&Math.abs(d.m)<=MG&&d.m!==0&&isFinite(d.y)&&d.y>-40&&d.y<60);
   const G=[["Ganó el PP por poco",sel.filter(d=>d.m<0),"pt-f-ink",""],["Ganó el PSOE por poco",sel.filter(d=>d.m>0),"pt-f-br"," br"]].map(([l,g,c,cl])=>({l,n:g.length,v:d3.mean(g,d=>d.y),c,cl}));
-  const x0=24,x1=W-100, mx=Math.max(...G.map(g=>g.v),1)*1.08, sc=v=>(x1-x0)*Math.max(0,v)/mx;
-  let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-t");
-  G.forEach((g,i)=>{ const y=62+i*80; s+=T(x0,y,g.l,"pt-g-l"+g.cl)+R(x0,y+12,sc(g.v),38,g.c,3)+T(x0+sc(g.v)+10,y+42,(g.v>=0?"+":"−")+nf(Math.abs(g.v),1)+NB+"%","pt-g-n"+g.cl); });
-  const dif=G[1].v-G[0].v, se=Math.sqrt(d3.variance(sel.filter(d=>d.m>0),d=>d.y)/G[1].n+d3.variance(sel.filter(d=>d.m<0),d=>d.y)/G[0].n), mar=1.96*se;
-  s+=T(x0,H-10,`Diferencia dentro del margen de error (±${nf(mar,1)})`,"pt-g-g");
+  const x0=30,x1=W-30, X=v=>x0+(x1-x0)*v/4, y=140, dif=G[1].v-G[0].v, se=Math.sqrt(d3.variance(sel.filter(d=>d.m>0),d=>d.y)/G[1].n+d3.variance(sel.filter(d=>d.m<0),d=>d.y)/G[0].n), mar=1.96*se;
+  let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-t")+L(x0,y,x1,y)+C(X(G[0].v),y,15,"pt-f-ink")+C(X(G[1].v),y,15,"pt-f-br");
+  s+=T(X(G[0].v),y-58,"Ganó el PP por poco","pt-g-l","middle")+T(X(G[0].v),y-32,"+"+nf(G[0].v,1)+NB+"%","pt-g-n","middle");
+  s+=T(X(G[1].v),y+58,(G[1].v>=0?"+":"−")+nf(Math.abs(G[1].v),1)+NB+"%","pt-g-n br","middle")+T(X(G[1].v),y+80,"Ganó el PSOE por poco","pt-g-l br","middle");
+  s+=T(x0,H-8,`Diferencia dentro del margen de error (±${nf(mar,1)})`,"pt-g-g");
   add("quien-gobierna",`Media de los municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en 2019 y quedaron a menos de ${MG} puntos (${G[0].n} donde ganó el PP y ${G[1].n} donde ganó el PSOE). Diferencia de ${nf(Math.abs(dif),1)} puntos. Fuente: Ministerio del Interior e INE (padrón).`,
     `Donde el PP ganó por poco la población creció un ${nf(G[0].v,1)} % de 2019 a 2025, y donde ganó el PSOE por poco, un ${nf(G[1].v,1)} %.`,s); }
 
@@ -179,16 +179,21 @@ const short=n=>String(n).replace(/\s*(Alta Velocidad|AV|Guiomar|Miguel Hernánde
 // ---------- 12. estudiar: renta según titulados ----------
 { const rs=ROWS.filter(r=>r[F.superiores]!=null&&r[F.renta]&&r[F.pop]>=100), qs=d3.range(0,1.001,.2).map(q=>d3.quantile(rs.map(r=>r[F.superiores]).sort(d3.ascending),q));
   const B=d3.range(5).map(i=>{ const g=rs.filter(r=>r[F.superiores]>=qs[i]&&(i===4?r[F.superiores]<=qs[5]:r[F.superiores]<qs[i+1])); return {a:qs[i],b:qs[i+1],v:d3.median(g,r=>r[F.renta])}; });
-  const x0=24,x1=W-24,y0=H-42,y1=64,w=(x1-x0)/5, Y=d3.scaleLinear().domain([0,d3.max(B,b=>b.v)]).range([y0,y1]); let s=T(x0,18,"Renta por persona, según los titulados de cada municipio","pt-g-t");
-  B.forEach((b,i)=>{ const x=x0+i*w, hi=i===4; s+=R(x+6,Y(b.v),w-12,y0-Y(b.v),hi?"pt-f-br":"pt-f-mu",3); if(i===0||hi) s+=T(x+w/2,Y(b.v)-9,nf(Math.round(b.v/100)*100)+NB+"€","pt-g-l"+(hi?" br":""),"middle"); });
-  s+=T(x0,y0+22,"Menos titulados","pt-g-t")+T(x1,y0+22,"Más titulados","pt-g-t","end");
+  const x0=44,x1=W-44,y0=H-46,y1=70, X=i=>x0+(x1-x0)*i/4, Y=d3.scaleLinear().domain([0,d3.max(B,b=>b.v)]).range([y0,y1]); let s=T(24,18,"Renta por persona, según los titulados de cada municipio","pt-g-t")+L(x0-20,y0,x1+20,y0);
+  s+=PL(B.map((b,i)=>[X(i),Y(b.v)]),"br")+B.map((b,i)=>C(X(i),Y(b.v),i===0||i===4?6:4,"pt-f-br")).join("");
+  s+=T(X(0),Y(B[0].v)-16,nf(Math.round(B[0].v/100)*100)+NB+"€","pt-g-l","middle")+T(X(4),Y(B[4].v)-16,nf(Math.round(B[4].v/100)*100)+NB+"€","pt-g-l br","middle");
+  s+=T(x0-20,y0+22,"Menos titulados","pt-g-t")+T(x1+20,y0+22,"Más titulados","pt-g-t","end");
   add("estudiar","Mediana de la renta neta por persona en cada quinto de municipios (100 habitantes o más) según su parte de titulados superiores. Fuente: INE, Atlas de renta y censo.",
     `Los municipios con más titulados superiores tienen una renta mediana de ${nf(Math.round(B[4].v/100)*100)} euros por persona, frente a ${nf(Math.round(B[0].v/100)*100)} en los que menos.`,s); }
 
 // ---------- 13. paro en el sur: las tres provincias con más paro y las dos con menos ----------
-{ const P=PROVS.map(p=>({p,v:wmean(ROWS.filter(r=>r[F.code].slice(0,2)===p),r=>r[F.paroReg])})).filter(d=>d.v!=null).sort((a,b)=>b.v-a.v), sel=[...P.slice(0,3),...P.slice(-2)];
-  const x0=124,x1=W-104, mx=d3.max(sel,d=>d.v), sc=v=>(x1-x0)*v/mx; let s=T(24,18,"Paro registrado, % de las personas de 16 a 64 años","pt-g-t");
-  sel.forEach((d,i)=>{ const y=40+i*42+(i>=3?26:0), hi=i<3; s+=T(x0-12,y+25,PN[d.p],"pt-g-l"+(hi?" br":""),"end")+R(x0,y+4,sc(d.v),30,hi?"pt-f-br":"pt-f-mu",3)+T(x0+sc(d.v)+10,y+28,pc(d.v,1),"pt-g-n"+(hi?" br":"")); });
+{ const P=PROVS.map(p=>({p,v:wmean(ROWS.filter(r=>r[F.code].slice(0,2)===p),r=>r[F.paroReg])})).filter(d=>d.v!=null).sort((a,b)=>b.v-a.v);
+  const x0=30,x1=W-30, X=d3.scaleLinear().domain([2,15]).range([x0,x1]), y0=210, r=6.2, placed=[];
+  [...P].sort((a,b)=>a.v-b.v).forEach(d=>{ d.x=X(d.v); let k=0; while(placed.some(o=>Math.abs(o.x-d.x)<2*r+1&&Math.abs(o.k-k)<1)) k++; d.k=k; placed.push(d); });
+  let s=T(24,18,"Paro registrado por provincia, % de 16 a 64 años","pt-g-t")+L(x0-10,y0+r+6,x1+10,y0+r+6);
+  P.forEach((d,i)=>{ s+=C(d.x,y0-d.k*(2*r+1.5),r,i<6?"pt-f-br":"pt-f-mu"); });
+  const hi=P[0], lo=P[P.length-1];
+  s+=T(hi.x+14,y0-hi.k*(2*r+1.5)-22,PN[hi.p]+" "+pc(hi.v,1),"pt-g-l br","end")+T(lo.x,y0+r+30,PN[lo.p]+" "+pc(lo.v,1),"pt-g-l","start");
   add("paro-sur","Paro registrado medio de 2025 (SEPE) en cada provincia, ponderado por la población de sus municipios: las tres más altas y las dos más bajas.",
     `El paro registrado va del ${nf(P[P.length-1].v,1)} % en ${PN[P[P.length-1].p]} al ${nf(P[0].v,1)} % en ${PN[P[0].p]}.`,s); }
 
@@ -197,16 +202,15 @@ const short=n=>String(n).replace(/\s*(Alta Velocidad|AV|Guiomar|Miguel Hernánde
   const x0=28,x1=W-28, sc=v=>x0+(x1-x0)*v/hi, ys=196, k=v=>nf(Math.round(v/100)*100)+NB+"€";
   let s=T(x0,18,`Sueldo bruto anual de los asalariados, ${yr}`,"pt-g-t")+T(x0,92,k(md),"pt-g-big")+T(x0,120,"La mitad cobra menos que esto","pt-g-g");
   s+=R(sc(lo),ys-6,sc(hi)-sc(lo),12,"pt-f-mu",6)+C(sc(lo),ys,6,"pt-f-ink")+C(sc(hi),ys,6,"pt-f-ink")+C(sc(md),ys,9,"pt-f-br");
-  s+=T(sc(lo),ys-20,k(lo),"pt-g-l","middle")+T(sc(hi)+8,ys-20,k(hi),"pt-g-l","end")+T(sc(md),ys+34,"La mitad","pt-g-t","middle");
-  s+=T(x0,ys+62,"El 10 % que menos cobra","pt-g-t")+T(x1,ys+62,"El 10 % que más cobra","pt-g-t","end");
+  s+=T(sc(lo),ys-20,k(lo),"pt-g-l","middle")+T(sc(hi)+8,ys-20,k(hi),"pt-g-l","end");
   add("sueldos",`La mediana y los extremos de la fila de sueldos (percentiles 10 y 90). Fuente: INE, Encuesta de Estructura Salarial.`,
     `La mitad de los asalariados cobra menos de ${nf(Math.round(md/100)*100)} euros brutos al año; el 10 % que menos cobra, menos de ${nf(Math.round(lo/100)*100)}.`,s); }
 
 // ---------- 15. gobiernos: paro de España y de la UE ----------
 { const PA=J("paises.json"), ES=PA.paises.ES.paro, EU=PA.paises.EU27_2020.paro, Yr=Object.keys(ES).map(Number).filter(y=>EU[y]!=null).sort((a,b)=>a-b);
   const x0=40,x1=W-16,y0=H-34,y1=40, X=d3.scaleLinear().domain([Yr[0],Yr[Yr.length-1]]).range([x0,x1]), Y=d3.scaleLinear().domain([0,Math.ceil(d3.max(Yr,y=>ES[y])/5)*5]).range([y0,y1]);
-  let s=[10,20].filter(g=>g<=Y.domain()[1]).map(g=>L(x0,Y(g),x1,Y(g))+T(x0-8,Y(g)+4,g+NB+"%","pt-g-t","end")).join("");
-  s+=[Yr[0],2000,2010,Yr[Yr.length-1]].filter((y,i,a)=>a.indexOf(y)===i).map(y=>T(X(y),y0+22,String(y),"pt-g-t","middle")).join("");
+  let s=L(x0,Y(0),x1,Y(0));
+  s+=[Yr[0],Yr[Yr.length-1]].filter((y,i,a)=>a.indexOf(y)===i).map(y=>T(X(y),y0+22,String(y),"pt-g-t","middle")).join("");
   s+=PL(Yr.map(y=>[X(y),Y(EU[y])]),"ink")+PL(Yr.map(y=>[X(y),Y(ES[y])]),"br");
   const my=Yr.reduce((a,b)=>ES[b]>ES[a]?b:a), ly=Yr[Yr.length-1];
   s+=C(X(my),Y(ES[my]),4.5,"pt-f-br")+T(X(my),Y(ES[my])-12,`${my}: ${pc(ES[my])}`,"pt-g-l br","middle",true)+T(x1,Y(ES[ly])-12,"España","pt-g-l br","end",true)+T(x1,Y(EU[ly])+22,"Unión Europea","pt-g-l","end",true);
