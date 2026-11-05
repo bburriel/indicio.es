@@ -6,6 +6,13 @@
 // - Lo lee el build (lo mete en /assets/i18n.<hash>.js) y `npm run i18n:faltan`.
 // Para ver qué frases de la interfaz siguen sin traducir: npm run i18n:faltan
 export const ROWS=[
+ // portada: lo que es Indicio, en tres líneas
+ ["{#} municipios","{#} municipis","{#} municipios","{#} udalerri","{#} municipalities"],
+ ["De un pueblo de diez vecinos a Madrid.","D'un poble de deu veïns a Madrid.","Dunha aldea de dez veciños a Madrid.","Hamar auzoko herri batetik Madrilera.","From a village of ten residents to Madrid."],
+ ["Fuentes públicas","Fonts públiques","Fontes públicas","Iturri publikoak","Public sources"],
+ ["INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.","INE, SEPE, Seguretat Social i Eurostat. Cada gràfic diu d'on surt.","INE, SEPE, Seguridade Social e Eurostat. Cada gráfico di de onde sae.","INE, SEPE, Gizarte Segurantza eta Eurostat. Grafiko bakoitzak zehazten du nondik datorren.","INE, SEPE, Social Security and Eurostat. Every chart says where it comes from."],
+ ["Tres niveles de prueba","Tres nivells de prova","Tres niveis de proba","Hiru froga maila","Three levels of proof"],
+ ["Cada respuesta dice si describe, compara casos parecidos o es un experimento natural.","Cada resposta diu si descriu, compara casos semblants o és un experiment natural.","Cada resposta di se describe, compara casos parecidos ou é un experimento natural.","Erantzun bakoitzak dio deskribatzen duen, antzeko kasuak alderatzen dituen ala esperimentu natural bat den.","Each answer says whether it describes, compares similar cases or is a natural experiment."],
  // cabecera
  ["Preguntas","Preguntes","Preguntas","Galderak","Questions"],
  ["Municipios","Municipis","Municipios","Udalerriak","Municipalities"],
