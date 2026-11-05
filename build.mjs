@@ -34,8 +34,9 @@ const provShort=n=>n?n.split("/")[0].replace(/^(.*), (A|Las|La|Les|Illes|Os)$/,"
 try{ fs.rmSync(OUT,{recursive:true,force:true}); }catch(e){ /* sin permiso de borrado: se sobrescribe encima */ }
 fs.mkdirSync(OUT,{recursive:true});
 const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.readdirSync(from,{withFileTypes:true})){ const a=path.join(from,e.name), b=path.join(to,e.name); if(e.isDirectory()) copyDir(a,b); else fs.writeFileSync(b,fs.readFileSync(a)); } };
+// la versión también depende de build.mjs, que es donde se calcula portada.json (si no, un cambio de cuentas no cambia la URL)
 // covers.json y portada.json llevan una versión en la URL (?v=…): sin ella el service worker y la caché del navegador siguen sirviendo la copia vieja
-const DV=crypto.createHash("sha256").update(["covers","alimentos","sueldos","vivienda","causales","infra"].map(f=>rd("data/"+f+".json")).join("")).digest("hex").slice(0,8);
+const DV=crypto.createHash("sha256").update(["covers","alimentos","sueldos","vivienda","causales","infra"].map(f=>rd("data/"+f+".json")).concat(rd("build.mjs")).join("")).digest("hex").slice(0,8);
 const css=rd("src/styles.css"), js=rd("src/app.js").replaceAll("__DV__",DV), tpl=rd("src/template.html");
 const MENUAN=STUDIES.map(S=>`      <a href="/preguntas/${S.id}/">${esc(S.t)}</a>`).join("\n");
 const body=rd("src/body.html").replaceAll("{{MENUAN}}",MENUAN);
