@@ -1,17 +1,17 @@
 ---
 titulo: ¿Por qué cuesta tanto pagar una casa?
-entradilla: Alquilar y comprar han subido mucho más que los sueldos. Vemos a quién golpea y por qué.
-respuesta: Porque hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual. Movilizar viviendas vacías y turísticas donde hay demanda puede aportar entre 200.000 y 300.000 de una vez; construir es lo único que sigue sumando cada año. El alquiler ha subido sobre todo donde llega gente: es lo que más separa a unos municipios de otros. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
+entradilla: El alquiler ha subido más que los sueldos en casi todas partes. Buscamos por qué, y vemos que no es lo mismo en una gran ciudad que en la costa o en un pueblo.
+respuesta: Porque llega más gente de la que se construye para alojarla. En los cinco tipos de municipio que separamos el alquiler declarado ha subido entre un 35 % (pueblos) y un 47 % (costa), y en todos lo que más distingue a unos sitios de otros es cuánta gente ha llegado. Las viviendas vacías y los pisos turísticos pesan bastante menos; la costa, con más compradores de fuera y más casas que no son hogar de nadie, es donde más sube. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
 publicado: 2026-10-25
-actualizado: 2026-11-03
+actualizado: 2026-11-05
 orden: -1
 ---
 
 Desde 2015, el alquiler medio en España ha subido un **{{alq15|pct0}}**. El sueldo mediano, un {{sal15|pct0}}. En València, el alquiler medio ha pasado de {{vlc15|eur}} a {{vlc24|eur}} al mes; en Málaga, de {{mlg15|eur}} a {{mlg24|eur}}.
 
-Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a cuatro preguntas: cuánto ha subido de verdad, a quién le golpea, por qué ha pasado (y si pasa igual en todas partes) y qué funcionaría.
+Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a una pregunta: por qué. Primero, cuánto ha subido de verdad; después, qué explica la subida y si es lo mismo en una gran ciudad, en la costa o en un pueblo; y al final, qué dicen los datos de lo que se propone.
 
 ## Lo que ha subido
 
@@ -19,9 +19,8 @@ Pon el año 2015 como punto de partida. Desde entonces, el precio de compra de l
 
 [[grafico:carrera]]
 
-La subida no es igual en todas partes. Donde más ha subido el alquiler es en las ciudades que más empleo y más población atraen: {{ciudad1}} ({{ciudad1v|pcts0}}), {{ciudad2}} ({{ciudad2v|pcts0}}) y {{ciudad3}} ({{ciudad3v|pcts0}}).
+La subida no es igual en todas partes, y más abajo vemos de dónde viene en cada tipo de sitio. Pero casi en ninguno ha sido pequeña.
 
-[[grafico:ciudades]]
 
 ## Alquilar: quien busca piso paga mucho más que quien ya tiene contrato
 
@@ -32,10 +31,6 @@ Hay dos formas de medir el alquiler y no cuentan lo mismo. El **alquiler declara
 El INE solo separa los contratos nuevos de los antiguos desde 2021. Desde entonces, el alquiler de los contratos nuevos ha subido un {{r_nuevos|pct0}} y el sueldo mediano, un {{r_sal21|pct0}}.
 
 [[grafico:contratosNuevos]]
-
-No pasa igual en todas partes: entre 2021 y 2024, los contratos nuevos subieron más que la renta por persona en {{r_nOver|n0}} provincias. La mayor distancia está en {{r_p1}} ({{r_p1d|n1}} puntos más que la renta) y en {{r_p2}} ({{r_p2d|n1}}).
-
-[[grafico:provinciasNuevos]]
 
 Los datos de alquiler por municipio que usa el resto del análisis son los del alquiler declarado: sirven para ver **dónde** sube más, no cuánto le cuesta a quien busca piso.
 
@@ -61,17 +56,9 @@ Si comprar cuesta mucho o poco depende de qué se mida, y las tres formas habitu
 
 España ha sido siempre un país de propietarios, y lo sigue siendo, pero cada vez menos. En 2008, el {{prop08|pct0}} de los hogares vivía en una casa propia; en {{añoTen}}, el {{propUlt|pct0}}. Los que alquilan a precio de mercado han pasado del {{alq08|pct0}} al {{alqUlt|pct0}}.
 
-[[grafico:tenencia]]
-
-El alquiler pesa muy distinto según dónde se viva. Según el censo de 2021, el {{alqEs|pct0}} de los hogares españoles vive de alquiler, pero es casi uno de cada cuatro en Girona, Barcelona y Baleares, y menos de uno de cada diez en Jaén, Zamora, Badajoz o Córdoba. Es una de las razones por las que la misma subida se nota tan distinto de un sitio a otro.
-
-[[grafico:alquilerProv]]
-
-Y a los inquilinos les cuesta mucho más que en el resto de Europa. En {{añoEU}}, el **{{sobreES|pct0}} de los que alquilan a precio de mercado dedica más del 40 % de su renta a la vivienda**, frente al {{sobreEU|pct0}} en la Unión Europea. Es menos que en 2014 ({{sobreES14|pct0}}), porque desde entonces han subido el empleo y las rentas, pero sigue de los más altos de Europa.
+A los inquilinos les cuesta mucho más que en el resto de Europa. En {{añoEU}}, el **{{sobreES|pct0}} de los que alquilan a precio de mercado dedica más del 40 % de su renta a la vivienda**, frente al {{sobreEU|pct0}} en la Unión Europea. Es menos que en 2014 ({{sobreES14|pct0}}), porque desde entonces han subido el empleo y las rentas, pero sigue de los más altos de Europa.
 
 Los que más lo notan son los jóvenes. **La mitad de los españoles de 25 a 34 años ({{padresES|pct0}}) vive todavía con sus padres**; en la Unión Europea, menos de un tercio ({{padresEU|pct0}}), y en Francia o Alemania, uno de cada siete. La edad media a la que se van de casa es de {{edadES|n1}} años, frente a {{edadEU|n1}} en la UE.
-
-[[grafico:padres]]
 
 ## Por qué: más hogares que casas
 
@@ -85,35 +72,55 @@ Mientras, se construye una fracción de lo que se construía. En 2006 se termina
 
 > La burbuja de los 2000 dejó una lección que pesa todavía: se construyó mucho, en sitios donde nadie quería vivir, con crédito barato. Tras el estallido, la construcción se hundió y no se ha recuperado, aunque ahora la demanda sí está, y está en las ciudades.
 
-## No es el mismo problema en todas partes
+## Según el sitio, la subida viene de otra parte
 
-Hasta aquí, los números son los de España entera. Pero una media que junta a Palma, Barcelona, Zaragoza y un pueblo de 300 vecinos no describe a ninguno. Con los mismos datos de tasación y de sueldo mediano de cada comunidad, el esfuerzo de comprar 80 m² ha bajado desde 2008 casi en todas partes, pero no igual: Madrid pasa de {{c_mad08|n1}} a {{c_mad24|n1}} años de sueldo y Barcelona, de {{c_bcn08|n1}} a {{c_bcn24|n1}}, y siguen siendo las más caras del país. Zaragoza baja de {{c_zgz08|n1}} a {{c_zgz24|n1}} y Murcia, de {{c_mur08|n1}} a {{c_mur24|n1}}. Entre las que más han empeorado desde 2019 están Málaga ({{c_mlg19|n1}} a {{c_mlg24|n1}} años), València ({{c_vlc19|n1}} a {{c_vlc24|n1}}) y Palma ({{c_pmi19|n1}} a {{c_pmi24|n1}}).
+La subida media esconde sitios muy distintos. Para verlos separamos los {{tpN|n0}} municipios con dato de alquiler del Ministerio de Vivienda en cinco tipos, con reglas sencillas: **grandes ciudades** (100.000 habitantes o más), **coronas** de las grandes ciudades (a 30 km o menos), **costa** con muchos extranjeros, pisos turísticos o segundas residencias, **ciudades medianas** y **pueblos y villas**.
 
-Para no juntarlo todo en el mismo saco, repartimos las {{cN|n0}} ciudades de 50.000 habitantes o más en tres grupos con una regla sencilla (no es un modelo, y a veces una ciudad cae en un grupo discutible): **costa y compradores extranjeros**, si en su provincia los extranjeros hacen un 25 % o más de las compras; **ciudades que atraen población**, si no y han ganado un 3 % o más de habitantes desde 2019; y el resto, que **crece poco**.
+[[grafico:tiposMun]]
 
-[[grafico:tipos]]
+La subida se parece más de lo que cabría esperar: de un {{tp_pueblo_sub|pct0}} mediano en los pueblos y un {{tp_mediana_sub|pct0}} en las ciudades medianas a un {{tp_gran_sub|pct0}} en las grandes ciudades, un {{tp_corona_sub|pct0}} en las coronas y un {{tp_costa_sub|pct0}} en la costa. Dentro de cada tipo hay más diferencia que entre tipos: la mitad central de las coronas va del {{tp_corona_p25|pct0}} al {{tp_corona_p75|pct0}}. Lo que cambia de un tipo a otro no es tanto cuánto sube como por qué, y eso se ve mirando, dentro de cada tipo, qué distingue a los sitios donde más ha subido de los demás.
 
-**En la costa, el comprador viene de fuera.** Los {{costa_n|n0}} municipios del grupo (Málaga, Palma, Las Palmas, Alicante, Murcia…) tienen bastantes más compraventas por habitante que el resto ({{costa_comp|n0}} al año por cada 1.000, frente a {{atrae_comp|n0}} y {{estable_comp|n0}}), más extranjeros empadronados ({{costa_extr|pct0}}) y el doble de viviendas que no son hogar de nadie ({{costa_np|pct0}}, entre vacías y segundas residencias, frente al {{atrae_np|pct0}} de las que atraen población). Aquí el precio de tasación ha subido un {{costa_vtVar|pct0}} desde 2015 y llegan {{costa_hog|n1}} hogares nuevos al año por cada 1.000 habitantes, cuando se empiezan unas {{costa_ini|n1}} viviendas. Es coherente con la idea de que parte de la demanda no busca casa para vivir, aunque estos datos no separan una cosa de otra. Los pisos turísticos que cuenta el INE son pocos (el {{costa_tur|pct1}} de las viviendas, de mediana), pero se concentran en barrios concretos y esa media los diluye. **Lo que apuntan los datos:** aquí pesa más que en otros sitios lo que no es hogar de nadie (vacías, segundas residencias, turísticas), así que movilizar lo que hay puede aportar más que solo construir; lo vemos en «Dos ideas», más abajo.
+[[grafico:motores]]
 
-**En las ciudades que atraen población, el problema es la gente que llega.** Madrid, Barcelona, València y sus coronas (Hospitalet, Badalona, Getafe…) han ganado habitantes a un ritmo de {{atrae_hog|n1}} hogares nuevos al año por cada 1.000 habitantes y empiezan unas {{atrae_ini|n1}} viviendas por cada 1.000: la mitad. Tienen pocas viviendas sin habitar (el {{atrae_np|pct0}} no son hogar de nadie) y algo más de alquiler que el resto (el {{atrae_alq|pct0}} de los hogares) y los precios de tasación más disparados desde 2015: un {{atrae_vtVar|pct0}}. Los datos no dicen si el alquiler sube por especulación o porque hay más gente buscando; lo que sí dicen es que aquí no sobran casas. **Lo que apuntan los datos:** aquí casi no hay viviendas que movilizar y llega más gente de la que se construye para, así que lo que más encaja es construir; la vivienda pública de alquiler es la forma de que lo que se construya sea asequible.
+La tabla se lee por columnas. En los cinco tipos, lo que más se asocia a una subida mayor es lo mismo: que haya llegado gente o que haya crecido el empleo. El resto cambia.
 
-**Donde llega menos gente, el problema es menor.** Las {{estable_n|n0}} ciudades que crecen poco (Zaragoza, Sevilla, Bilbao, Valladolid, Gijón…) tienen un esfuerzo mediano de {{estable_a24|n1}} años de sueldo, el precio ha subido un {{estable_vtVar|pct0}} y llegan {{estable_hog|n1}} hogares nuevos por cada 1.000 habitantes, menos de lo que se empieza a construir. Aun así hay excepciones: Sevilla, Bilbao o A Coruña, con entre 7 y 8 años de sueldo, están por encima de la mediana de las ciudades que atraen población. **Lo que apuntan los datos:** es donde menos se nota el desajuste entre hogares y obra y donde el esfuerzo de compra es menor, con excepciones.
+**En las grandes ciudades, donde hay empleo, sube.** El alquiler ha subido un {{tp_gran_sub|pct0}}. Lo que más separa a unas ciudades de otras es el empleo (correlación de {{mo_gran_emp|n2}}) y la población ({{mo_gran_pob|n2}}): subió más donde más crecieron los afiliados y los vecinos. Las viviendas vacías o secundarias no distinguen a unas de otras ({{mo_gran_np|n2}}): hay pocas, el {{tp_gran_np|pct0}}. Los pisos turísticos se asocian algo ({{mo_gran_vt|n2}}), con un margen que apenas se separa del cero. Si se mira solo a las ciudades de 50.000 habitantes o más que ganan población, llegan {{atrae_hog|n1}} hogares nuevos al año por cada 1.000 habitantes y se empiezan {{atrae_ini|n1}} viviendas: no sobran casas. **Lo que apuntan los datos:** aquí el motor es la gente que llega a trabajar frente a una oferta que no la sigue; lo que más margen da es construir, y que lo que se construya sea asequible.
 
-**Y los pueblos pequeños y lejanos sufren lo contrario.** En los {{rurN|n0}} municipios de menos de 2.000 habitantes a 45 km o más de una gran ciudad, la mediana ha perdido un {{rurPob|abs|pct0}} de población desde 2015, el {{rurNp|pct0}} de las viviendas no es el hogar de nadie y solo el {{rurAlq|pct0}} de los hogares vive de alquiler. Casi no hay mercado, ni para comprar ni para alquilar: la casa es barata y lo que falta es gente y trabajo. Aquí mover viviendas vacías ayuda poco, porque el problema es que no hay quien las ocupe. **Lo que apuntan los datos:** no es un problema de falta de vivienda; lo que falta es gente.
+**En las coronas, el alquiler sube casi igual que en la ciudad.** Son {{tp_corona_n|n0}} municipios (Las Rozas, Sant Cugat, Guadalajara…) con {{tp_corona_pob|n1}} millones de vecinos, que han crecido un {{tp_corona_vp|pct0}} desde 2015, más que las propias ciudades ({{tp_gran_vp|pct0}}). El alquiler ha subido un {{tp_corona_sub|pct0}}, y lo que más separa a unas coronas de otras es la gente que llega ({{mo_cor_pob|n2}}) y el peso de los llegados del extranjero ({{mo_cor_inm|n2}}). Que crezcan más que la ciudad y que la subida sea casi igual encaja con que parte de la demanda no cabe o no puede pagar el centro. Es una hipótesis: estos datos no ven de dónde viene cada vecino. **Lo que apuntan los datos:** el problema no se queda dentro de la ciudad: las coronas suman {{tp_corona_pob|n1}} millones de vecinos, frente a los {{tp_gran_pob|n1}} de las grandes ciudades, y su alquiler sube igual.
 
-Hay cosas que faltan en el cuadro. **La obra terminada** solo se publica por provincia, así que comparamos con las viviendas iniciadas de cada provincia y no con las de cada ciudad. **La multipropiedad** (quién tiene varias casas) solo está para el conjunto de España: el Catastro publica el detalle por municipio, pero todavía no lo hemos incorporado. Y **la edad de quien llega** o el peso de los inversores no se pueden medir con datos públicos municipales; por eso no afirmamos que en Barcelona suba el alquiler por los jóvenes o por la inversión, aunque sea plausible.
+**En la costa, además de gente, hay muchas casas que no son hogar de nadie.** Es donde más ha subido el alquiler ({{tp_costa_sub|pct0}}) y el tipo más distinto: {{tp_costa_ex|pct0}} de extranjeros, {{tp_costa_np|pct0}} de viviendas que no son hogar de nadie (en las grandes ciudades, {{tp_gran_np|pct0}}), {{tp_costa_vt|pct1}} de pisos turísticos y casi el doble de compraventas por habitante ({{tp_costa_cp|n0}} al año por cada 1.000, frente a {{tp_gran_cp|n0}}). También es donde más ha crecido la población ({{tp_costa_vp|pct0}} desde 2015). Dentro de la costa, lo que separa a unos municipios de otros vuelve a ser la gente que llega ({{mo_cos_pob|n2}}); las vacías ({{mo_cos_np|n2}}) y los pisos turísticos ({{mo_cos_vt|n2}}) no distinguen porque casi todos los tienen. Eso no los absuelve: la costa puede ser la más cara porque todos esos usos son altos a la vez, y esta comparación no puede separar un efecto de otro. Los datos tampoco distinguen entre quien compra para vivir y quien compra para invertir o para pasar el invierno. **Lo que apuntan los datos:** aquí pesa más que en otros sitios lo que no es hogar de nadie, así que movilizar lo que hay puede aportar más que en la ciudad.
 
-Busca tu ciudad (cada nombre abre su ficha):
+**En las ciudades medianas, donde llega poca gente, sube menos.** Han crecido un {{tp_mediana_vp|pct0}} desde 2015 y el alquiler ha subido un {{tp_mediana_sub|pct0}}, la menor subida entre las ciudades. Pero las medianas que sí han crecido se parecen a las grandes, y aquí la población ({{mo_med_pob|n2}}) y los llegados del extranjero ({{mo_med_inm|n2}}) separan a unas de otras tanto como en las grandes ciudades. **Lo que apuntan los datos:** el mecanismo es el mismo que en las grandes ciudades, con menos intensidad.
 
-[[grafico:fichaCiudades]]
+**En los pueblos y villas, donde sobran casas, sube menos.** Son {{tp_pueblo_n|n0}} municipios de menos de 20.000 habitantes y lejos de una gran ciudad, donde el alquiler ha subido un {{tp_pueblo_sub|pct0}}. La gente que llega sigue siendo lo que más se asocia a una subida mayor ({{mo_pue_pob|n2}}), pero los llegados del extranjero casi no distinguen ({{mo_pue_inm|n2}}), y las viviendas vacías o secundarias se asocian a una subida menor ({{mo_pue_np|n2}}), una relación débil pero clara. **Lo que apuntan los datos:** una casa vacía en un pueblo que se vacía no es la que falta en una gran ciudad.
 
-Y si vives en un municipio que no sale en la lista, o en un pueblo, búscalo aquí y compara sus cifras de vivienda con las de España:
+Los pueblos más pequeños y lejanos no salen en esta lista, porque casi no hay contratos declarados. En los {{rurN|n0}} municipios de menos de 2.000 habitantes a 45 km o más de una gran ciudad, la mediana ha perdido un {{rurPob|abs|pct0}} de población desde 2015, el {{rurNp|pct0}} de las viviendas no es el hogar de nadie y solo el {{rurAlq|pct0}} de los hogares vive de alquiler. Casi no hay mercado, ni para comprar ni para alquilar: la casa es barata y lo que falta es gente y trabajo.
+
+### Cuánto pesa cada explicación
+
+Para ponerle números al conjunto, repartimos entre cinco grupos de factores lo que explican de la subida entre 2020 y 2024. Comparamos los {{mN|n0}} municipios de 5.000 habitantes o más con todos los datos, donde vive el {{mPob|pct0}} de la población.
+
+[[grafico:pesos]]
+
+**La demanda se lleva la mayor parte: en torno al {{pDem|pct0}}**, con un margen de entre el {{pDemLo|pct0}} y el {{pDemHi|pct0}}. El alquiler subió más donde más creció la población y el empleo. Los pisos turísticos explican en torno al {{pTur|pct0}}; las viviendas vacías o secundarias, el {{pVac|pct0}}; las compraventas por habitante, el {{pCom|pct0}}; y la construcción nueva, apenas el {{pCon|pct0}}.
+
+Tres avisos para leerlo bien:
+
+- **Explica una parte, no todo.** Estos cinco factores explican en torno al {{r2m|pct0}} de las diferencias entre municipios. El resto depende de cosas que estos datos no miden, como el tipo de vivienda, el barrio o la oferta de alquiler en cada momento.
+- **Que la construcción pese poco no quiere decir que construir no sirva.** Se construye poco en casi todas partes, así que no es lo que ha separado a unos municipios de otros. Por provincias, con las viviendas terminadas de verdad y no solo las compraventas de obra nueva, la construcción tampoco pesa más del {{pConPr|pct0}}, y la demanda se lleva el {{pDemPr|pct0}}.
+- **Es una comparación entre lugares, no un experimento.** Si se comparan solo municipios de la misma provincia, la demanda sigue en cabeza, con el {{pDemP|pct0}}, aunque ahí los cinco factores explican muy poco: casi todo lo que separa a unos municipios de otros es la provincia en la que están.
+
+Las dos miradas apuntan a lo mismo: el alquiler sube sobre todo donde llega gente. Lo que se construye y las viviendas sin habitar han pesado poco en las diferencias entre unos sitios y otros, porque en casi ninguno han ido al ritmo de esa llegada.
+
+Hay cosas que faltan en el cuadro. **La obra terminada** solo se publica por provincia, así que comparamos con las viviendas iniciadas de cada provincia y no con las de cada ciudad. **La multipropiedad** (quién tiene varias casas) solo está para el conjunto de España: el Catastro publica el detalle por municipio, pero todavía no lo hemos incorporado. Y **la edad de quien llega** o el peso de los inversores no se pueden medir con datos públicos municipales; por eso no afirmamos que en Barcelona suba el alquiler por los jóvenes o por la inversión, aunque sea plausible. Tampoco medimos los tipos de interés, que encarecen comprar y empujan a más hogares al alquiler, ni las reglas que limitan cuánto puede subir un contrato en vigor.
+
+Si vives en un municipio que no sale entre los citados, o en un pueblo, búscalo aquí y compara sus cifras de vivienda con las de España:
 
 [[grafico:miMunicipio]]
 
 ## Dos ideas: construir más o que cada casa sea para vivir
 
-Con los tres tipos de sitio en la cabeza, vuelve la pregunta de qué hacer. Cuando se discute, aparecen dos ideas. Una dice que faltan casas y que hay que construir más. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas y cada vez más se acumulan en manos de quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál de las dos, sino cuánto puede aportar cada una.
+Con esto en la cabeza, vuelve la pregunta de qué hacer. Cuando se discute, aparecen dos ideas. Una dice que faltan casas y que hay que construir más. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas y cada vez más se acumulan en manos de quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál de las dos, sino cuánto puede aportar cada una.
 
 ### Construir más
 
@@ -142,22 +149,6 @@ Los pisos turísticos tocaron techo en {{t_maxMes}} de {{t_maxAño}}, con {{t_ma
 **Quién compra.** Las personas jurídicas fueron el comprador del {{cpPJ|pct0}} de las compraventas de vivienda de {{añoCp}}, frente al {{cpPJ15|pct0}} en 2015, según el INE; la cifra incluye a promotoras y a quien compra a otra empresa. Los Registradores dan casi lo mismo para 2024 (10,9 %), con más peso en Canarias (16,5 %), Castilla-La Mancha (14,2 %), Madrid (14,1 %) y Cataluña (12,5 %). Los extranjeros fueron el 14,6 % de las compras registradas en 2024 (el 15,0 % en 2023) y el 13,5 % en el último trimestre de 2025, también según los Registradores, pero con diferencias enormes: en 2024, el 44 % en Alicante, el 33 % en Santa Cruz de Tenerife y el 32 % en Baleares y en Málaga. Comprar para vivir, para invertir o para pasar el invierno no deja la misma huella en el mercado, y estos datos no separan una cosa de otra.
 
 Aquí está el matiz. Una vivienda acumulada que se alquila sigue alojando a un hogar: no resta casas. Las resta cuando se queda vacía, se usa unas semanas al año o se alquila a turistas, y eso ya está en las dos piezas anteriores. Lo que sí puede hacer la acumulación es empujar los precios: quien compra para invertir compite con quien compra para vivir, y concentrar la propiedad puede dar más poder para fijar el alquiler. Es un efecto plausible, pero con los datos públicos no se puede medir bien, y por eso no entra en la cuenta de abajo.
-
-### Qué ha separado a los sitios donde más ha subido el alquiler
-
-Antes de hacer cuentas hacia delante, conviene mirar atrás. Lo que ya ha pasado dice otra cosa útil: qué distingue a los municipios donde más ha subido el alquiler de los demás. Comparamos los {{mN|n0}} municipios de 5.000 habitantes o más con todos los datos, donde vive el {{mPob|pct0}} de la población, y repartimos entre cinco grupos de factores lo que explican de la subida entre 2020 y 2024.
-
-[[grafico:pesos]]
-
-**La demanda se lleva la mayor parte: en torno al {{pDem|pct0}}**, con un margen de entre el {{pDemLo|pct0}} y el {{pDemHi|pct0}}. El alquiler subió más donde más creció la población y el empleo. Los pisos turísticos explican en torno al {{pTur|pct0}}; las viviendas vacías o secundarias, el {{pVac|pct0}}; las compraventas por habitante, el {{pCom|pct0}}; y la construcción nueva, apenas el {{pCon|pct0}}.
-
-Tres avisos para leerlo bien:
-
-- **Explica una parte, no todo.** Estos cinco factores explican en torno al {{r2m|pct0}} de las diferencias entre municipios. El resto depende de cosas que estos datos no miden, como el tipo de vivienda, el barrio o la oferta de alquiler en cada momento.
-- **Que la construcción pese poco no quiere decir que construir no sirva.** Se construye poco en casi todas partes, así que no es lo que ha separado a unos municipios de otros. Por provincias, con las viviendas terminadas de verdad y no solo las compraventas de obra nueva, la construcción tampoco pesa más del {{pConPr|pct0}}, y la demanda se lleva el {{pDemPr|pct0}}.
-- **Es una comparación entre lugares, no un experimento.** Si se comparan solo municipios de la misma provincia, la demanda sigue en cabeza, con el {{pDemP|pct0}}, aunque ahí los cinco factores explican muy poco: casi todo lo que separa a unos municipios de otros es la provincia en la que están.
-
-Las dos miradas apuntan a lo mismo: el alquiler sube sobre todo donde llega gente. Lo que se construye y las viviendas sin habitar han pesado poco en las diferencias entre unos sitios y otros, porque en casi ninguno han ido al ritmo de esa llegada.
 
 ### Entre el blanco y el negro: ¿cuánto puede aportar cada idea?
 
@@ -205,6 +196,7 @@ Cada uno de estos análisis responde a una pregunta concreta, con el método a l
 - **Hogares y viviendas:** hogares de la Encuesta de Población Activa (Eurostat), proyección de hogares del INE, viviendas libres terminadas y viviendas protegidas con calificación definitiva (Ministerio de Vivienda).
 - **Viviendas vacías y municipios con demanda:** Censo de 2021 (INE, tablas 59525 y 59531): 3.828.307 viviendas vacías y 2.517.628 de uso esporádico, según el consumo de electricidad (un 0,2 % menos de vacías y un 0,1 % más de esporádicas que las cifras que citábamos antes, 3.837.328 y 2.514.511). El INE publica el total de viviendas, las principales, las vacías y las de uso esporádico de 3.139 municipios, donde vive el 97 % de la población y que incluyen todos los de 20.000 habitantes o más; las cifras de los municipios con demanda son la suma de esos datos, sin estimar. «Con demanda» son los municipios de 20.000 habitantes o más que han ganado población desde 2015. Las viviendas turísticas son las de la estadística experimental del INE.
 - **Propiedad y compradores:** Catastro, titulares de bienes urbanos por número de bienes (2015–2026, todos los usos) y de bienes de uso residencial por tramos (solo desde 2024); INE, Estadística de Transmisiones de Derechos de la Propiedad, compraventas de vivienda según quién vende y quién compra (el comprador persona jurídica suma «física a jurídica» y «jurídica a jurídica»); Colegio de Registradores, Estadística Registral Inmobiliaria, Anuario 2024 y cuarto trimestre de 2025; Banco de España, Encuesta Financiera de las Familias de 2022 (Documento Ocasional 2413); viviendas alquiladas según cuántas tiene su dueño, Panel de Hogares de la Agencia Tributaria de 2023 (estudio «Multiarrendadores» del Ministerio de Derechos Sociales y el CSIC; el 61 % suma los multiarrendadores particulares con las personas jurídicas y el parque público, que el estudio estima aparte con datos del Banco de España). Déficit del Banco de España: Informe Anual 2025.
+- **Tipos de municipio:** subida del alquiler por m² de 2015 a 2024 (SERPAVI, Ministerio de Vivienda: mediana del alquiler declarado en el IRPF, misma tipología, municipios con al menos 20 viviendas arrendadas en los dos años; {{tpN|n0}} municipios). Tipos, por este orden: grandes ciudades (100.000 habitantes o más); costa (con costa y al menos un 15 % de extranjeros, un 1,5 % de pisos turísticos o un 50 % de viviendas no habituales); coronas (a 30 km o menos de una ciudad de 100.000); ciudades medianas (20.000 a 100.000); pueblos y villas (el resto). Los límites son una elección razonable, no la única. La subida de cada tipo es la mediana ponderada por población y la mitad central, entre los percentiles 25 y 75. Las correlaciones son de Spearman entre municipios del mismo tipo, con intervalo del 90 % de 500 remuestreos: miden asociación, no causa, y mezclan periodos distintos (población desde 2015, empleo desde 2019, composición del Censo de 2021). Código: `scripts/datos/vivienda_tipos.py`.
 - **Qué ha separado a los municipios:** regresión ponderada por población de la subida del alquiler 2020–2024 (IPVA del INE) sobre cinco grupos: demanda (crecimiento de la población 2020–2025 y de los afiliados desde 2019), construcción nueva (% de compraventas de vivienda nueva, 2021–2025), viviendas no principales (Censo 2021), pisos turísticos (peso en 2024 y cambio desde 2020) y compraventas por habitante, con la renta y el tamaño como controles. El R² se reparte entre los grupos con el método de Shapley y el margen es el intervalo del 90 % de 300 remuestreos. Por provincias, la subida del IPVA 2019–2024 con la población, las viviendas terminadas por habitante, las no principales y las turísticas. Código: `scripts/datos/vivienda_pesos.py`.
 - **Lo que faltaría:** viviendas que faltan hoy (mando) más, cada año, los hogares nuevos de la proyección del INE (2026–2036) menos las viviendas que se terminan ahora (media de 2021 a {{añoHog21}}). Construir más empieza a sumar a los dos años.
 - **Europa:** Eurostat (índice de precios de la vivienda, sobrecarga del gasto en vivienda, jóvenes que viven con sus padres, edad de emancipación, inversión en vivienda).
