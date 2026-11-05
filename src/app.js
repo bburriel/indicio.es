@@ -2808,7 +2808,7 @@ function renderEstudios(id){
 // ---------- gráficos de cabecera de cada análisis (noviembre de 2026) ----------
 // Los de la cesta, los contratos, el tope y la vivienda son los de la portada (ptCharts, con portada.json); el resto salen de
 // data/covers.json, que genera scripts/ilustraciones/portadas.mjs con las mismas clases pt-g-* (valen en modo oscuro).
-let COV_P=null; const loadCovers=()=>COV_P||(COV_P=Promise.all([getJSON("/data/covers.json").catch(()=>null),loadPortada()]).then(([c,D])=>({C:(c&&c.covers)||{},D})));
+let COV_P=null; const loadCovers=()=>COV_P||(COV_P=Promise.all([getJSON("/data/covers.json?v=__DV__").catch(()=>null),loadPortada()]).then(([c,D])=>({C:(c&&c.covers)||{},D})));
 const splitA=t=>{ const f=String(t||"").trim().split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ¿¡0-9])/); return {v:f[0]||"",r:f.slice(1).join(" ")}; };
 function coverOf(id,{C,D}){
   const hq=HEROQ.find(h=>h.id===id);
@@ -6371,7 +6371,7 @@ const HEROQ=[
 // Quien ya tenía portada.json en caché (navegador o service worker) no trae la serie de infraestructuras: se completa desde infra.json,
 // que es un fichero nuevo y no puede estar viejo. Así la diapositiva no aparece con la portada pre-renderizada y desaparece al pintar.
 const infraDeFit=F=>{ const I=F.itf; return {years:I.years,road:I.road_q.map(v=>Math.round(v)/1000),rail:I.rail_q.map(v=>Math.round(v)/1000)}; };
-let PORTADA_P=null; const loadPortada=()=>PORTADA_P||(PORTADA_P=getJSON("/data/portada.json").then(D=>D&&!D.infra?getJSON("/data/infra.json").then(F=>({...D,infra:infraDeFit(F)})).catch(()=>D):D).catch(()=>{ PORTADA_P=null; return null; }));
+let PORTADA_P=null; const loadPortada=()=>PORTADA_P||(PORTADA_P=getJSON("/data/portada.json?v=__DV__").then(D=>D&&!D.infra?getJSON("/data/infra.json").then(F=>({...D,infra:infraDeFit(F)})).catch(()=>D):D).catch(()=>{ PORTADA_P=null; return null; }));
 
 // los cuatro gráficos de la cabecera: SVG en un lienzo de 440×300, con los colores por clase (valen en modo oscuro)
 const PTW=440, PTH=300;
