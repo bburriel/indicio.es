@@ -7,17 +7,17 @@
 // Para ver qué frases de la interfaz siguen sin traducir: npm run i18n:faltan
 export const ROWS=[
  // cabecera
- ["Análisis","Anàlisi","Análises","Azterketak","Analysis"],
+ ["Preguntas","Preguntes","Preguntas","Galderak","Questions"],
  ["Municipios","Municipis","Municipios","Udalerriak","Municipalities"],
  ["Laboratorio","Laboratori","Laboratorio","Laborategia","Lab"],
  ["Quién soy","Qui sóc","Quen son","Nor naiz","About me"],
  ["Preguntas ya respondidas, por tema","Preguntes que ja tenen resposta, per tema","Preguntas xa respondidas, por tema","Erantzundako galderak, gaika","Questions already answered, by topic"],
  ["Fichas, comparador y rankings de los municipios de España","Fitxes, comparador i rànquings dels municipis d'Espanya","Fichas, comparador e clasificacións dos municipios de España","Espainiako udalerrien fitxak, konparagailua eta sailkapenak","Profiles, comparison tool and rankings for Spain's municipalities"],
  ["Cruza datos, comprueba si una relación aguanta y mide antes y después","Creua dades, comprova si una relació s'aguanta i mesura l'abans i el després","Cruza datos, comproba se unha relación aguanta e mide antes e despois","Gurutzatu datuak, egiaztatu erlazio bat sendoa den eta neurtu aurreko eta ondorengo egoera","Cross-reference data, test whether a relationship holds up and measure before and after"],
- ["Abrir el menú de Análisis","Obre el menú d'Anàlisi","Abrir o menú de Análises","Ireki Azterketen menua","Open the Analysis menu"],
+ ["Abrir el menú de Preguntas","Obre el menú de Preguntes","Abrir o menú de Preguntas","Ireki Galderen menua","Open the Questions menu"],
  ["Abrir el menú de Municipios","Obre el menú de Municipis","Abrir o menú de Municipios","Ireki Udalerrien menua","Open the Municipalities menu"],
  ["Abrir el menú del Laboratorio","Obre el menú del Laboratori","Abrir o menú do Laboratorio","Ireki Laborategiaren menua","Open the Lab menu"],
- ["Menú de Análisis","Menú d'Anàlisi","Menú de Análises","Azterketen menua","Analysis menu"],
+ ["Menú de Preguntas","Menú de Preguntes","Menú de Preguntas","Galderen menua","Questions menu"],
  ["Menú de Municipios","Menú de Municipis","Menú de Municipios","Udalerrien menua","Municipalities menu"],
  ["Menú del Laboratorio","Menú del Laboratori","Menú do Laboratorio","Laborategiaren menua","Lab menu"],
  ["Secciones","Seccions","Seccións","Atalak","Sections"],

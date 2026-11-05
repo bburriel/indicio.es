@@ -189,7 +189,7 @@ function route(){
   if(h==="__static"){ const e=document.getElementById("nav-municipio"); if(e) e.setAttribute("aria-current","page"); return; }   // páginas solo estáticas (provincias, rankings): el HTML ya trae todo
   const m=h.match(/^m(\d{5})(?:-([a-z]+))?$/), rt=h.match(/^(?:renta|riqueza)(?:-(\d{5}))?$/), cr=h.match(/^(?:cruces|relaciones)(?:-([a-zA-Z0-9]+)-([a-zA-Z0-9]+))?$/);
   document.querySelectorAll(".nav a,.nav .ddb").forEach(a=>a.removeAttribute("aria-current")); ddClose();
-  // cuatro entradas: «Análisis» (preguntas y temas), «Municipios» (fichas, comparar, provincias, rankings), el laboratorio y quién soy
+  // cuatro entradas: «Preguntas» (preguntas y temas), «Municipios» (fichas, comparar, provincias, rankings), el laboratorio y quién soy
   const cur=id=>{ id=({temas:"preguntas"})[id]||id; const e=document.getElementById("nav-"+id); if(e) e.setAttribute("aria-current","page"); };
   if(INIT_T){ clearInterval(INIT_T); INIT_T=null; } if(typeof QH_T!=="undefined"&&QH_T){ clearInterval(QH_T); QH_T=null; } if(typeof QSPOT_T!=="undefined"&&QSPOT_T){ clearInterval(QSPOT_T); QSPOT_T=null; }
   if(m && BYCODE.has(m[1])){ cur("municipio"); EXF={prov:"",min:0,max:Infinity}; if(!myOk(lastMun)){ setMyMun(m[1],{silent:true}); setTimeout(()=>{ const t=toast(`📍 Hemos guardado <b>${esc(myName(m[1]))}</b> como tu municipio: lo verás destacado en temas y gráficos. <button type="button" id="tchg">Cambiar</button>`,4500); const c=document.getElementById("tchg"); if(c) c.addEventListener("click",()=>{ t.remove(); myPop(); }); },600); } renderMun(m[1], m[2]); return; }
@@ -216,7 +216,7 @@ function route(){
 }
 let INIT_T=null;
 const saveMun=()=>{ try{ localStorage.setItem("cifrario.mun",lastMun); }catch(e){} };
-// menús desplegables (Análisis y Municipios): al pasar por encima (o con la flecha, en táctil) se abre su panel
+// menús desplegables (Preguntas y Municipios): al pasar por encima (o con la flecha, en táctil) se abre su panel
 const TOP=document.getElementById("top");
 const DDS=[...document.querySelectorAll(".navdd")].map(dd=>({dd, btn:dd.querySelector(".ddb"), mega:document.getElementById(dd.dataset.mega)})).filter(x=>x.btn&&x.mega);
 let MEGA_T=null;
@@ -3026,7 +3026,7 @@ function coverOf(id,{C,D}){
 // el titular de los análisis del carrusel lleva el mismo final en granate que en la portada, para que la transición encaje
 const shTitle=S=>{ const h=(typeof HEROQ!=="undefined"?HEROQ:[]).find(x=>x.id===S.id); return h&&h.em&&S.t.endsWith(h.em)?esc(S.t.slice(0,-h.em.length))+`<em>${esc(h.em)}</em>`:esc(S.t); };
 function studyHead(S){ const {v}=splitA(S.a);
-  return `<nav class="crumbs"><a href="/preguntas/">Análisis</a> › <a href="/preguntas/?tema=${S.tema}">${esc(TOPICL(S.tema))}</a></nav>`
+  return `<nav class="crumbs"><a href="/preguntas/">Preguntas</a> › <a href="/preguntas/?tema=${S.tema}">${esc(TOPICL(S.tema))}</a></nav>`
     +`<header class="sh"><div class="sh-t"><div class="kk2">${esc(TOPICL(S.tema))}</div><h1 class="sh-q">${shTitle(S)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
     +`<figure class="sh-f" id="shf"><div class="sh-ph"></div></figure></header>`; }
 function studyCover(S){ loadCovers().then(cv=>{ const f=document.getElementById("shf"); if(!f||!document.body.contains(f)) return; const c=coverOf(S.id,cv);
@@ -3753,7 +3753,7 @@ async function topicDecorate(id){
   const body=view.querySelector("#body")||view;
   const hs=[...body.querySelectorAll(":scope > .finding > h2, :scope > section.finding > h2")];
   const words=[...view.querySelectorAll(".txt, .phead .dek")].map(e=>e.textContent).join(" ").split(/\s+/).length+hs.length*40, mins=Math.max(2,Math.round(words/230));
-  ph.insertAdjacentHTML("afterbegin",`<div class="tp-crumb"><a href="/preguntas/">Análisis</a> › <a href="/preguntas/?tema=${id}">${T.l}</a> · ${hs.length} ideas · ${mins} minutos de lectura</div>`);
+  ph.insertAdjacentHTML("afterbegin",`<div class="tp-crumb"><a href="/preguntas/">Preguntas</a> › <a href="/preguntas/?tema=${id}">${T.l}</a> · ${hs.length} ideas · ${mins} minutos de lectura</div>`);
   const ess=el("section","tp-ess",`<h2>Lo esencial</h2><div class="g4" id="essg"></div><div id="mestrip"></div>`);
   ph.after(ess);
   hs.forEach((h,i)=>{ h.id="idea-"+(i+1); });
@@ -7065,7 +7065,7 @@ async function renderInicio(){
     <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Empieza por una pregunta</a><a class="ho-lk" href="#" data-go=".pt-mun">Mira cómo está tu pueblo</a></p></section>
   ${heroCarHTML(D)}
-  <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todos los análisis →</a></p>
+  <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p>
   <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
       <p class="pt-labx-lead">Elige lo que quieras comparar (renta, vivienda, edad, voto, sueldos, pensiones…) y míralo en un mapa, un ranking o un gráfico. Después comprueba si la relación aguanta al comparar lo que es comparable, o qué pasó antes y después de una ley.</p>
       <div class="pt-labx-h" id="labq-t">Empieza por una pregunta</div>
@@ -7076,7 +7076,7 @@ async function renderInicio(){
         <small>Cada municipio, coloreado por su dato. En gris, sin dato.</small></figcaption></figure></div></section>
   <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>Tu pueblo, <em>frente a España entera.</em></h2>
       <p class="pt-land-lead">Escribe dónde vives y mira en un minuto cuánto se gana, cuánto cuesta el alquiler y qué lo distingue de los demás. Las cifras son de los ${nMun} municipios, desde un pueblo de diez vecinos hasta Madrid.</p></div>
-    <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Enfrentar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
+    <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Comparar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
@@ -7186,7 +7186,7 @@ new MutationObserver(()=>{ clearTimeout(revealObserve._t); revealObserve._t=setT
 // arriba) muestra solo ese tema, sin carrusel.
 async function renderPreguntas(){
   const tq=new URLSearchParams(location.search).get("tema"), tema=TOPIC_IDS.includes(tq)?tq:"", T=TOPICS[tema];
-  document.title=(T?T.l+" · Análisis":"Análisis")+" · Indicio";
+  document.title=(T?T.l+" · Preguntas":"Preguntas")+" · Indicio";
   // el mismo carrusel que la portada; mientras llega portada.json sigue a la vista la página pre-renderizada
   const D=T?null:await loadPortada(); if(!/^\/preguntas\/?$/.test(location.pathname)) return;
   const all=[...STUDIES.map(S=>({id:S.id,href:"/preguntas/"+S.id+"/",t:S.t,d:S.d,tema:S.tema,ev:S.ev,a:S.a||S.d,pub:S.pub||"",upd:S.upd||S.pub||""})),
@@ -7198,7 +7198,7 @@ async function renderPreguntas(){
   const chips=`<nav class="np-chips" aria-label="Temas"><a href="/preguntas/"${T?"":' class="on"'}>Todos<small>${all.length}</small></a>${TOPIC_IDS.filter(id=>cnt(id)>0||id===tema).map(id=>`<a href="/preguntas/?tema=${id}"${id===tema?' class="on"':""}>${TOPICS[id].l}<small>${cnt(id)}</small></a>`).join("")}</nav>`;
 const labBlock=`<section class="np-lab"><div class="np-lab-t"><div class="kk2">Laboratorio</div><h2>${T?`Ya has visto lo de ${low(T.l)}. Ahora haz tu propio análisis.`:"Si tu pregunta no está, pruébala tú"}</h2><p>Elige dos datos, como el paro y la edad o la renta y el voto, y mira si van juntos de verdad en los ${nf0.format(rowsAll().length)} municipios y cuánto aguanta la relación cuando se compara entre iguales. También puedes ver qué pasó antes y después de una ley.</p><p class="np-lab-b"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a> <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><a class="np-lab-i" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a></section>`;
   const otros=T?`<section class="np-sec"><div class="np-sh"><h2>Otros temas</h2></div><div class="np-tg">${TOPIC_IDS.filter(id=>id!==tema&&cnt(id)>0).map(id=>`<a class="np-t" href="/preguntas/?tema=${id}"><div class="np-ti">${tIll(id)}</div><h3>${TOPICS[id].l}</h3><p>${esc(TOPICS[id].q)}</p><span>${cnt(id)} análisis →</span></a>`).join("")}</div></section>`:"";
-  view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">${T?"Análisis · "+esc(T.l):"Análisis"}</div><h1>${T?esc(T.l):"Lo que dicen los datos"}</h1><p>${T?esc(T.q)+" Estas son las preguntas que ya hemos contestado."+` <a href="/temas/${tema}/">Leer el panorama del tema →</a>`:`${all.length} preguntas respondidas con datos públicos. Cada respuesta dice hasta dónde llega.`}</p>${chips}</header>
+  view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">${T?"Preguntas · "+esc(T.l):"Preguntas"}</div><h1>${T?esc(T.l):"Lo que dicen los datos"}</h1><p>${T?esc(T.q)+" Estas son las preguntas que ya hemos contestado."+` <a href="/temas/${tema}/">Leer el panorama del tema →</a>`:`${all.length} preguntas respondidas con datos públicos. Cada respuesta dice hasta dónde llega.`}</p>${chips}</header>
     ${T?(L.length?`<section class="np-sec np-all"><div class="np-grid">${L.map(card).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis sobre ${low(T.l)}. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`):`${heroCarHTML(D)}${L.length?`<section class="np-sec"><div class="np-sh"><h2>Más recientes</h2></div><div class="np-grid">${L.map(card).join("")}</div></section>`:""}`}
     ${T?"":`<section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/municipio/">Ver el mapa de municipios →</a></p></div></section>`}
     ${labBlock}
