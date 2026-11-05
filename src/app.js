@@ -6567,7 +6567,10 @@ async function renderInicio(){
   view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio.</span><i class="ho-cur"></i></span></span></h1>
     <p class="ho-sub">Los datos públicos, a tu alcance.</p>
     <p class="ho-p">Indicio parte de preguntas de la calle, como qué pasó con el alquiler o dónde se dejó de invertir, y las contesta con datos públicos. Si dudas, compruébalo tú en el laboratorio.</p>
-    <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Ver las preguntas</a><a class="ho-lk" href="#" data-go=".pt-labx">Abrir el laboratorio</a><a class="ho-lk" href="#" data-go=".pt-mun">Buscar mi municipio</a></p></section>
+    <ul class="ho-f" aria-label="Qué es Indicio">
+      <li><b>${nMun} municipios</b><span>De un pueblo de diez vecinos a Madrid.</span></li>
+      <li><b>Fuentes públicas</b><span>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></li>
+      <li><b>Tres niveles de prueba</b><span>Cada respuesta dice si describe, compara casos parecidos o es un experimento natural.</span></li></ul></section>
   <div class="pt-carband">${heroCarHTML(D)}
   <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p></div>
   <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
