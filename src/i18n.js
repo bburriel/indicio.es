@@ -35,6 +35,13 @@ var NOTE={
  en:"The texts and analyses on this page are only available in Spanish for now."
 };
 
+var AUTO={
+ ca:'Aquesta web s\'ha traduït automàticament del castellà. Si hi trobes un error de traducció, <a href="/quien-soy/contacto/">escriu-nos</a>.',
+ gl:'Esta web foi traducida automaticamente do castelán. Se atopas algún erro de tradución, <a href="/quien-soy/contacto/">escríbenos</a>.',
+ eu:'Webgune hau automatikoki itzuli da gaztelaniatik. Itzulpen-errorerik aurkitzen baduzu, <a href="/quien-soy/contacto/">idatzi iezaguzu</a>.',
+ en:'This site has been machine-translated from Spanish. If you spot a translation error, <a href="/quien-soy/contacto/">write to us</a>.'
+};
+
 var MAP={ca:{},gl:{},eu:{},en:{}};
 ROWS.forEach(function(r){ ["ca","gl","eu","en"].forEach(function(l,i){ if(typeof r[i+1]==="string") MAP[l][norm(r[0]).replace(/\d[\d.,]*\d|\d/g,"{#}")]=r[i+1]; }); });
 function norm(s){ return s.replace(/\s+/g," ").trim(); }
@@ -132,6 +139,14 @@ function noteCheck(){
   old.setAttribute("lang",lang); old.textContent=NOTE[lang];
 }
 
+function autoNote(){
+  var old=document.querySelector(".langauto");
+  if(lang==="es"||!AUTO[lang]){ if(old) old.remove(); return; }
+  var wrap=document.querySelector(".sitefoot .wrap"); if(!wrap) return;
+  if(!old){ old=document.createElement("p"); old.className="langauto"; old.setAttribute("translate","no"); wrap.appendChild(old); }
+  old.setAttribute("lang",lang); old.innerHTML=AUTO[lang];
+}
+
 function flush(){
   raf=0; var items=Array.from(pending); pending.clear();
   items.forEach(function(n){ if(n.isConnected) walk(n); });
@@ -172,8 +187,8 @@ function apply(l,save){
   var sel=document.getElementById("langsel"); if(sel&&sel.value!==l) sel.value=l;
   setLogo(l);
   if(prev!=="es"){ restoreAll(); titleBack(); }
-  if(l==="es"){ stop(); noteCheck(); return; }
-  start(); walk(document.body); titleTr(); noteCheck();
+  if(l==="es"){ stop(); noteCheck(); autoNote(); return; }
+  start(); walk(document.body); titleTr(); noteCheck(); autoNote();
 }
 
 function detect(){
