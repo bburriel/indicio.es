@@ -3195,8 +3195,8 @@ async function renderMunLanding(){
   const tok=++MLTOK;
   document.title="Municipios · Indicio";
   view.innerHTML=`<section class="ci-hero mun-hero">
-    <div><span class="kk">Municipios</span><h1>Busca tu municipio y míralo de un vistazo</h1>
-      <p class="dek">Sus cifras clave frente a España, cómo ha cambiado desde 2015, en qué destaca y a qué municipios se parece. Con todo el detalle plegado por si quieres más.</p>
+    <div><span class="kk">Municipios</span><h1>Tu municipio frente al resto de España</h1>
+      <p class="dek">Su renta, su paro, su alquiler y cómo han cambiado desde 2015, comparados con los 8.139 municipios del país. Y los cinco que más se le parecen.</p>
       ${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}
       <p class="linkrow"><a href="#comparar">Comparar dos municipios</a> · <a href="/provincia/">Municipios por provincia</a> · <a href="/rankings/">Rankings</a></p></div>
     <div class="ci-map"><div id="mlmap" style="min-height:240px"></div><div class="mleg" id="mleg"></div></div>
