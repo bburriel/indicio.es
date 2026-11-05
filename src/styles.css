@@ -2346,8 +2346,6 @@ details.chk > section{margin-top:18px}
 .mi-h p{margin:0; color:var(--ink-2); font-size:16px}
 .mi-go{display:flex; flex-wrap:wrap; align-items:center; gap:10px 22px}
 .mi-go .btn{display:inline-block; padding:12px 22px; font-size:16px; text-decoration:none}
-.mi-lk{color:var(--brand); font-weight:600; text-decoration:none}
-.mi-lk:hover{text-decoration:underline}
 .mi-g{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); margin-top:22px}
 .mi-k{display:flex; flex-direction:column; gap:3px; padding:0 18px; border-left:1px solid var(--rule-2); min-width:0}
 .mi-k:first-child{padding-left:0; border-left:0}

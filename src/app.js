@@ -6588,7 +6588,7 @@ function munMini(code){
   const r=BYCODE.get(code); if(!r) return "";
   const cell=([k,l])=>{ const v=r[F[k]], e=esOff(k); return `<div class="mi-k"><span>${esc(l)}</span><b>${v==null?"—":fmtK(k)(v)}</b><small>${e==null?"":`<span>España</span> ${fmtK(k)(e)}`}</small></div>`; };
   return `<div class="mi-h"><div><span class="kk">${code===lastMun?"Tu municipio":"Municipio"}</span><h3>${esc(dispName(r[F.name]))}</h3><p>${esc(provShort(PROVS[r[F.prov]]))} · ${nf0.format(r[F.pop]||0)} <span>habitantes</span></p></div>
-    <div class="mi-go"><a class="btn" href="${munPath(code)}">Ver su ficha completa →</a><a class="mi-lk" href="/comparar/${code}/">Comparar con otro →</a></div></div>
+    <div class="mi-go"><a class="btn" href="${munPath(code)}">Ver su ficha completa →</a></div></div>
     <div class="mi-g">${MINI_KS.map(cell).join("")}</div>`;
 }
 // tres cifras de los municipios para el hueco de la ficha, mientras no se elige ninguno
