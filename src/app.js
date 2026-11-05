@@ -7054,7 +7054,7 @@ async function renderInicio(){
     <figure class="pt-labx-map"><div class="labmap" id="labmap" role="img" aria-label="Mapa de España por municipios, coloreado según la pregunta elegida"></div>
       <figcaption><b id="labcap">Renta por persona, 2024</b><span class="leg" aria-hidden="true"><em>menos</em><i style="background:var(--ramp-0)"></i><i style="background:var(--ramp-1)"></i><i style="background:var(--ramp-2)"></i><i style="background:var(--ramp-3)"></i><i style="background:var(--ramp-4)"></i><i style="background:var(--ramp-5)"></i><i style="background:var(--ramp-6)"></i><em>más</em></span>
         <small>Cada municipio, coloreado por su dato. En gris, sin dato.</small></figcaption></figure></div></section>
-  <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">El dato público, a tu alcance</div><h2>Tu pueblo, <em>frente a España entera.</em></h2>
+  <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>Tu pueblo, <em>frente a España entera.</em></h2>
       <p class="pt-land-lead">Escribe dónde vives y mira en un minuto cuánto se gana, cuánto cuesta el alquiler y qué lo distingue de los demás. Las cifras son de los ${nMun} municipios, desde un pueblo de diez vecinos hasta Madrid.</p></div>
     <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Enfrentar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
