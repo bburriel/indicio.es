@@ -2125,15 +2125,15 @@ function psBar(bar){
     ${esMode?`<div class="lb-step"><h4><i>2</i>Qué series</h4>`:`<div class="lb-step"><h4><i>2</i>Qué dato</h4><div class="slot full"><span class="nm" style="flex:1"><small>Dato</small><button type="button" class="pick" id="pspick" aria-haspopup="dialog"><span class="pv">${esc(PSIND[PS.k].l)}</span><span class="pg">Países</span></button></span></div><p class="hint">${esc(PSIND[PS.k].d)}</p></div>
     <div class="lb-step"><h4><i>3</i>Qué países</h4>`}
       ${esMode?`${PS.s.map((k,i)=>`<div class="slot full"><span class="nm" style="flex:1"><small>Serie ${i+1}</small><button type="button" class="pick" data-ser="${k}" ${i===0?'id="pspick"':`data-sw="${k}"`} aria-haspopup="dialog"><span class="pv">${esc((SE[k]||{}).l||k)}</span><span class="pg">${esc(((SE[k]||{}).g||"").replace(/ \(.*\)$/,""))}</span></button></span>${PS.s.length>1?`<button type="button" data-rs="${k}" aria-label="Quitar">×</button>`:""}</div>`).join("")}
-        ${PS.s.length<7?`<div class="slot"><span class="nm" style="flex:1"><small>Añadir una serie</small><button type="button" class="pick add" id="psadd" aria-haspopup="dialog"><span class="pv">+ elige una serie</span></button></span></div>`:""}
-        ${cur&&!cur.g.startsWith("Precios")&&!PS.s.includes("ipc_general")?`<button type="button" class="ed-go psq" id="psipc">+ Añadir el IPC general, para comparar</button>`:""}
+        ${PS.s.length<7?`<div class="slot${PS.su?" dis":""}"><span class="nm" style="flex:1"><small>Añadir una serie</small><button type="button" class="pick add" id="psadd" aria-haspopup="dialog" ${PS.su?"disabled":""}><span class="pv">+ elige una serie</span></button></span></div>${PS.su?`<p class="hint">Con un suceso marcado solo cabe una serie. Pon «Ninguno» en el paso 3 para comparar varias.</p>`:""}`:""}
+        ${cur&&!cur.g.startsWith("Precios")&&!PS.s.includes("ipc_general")?`<button type="button" class="ed-go psq" id="psipc" ${PS.su?"disabled":""}>+ Añadir el IPC general, para comparar</button>`:""}
         ${scoped?`<div style="margin-top:12px"><label class="blk">Dónde</label><div class="seg sm" role="group" aria-label="Ámbito"><button type="button" data-l="es" aria-pressed="${sc.lev==="es"}">España</button>${sc.code?`<button type="button" data-l="prov" aria-pressed="${sc.lev==="prov"}">${esc(provShort(PROVS[sc.P]))}</button><button type="button" data-l="mun" aria-pressed="${sc.lev==="mun"}">${esc(dispName(BYCODE.get(sc.code)[F.name]))}</button>`:""}</div>
           <div class="search" id="ps-s" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="margin:8px 0 0;flex:none;min-width:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="ps-q" type="search" placeholder="${sc.code?"Otro municipio":"Elige un municipio"}" autocomplete="off" aria-label="Elegir municipio"><ul id="ps-r" class="results" role="listbox" hidden></ul></div>
           <p class="hint">Los precios, los sueldos y el gasto público son de toda España.</p></div>`:""}`
-        :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
+        :`<div class="pschips">${all.map(([g,o])=>`<label class="chk${PS.su&&g!=="ES"&&g!==PS.ref&&!PS.c.includes(g)?" dis":""}"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"||(PS.su&&g!==PS.ref&&!PS.c.includes(g))?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>${PS.su?`<p class="hint">Con un suceso marcado solo se puede comparar España con ${esc((Pz[PS.ref]||{}).n||"la UE")}.</p>`:""}`}</div>
     <div class="lb-step"><h4><i>${esMode?3:4}</i>Un suceso <small class="muted">(opcional)</small></h4>
-      <select class="sel" id="pssu" aria-label="Marcar un suceso">${psSucesoOpts()}</select>
-      <p class="hint">Márcalo para ver si la serie se sale de la tendencia que traía. No prueba que el suceso sea la causa.</p></div>
+      <select class="sel" id="pssu" aria-label="Marcar un suceso" ${psMuchas()?"disabled":""}>${psSucesoOpts()}</select>${psSucesoYear()}
+      <p class="hint">${psMuchas()?(PS.s.length?"Con varias series no se puede marcar un suceso. Deja una sola.":"Con más países que España y la UE no se puede marcar un suceso. Deja solo esos."):"Márcalo para ver si la serie se sale de la tendencia que traía. No prueba que el suceso sea la causa."}</p></div>
     <div class="lb-step"><h4><i>${esMode?4:5}</i>Ajustes</h4>
       <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
       <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
@@ -2151,7 +2151,8 @@ function psBar(bar){
   const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",async()=>{ await loadAllCat(); openPicker(ad,{all:true,jump:false,here:k=>k.startsWith("es:"),current:null,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}); });
   bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{all:true,jump:false,here:k=>k.startsWith("es:"),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-rs]").forEach(b=>b.addEventListener("click",()=>{ PS.s=PS.s.filter(x=>x!==b.dataset.rs); exUpdate(); }));
-  on("pssu",e=>{ PS.su=e.target.value; exUpdate(); });
+  on("pssu",e=>{ PS.su=e.target.value==="otro"?"y2015":e.target.value; exUpdate(); });
+  on("pssuy",e=>{ PS.su="y"+e.target.value; exUpdate(); });
   on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
   on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
   on("psref",e=>{ PS.ref=e.target.value; exUpdate(); });
@@ -2195,8 +2196,11 @@ const SUCESOS=[
   {id:"tope",l:"Tope del alquiler en Cataluña (2024)",y:2024,lab:"tensionadas"}
 ];
 const psSuceso=()=>{ if(!PS.su) return null; const m=PS.su.match(/^y(\d{4})$/); return m?{id:PS.su,l:`Un suceso en ${m[1]}`,y:+m[1]}:SUCESOS.find(e=>e.id===PS.su)||null; };
-const psSucesoOpts=()=>{ const c=psSuceso(), yrs=d3.range(2005,2026);
-  return `<option value="">Ninguno</option>${SUCESOS.map(e=>`<option value="${e.id}" ${PS.su===e.id?"selected":""}>${esc(e.l)}</option>`).join("")}<optgroup label="Otro año">${yrs.map(y=>`<option value="y${y}" ${PS.su==="y"+y?"selected":""}>Un suceso en ${y}</option>`).join("")}</optgroup>`; };
+const psSucesoOpts=()=>{ const yr=/^y\d{4}$/.test(PS.su||"");
+  return `<option value="">Ninguno</option>${SUCESOS.map(e=>`<option value="${e.id}" ${PS.su===e.id?"selected":""}>${esc(e.l)}</option>`).join("")}<option value="otro" ${yr?"selected":""}>Otro año…</option>`; };
+const psSucesoYear=()=>{ const m=(PS.su||"").match(/^y(\d{4})$/); return m?`<label class="psb">¿En qué año? <select class="sel" id="pssuy" aria-label="Año del suceso">${d3.range(2005,2026).map(y=>`<option ${+m[1]===y?"selected":""}>${y}</option>`).join("")}</select></label>`:""; };
+// con un suceso solo cabe una serie (o España y su comparador); y al revés, con varias series no se puede marcar un suceso
+const psMuchas=()=>PS.s.length?PS.s.length>1:PS.c.some(g=>g!=="ES"&&g!==PS.ref);
 const T975=[0,12.71,4.30,3.18,2.78,2.57,2.45,2.36,2.31,2.26,2.23,2.20,2.18,2.16,2.14,2.13,2.12,2.11,2.10,2.09,2.09,2.08,2.07,2.07,2.06,2.06,2.06,2.05,2.05,2.05,2.04];
 // tendencia previa (recta; en logaritmos si todo es positivo) proyectada tras el suceso, con su intervalo del 95 %
 function itsFit(v,t0){

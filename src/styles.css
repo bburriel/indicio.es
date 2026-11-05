@@ -2318,3 +2318,9 @@ details.chk > section{margin-top:18px}
 
 /* Suceso en series: el veredicto va pegado al gráfico único y con aire debajo */
 .its-out{margin:6px 0 22px}
+
+/* Suceso: lo que no cabe se queda en gris, no desaparece */
+.slot.dis,label.chk.dis{opacity:.45}
+.slot.dis .pick,label.chk.dis,.ed-go:disabled,.pick:disabled{cursor:not-allowed}
+.sel:disabled{opacity:.5;cursor:not-allowed}
+.lb-step .psb{display:block;margin-top:8px}
