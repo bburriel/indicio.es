@@ -1303,7 +1303,7 @@ export const ROWS=[
  ["Más de {#} hab.", "Més de {#} hab.", "Máis de {#} hab.", "{#} biztanle baino gehiago", "More than {#} inhab."],
  ["{#} hab. o más", "{#} hab. o més", "{#} hab. ou máis", "{#} biztanle edo gehiago", "{#} inhab. or more"],
  ["En España hay {#} municipios.","A Espanya hi ha {#} municipis.","En España hai {#} municipios.","Espainian {#} udalerri daude.","Spain has {#} municipalities."],
- ["En uno de ellos vives tú","En un d'ells hi vius tu","Nun deles vives ti","Horietako batean zu bizi zara","You live in one of them"],
+ ["En uno de ellos vives tú.","En un d'ells hi vius tu.","Nun deles vives ti.","Horietako batean zu bizi zara.","You live in one of them."],
  ["Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde {#} y a qué municipios se parece.","Cerca el teu i mira com surt en renda, atur i lloguer, què ha canviat des del {#} i a quins municipis s'assembla.","Busca o teu e mira como sae en renda, paro e aluguer, que cambiou desde {#} e a que municipios se parece.","Bilatu zurea eta ikusi nolakoa den errentan, langabezian eta alokairuan, zer aldatu den {#}. urtetik eta zein udalerriren antza duen.","Look yours up and see how it fares on income, unemployment and rent, what has changed since {#} and which municipalities it resembles."],
  ["O prueba:", "O prova:", "Ou proba:", "Edo probatu:", "Or try:"],
  ["Rankings", "Rànquings", "Clasificacións", "Sailkapenak", "Rankings"],
