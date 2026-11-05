@@ -2298,3 +2298,20 @@ details.chk > section{margin-top:18px}
 .ad-det .czdb{padding-top:4px}
 @media(max-width:760px){ .its-rows{margin-left:0} }
 .its-fig{margin-top:26px}
+
+/* Municipios (nov. 2026): dos entradas, «tu municipio» y «comparar», y el mapa debajo */
+.ci-hero.mun-hero > .mun-cards{display:grid; grid-template-columns:1fr 1fr; gap:0 48px; width:100%}
+.mun-hero .mun-card{border-top:1px solid var(--rule-2); padding-top:18px; min-width:0}
+.mun-hero .mun-card .kk{display:block}
+.mun-hero .mun-card h3{font-family:var(--serif); font-weight:500; font-size:30px; line-height:1.1; margin:6px 0 10px; letter-spacing:-.01em}
+.mun-hero .mun-card h3 span{color:var(--brand)}
+.mun-hero .mun-card p{margin:0 0 16px; color:var(--ink-2); font-size:16px}
+.mun-hero .mun-card .btn{display:inline-block; padding:13px 24px; font-size:16.5px; text-decoration:none}
+.mun-hero .mun-card .bigsearch{max-width:none!important; margin:0 0 4px!important}
+.mun-hero .mun-card .chipsq{margin-top:14px}
+.mun-hero .mun-card p.mun-otro{margin:22px 0 8px; font-size:15px; color:var(--muted)}
+.mun-hero .ci-map{margin:30px auto 0}
+.mun-hero .mun-more{margin:2px 0 0; text-align:center; font-size:15px; color:var(--muted)}
+.mun-hero .mun-more a{color:var(--ink); margin:0 4px}
+:root[data-theme="dark"] .mun-hero .mun-card h3 span{color:#e0a3ab}
+@media (max-width:860px){ .ci-hero.mun-hero > .mun-cards{grid-template-columns:minmax(0,1fr); gap:26px} .mun-hero .mun-card h3{font-size:26px} }
