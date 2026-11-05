@@ -2077,7 +2077,7 @@ details.chk > section{margin-top:18px}
 @media (prefers-reduced-motion:reduce){ .ho-cur{display:none} }
 .ho-sub{font-family:var(--serif); font-size:clamp(20px,2.6vw,30px); line-height:1.25; color:var(--brand); margin:22px 0 0}
 .ho-p{font-family:var(--serif); font-size:clamp(18px,1.9vw,21px); line-height:1.55; color:var(--ink-2); max-width:40em; margin:18px 0 0}
-.ho-go{display:flex; flex-wrap:wrap; gap:12px 22px; align-items:center; margin:28px 0 0}
+.ho-go{display:flex; flex-wrap:wrap; gap:14px 26px; align-items:center; margin:28px 0 0}
 .ho-lk{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--brand); padding-bottom:2px; font-size:15px}
 .ho-lk:hover{color:var(--brand)}
 /* las pestañas del carrusel se deslizan con el dedo cuando no caben */
