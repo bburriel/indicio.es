@@ -32,7 +32,7 @@ export const STUDIES=[
     upd:"2026-11-03",a:"Depende de cuánto se quiera gastar. Si solo cambia la demografía, el gasto pasa del 13,2 % al 24,9 % del PIB en 2050 (un ejercicio, no una previsión): no cuadra. Con lo previsto tras las reformas (pensiones con el IPC, un año más de trabajo efectivo y un 5 % más de empleo y de población en edad de trabajar) queda en el 16,5 %, a 0,3 puntos del límite del 16,2 % (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea): cuadra por poco o se pasa por poco. Para asegurarlo, cada pensión tendría que pesar algo menos frente a lo que produce un trabajador."},
   {id:"pandemia-turismo",oculto:true,ev:"natural",t:"¿Golpeó más la pandemia a las zonas turísticas?",d:"En la primavera de 2020 los hoteles cerraron y los aviones se quedaron en tierra. Comparamos el paro y la renta de las provincias más turísticas con las del resto, antes y después, para ver si el golpe fue mayor.",m:"Diferencias en diferencias y estudio de eventos",pub:"2026-10-22",
     upd:"2026-10-24",a:"Sí: en 2020 el paro subió más y la renta bajó más en las provincias más turísticas que en el resto, también dentro de cada provincia, y después recuperaron."},
-  {id:"quien-gobierna",ev:"natural",upd:"2026-11-02",t:"¿Importa quién gobierna tu ayuntamiento?",d:"Comparar pueblos del PP y del PSOE no sirve: ya eran distintos. Miramos solo las elecciones decididas por un puñado de votos.",m:"Regresión discontinua",pub:"2026-10-23",
+  {id:"quien-gobierna",ev:"natural",upd:"2026-11-02",t:"¿Importa quién gobierna tu ayuntamiento?",d:"Los pueblos del PP y los del PSOE ya eran distintos antes de gobernar. Por eso miramos solo las elecciones decididas por un puñado de votos.",m:"Regresión discontinua",pub:"2026-10-23",
     a:"Donde el PP o el PSOE ganaron por poco, no se ve que el alcalde cambiara nada: población, paro, renta y deuda siguieron caminos parecidos. Pero con tan pocos pueblos solo se descartan diferencias grandes (unos 4 puntos de población, 8 parados por cada 100 o 80 € de deuda por vecino), y se mide quedar primero, no ser alcalde."},
   {id:"ave",oculto:true,ev:"natural",upd:"2026-10-24",t:"¿Cambia algo cuando llega el AVE?",d:"Entre 2021 y 2023 la alta velocidad llegó a Galicia, Extremadura, Burgos, Murcia, Elche y Asturias. ¿Ha cambiado algo en los pueblos de alrededor? Los comparamos con otros casi idénticos que se quedaron sin estación.",m:"Gemelos y estudio de eventos",pub:"2026-10-23",
     a:"Poco, por ahora. A dos o cuatro años vista, los municipios cercanos a una estación nueva apenas se distinguen de sus gemelos en población o renta, y los métodos no coinciden en el signo; varía mucho de una estación a otra."},
@@ -50,8 +50,10 @@ export const STUDIES=[
 // Preguntas que se responden en el laboratorio, no en un análisis paso a paso
 export const QUICK=[
   {id:"estudiar",ev:"desc",t:"¿Estudiar hace más rico a un lugar?",href:"/laboratorio/cruce/?d=superiores,renta&t=g1",
+    d:"Los municipios con más universitarios y los de más renta, ¿son los mismos? Y si lo son, ¿es estudiar lo que enriquece?",
     a:"Van muy juntos: donde más gente tiene estudios superiores, la renta es bastante mayor. Si una cosa causa la otra, es otra historia."},
   {id:"paro-sur",ev:"desc",t:"¿De verdad hay más paro en el sur?",href:"/laboratorio/mapa/?d=paroReg",
+    d:"Andalucía y Extremadura frente al norte: dónde hay más paro registrado, municipio a municipio.",
     a:"Sí. En Andalucía y Extremadura el paro registrado es bastante más alto que en el norte peninsular."}
 ];
 
