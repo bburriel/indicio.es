@@ -1614,7 +1614,7 @@ const CCAA_OF={"01":"País Vasco","20":"País Vasco","48":"País Vasco","02":"Ca
   "04":"Andalucía","11":"Andalucía","14":"Andalucía","18":"Andalucía","21":"Andalucía","23":"Andalucía","29":"Andalucía","41":"Andalucía","05":"Castilla y León","09":"Castilla y León","24":"Castilla y León","34":"Castilla y León","37":"Castilla y León","40":"Castilla y León","42":"Castilla y León","47":"Castilla y León","49":"Castilla y León",
   "06":"Extremadura","10":"Extremadura","07":"Illes Balears","08":"Cataluña","17":"Cataluña","25":"Cataluña","43":"Cataluña","15":"Galicia","27":"Galicia","32":"Galicia","36":"Galicia","22":"Aragón","44":"Aragón","50":"Aragón",
   "26":"La Rioja","28":"Madrid","30":"Murcia","31":"Navarra","33":"Asturias","35":"Canarias","38":"Canarias","39":"Cantabria","51":"Ceuta","52":"Melilla"};
-const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si la relación aguanta entre iguales"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Distribución","Cómo se reparte un dato entre la población"],["burbujas","Trayectorias","Provincias en movimiento: dos datos año a año"],["matriz","Matriz","Qué datos van juntos, todos a la vez"],["pendientes","Antes y ahora","Cómo ha cambiado cada provincia o comunidad entre dos años"],["piramide","Pirámide","Población por edad y sexo"],["composicion","Composición","De qué partes se compone un total en cada grupo"],["paises","Series","Series año a año: precios, sueldos, vivienda, empleo o población de España, una provincia o un municipio, y España frente a otros países"]];
+const EXVIEWS=[["mapa","Mapa","Cómo cambia un dato de un municipio a otro"],["tabla","Ranking","Ordena y filtra los municipios por varios datos"],["cruce","Relación","Si dos datos van juntos, y si la relación aguanta entre iguales"],["grupos","Grupos","Medias por comunidad, provincia, tamaño o nivel de otro dato"],["distribucion","Distribución","Cómo se reparte un dato entre la población"],["burbujas","Trayectorias","Provincias en movimiento: dos datos año a año"],["matriz","Matriz","Qué datos van juntos, todos a la vez"],["pendientes","Antes y ahora","Cómo ha cambiado cada provincia o comunidad entre dos años"],["antes","Antes y después","Qué pasó tras una ley o un suceso, frente a municipios parecidos que no lo vivieron"],["piramide","Pirámide","Población por edad y sexo"],["composicion","Composición","De qué partes se compone un total en cada grupo"],["paises","Series","Series año a año: precios, sueldos, vivienda, empleo o población de España, una provincia o un municipio, y España frente a otros países"]];
 const EXSIZES=[["","Todos los tamaños",0,Infinity],["s1","Menos de 1.000 hab.",0,1000],["s2","1.000 a 10.000 hab.",1000,10000],["s3","10.000 a 50.000 hab.",10000,50000],["s4","Más de 50.000 hab.",50000,Infinity],["g1","1.000 hab. o más",1000,Infinity],["g10","10.000 hab. o más",10000,Infinity]];
 const EXQ=[["¿Dónde ha subido más el alquiler?","mapa",{d:["alqVar","rentaVar"]}],["¿Qué pueblos pequeños crecen?","tabla",{d:["varPob","migInt","edad"],t:"s2",o:"varPob"}],["¿Votan más los municipios ricos?","cruce",{d:["renta","part"],t:"g1"}],["¿Cuánto del sueldo se va en alquiler?","paises",{ser:["viv_esfuerzo"],idx:0}],["¿Suben los sueldos como los precios?","paises",{ser:["sal_mediana","viv_alq","ipc_general"],b:2015}],["¿Más paro, menos renta? ¿Y a igual edad?","cruce",{d:["paroReg","renta"],t:"g1",c:["edad"]}],["¿Cómo se reparte la renta?","distribucion",{d:["renta"]}],["¿Dónde pesan más las pensiones?","grupos",{d:["pensiones","edad"],gb:"ccaa"}],["¿Pisos turísticos y alquiler, a igual tamaño?","cruce",{d:["vt","alquiler"],t:"g10",c:["lpop","renta"]}],["¿Dónde pesa más la brecha de empleo entre hombres y mujeres?","mapa",{d:["brechaEmpleo","empleoMujeres"]}],["¿Más estudios, menos contratos temporales?","cruce",{d:["superiores2539","temporales"],t:"g1"}],["¿Quién vive de qué? Renta de trabajo frente a renta del capital","cruce",{d:["irpfTrabajo","irpfBruta"],t:"g1"}]];
 let EX={v:"mapa",d:["renta","paroReg"],p:"",t:"",m:null,c:[],gb:"ccaa",w:1,o:null,lx:0,sz:"",col:"",q:0,bv:0,u:"",dg:"",ya:null,yb:null,pz:"es",pc:"es",pp:1,cf:"sector",co:0};
@@ -1624,11 +1624,10 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(m[1]&&EXVIEWS.some(v=>v[0]===m[1])) EX.v=m[1];
   const q=new URLSearchParams(m[2]||"");
   q.getAll("dv").forEach(vFromUrl);   // datos propios que trae el enlace: se crean antes de leer «d», «c», etc.
-  // «Evolución» ahora es parte de «Series»; «Antes y después» ya no está en el laboratorio
+  // «Evolución» ahora es parte de «Series»
   if(m[1]==="evolucion"){ EX.v="paises"; const E2S={salMed:"sal_mediana",salMedia:"sal_media",ipc:"ipc_general"}, e=q.has("e")?q.get("e").split(","):["salMed","alq","alqNuevo","ipc"];
     const nq=new URLSearchParams(); nq.set("ser",e.filter(k=>EVOK[k]).map(k=>E2S[k]||"ev_"+k).join(",")); if(q.has("b")) nq.set("b",q.get("b")); if(q.has("r")) nq.set("r",q.get("r")); if(q.has("m")){ nq.set("m",q.get("m")); if(q.has("lv")) nq.set("lv",q.get("lv")); }
     exParse("explorar/paises?"+nq.toString()); return; }
-  if(m[1]==="antes"){ EX.v="mapa"; }
   // la URL manda: lo que no trae vuelve a su valor por defecto (si no, al ir atrás se quedan filtros de antes)
   if(m[2]!=null){ Object.assign(EX,{p:"",t:"",m:null,c:[],o:null,w:1,lx:0,sz:"",col:"",q:0,bv:0,u:""}); if(EX.v==="evolucion"){ ES_.base=null; REAL=false; } }
   if(q.has("d")){ const raw=q.get("d").split(","); EX.d=raw.filter(k=>CATK[k]).slice(0,10); if(raw.some(k=>/^u_/.test(k)&&!CATK[k])) setTimeout(()=>toast("Este enlace usa un dato propio que no se puede recuperar: hemos puesto otro en su lugar.",5500),600); }
@@ -1641,6 +1640,7 @@ function exParse(h){ // explorar/vista?d=a,b&p=46&t=g1&m=46166&c=edad&gb=ccaa&e=
   if(q.has("lv")) ES_.lev=["es","prov","mun"].includes(q.get("lv"))?q.get("lv"):"es"; if(EX.v==="evolucion"&&q.has("m")&&BYCODE.has(q.get("m"))) ES_.mun=q.get("m");
   if(EX.v==="paises"){ if(q.has("ind")&&PSIND[q.get("ind")]) PS.k=q.get("ind"); if(q.has("pa")) PS.c=["ES",...q.get("pa").split(",").filter(g=>/^[A-Z0-9_]{2,10}$/.test(g)&&g!=="ES")].slice(0,7); PS.gob=q.get("gob")==="0"?0:1; PS.rel=q.get("rel")==="1"?1:0; PS.ref=q.has("ref")&&/^[A-Z0-9_]{2,10}$/.test(q.get("ref"))?q.get("ref"):"EU27_2020";
     PS.s=q.has("ser")?q.get("ser").split(",").filter(k=>/^[\w]{2,60}$/.test(k)).slice(0,7):[]; PS.idx=q.get("idx")==="0"?0:q.get("idx")==="1"?1:(PS.s.length===1&&PS.s[0]==="viv_esfuerzo"?0:1); PS.desde=+q.get("desde")||null; PS.hasta=+q.get("hasta")||null;
+    PS.su=/^(y\d{4}|[a-z_]{3,20})$/.test(q.get("su")||"")?q.get("su"):"";
     PS.b=+q.get("b")||null; PS.real=q.get("r")==="1"?1:0; PS.m=q.has("m")&&BYCODE.has(q.get("m"))?q.get("m"):(PS.m||lastMun||null); PS.lev=q.has("m")?(["es","prov","mun"].includes(q.get("lv"))?q.get("lv"):"mun"):(PS.lev||"es"); }
   if(EX.v==="antes"){ adSet(q.has("ev")&&ADEV[q.get("ev")]?q.get("ev"):AD.ev); if(q.has("oy")&&ADY[q.get("oy")]) AD.y=q.get("oy"); if(q.has("yr")) AD.yr=+q.get("yr")||AD.yr; if(q.has("cc")) AD.cc=q.get("cc"); if(q.has("pv")) AD.pv=q.get("pv");
     if(q.has("ms")) AD.ms=q.get("ms").split(",").filter(c=>BYCODE.has(c)).slice(0,200); if(q.has("mc")) AD.mc=+q.get("mc"); if(q.has("mp")) AD.mp=+q.get("mp"); if(q.has("mt")) AD.mt=q.get("mt")==="sint"?"sint":"gem"; }
@@ -1654,7 +1654,7 @@ function exHash(over){ const S={...EX,...(over||{})}; const q=new URLSearchParam
   if(S.v==="composicion"){ ["d","o","w","lx","c"].forEach(k=>q.delete(k)); q.set("cf",S.cf||"sector"); q.set("gb",S.gb); if(S.co) q.set("co",S.co); } if(S.v==="distribucion"&&S.dg) q.set("dg",S.dg);
   if(S.v==="cruce"){ if(S.u) q.set("u",S.u); if(S.sz) q.set("sz",S.sz); if(S.col) q.set("col",S.col); if(S.q) q.set("q","1"); }
   if(S.v==="evolucion"){ ["d","p","t","c","o","m"].forEach(k=>q.delete(k)); q.set("e",(S.e||ES_.sel).join(",")); if(ES_.base) q.set("b",ES_.base); if(REAL) q.set("r","1"); if(ES_.lev!=="es"){ q.set("lv",ES_.lev); if(ES_.mun) q.set("m",ES_.mun); } }
-  if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); else if(PS.b) q.set("b",PS.b); if(PS.real) q.set("r","1"); if(PS.m&&PS.s.some(k=>/^ev_/.test(k))){ q.set("m",PS.m); if(PS.lev!=="mun") q.set("lv",PS.lev); } } else { q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
+  if(S.v==="paises"){ ["d","p","t","c","m","o","w","lx"].forEach(k=>q.delete(k)); if(PS.s.length){ q.set("ser",PS.s.join(",")); if(!PS.idx) q.set("idx","0"); else if(PS.b) q.set("b",PS.b); if(PS.real) q.set("r","1"); if(PS.su) q.set("su",PS.su); if(PS.m&&PS.s.some(k=>/^ev_/.test(k))){ q.set("m",PS.m); if(PS.lev!=="mun") q.set("lv",PS.lev); } } else { q.set("ind",PS.k); q.set("pa",PS.c.join(",")); if(PS.rel) q.set("rel","1"); if(PS.ref!=="EU27_2020") q.set("ref",PS.ref); }
     if(!PS.gob) q.set("gob","0"); if(PS.desde) q.set("desde",PS.desde); if(PS.hasta) q.set("hasta",PS.hasta); }
   if(S.v==="antes"){ ["d","p","t","c","m","o"].forEach(k=>q.delete(k)); const A={...AD,...(S.ad||{})}; q.set("ev",A.ev); q.set("oy",A.y); if(ADEV[A.ev].free) q.set("yr",A.yr); if(A.ev==="ccaa"&&A.cc) q.set("cc",A.cc); if(A.ev==="prov"&&A.pv) q.set("pv",A.pv); if(A.ev==="lista"&&A.ms.length) q.set("ms",A.ms.join(",")); { const dmc=ADEV[A.ev].mc||0; if(A.mc!==dmc) q.set("mc",A.mc?"1":"0"); } if(A.mp!==ADEV[A.ev].mp) q.set("mp",A.mp); if(A.mt==="sint") q.set("mt","sint"); }
   vCustomIn([...(q.get("d")||"").split(","),...(q.get("c")||"").split(","),q.get("sz"),q.get("col"),(q.get("o")||"").replace(/^-/,"")]).forEach(k=>q.append("dv",vEnc(VBYK[k])));   // los datos propios viajan con el enlace
@@ -2045,7 +2045,7 @@ const PSIND={pibpc:{l:"PIB por habitante",u:"€ de 2020",t:"nivel",f:v=>nf0.for
   inflacion:{l:"Inflación",u:"%",t:"flujo",f:v=>sgn(v),d:"Subida media de los precios de consumo en el año."},
   gasto:{l:"Gasto público",u:"% del PIB",t:"tasa",f:pc,d:"Gasto total de las administraciones públicas, en % del PIB."},
   ingresos:{l:"Ingresos públicos",u:"% del PIB",t:"tasa",f:pc,d:"Ingresos totales de las administraciones públicas, en % del PIB."}};
-const PS={k:"pibpc",c:["ES","EU27_2020"],gob:1,rel:0,ref:"EU27_2020",s:[],idx:1,desde:null,hasta:null,b:null,real:0,lev:"es",m:null};
+const PS={su:"",k:"pibpc",c:["ES","EU27_2020"],gob:1,rel:0,ref:"EU27_2020",s:[],idx:1,desde:null,hasta:null,b:null,real:0,lev:"es",m:null};
 const PSCOL=["--rust","--ink","--slate","--mustard","--plum","--olive","--stone"];
 const PARTYC={PSOE:"#d6342c",PP:"#1f6fb5",UCD:"#2f8f4e"};
 // años de cada mandato: los que el presidente pasó más de la mitad en el cargo
@@ -2130,7 +2130,10 @@ function psBar(bar){
           <div class="search" id="ps-s" role="combobox" aria-expanded="false" aria-haspopup="listbox" style="margin:8px 0 0;flex:none;min-width:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="ps-q" type="search" placeholder="${sc.code?"Otro municipio":"Elige un municipio"}" autocomplete="off" aria-label="Elegir municipio"><ul id="ps-r" class="results" role="listbox" hidden></ul></div>
           <p class="hint">Los precios, los sueldos y el gasto público son de toda España.</p></div>`:""}`
         :`<div class="pschips">${all.map(([g,o])=>`<label class="chk"><input type="checkbox" data-g="${g}" ${PS.c.includes(g)?"checked":""} ${g==="ES"?"disabled":""}> ${esc(o.n)}</label>`).join("")}</div>`}</div>
-    <div class="lb-step"><h4><i>${esMode?3:4}</i>Ajustes</h4>
+    ${esMode?`<div class="lb-step"><h4><i>3</i>Un suceso <small class="muted">(opcional)</small></h4>
+      <select class="sel" id="pssu" aria-label="Marcar un suceso">${psSucesoOpts()}</select>
+      <p class="hint">Márcalo para ver si la serie se sale de la tendencia que traía. No prueba que el suceso sea la causa.</p></div>`:""}
+    <div class="lb-step"><h4><i>4</i>Ajustes</h4>
       <div class="psrange"><label>Desde <select class="sel" id="psd">${yOpt(psRange(yrs)[0])}</select></label><label>Hasta <select class="sel" id="psh">${yOpt(psRange(yrs).slice(-1)[0])}</select></label></div>
       <label class="chk"><input type="checkbox" id="psgob" ${PS.gob?"checked":""}> Mostrar quién gobernaba en España</label>
       ${esMode?`<label class="chk"><input type="checkbox" id="psidx" ${PS.idx?"checked":""}> Como índice, con un año de referencia = 100</label>
@@ -2147,6 +2150,7 @@ function psBar(bar){
   const ad=document.getElementById("psadd"); if(ad) ad.addEventListener("click",async()=>{ await loadAllCat(); openPicker(ad,{all:true,jump:false,here:k=>k.startsWith("es:"),current:null,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=[...PS.s,v.slice(3)].slice(0,7); exUpdate(); }}); });
   bar.querySelectorAll("button[data-sw]").forEach(b=>b.addEventListener("click",async()=>{ await loadAllCat(); openPicker(b,{all:true,jump:false,here:k=>k.startsWith("es:"),current:"es:"+b.dataset.sw,excl:PS.s.map(k=>"es:"+k),onPick:v=>{ PS.s=PS.s.map(x=>x===b.dataset.sw?v.slice(3):x); exUpdate(); }}); }));
   bar.querySelectorAll("button[data-rs]").forEach(b=>b.addEventListener("click",()=>{ PS.s=PS.s.filter(x=>x!==b.dataset.rs); exUpdate(); }));
+  on("pssu",e=>{ PS.su=e.target.value; exUpdate(); });
   on("psgob",e=>{ PS.gob=e.target.checked?1:0; exUpdate(); });
   on("psrel",e=>{ PS.rel=e.target.checked?1:0; exUpdate(); });
   on("psref",e=>{ PS.ref=e.target.value; exUpdate(); });
@@ -2175,6 +2179,71 @@ function psMandTable(out,cols,t,title,sub,note){
     return [`<b style="color:${PARTYC[g.partido]}">${esc(g.p)}</b> <small class="muted">${g.partido}, ${g.ys[0]}–${g.hasta?g.ys[g.ys.length-1]:"hoy"}${w&&!full?` (${w.yy[0]}–${w.yy[w.yy.length-1]})`:""}</small>`,...cols.map(c=>fm(psChange(c.v,w,t)))]; });
   if(!rows.length) return; const f=fig(out,{title,sub,source:note}); table(f.body,["Presidente",...cols.map(c=>esc(c.n))],rows);
 }
+
+// =====================================================================
+// SUCESOS EN UNA SERIE: ¿se sale de la tendencia que traía? (serie interrumpida, sin grupo de comparación)
+// =====================================================================
+const SUCESOS=[
+  {id:"crisis08",l:"Crisis financiera (2008)",y:2008},
+  {id:"smi19",l:"Subida del salario mínimo a 900 € (2019)",y:2019},
+  {id:"covid",l:"Pandemia (2020)",y:2020},
+  {id:"reforma",l:"Reforma laboral (efectos desde 2022)",y:2022},
+  {id:"energia",l:"Guerra de Ucrania y precios de la energía (2022)",y:2022},
+  {id:"ivaalim",l:"Rebaja del IVA de los alimentos (2023)",y:2023},
+  {id:"leyviv",l:"Ley de vivienda (2023)",y:2023},
+  {id:"tope",l:"Tope del alquiler en Cataluña (2024)",y:2024,lab:"tensionadas"}
+];
+const psSuceso=()=>{ if(!PS.su) return null; const m=PS.su.match(/^y(\d{4})$/); return m?{id:PS.su,l:`Un suceso en ${m[1]}`,y:+m[1]}:SUCESOS.find(e=>e.id===PS.su)||null; };
+const psSucesoOpts=()=>{ const c=psSuceso(), yrs=d3.range(2005,2026);
+  return `<option value="">Ninguno</option>${SUCESOS.map(e=>`<option value="${e.id}" ${PS.su===e.id?"selected":""}>${esc(e.l)}</option>`).join("")}<optgroup label="Otro año">${yrs.map(y=>`<option value="y${y}" ${PS.su==="y"+y?"selected":""}>Un suceso en ${y}</option>`).join("")}</optgroup>`; };
+const T975=[0,12.71,4.30,3.18,2.78,2.57,2.45,2.36,2.31,2.26,2.23,2.20,2.18,2.16,2.14,2.13,2.12,2.11,2.10,2.09,2.09,2.08,2.07,2.07,2.06,2.06,2.06,2.05,2.05,2.05,2.04];
+// tendencia previa (recta; en logaritmos si todo es positivo) proyectada tras el suceso, con su intervalo del 95 %
+function itsFit(v,t0){
+  const pre=Object.keys(v).map(Number).filter(y=>y<t0&&v[y]!=null).sort((a,b)=>a-b).slice(-9), post=Object.keys(v).map(Number).filter(y=>y>=t0&&v[y]!=null).sort((a,b)=>a-b);
+  if(pre.length<4||!post.length) return {pre,post,ok:false};
+  const lg=pre.concat(post).every(y=>v[y]>0), f=lg?Math.log:(x=>x), g=lg?Math.exp:(x=>x);
+  const n=pre.length, xb=d3.mean(pre), yb=d3.mean(pre,y=>f(v[y])), sxx=d3.sum(pre,y=>(y-xb)**2), b=d3.sum(pre,y=>(y-xb)*(f(v[y])-yb))/sxx, a=yb-b*xb;
+  const sse=d3.sum(pre,y=>(f(v[y])-(a+b*y))**2), sd=Math.sqrt(sse/(n-2)), tc=T975[Math.min(n-2,30)]||2.04;
+  const at=y=>{ const m=a+b*y, h=tc*sd*Math.sqrt(1+1/n+(y-xb)**2/sxx); return {m:g(m),lo:g(m-h),hi:g(m+h)}; };
+  const rows=post.slice(0,4).map(y=>{ const P=at(y), o=v[y]; return {y,o,...P,dev:lg?(o/P.m-1)*100:o-P.m,out:o<P.lo||o>P.hi}; });
+  const nOut=rows.filter(r=>r.out).length, dir=d3.mean(rows,r=>r.dev), pre0=pre[0];
+  return {ok:true,lg,pre,post,at,rows,nOut,dev:dir,slope:lg?(Math.exp(b)-1)*100:b,pre0,sd,n};
+}
+function psEvent(out,ser,years,{idx,u}){
+  const E=psSuceso(); if(!E) return;
+  const pc=v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+NB+"%", nm0=s=>s.n.replace(/ \(.*\)$/,"");
+  const R=ser.map(s=>({s,r:itsFit(s.v,E.y)}));
+  const main=R.find(o=>o.r.ok)||R[0], r=main.r, f=fig(out,{title:`¿Se sale de su tendencia tras ${low(E.l.replace(/ \(.*\)$/,""))}?`,sub:r.ok?`${nm0(main.s)}: lo que marcaba la tendencia de ${r.pre0}–${E.y-1}, frente a lo que ocurrió`:"",source:"Tendencia previa: recta ajustada a los años anteriores al suceso, proyectada hacia delante con su intervalo del 95 %. Medias anuales."});
+  f.classList.add("its-fig");
+  if(!r.ok){ const why=!r.pre.length||r.pre.length<4?`Hay solo ${r.pre.length} año${r.pre.length===1?"":"s"} con dato antes de ${E.y}; hacen falta cuatro para saber qué tendencia traía.`:`No hay datos de ${nm0(main.s)} desde ${E.y}.`; f.body.innerHTML=`<p class="loading">${why} Prueba con otra serie, otro año o ensancha el periodo.</p>`; return; }
+  const all=Object.keys(main.s.v).map(Number).sort((a,b)=>a-b), last=all[all.length-1], pro=d3.range(E.y-1,last+1).filter(y=>y>=E.y-1).map(y=>r.at(y));
+  const W=Math.max(300,f.body.clientWidth||760), H=Math.min(340,Math.max(240,W*.36)), m={t:16,r:20,b:28,l:52};
+  const X=d3.scaleLinear().domain([all[0],last]).range([m.l,W-m.r]), vs=all.map(y=>main.s.v[y]).concat(pro.flatMap(p=>[p.lo,p.hi])).filter(v=>v!=null&&isFinite(v)), lo=d3.min(vs), hi=d3.max(vs), pd=(hi-lo)*.08||1;
+  const Y=d3.scaleLinear().domain([lo-pd,hi+pd]).nice(5).range([H-m.b,m.t]), svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`${nm0(main.s)}: serie y tendencia previa`);
+  svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",Y).attr("y2",Y);
+  svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>idx?nf0.format(v):(u==="€"&&v>=10000?nf0.format(v/1000)+" mil":nf0.format(v)));
+  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/80))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-8).attr("text-anchor","middle").text(String);
+  const ys0=d3.range(E.y-1,last+1), pts=ys0.map((y,i)=>({y,...pro[i]}));
+  svg.append("path").attr("d",d3.area().x(d=>X(d.y)).y0(d=>Y(d.lo)).y1(d=>Y(d.hi))(pts)).attr("fill",css("--slate")).attr("opacity",.16);
+  const xm=X(E.y-0.5); svg.append("line").attr("x1",xm).attr("x2",xm).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",css("--muted")).attr("stroke-dasharray","4 3");
+  svg.append("text").attr("class","lab").attr("x",xm+5).attr("y",m.t+10).style("fill",css("--muted")).text("suceso →");
+  svg.append("path").attr("d",d3.line().x(d=>X(d.y)).y(d=>Y(d.m))(pts)).attr("fill","none").attr("stroke",css("--slate")).attr("stroke-width",2).attr("stroke-dasharray","6 4");
+  const ob=all.map(y=>[y,main.s.v[y]]); svg.append("path").attr("d",d3.line().x(d=>X(d[0])).y(d=>Y(d[1]))(ob)).attr("fill","none").attr("stroke",css("--rust")).attr("stroke-width",2.8);
+  svg.append("g").selectAll("circle").data(ob).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",2.8).attr("fill",css("--rust")).append("title").text(d=>`${d[0]}: ${idx?nf1.format(d[1]):nf0.format(d[1])}`);
+  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",Y(ob[ob.length-1][1])-8).attr("text-anchor","end").style("fill",css("--rust")).text("Lo que ocurrió");
+  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",Y(pro[pro.length-1].lo)+15).attr("text-anchor","end").style("fill",css("--slate")).text("Tendencia previa");
+  // frase
+  const yl=low(nm0(main.s)), pre=r.slope, dirTxt=pre>=0?"subiendo":"bajando", ab=nf1.format(Math.abs(r.dev))+(r.lg?NB+"%":""), where=r.dev>=0?"por encima":"por debajo", un=r.lg?"un ":"";
+  const nP=r.rows.length, ver=r.nOut>=1&&r.nOut>=Math.min(2,nP)?(r.dev>0?"Se sale por arriba":"Se sale por abajo"):"Sigue su tendencia";
+  const cls=ver==="Sigue su tendencia"?"mu":"ko";
+  const trend=`Desde ${r.pre0} venía ${dirTxt} ${nf1.format(Math.abs(pre))}${r.lg?NB+"% al año":" al año"}.`;
+  const body=ver==="Sigue su tendencia"?`${trend} Tras ${E.y}, ${yl} queda ${un}${ab} ${where} de lo que marcaba esa tendencia, dentro de lo normal en esta serie: no se ve ruptura.`
+    :`${trend} Tras ${E.y}, ${yl} queda ${un}${ab} ${where} de lo que marcaba esa tendencia, fuera del rango normal en ${r.nOut} de ${nP} año${nP===1?"":"s"}.`;
+  const g=add(out,"div","czout its-out"); g.innerHTML=`<p class="czverd"><span class="m ${cls}" aria-hidden="true"></span><span><span class="czkk">Resultado</span><b>${ver}</b></span></p><p class="czvs">${body}${nP<2?" Solo hay un año de datos tras el suceso: conviene esperar a tener más.":""} Una serie sola no separa el suceso de todo lo demás que pasó a la vez: es una pista, no una prueba.${E.lab?` <a href="/laboratorio/antes/?ev=${E.lab}">Compáralo con municipios que no lo vivieron →</a>`:""}</p>`;
+  const rest=R.filter(o=>o!==main);
+  if(rest.length){ const row=o=>{ const q=o.r; if(!q.ok) return `<li class="na"><span class="em" aria-hidden="true">○</span><span class="rl">${esc(nm0(o.s))}</span><span class="rv">sin datos suficientes</span></li>`; const up=q.nOut>=Math.min(2,q.rows.length)&&q.nOut>=1; return `<li class="${up?"ko":"ok"}"><span class="em" aria-hidden="true">${up?"✗":"✓"}</span><span class="rl">${esc(nm0(o.s))}</span><span class="rv">${up?(q.lg?nf1.format(Math.abs(q.dev))+NB+"%":nf1.format(Math.abs(q.dev)))+(q.dev>0?" por encima":" por debajo")+" de la tendencia":"sigue su tendencia"}</span></li>`; };
+    g.insertAdjacentHTML("beforeend",`<ul class="czrows its-rows" aria-label="Las otras series">${rest.map(row).join("")}</ul>`); }
+}
 function psDrawES(out){
   const SE=SERES, ks0=PS.s, ks=ks0.filter(k=>Object.keys(SE[k].v).length>=2), miss=ks0.filter(k=>!ks.includes(k));
   if(!ks.length){ out.innerHTML='<p class="loading">No hay datos de estas series para este lugar. Prueba con España o con la provincia.</p>'; return; }
@@ -2192,6 +2261,7 @@ function psDrawES(out){
   govChart(out,{title:listY(ks.map(k=>SE[k].l.replace(/ \(.*\)$/,""))).replace(/^./,c=>c.toUpperCase())+(wh.length?" · "+wh.join(", "):""),
     sub:(idx?`Índice: ${y0} = 100${units.length>1&&!PS.idx?" (las series tienen unidades distintas)":""}`:`${u==="€"?(real?`Euros de ${yI}, descontando la inflación`:"Euros de cada año"):u||"Número"}`)+(idx&&real?`. En euros de ${yI}`:"")+". Medias anuales",
     source:`Fuente: ${[...new Set(ks.map(k=>SE[k].src))].join("; ")}.${PS.gob?" Fondo: presidente del Gobierno; cada año se asigna a quien gobernó más de la mitad.":""}`,years,series:ser,fmt,tick:v=>idx?nf0.format(v):u==="€"&&v>=10000?nf0.format(v/1000)+" mil":nf0.format(v),gob:!!PS.gob,ref:idx?y0:null});
+  if(PS.su) psEvent(out,ser,years,{idx,u});
   const ch=ser.map(s=>{ const ys=Object.keys(s.v).map(Number), a=s.v[ys[0]], b=s.v[ys[ys.length-1]]; return a&&b?{n:s.n,g:s.pts?b-a:(b/a-1)*100,pts:s.pts,a:ys[0],z:ys[ys.length-1]}:null; }).filter(Boolean);
   if(ch.length) add(out,"p",null,`${ch.map(c=>`<b>${esc(c.n.replace(/ \(.*\)$/,""))}</b> ${c.pts?(c.g>0?"+":c.g<0?"−":"")+nf1.format(Math.abs(c.g))+NB+"puntos":sgn(c.g)} <small class="muted">(${c.a}–${c.z})</small>`).join(" · ")}.`).style.cssText="max-width:var(--medida);font-size:15px;margin-top:4px";
   if(ks.includes("viv_esfuerzo")) add(out,"p","muted",`<b>Esfuerzo de pagar el alquiler:</b> alquiler medio de cada año (× 12) entre el sueldo mediano anual, en %. Es una cuenta aproximada: usa el alquiler medio de todos los inquilinos, con contratos antiguos incluidos, y el sueldo de una sola persona. Quien firma hoy un contrato nuevo paga más que esa media.`).style.cssText="max-width:var(--medida);font-size:14px";
@@ -3258,14 +3328,15 @@ const LBTYPES=[["mapa","Mapa",`<path d="M6 4h12l4 6 10 1 3 10H8z"/>`],["tabla","
   ["cruce","Relación",`<circle cx="8" cy="20" r="2.2"/><circle cx="14" cy="16" r="2.2"/><circle cx="20" cy="14" r="2.2"/><circle cx="26" cy="9" r="2.2"/><circle cx="32" cy="6" r="2.2"/>`],
   ["grupos","Grupos",`<rect x="5" y="10" width="6" height="13"/><rect x="14" y="5" width="6" height="18"/><rect x="23" y="13" width="6" height="10"/><rect x="32" y="8" width="6" height="15"/>`],["distribucion","Distribución",`<rect x="3" y="18" width="5" height="5"/><rect x="9" y="11" width="5" height="12"/><rect x="15" y="5" width="5" height="18"/><rect x="21" y="9" width="5" height="14"/><rect x="27" y="15" width="5" height="8"/><rect x="33" y="19" width="5" height="4"/>`],["burbujas","Trayectorias",`<circle cx="9" cy="17" r="4"/><circle cx="21" cy="11" r="6"/><circle cx="33" cy="15" r="3"/>`],
   ["paises","Series",`<rect x="5" y="4" width="2.5" height="20"/><path d="M7.5 5h22l-4 5 4 5h-22z"/>`],
+  ["antes","Antes y después",`<line x1="20" y1="3" x2="20" y2="23" style="stroke-dasharray:3 3"/><polyline points="4,18 12,15 20,12 36,6" style="fill:none;stroke-width:2.5"/><polyline points="4,18 12,15 20,12 36,17" style="fill:none;stroke-width:2.5;opacity:.55"/>`],
   ["matriz","Matriz",`<rect x="8" y="1" width="7" height="7"/><rect x="8" y="9.5" width="7" height="7"/><rect x="16.5" y="9.5" width="7" height="7"/><rect x="8" y="18" width="7" height="7"/><rect x="16.5" y="18" width="7" height="7"/><rect x="25" y="18" width="7" height="7"/>`],
   ["pendientes","Antes y ahora",`<line x1="8" y1="5" x2="32" y2="19" style="stroke-width:2.5"/><line x1="8" y1="21" x2="32" y2="8" style="stroke-width:2.5"/><circle cx="8" cy="5" r="2.4"/><circle cx="32" cy="19" r="2.4"/><circle cx="8" cy="21" r="2.4"/><circle cx="32" cy="8" r="2.4"/>`],
   ["piramide","Pirámide",`<rect x="15" y="1" width="10" height="5"/><rect x="11" y="7" width="18" height="5"/><rect x="7" y="13" width="26" height="5"/><rect x="5" y="19" width="30" height="5"/>`],
   ["composicion","Composición",`<rect x="4" y="2" width="13" height="6"/><rect x="18" y="2" width="9" height="6"/><rect x="28" y="2" width="8" height="6" style="opacity:.5"/><rect x="4" y="10" width="7" height="6"/><rect x="12" y="10" width="16" height="6"/><rect x="29" y="10" width="7" height="6" style="opacity:.5"/><rect x="4" y="18" width="18" height="6"/><rect x="23" y="18" width="7" height="6"/><rect x="31" y="18" width="5" height="6" style="opacity:.5"/>`]];
 const LBDESC={matriz:"¿Qué datos van juntos? Todas las parejas de datos a la vez, municipio a municipio",pendientes:"¿Quién ha mejorado y quién se ha quedado atrás? Cada provincia o comunidad, entre dos años",piramide:"¿Cómo es la población? Hombres y mujeres por edad, en España, una comunidad o una provincia",composicion:"¿De qué se compone? Sectores, voto o edades en cada comunidad, provincia, tamaño o nivel de renta",paises:"¿Cómo ha cambiado? Las series que quieras, año a año, con un año de referencia si quieres: precios, sueldos, vivienda, empleo… de España, tu provincia o tu municipio, o España frente a otros países",mapa:"¿Dónde es más alto o más bajo? Un dato, municipio a municipio",tabla:"¿Quiénes encabezan la lista? Ordena y filtra por varios datos",cruce:"¿Van juntos dos datos? Mira si la relación aguanta al comparar entre iguales",antes:"¿Cambió algo tras una ley o un suceso? Afectados frente a gemelos, año a año",evolucion:"¿Cómo ha cambiado? Cuánto ha crecido cada dato desde un año",grupos:"¿Qué zona destaca? Medias por comunidad, provincia, tamaño o nivel",distribucion:"¿Cómo se reparte? Un dato entre toda la población",burbujas:"¿Cómo se mueven las provincias? Dos datos y el tamaño, año a año"};
 // Paso 1 del laboratorio: cada gráfico se nombra por la pregunta que responde, con el nombre del gráfico debajo
-const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Si van juntos",grupos:"Qué zona destaca",distribucion:"Cómo se reparte",matriz:"Todo con todo",paises:"Cómo ha cambiado",pendientes:"Quién mejoró",burbujas:"Cómo se mueven",piramide:"Por edades",composicion:"De qué se compone"};
-const LBEJ={mapa:"dónde hay más paro registrado",tabla:"los municipios con la renta más alta",cruce:"si donde se estudia más se gana más",grupos:"la renta media por comunidad",distribucion:"cuántos municipios tienen mucho paro y cuántos poco",matriz:"qué datos se mueven juntos en los municipios",paises:"cómo han subido los alquileres en tu provincia",pendientes:"qué provincias han mejorado su renta desde 2015",burbujas:"cómo se mueven las provincias en renta y paro",piramide:"cómo de envejecida está una provincia",composicion:"qué sectores dan trabajo en cada comunidad"};
+const LBQ={mapa:"Dónde",tabla:"Quién va primero",cruce:"Si van juntos",grupos:"Qué zona destaca",distribucion:"Cómo se reparte",matriz:"Todo con todo",paises:"Cómo ha cambiado",pendientes:"Quién mejoró",antes:"Si hubo efecto",burbujas:"Cómo se mueven",piramide:"Por edades",composicion:"De qué se compone"};
+const LBEJ={mapa:"dónde hay más paro registrado",tabla:"los municipios con la renta más alta",cruce:"si donde se estudia más se gana más",grupos:"la renta media por comunidad",distribucion:"cuántos municipios tienen mucho paro y cuántos poco",matriz:"qué datos se mueven juntos en los municipios",paises:"cómo han subido los alquileres en tu provincia",pendientes:"qué provincias han mejorado su renta desde 2015",antes:"si el tope del alquiler frenó la subida en Cataluña",burbujas:"cómo se mueven las provincias en renta y paro",piramide:"cómo de envejecida está una provincia",composicion:"qué sectores dan trabajo en cada comunidad"};
 const typesHTML=cur=>`<div class="types">${LBTYPES.map(([k,l,svg])=>`<button type="button" data-v="${k}" aria-pressed="${k===cur}">${typeIcon(svg)}<b>${LBQ[k]}</b><small>${l}</small></button>`).join("")}</div>`;
 const typesTips=root=>tipBind(root.querySelectorAll(".types button"),b=>{ const k=b.dataset.v; return `<b>${LBQ[k]}</b> <span style="opacity:.7">· ${LBTYPES.find(t=>t[0]===k)[1]}</span><br>${LBDESC[k]}.${LBEJ[k]?`<br><i>Ejemplo: ${LBEJ[k]}.</i>`:""}`; });
 const lbh=(t,l)=>`<button type="button" class="iq lbh" data-h="${esc(t)}" aria-label="${esc(l||"Más información")}">${IQ_SVG}</button>`;
@@ -4366,18 +4437,24 @@ async function exAntes(out){
       :plOk===false?`Después se separan ${nf1.format(Math.abs(post))} puntos, pero grupos elegidos al azar también se separan así a menudo.<small>No basta para atribuirlo a la medida: ${nf0.format(pl.p*100)}${NB}% de los grupos al azar dan una diferencia igual o mayor.</small>`
       :`Después de la medida, ${yl} queda ${nf1.format(Math.abs(post))} puntos ${post<0?"por debajo":"por encima"} de sus gemelos${preOk?", y antes iban parejos":" (no hay datos de años anteriores para comprobar si antes iban parejos)"}.<small>${plOk?`${pl.p===0?`Ninguno de los ${pl.n} grupos elegidos al azar da`:`Solo un ${nf0.format(pl.p*100)}${NB}% de los grupos elegidos al azar dan`} una diferencia así. Es lo más cerca de un efecto que permiten estos datos, si se cumple lo de abajo.`:"Falta el contraste con grupos al azar."}</small>`;
     document.getElementById("adv").innerHTML=verdict;
-    tests.innerHTML=`<ul class="ad-tests">
+    const pvTxt=pl?(pl.p===0?`ninguno de ${pl.n}`:`${nf0.format(pl.p*100)}${NB}% de ${pl.n}`):"…";
+    tests.innerHTML=`<ul class="czrows ad-rows" aria-label="Comprobaciones">
+      <li class="${preOk==null?"na":preOk?"ok":"ko"}"><span class="em" aria-hidden="true">${preOk==null?"○":preOk?"✓":"✗"}</span><span class="rl">Antes iban parejos</span><span class="rv">${pre==null?"sin datos":Math.abs(pre)<0.05?"≈ 0 pts":pts(pre)+" pts"}</span></li>
+      <li class="${postSig?"ok":"ko"}"><span class="em" aria-hidden="true">${postSig?"✓":"✗"}</span><span class="rl">Después se separan</span><span class="rv">${pts(post)} pts</span></li>
+      <li class="${pl==null?"na":plOk?"ok":"ko"}"><span class="em" aria-hidden="true">${pl==null?"○":plOk?"✓":"✗"}</span><span class="rl">Es raro entre grupos al azar</span><span class="rv">${pvTxt}</span></li></ul>
+      <details class="czd czdet2 ad-det"><summary><span class="czdt">Ver cómo se calcula y qué tendría que ser cierto</span></summary><div class="czdb">
+      <ul class="ad-tests">
       <li><span>${preOk==null?"⚪":em(preOk)}</span><span><b>Antes iban parejos.</b> Diferencia media de 4 a 6 años antes (años que no se usan para elegir a los gemelos): ${pre==null?"no hay datos tan atrás, así que no se puede comprobar":`${pts(pre)} puntos${preCI?` [${pts(preCI[0])}; ${pts(preCI[1])}]`:""}`}. Los gemelos se eligen para que vinieran del mismo camino; si aun así se separaban, la comparación falla.</span></li>
       <li><span>${em(postSig)}</span><span><b>Después se separan.</b> Diferencia media desde el año de la medida: <b>${pts(post)} puntos</b>${postCI?` [${pts(postCI[0])}; ${pts(postCI[1])}]`:""}.</span></li>
       <li><span>${em(plOk)}</span><span><b>Es raro entre grupos al azar.</b> ${pl?`Repetido con ${pl.n} grupos del mismo tamaño elegidos al azar entre los municipios no afectados, la diferencia va de ${pts(pl.min)} a ${pts(pl.max)} puntos; ${pl.p===0?"ninguno iguala la real":`un ${nf0.format(pl.p*100)}${NB}% iguala o supera la real`}.`:"Calculando…"}</span></li>
       <li><span>ℹ️</span><span><b>Gemelos.</b> ${nf0.format(nT)} municipios afectados con datos, emparejados con ${nf0.format(pairs.length-reuse)} gemelos distintos${reuse?` (algunos sirven a más de uno)`:""}, parecidos en tamaño, nivel de ${yl} y cómo cambiaba en los dos años previos${AD.mc&&AD.ev!=="ccaa"?", de la misma comunidad":""}.</span></li></ul>
       <div class="mustbe"><h4>Qué tendría que ser cierto para que fuera un efecto ${("de "+esc(E.t(AD))).replace(/^de el /,"del ")}</h4><ol>
-        <li><b>Sin la medida, los afectados habrían seguido como sus gemelos.</b> Es el supuesto clave, y solo se puede comprobar en parte: mirando que antes iban parejos.</li>
+        <li><b>Sin la medida, los afectados habrían seguido como sus gemelos.</b> Solo se puede comprobar en parte: mirando que antes iban parejos.</li>
         <li><b>Nada más cambió a la vez solo en los afectados.</b> Si la misma comunidad aprobó otra ley ese año, o llegó otro suceso, se mezclan.</li>
-        <li><b>La medida no se anticipó.</b> Si la gente reaccionó antes de que entrara en vigor (firmando contratos, mudándose), parte del efecto cae en el «antes».</li>
-        <li><b>Los gemelos no la notaron.</b> Si el efecto se contagia a los vecinos, la diferencia se queda corta. Por eso en algunos casos se excluyen los municipios cercanos.</li></ol>
-        <p>Si el diseño se te queda corto, mira cómo se hace a fondo en <a href="/preguntas/tope-cataluna/">el estudio del tope</a>, o lee <a href="/laboratorio/metodo/#evidencia">los niveles de evidencia</a>.</p></div>`;
-    ficha(tests,[["Afectados",`${E.d} ${nf0.format(nT)} con datos de ${yl} el año anterior y después${AD.mp?`, de ${nf0.format(AD.mp)} habitantes o más`:""}`],["Gemelos","Para cada afectado, el municipio no afectado más parecido (distancia euclídea sobre variables estandarizadas) en log del padrón, cambio anual medio del resultado en los dos años previos y nivel (log) el año anterior; con reemplazo"],["Resultado",`${ADY[Yk].l}, en índice con el año anterior a la medida = 100. ${ADY[Yk].note}`],["Modelo",`Diferencias en diferencias por parejas: diferencia del índice afectado − gemelo en cada año relativo (el año −1 es 0 por construcción). «Antes» = media de los años −4 a −2; «después» = media de los años 0 a +3 disponibles. Intervalos del 95 % por remuestreo de parejas. Placebo: ${pl?pl.n:40} grupos del mismo tamaño elegidos al azar entre los no afectados, con los mismos años de referencia, emparejados igual`]]);
+        <li><b>La medida no se anticipó.</b> Si la gente reaccionó antes de que entrara en vigor, parte del efecto cae en el «antes».</li>
+        <li><b>Los gemelos no la notaron.</b> Si el efecto se contagia a los vecinos, la diferencia se queda corta.</li></ol>
+        <p>Mira cómo se hace a fondo en <a href="/preguntas/tope-cataluna/">el estudio del tope</a>, o lee <a href="/laboratorio/metodo/#evidencia">los niveles de evidencia</a>.</p></div></div></details>`;
+    ficha(tests.querySelector(".czdb"),[["Afectados",`${E.d} ${nf0.format(nT)} con datos de ${yl} el año anterior y después${AD.mp?`, de ${nf0.format(AD.mp)} habitantes o más`:""}`],["Gemelos","Para cada afectado, el municipio no afectado más parecido (distancia euclídea sobre variables estandarizadas) en log del padrón, cambio anual medio del resultado en los dos años previos y nivel (log) el año anterior; con reemplazo"],["Resultado",`${ADY[Yk].l}, en índice con el año anterior a la medida = 100. ${ADY[Yk].note}`],["Modelo",`Diferencias en diferencias por parejas: diferencia del índice afectado − gemelo en cada año relativo (el año −1 es 0 por construcción). «Antes» = media de los años −4 a −2; «después» = media de los años 0 a +3 disponibles. Intervalos del 95 % por remuestreo de parejas. Placebo: ${pl?pl.n:40} grupos del mismo tamaño elegidos al azar entre los no afectados, con los mismos años de referencia, emparejados igual`]]);
   };
   renderTests(null);
   // placebos en el espacio, en segundo plano
