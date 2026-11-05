@@ -2113,3 +2113,8 @@ details.chk > section{margin-top:18px}
 /* municipios: banda blanca a sangre, para que se note el cambio de sección tras el laboratorio */
 .pt-land.pt-mun{margin-top:0; border-top:0; padding:clamp(48px,7vw,96px) 0; background:var(--card); box-shadow:0 0 0 100vmax var(--card); clip-path:inset(0 -100vmax)}
 .pt-why{margin-top:clamp(40px,6vw,72px)}
+
+/* los bloques de la portada entran al hacer scroll */
+.pv{opacity:0; transform:translateY(28px); transition:opacity .8s cubic-bezier(.2,.7,.2,1) var(--d,0s), transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.pv.in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){ .pv{opacity:1; transform:none; transition:none} }

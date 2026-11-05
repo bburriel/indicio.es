@@ -3496,9 +3496,9 @@ function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
     }
   }
   const api={svg,paths:ps,proj,path,
-    set(k,{dur=900}={}){ const fi=F[k]; const ramp=[0,1,2,3,4,5,6].map(i=>css("--ramp-"+i));
+    set(k,{dur=900,delay=0}={}){ const fi=F[k]; const ramp=[0,1,2,3,4,5,6].map(i=>css("--ramp-"+i));
       const vals=rowsAll().map(r=>r[fi]).filter(v=>v!=null), sc=d3.scaleQuantile().domain(vals).range(ramp);
-      ps.transition().duration(dur).attr("fill",f=>{ const r=BYCODE.get(f.id); return r&&r[fi]!=null?sc(r[fi]):css("--nodata"); }); return sc; },
+      ps.transition().duration(dur).delay(delay).attr("fill",f=>{ const r=BYCODE.get(f.id); return r&&r[fi]!=null?sc(r[fi]):css("--nodata"); }); return sc; },
     setCat(k,colorOf){ const fi=F[k]; ps.attr("fill",f=>{ const r=BYCODE.get(f.id); return r&&r[fi]?colorOf(r[fi]):css("--nodata"); }); },
     // label (opcional): nombre junto al aro, para las vistas previas de los ejemplos
     mark(code,label){ g.selectAll(".mk").remove(); const ft=FEATS.find(x=>x.id===code); if(!ft) return; let [cx,cy]=path.centroid(ft); if(refine&&isCan(ft)) cy+=canDy;
@@ -6960,6 +6960,9 @@ const PT_MS=7000;
 function heroCarBind(C){
   if(!C) return; const S=[...C.querySelectorAll(".pt-s")], T=[...C.querySelectorAll(".pt-tabs button")]; if(S.length<2) return;
   const bar=k=>T[k].querySelector(".pt-bar span");
+  // si el carrusel queda debajo de la primera pantalla, la primera diapositiva se «construye» al llegar (texto que entra y gráfico que se dibuja)
+  if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&C.getBoundingClientRect().top>innerHeight*.8){
+    S[0].classList.remove("on"); const o=new IntersectionObserver(es=>{ if(es[0].isIntersecting){ o.disconnect(); if(!S[0].classList.contains("out")) S[0].classList.add("on"); } },{threshold:.3}); o.observe(C); }
   let i=0, el=0, last=performance.now(), hov=false, vis=true;
   const go=(n,dir)=>{ const prev=i; i=(n+S.length)%S.length; el=0; bar(prev).style.transform=""; if(i===prev) return;
     C.dataset.dir=dir<0?"back":"fwd";
@@ -7027,14 +7030,29 @@ function heroType(root){
 function heroLab(root){
   const sec=root.querySelector(".pt-labx"); if(!sec) return;
   const box=sec.querySelector("#labmap"), cap=sec.querySelector("#labcap"), btns=[...sec.querySelectorAll(".pt-labx-q button")], K=btns.map(b=>b.dataset.k);
-  let i=0, api=null, vis=false, user=false;
-  const show=(n,dur)=>{ i=n; btns.forEach((b,j)=>{ b.classList.toggle("on",j===n); b.setAttribute("aria-pressed",j===n?"true":"false"); });
-    const m=MAPLAYERS.find(q=>q[0]===K[n]); cap.textContent=m?m[2]:K[n]; if(api) api.set(K[n],{dur}); };
-  btns.forEach((b,j)=>b.addEventListener("click",()=>{ user=true; show(j,700); }));
-  loadTopo().then(()=>{ if(!document.body.contains(box)) return; api=spainMap(box,{refine:true,width:560,height:440}); show(i,0); }).catch(()=>{});
-  const io="IntersectionObserver" in window?new IntersectionObserver(es=>{ vis=es[0].isIntersecting; },{threshold:.3}):null; if(io) io.observe(sec); else vis=true;
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const t=setInterval(()=>{ if(!document.body.contains(sec)){ clearInterval(t); io&&io.disconnect(); return; } if(!user&&vis&&api) show((i+1)%K.length,1100); },4200);
+  const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let i=0, api=null, vis=false, user=false, painted=false, sweep=null;
+  const label=n=>{ i=n; btns.forEach((b,j)=>{ b.classList.toggle("on",j===n); b.setAttribute("aria-pressed",j===n?"true":"false"); });
+    const m=MAPLAYERS.find(q=>q[0]===K[n]); cap.textContent=m?m[2]:K[n]; };
+  const show=(n,dur)=>{ label(n); if(api&&painted) api.set(K[n],{dur}); };
+  // la primera vez que se ve, el mapa se pinta de oeste a este
+  const paint=()=>{ if(painted||!api||!vis) return; painted=true;
+    if(calm){ api.set(K[i],{dur:0}); return; }
+    let lo=1e9,hi=-1e9; const cx=new Map(); api.paths.each(f=>{ const x=api.path.centroid(f)[0]; cx.set(f.id,x); if(x<lo) lo=x; if(x>hi) hi=x; });
+    api.set(K[i],{dur:900,delay:f=>((cx.get(f.id)-lo)/(hi-lo||1))*1100}); };
+  btns.forEach((b,j)=>b.addEventListener("click",()=>{ user=true; if(!painted){ label(j); painted=true; api&&api.set(K[j],{dur:700}); } else show(j,700); }));
+  label(0);
+  loadTopo().then(()=>{ if(!document.body.contains(box)) return; api=spainMap(box,{refine:true,width:560,height:440}); paint(); }).catch(()=>{});
+  const io="IntersectionObserver" in window?new IntersectionObserver(es=>{ vis=es[0].isIntersecting; paint(); },{threshold:.3}):null; if(io) io.observe(sec); else vis=true;
+  if(calm) return;
+  const t=setInterval(()=>{ if(!document.body.contains(sec)){ clearInterval(t); io&&io.disconnect(); return; } if(!user&&vis&&painted) show((i+1)%K.length,1100); },4200);
+}
+// los bloques de la portada que quedan debajo de la primera pantalla entran al llegar (suben y aparecen, escalonados)
+function homeReveal(root){
+  if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{threshold:.12,rootMargin:"0px 0px -8% 0px"});
+  [[".pt-all",0],[".pt-labx-tx",0],[".pt-labx-map",.14],[".pt-mun .pt-land-tx",0],[".pt-mun .pt-mun-q",.1],[".pt-mun .pt-mun-art",.18],[".pt-why",0],[".ed-sec",0]].forEach(([q,d])=>root.querySelectorAll(q).forEach(el=>{
+    if(el.getBoundingClientRect().top<innerHeight) return; el.classList.add("pv"); el.style.setProperty("--d",d+"s"); io.observe(el); }));
 }
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
@@ -7071,7 +7089,7 @@ async function renderInicio(){
   heroCarBind(view.querySelector(".pt-car"));
   heroType(view.querySelector(".ho"));
   view.querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const t=view.querySelector(x.dataset.go); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
-  heroLab(view);
+  heroLab(view); homeReveal(view);
   bindBig("q2");
   // la nube de municipios: imagen fija y, encima, qué municipio es cada punto
   const ar=document.getElementById("qhart");
