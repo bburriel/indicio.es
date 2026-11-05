@@ -2364,3 +2364,6 @@ details.chk > section{margin-top:18px}
 .pt-tools .btn{font-size:15.5px; color:var(--bg)}
 .pt-tools .btn:hover{color:#fff; text-decoration:none}
 .pt-tools .btn.alt,.pt-tools .btn.alt:hover{color:var(--ink)}
+
+/* Municipios en la portada: los ejemplos del buscador, en píldora como los botones de debajo */
+.pt-mun-q .chipsq a{border-radius:999px!important; padding:5px 15px}
