@@ -1573,7 +1573,7 @@ details.chk > section{margin-top:18px}
 .np-c{display:flex; flex-direction:column; color:inherit; text-decoration:none; min-width:0}
 .np-c .np-fig{margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
 .np-q{font-family:var(--serif); font-weight:500; font-size:clamp(21px,2vw,25px); line-height:1.15; letter-spacing:-.01em; margin:7px 0 8px; text-wrap:balance}
-.np-v{font:500 17.5px/1.3 var(--serif); color:var(--brand); margin:0}
+.np-v{font:16.5px/1.45 var(--serif); color:var(--ink-2); margin:7px 0 0}
 .np-r{font:15.5px/1.45 var(--serif); color:var(--ink-2); margin:7px 0 0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
 .np-go{margin-top:auto; padding-top:14px; font:600 14.5px var(--font); color:var(--ink)}
 .np-go time{float:right; font-weight:400; font-size:12.5px; color:var(--muted); margin-top:2px}
