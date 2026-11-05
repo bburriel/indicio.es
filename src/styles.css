@@ -2184,3 +2184,14 @@ details.chk > section{margin-top:18px}
   .top .top-in .nav a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--brand)}
   .top .top-in .navdd,.top .mega-wrap{display:none!important}
 }
+
+/* Laboratorio: tarjetas «Cuánto van juntos» y «En euros» más compactas (noviembre 2026) */
+.czb-e .czsent{margin:2px 0 0; font-size:16px; line-height:1.5; color:var(--ink-2)}
+.czsent b.czv{font-family:"Newsreader",var(--serif,Georgia,serif); font-weight:500; font-size:1.5em; line-height:1; color:var(--brand); white-space:nowrap; font-variant-numeric:tabular-nums}
+.czci{margin-top:8px; cursor:help; border-radius:6px} .czci:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+.czcl{margin:0; font-size:12.5px; color:var(--muted)}
+.czr2{margin:10px 0 0; font-size:13.5px; line-height:1.45; color:var(--muted)} .czr2 b{color:var(--ink-2); font-weight:600}
+.srcdef{display:block; margin-top:2px}
+.srcdef>summary{display:inline; cursor:pointer; color:var(--brand); font-size:13px}
+.srcdef[open]>summary{display:block}
+.srcdef>p{margin:4px 0 0; font-size:13px; color:var(--muted); max-width:var(--medida)}
