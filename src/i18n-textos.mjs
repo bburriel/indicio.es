@@ -883,6 +883,10 @@ export const ROWS=[
  ["Rebaja del IVA de los alimentos (2023)","Rebaixa de l'IVA dels aliments (2023)","Rebaixa do IVE dos alimentos (2023)","Elikagaien BEZa jaistea (2023)","Cut in VAT on food (2023)"],
  ["Ley de vivienda (2023)","Llei d'habitatge (2023)","Lei de vivenda (2023)","Etxebizitza legea (2023)","Housing law (2023)"],
  ["Tope del alquiler en Cataluña (2024)","Topall del lloguer a Catalunya (2024)","Tope do aluguer en Cataluña (2024)","Kataluniako alokairuaren muga (2024)","Rent cap in Catalonia (2024)"],
+  ["Otro año…","Un altre any…","Outro ano…","Beste urte bat…","Another year…"],
+  ["¿En qué año?","En quin any?","En que ano?","Zein urtetan?","Which year?"],
+  ["Con varias series no se puede marcar un suceso. Deja una sola.","Amb diverses sèries no es pot marcar un succés. Deixa'n només una.","Con varias series non se pode marcar un suceso. Deixa só unha.","Serie askorekin ezin da gertaerarik markatu. Utzi bakarra.","With several series you can't mark an event. Keep just one."],
+  ["Con un suceso marcado solo cabe una serie. Pon «Ninguno» en el paso 3 para comparar varias.","Amb un succés marcat només hi cap una sèrie. Posa «Cap» al pas 3 per comparar-ne diverses.","Cun suceso marcado só cabe unha serie. Pon «Ningún» no paso 3 para comparar varias.","Gertaera markatuta, serie bakarra sar daiteke. Jarri «Bat ere ez» 3. urratsean hainbat alderatzeko.","With an event marked only one series fits. Set «None» in step 3 to compare several."],
  // bloque «¿Aguanta al comparar?» del laboratorio (noviembre 2026)
  ["¿Aguanta al comparar?","Aguanta quan es compara?","Aguanta ao comparar?","Eutsi egiten al dio konparatzean?","Does it hold up when compared?"],
  ["Se explica por otra cosa.","S'explica per una altra cosa.","Explícase por outra cousa.","Beste zerbaitek azaltzen du.","Something else explains it."],
