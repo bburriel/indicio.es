@@ -5604,13 +5604,13 @@ async function studySueldos(B){
     edad:el=>{ const f=fig(el,{title:`Sueldo medio por edad, ${2008}–${eY}`,sub:"Cambio descontada la inflación",source:"Fuente: INE, EPA (salarios por deciles) e IPC."});
       hbars(f.body,[...AG.map(a=>({l:a.l,v:a.v})),{l:"Todos",v:ageTot,c:"--rust"}],{fmt:v=>sgn(v),wide:true}); },
     quien:el=>lineChart(el,{title:"Quién cobra una nómina: reparto de los asalariados por edad",sub:"% de los asalariados de cada año",source:"Fuente: INE, EPA (asalariados por grupo de edad).",years:EY,xticks:[2008,2014,2019,eY],tickFmt:v=>nf0.format(v)+"%",fmt:pc,
-      series:[{n:"55 o más años",v:EY.map(y=>shG(GV,y)),c:"--rust",main:true},{n:"De 35 a 54",v:EY.map(y=>shG(GM,y)),c:"--slate"},{n:"Menos de 35",v:EY.map(y=>shG(GJ,y)),c:"--mustard"}]}),
+      series:[{n:"55 o más",v:EY.map(y=>shG(GV,y)),c:"--rust",main:true},{n:"De 35 a 54",v:EY.map(y=>shG(GM,y)),c:"--slate"},{n:"Menos de 35",v:EY.map(y=>shG(GJ,y)),c:"--mustard"}]}),
     simpson:el=>lineChart(el,{title:"El sueldo medio, con y sin el envejecimiento de quienes trabajan (2008 = 100)",sub:"Sueldo mensual bruto medio, descontada la inflación",source:"Fuente: INE, EPA (salarios por edad y asalariados por edad) e IPC. Cálculo propio.",years:EY,index:true,xticks:[2008,2014,2019,eY],
       series:[{n:"Sueldo medio",v:EY.map(totReal),c:"--ink",main:true},{n:"Edad de 2008",v:EY.map(y=>fijaEd(y,2008)),c:"--rust",dash:true}]}),
     hogares:el=>lineChart(el,{title:"Cuántas personas trabajan en cada hogar",sub:"Ocupados por hogar, media de cada año",source:"Fuente: INE, EPA (hogares según el número de ocupados).",years:HY,xticks:[2008,2013,2019,HY[HY.length-1]],tickFmt:v=>nf2.format(v),fmt:v=>nf2.format(v)+" ocupados",
-      series:[{n:"Ocupados por hogar",v:HY.map(hPer),c:"--rust",main:true}]}),
+      series:[{n:"Por hogar",v:HY.map(hPer),c:"--rust",main:true}]}),
     reparto:el=>lineChart(el,{title:"Hogares sin ningún ocupado y con dos o más",sub:"% de los hogares de España",source:"Fuente: INE, EPA (hogares según el número de ocupados).",years:HY,xticks:[2008,2013,2019,HY[HY.length-1]],tickFmt:v=>nf0.format(v)+"%",fmt:pc,
-      series:[{n:"Sin ocupados",v:HY.map(hSin),c:"--slate",main:true},{n:"Dos o más ocupados",v:HY.map(hDos),c:"--rust",main:true}]}),
+      series:[{n:"Sin ocupados",v:HY.map(hSin),c:"--slate",main:true},{n:"Dos o más",v:HY.map(hDos),c:"--rust",main:true}]}),
     renta:el=>{ const f=fig(el,{title:`Renta de los hogares: cambio de cada escalón, ingresos de 2018 a ${cLast-1}`,sub:"Límite de cada decil de renta por unidad de consumo, descontada la inflación",source:"Fuente: INE, Encuesta de Condiciones de Vida e IPC."});
       const N=["Segundo decil","Tercer decil","Cuarto decil","Quinto decil","Sexto decil","Septimo decil","Octavo decil","Noveno decil","Décimo decil"];
       hbars(f.body,N.map((n,i)=>({l:i===0?"El 10 % de abajo":i===4?"La mitad":i===8?"El 10 % de arriba":`${(i+1)*10} %`,v:creal(C.limite[n],cLast,2019),c:i===4?"--rust":null})),{fmt:v=>sgn(v),wide:true}); },
