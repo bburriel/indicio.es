@@ -2258,3 +2258,15 @@ details.chk > section{margin-top:18px}
 /* Municipios: segunda frase del titular en granate (noviembre 2026) */
 .mun-hero .mun-head h1 .mh-hl{display:block; color:var(--brand)}
 :root[data-theme="dark"] .mun-hero .mun-head h1 .mh-hl{color:#e0a3ab}
+
+/* Municipios: arriba el buscador y los accesos como botones, abajo el mapa en grande (noviembre 2026) */
+.ci-hero.mun-hero{grid-template-columns:minmax(0,1fr); gap:22px 0}
+.mun-hero > div:nth-child(2){width:100%; max-width:none; margin:0}
+.mun-hero .bigsearch{max-width:720px!important; margin-left:0!important; margin-right:auto!important; align-self:flex-start}
+.mun-hero .linkrow{display:flex; flex-wrap:wrap; gap:10px; font-size:0; margin:0; padding-top:18px}
+.mun-hero .linkrow a{display:inline-flex; align-items:center; min-height:40px; padding:0 18px; border:1px solid var(--rule-2); border-radius:3px; background:transparent; color:var(--ink); font-size:15px; font-weight:500; text-decoration:none; transition:border-color .15s, color .15s, background .15s}
+.mun-hero .linkrow a:hover{border-color:var(--brand); color:var(--brand); background:color-mix(in srgb, var(--brand) 6%, transparent)}
+:root[data-theme="dark"] .mun-hero .linkrow a:hover{color:var(--ink); border-color:var(--ink-2)}
+.mun-hero .ci-map{max-width:900px; width:100%; margin:6px auto 0}
+.mun-hero #mlmap svg{max-width:900px!important}
+@media (max-width:860px){ .mun-hero .linkrow{padding-top:14px} }
