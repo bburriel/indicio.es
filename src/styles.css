@@ -2353,3 +2353,4 @@ details.chk > section{margin-top:18px}
 .mi-que p:first-child{padding-left:0; border-left:0}
 .mi-que b{display:block; font-weight:500; font-size:1.25em; line-height:1.2; color:var(--ink); margin-bottom:2px}
 @media (max-width:760px){ .mi-que{grid-template-columns:minmax(0,1fr)} .mi-que p{padding:14px 0 0; border-left:0} }
+.pt-tools button.btn{font-family:inherit; cursor:pointer; line-height:inherit}

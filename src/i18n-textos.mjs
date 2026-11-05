@@ -1363,6 +1363,7 @@ export const ROWS=[
  ["Dos municipios, lado a lado","Dos municipis, costat per costat","Dous municipios, lado a lado","Bi udalerri, aldez alde","Two municipalities, side by side"],
  ["Elige dos y compáralos dato a dato.","Tria'n dos i compara'ls dada a dada.","Elixe dous e compáraos dato a dato.","Aukeratu bi eta alderatu itzazu datuz datu.","Pick two and compare them figure by figure."],
  ["Comparar dos municipios →","Comparar dos municipis →","Comparar dous municipios →","Alderatu bi udalerri →","Compare two municipalities →"],
+ ["Ve a tu municipio →","Ves al teu municipi →","Vai ao teu municipio →","Joan zure udalerrira →","Go to your municipality →"],
  ["También puedes ver","També pots veure","Tamén podes ver","Hauek ere ikus ditzakezu:","You can also see"],
  ["los municipios por provincia","els municipis per província","os municipios por provincia","udalerriak probintziaka","municipalities by province"],
  ["los rankings","els rànquings","as clasificacións","sailkapenak","the rankings"],
