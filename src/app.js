@@ -6991,7 +6991,7 @@ function heroCarBind(C){
 }
 
 // «Bienvenido/a a tu estudio» ↔ «Indicio»: un único cursor viaja entre las dos palabras y las edita a máquina, como una persona que las
-// va cambiando en bucle. Empieza en «tu estudio»; nada más entrar viaja a la o/a y la cambia, vuelve y cambia «tu estudio» por «Indicio»; y así en bucle. Con
+// va cambiando en bucle. Empieza en «tu estudio»; nada más entrar cambia la o/a, luego «tu estudio» por «Indicio», y después sigue al azar. Con
 // «reducir movimiento» se queda quieto (y el cursor se oculta).
 function heroType(root){
   if(!root||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -7006,25 +7006,29 @@ function heroType(root){
   { const v=vis.getBoundingClientRect(), r=cur.getBoundingClientRect(); cur.classList.add("fl"); cur.style.left=(r.left-v.left)+"px"; cur.style.top=(r.top-v.top)+"px"; cur.style.height=r.height+"px"; }
   let at=W; const keep=()=>{ if(live()) put(at); }; addEventListener("resize",keep);
   const busy=on=>cur.classList.toggle("mv",on);
-  // como las flechas del teclado, pasando por cada letra: para ir de «tu estudio» a la «o» retrocede por el texto, salta al final de la
-  // línea de arriba (como al tirar atrás en un editor) y sigue hacia atrás hasta la «o»; para volver, avanza, baja y recorre la palabra.
-  const L1=root.querySelector(".ho-l1"), L2=root.querySelector(".ho-l2"), idx=el=>el===OA?10:W.textContent.length;
+  // como las flechas del teclado, pasando por cada letra. Al llegar al principio de una línea el cursor no viaja: aparece al final de la
+  // anterior, como en un editor de texto. Hacia delante, al revés. Cada vuelta mezcla el orden, las pausas y la velocidad un poco al azar.
+  const L1=root.querySelector(".ho-l1"), L2=root.querySelector(".ho-l2"), idx=el=>el===OA?10:W.textContent.length, rnd=(a,b)=>a+Math.random()*(b-a);
   const cx=(L,i)=>{ const v=vis.getBoundingClientRect(); if(i<=0) return L.getBoundingClientRect().left-v.left;
     const tw=document.createTreeWalker(L,NodeFilter.SHOW_TEXT); let n, c=0;
     while((n=tw.nextNode())){ if(c+n.length>=i){ const rg=document.createRange(); rg.setStart(n,i-c-1); rg.setEnd(n,i-c); return rg.getBoundingClientRect().right-v.left; } c+=n.length; }
     return L.getBoundingClientRect().right-v.left; };
-  const stepTo=async(L,from,to)=>{ const d=to>from?1:-1; for(let i=from;i!==to;){ i+=d; cur.style.left=cx(L,i)+"px"; await sleep(45+Math.random()*40); } };
-  const hop=async(L,i,q)=>{ cur.classList.remove("ty"); cur.style.transitionDuration="170ms"; cur.style.left=cx(L,i)+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; await sleep(230); cur.style.transitionDuration=""; cur.classList.add("ty"); };
+  const stepTo=async(L,from,to)=>{ const d=to>from?1:-1; for(let i=from;i!==to;){ i+=d; cur.style.left=cx(L,i)+"px"; await sleep(rnd(28,58)); } };
+  const jump=async(L,i,q)=>{ cur.style.left=cx(L,i)+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; await sleep(rnd(70,140)); };
   const go=async el=>{ const from=at, n1=L1.textContent.length, n2=W.textContent.length; at=el; busy(true); cur.classList.add("ty");
-    if(from===W){ await stepTo(L2,n2,0); await hop(L1,n1,pos(OA)); await stepTo(L1,n1,idx(OA)); }
-    else { await stepTo(L1,idx(OA),n1); await hop(L2,0,pos(W)); await stepTo(L2,0,n2); } };
+    if(from===W){ await stepTo(L2,n2,0); await jump(L1,n1,pos(OA)); await stepTo(L1,n1,idx(OA)); }
+    else { await stepTo(L1,idx(OA),n1); await jump(L2,0,pos(W)); await stepTo(L2,0,n2); } };
   const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
-    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(70); } await sleep(220);
-    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(130); } };
-  (async()=>{ let k=0, oa="o"; await sleep(1300);
+    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(rnd(35,70)); } await sleep(rnd(120,330));
+    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(rnd(70,125)); } };
+  // primero la «a» y luego «Indicio»; después elige al azar cuál toca, y se queda parado solo un segundo
+  (async()=>{ let k=0, oa="o", next=OA, first=true; await sleep(1300);
     while(live()){
-      await go(OA); await sleep(300); oa=oa==="o"?"a":"o"; await edit(OA,oa); busy(false); await sleep(1100); if(!live()) break;
-      await go(W); await sleep(300); await edit(W,k?"tu estudio":"Indicio"); k=1-k; busy(false); await sleep(4500); } })();
+      if(at!==next) await go(next);
+      await sleep(rnd(150,300));
+      if(next===OA){ oa=oa==="o"?"a":"o"; await edit(OA,oa); } else { await edit(W,k?"tu estudio":"Indicio"); k=1-k; }
+      busy(false); await sleep(rnd(850,1150)); if(!live()) break;
+      next=first?W:(Math.random()<.5?OA:W); first=false; } })();
 }
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
