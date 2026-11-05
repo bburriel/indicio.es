@@ -6259,7 +6259,7 @@ const HEROQ=[
   {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver por qué sube →",
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
-    cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados y sueldo mediano hasta ${N.alquilerY}. Fuente: INE.`},
+    cap:N=>`Lo que ha subido cada cosa desde 2015 (2015 = 100): precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados y sueldo mediano hasta ${N.alquilerY}. Fuente: INE.`},
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué se encarece más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
@@ -6300,19 +6300,25 @@ const ptCharts={
       +`<path d="${area}" class="pt-g-area"/><path d="M${sa.map(pt).join(" L")}" pathLength="1" class="pt-g-ln ink"/><path d="M${fo.map(pt).join(" L")}" pathLength="1" class="pt-g-ln br"/>${dots(sa,"pt-f-ink")}${dots(fo,"pt-f-br")}`
       +lab(F,yF,"La comida"," br")+lab(Sl,yS,"El sueldo",""),
       `Desde 2019 el precio de la comida ha subido un ${nf0.format(F[1]-100)} % y el sueldo mediano un ${nf0.format(Sl[1]-100)} %.`); },
-  // la casa: tres barras desde 2015 (solo hay punto de partida y de llegada, así que no se dibuja una línea)
-  casa(D){ const C=D.casa, R=[["Comprar una vivienda",C.compra[0],"br"],["Alquilarla",C.alquiler[0],"br"],["El sueldo mediano",C.sueldo[0],"ink"]];
-    const x0=24, x1=326, mx=Math.max(...R.map(r=>r[1])), sc=v=>(x1-x0)*v/mx;   // deja sitio a la cifra a la derecha
-    return ptSvg(`<text x="${x0}" y="22" class="pt-g-t">Cuánto ha subido desde 2015</text>`+R.map(([l,v,c],i)=>{ const y=56+i*80;
-      return `<text x="${x0}" y="${y+14}" class="pt-g-l${c==="br"?" br":""}">${l}</text><rect x="${x0}" y="${y+24}" width="${Math.max(2,sc(v)).toFixed(1)}" height="32" rx="3" class="${c==="br"?"pt-f-br":"pt-f-ink"}"/>`
-        +`<text x="${(x0+sc(v)+10).toFixed(1)}" y="${y+49}" class="pt-g-n${c==="br"?" br":""}">+${nf0.format(v)}${NB}%</text>`; }).join(""),
+  // la casa: lo que ha subido cada cosa desde 2015 (2015 = 100), como la cesta
+  casa(D){ const C=D.casa, S=C.serie||{compra:[[2015,100],[C.compra[1],100+C.compra[0]]],alquiler:[[2015,100],[C.alquiler[1],100+C.alquiler[0]]],sueldo:[[2015,100],[C.sueldo[1],100+C.sueldo[0]]]};
+    const R=[["Comprar",S.compra,"br"],["Alquilar",S.alquiler,"lt"],["El sueldo",S.sueldo,"ink"]], all=R.flatMap(r=>r[1].map(p=>p[1]));
+    const t0=2015, t1=Math.max(...R.map(r=>r[1][r[1].length-1][0])), x0=40,x1=312,y0=262,y1=26, lo=95, hi=Math.ceil(Math.max(...all)/10)*10+2;
+    const X=t=>x0+(x1-x0)*(t-t0)/(t1-t0), Yv=v=>y0-(y0-y1)*(v-lo)/(hi-lo), pt=([t,v])=>`${X(t).toFixed(1)},${Yv(v).toFixed(1)}`;
+    const ends=R.map(([n,a,c])=>({n,c,p:a[a.length-1],y:Yv(a[a.length-1][1])})).sort((p,q)=>p.y-q.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<52) ends[i].y=ends[i-1].y+52;
+    const lines=R.map(([n,a,c])=>`<path d="M${a.map(pt).join(" L")}" pathLength="1" class="pt-g-ln ${c}"/>`).join(""), dots=R.map(([n,a,c])=>{ const p=a[a.length-1]; return `<circle cx="${X(p[0]).toFixed(1)}" cy="${Yv(p[1]).toFixed(1)}" r="4.5" class="${c==="br"?"pt-f-br":c==="lt"?"pt-f-lt":"pt-f-ink"}"/>`; }).join("");
+    const lab=e=>`<text x="${(X(e.p[0])+12).toFixed(1)}" y="${(e.y-4).toFixed(1)}" class="pt-g-l${e.c==="br"?" br":""}">${e.n}</text><text x="${(X(e.p[0])+12).toFixed(1)}" y="${(e.y+21).toFixed(1)}" class="pt-g-n${e.c==="br"?" br":""}">+${nf0.format(e.p[1]-100)}${NB}%</text>`;
+    return ptSvg([130,160].filter(g=>g<hi).map(g=>`<line x1="${x0}" x2="${x1}" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="${x0-8}" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">+${g-100}${NB}%</text>`).join("")
+      +`<line x1="${x0}" x2="${x1}" y1="${Yv(100).toFixed(1)}" y2="${Yv(100).toFixed(1)}" class="pt-g-base"/><text x="${x0-8}" y="${(Yv(100)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">2015</text>`
+      +[2018,2021,2024].filter(y=>y<=t1).map(y=>`<text x="${X(y).toFixed(1)}" y="${y0+24}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
+      +lines+dots+ends.map(lab).join(""),
       `Desde 2015 comprar una vivienda cuesta un ${nf0.format(C.compra[0])} % más, alquilarla un ${nf0.format(C.alquiler[0])} % más, y el sueldo mediano ha subido un ${nf0.format(C.sueldo[0])} %.`); },
-  tope(){ const x0=24,x1=416, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1);
-    return ptSvg(`<text x="${x0}" y="52" class="pt-g-l">Sin el tope (estimado)</text><rect x="${x0}" y="64" width="${(a-x0).toFixed(1)}" height="48" rx="3" class="pt-f-mu"/>`
-      +`<text x="${(a-12).toFixed(1)}" y="98" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
-      +`<text x="${x0}" y="156" class="pt-g-l br">Con el tope (lo que pasó)</text><rect x="${x0}" y="168" width="${(b-x0).toFixed(1)}" height="48" rx="3" class="pt-f-br"/>`
-      +`<text x="${(b-12).toFixed(1)}" y="202" text-anchor="end" class="pt-g-n on">+3,1${NB}%</text>`
-      +`<text x="${x0}" y="260" class="pt-g-g">En un piso de Barcelona, unos 7${NB}€ al mes</text>`,
+  tope(){ const x0=30,x1=410, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1), y=150;
+    return ptSvg(`<line x1="${x0}" x2="${x1}" y1="${y}" y2="${y}" class="pt-g-gr"/>`
+      +`<circle cx="${a.toFixed(1)}" cy="${y}" r="15" class="pt-g-ghost"/><circle cx="${b.toFixed(1)}" cy="${y}" r="15" class="pt-f-br"/>`
+      +`<text x="${x1}" y="${y-56}" text-anchor="end" class="pt-g-l">Sin el tope (estimado)</text><text x="${x1}" y="${y-28}" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
+      +`<text x="${b.toFixed(1)}" y="${y+58}" text-anchor="middle" class="pt-g-n br">+3,1${NB}%</text><text x="${b.toFixed(1)}" y="${y+80}" text-anchor="middle" class="pt-g-l br">Con el tope</text>`
+      +`<text x="${x0}" y="262" class="pt-g-g">Unos 7${NB}€ al mes en un piso de Barcelona</text>`,
       "Sin el tope el alquiler habría subido un 3,7 %; subió un 3,1 %."); },
   contratos(D){ const {meses:M,temporales:T,antes}=D.contratos, idx=T.map((v,i)=>i).filter(i=>T[i]!=null), n=M.length, last=idx[idx.length-1];
     const X=i=>40+(330-40)*i/(n-1), Yv=v=>262-(262-26)*(v-40)/(100-40), ir=M.indexOf("2022-04");
