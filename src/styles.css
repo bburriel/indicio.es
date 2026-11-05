@@ -1088,11 +1088,11 @@ a.ev:hover{background:color-mix(in srgb, currentColor 10%, transparent)}
 .abstract dl{display:grid; grid-template-columns:minmax(96px,128px) 1fr; gap:8px 16px; margin:0; font-size:15.5px; line-height:1.5}
 .abstract dt{font-weight:700; color:var(--ink)} .abstract dd{margin:0; color:var(--ink-2)}
 .abstract .abs-m{margin:10px 0 0; font-size:13.5px}
-.psec > h2{font-size:13px!important; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); font-family:inherit; max-width:none}
+.psec > h2{font:500 clamp(25px,2.9vw,32px)/1.16 var(--serif)!important; letter-spacing:-.015em; text-transform:none; color:var(--ink); max-width:var(--medida)}
 .psec-res{padding-bottom:0; border-bottom:0}
 #sbody{counter-reset:res}
 .pres{padding-top:22px; border-bottom:0}
-.pres > h3{font-size:clamp(21px,2.4vw,26px); line-height:1.24; font-weight:700; letter-spacing:-.01em; max-width:var(--medida); margin:0}
+.pres > h3{font:700 clamp(18px,2vw,21px)/1.3 var(--font); letter-spacing:0; max-width:var(--medida); margin:0}
 .pres > h3::before{content:none}
 .psec-res + .pres{padding-top:6px}
 .methods{background:color-mix(in srgb, var(--band) 55%, transparent); border-radius:10px; padding:22px 22px 18px!important; margin-top:24px; border-bottom:0!important}
@@ -1148,7 +1148,8 @@ table.reg td.num, table.reg th.r{white-space:nowrap}
 /* análisis en Markdown */
 .md-falta{color:var(--ko); text-decoration:line-through wavy; font-weight:700}
 .md-chart{margin:14px 0 18px}
-.md-intro{font-size:19px; line-height:1.55; max-width:var(--medida)}
+.md-intro{font-family:var(--serif); font-size:clamp(17.5px,1.8vw,20px); line-height:1.55; color:var(--ink-2); max-width:var(--medida)}
+.md-intro p{font-family:inherit}
 .md-intro p+p{margin-top:12px}
 .ruler{position:relative; height:16px; margin-top:14px; border-radius:8px; background:linear-gradient(90deg,var(--ramp-1),var(--ramp-5))}
 .ruler b{position:absolute; top:3px; bottom:3px; width:1px; background:var(--bg); opacity:.8}
@@ -1587,21 +1588,27 @@ details.chk > section{margin-top:18px}
 .sh-v{font:500 clamp(22px,2.4vw,30px)/1.18 var(--serif); color:var(--brand); margin:16px 0 0}
 .sh-d{font:clamp(17px,1.7vw,19px)/1.5 var(--serif); color:var(--ink-2); margin:12px 0 0; max-width:var(--medida)}
 .sh .byline{margin-top:16px}
+.sh-t{padding-top:6px}
 .sh-f{margin:0; min-width:0}
 .sh-ph{aspect-ratio:440/280; background:var(--band); border-radius:6px}
 .sh-toc{margin:26px 0 6px; max-width:var(--medida)}
-.sh-toc>b{font:700 12px var(--font); letter-spacing:.1em; text-transform:uppercase; color:var(--brand)}
-.sh-toc ol{counter-reset:toc; list-style:none; margin:10px 0 0; padding:0; border-top:1px solid var(--ink)}
-.sh-toc>ol>li{counter-increment:toc; border-bottom:1px solid var(--rule); padding:10px 0 11px}
+.sh-toc summary{font:700 12px var(--font); letter-spacing:.1em; text-transform:uppercase; color:var(--brand); cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-top:1px solid var(--ink); border-bottom:1px solid var(--rule)}
+.sh-toc summary::-webkit-details-marker{display:none}
+.sh-toc summary::after{content:"+"; font:400 20px/1 var(--font)}
+.sh-toc details[open] summary::after{content:"–"}
+.sh-toc details[open] summary{border-bottom-color:var(--rule)}
+.sh-toc ol{counter-reset:toc; list-style:none; margin:0; padding:0}
+.sh-toc ol>li{counter-increment:toc; border-bottom:1px solid var(--rule); padding:10px 0 11px}
 .sh-toc a{color:inherit; text-decoration:none}
 .sh-toc a:hover{color:var(--brand)}
-.sh-toc>ol>li>a{font:500 18px/1.3 var(--serif)}
-.sh-toc>ol>li>a::before{content:counter(toc,decimal-leading-zero); font:700 12px var(--font); color:var(--brand); margin-right:12px; letter-spacing:.04em}
+.sh-toc ol>li>a{font:500 18px/1.3 var(--serif)}
+.sh-toc ol>li>a::before{content:counter(toc,decimal-leading-zero); font:700 12px var(--font); color:var(--brand); margin-right:12px; letter-spacing:.04em}
 .sh-toc ul{list-style:none; margin:8px 0 0 30px; padding:0; display:grid; gap:5px}
 .sh-toc ul a{font:15px/1.4 var(--serif); color:var(--ink-2)}
 .sh-toc ul a::before{content:"→ "; color:var(--brand)}
 .psec,.pres{scroll-margin-top:84px}
-@media (max-width:860px){ .sh{grid-template-columns:minmax(0,1fr); gap:20px} .sh-toc ul{margin-left:24px} }
+@media (max-width:860px){ .sh{grid-template-columns:minmax(0,1fr); gap:20px} }
+@media (max-width:1099px){ .sh-toc ul{display:none} }
 :root[data-theme="dark"] .np,:root[data-theme="dark"] .sh{--brand:#d0505f}
 .np-fig{aspect-ratio:440/300}
 .np-fig .pt-g{width:100%; height:100%}
@@ -1646,20 +1653,20 @@ details.chk > section{margin-top:18px}
 
 /* análisis: índice lateral fijo, con la sección actual marcada */
 .sx{display:block}
-.sx #shtoc .sh-toc{margin:22px 0 6px}
+.sx #shtoc .sh-toc{margin:22px 0 26px}
 @media (min-width:1100px){
   .sx{display:grid; grid-template-columns:200px minmax(0,1fr); column-gap:44px; align-items:start}
   .sx #shtoc{position:sticky; top:calc(env(safe-area-inset-top,0px) + var(--toph,58px) + 22px); max-height:calc(100vh - var(--toph,58px) - 44px); overflow:auto; align-self:start; padding-top:0}
   .sx .sh-toc{margin:30px 0 0; max-width:none}
-  .sx .sh-toc>b{display:block; margin-bottom:12px}
+  .sx .sh-toc summary{pointer-events:none; border:0; padding:0 0 12px} .sx .sh-toc summary::after{display:none}
   .sx .sh-toc ol{margin:0; border-top:0; border-left:1px solid var(--rule)}
-  .sx .sh-toc>ol>li{border-bottom:0; padding:0; margin:0}
-  .sx .sh-toc>ol>li>a{display:block; font:500 14.5px/1.35 var(--font); padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent; color:var(--ink-2)}
-  .sx .sh-toc>ol>li>a::before{display:none}
-  .sx .sh-toc>ol>li>a:hover{color:var(--brand)}
-  .sx .sh-toc>ol>li.on>a{border-left-color:var(--brand); color:var(--ink); font-weight:700}
+  .sx .sh-toc ol>li{border-bottom:0; padding:0; margin:0}
+  .sx .sh-toc ol>li>a{display:block; font:500 14.5px/1.35 var(--font); padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent; color:var(--ink-2)}
+  .sx .sh-toc ol>li>a::before{display:none}
+  .sx .sh-toc ol>li>a:hover{color:var(--brand)}
+  .sx .sh-toc ol>li.on>a{border-left-color:var(--brand); color:var(--ink); font-weight:700}
   .sx .sh-toc ul{display:none; margin:0 0 6px 15px; gap:0}
-  .sx .sh-toc>ol>li.on>ul{display:grid}
+  .sx .sh-toc ol>li.on>ul{display:grid}
   .sx .sh-toc ul a{display:block; font:13.5px/1.35 var(--font); padding:4px 0 4px 10px; color:var(--muted)}
   .sx .sh-toc ul a::before{display:none}
   .sx .sh-toc ul a.on{color:var(--brand); font-weight:600}
