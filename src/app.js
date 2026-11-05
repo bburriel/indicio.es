@@ -6277,7 +6277,7 @@ const HEROQ=[
   {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver por qué sube →",
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
-    cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados, sueldo mediano y resto de precios hasta ${N.alquilerY}. Fuente: INE.`},
+    cap:N=>`Subida desde 2015: precio de compra hasta ${N.compraY}; alquiler medio de los contratos declarados y sueldo mediano hasta ${N.alquilerY}. Fuente: INE.`},
   {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué se encarece más →",
     v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
@@ -6293,7 +6293,7 @@ const HEROQ=[
   {id:"infraestructuras",tab:"Transporte",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver dónde se dejó de invertir →",
     v:()=>`Sí, y no se ha recuperado.`,
     a:N=>`En ${N.infPicoY} España invirtió ${N.infPico} mil millones de euros en carreteras y trenes; en ${N.infUltY}, ${N.infUlt}: un ${N.infCaida}${NB}% menos. Hoy destina a las dos cosas menos del 1${NB}% del PIB, por debajo de Francia y Alemania, cuando antes de la crisis invertía casi el doble que Alemania. Del mantenimiento hay menos datos, y los que hay vienen del propio sector.`,
-    cap:()=>`Inversión anual en carreteras (gris) y ferrocarril (granate), en miles de millones de euros de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).`},
+    cap:()=>`Inversión anual en carreteras y ferrocarril juntos, en miles de millones de euros de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).`},
 ];
 // Quien ya tenía portada.json en caché (navegador o service worker) no trae la serie de infraestructuras: se completa desde infra.json,
 // que es un fichero nuevo y no puede estar viejo. Así la diapositiva no aparece con la portada pre-renderizada y desaparece al pintar.
@@ -6318,20 +6318,19 @@ const ptCharts={
       +`<path d="${area}" class="pt-g-area"/><path d="M${sa.map(pt).join(" L")}" pathLength="1" class="pt-g-ln ink"/><path d="M${fo.map(pt).join(" L")}" pathLength="1" class="pt-g-ln br"/>${dots(sa,"pt-f-ink")}${dots(fo,"pt-f-br")}`
       +lab(F,yF,"La comida"," br")+lab(Sl,yS,"El sueldo",""),
       `Desde 2019 el precio de la comida ha subido un ${nf0.format(F[1]-100)} % y el sueldo mediano un ${nf0.format(Sl[1]-100)} %.`); },
-  // la casa: cuatro barras desde 2015
-  casa(D){ const C=D.casa, R=[["Comprar una vivienda",C.compra[0],"br"],["Alquilarla",C.alquiler[0],"br"],["El sueldo mediano",C.sueldo[0],"ink"],["El resto de precios",C.precios[0],"mu"]];
-    const x0=40, x1=345, mx=Math.max(...R.map(r=>r[1])), sc=v=>(x1-x0)*v/mx;   // deja sitio a la cifra a la derecha
-    return ptSvg(`<text x="${x0}" y="22" class="pt-g-t">Cuánto ha subido desde 2015</text>`+R.map(([l,v,c],i)=>{ const y=44+i*62;
-      return `<text x="${x0}" y="${y+14}" class="pt-g-l${c==="br"?" br":""}">${l}</text><rect x="${x0}" y="${y+22}" width="${Math.max(2,sc(v)).toFixed(1)}" height="26" rx="3" class="${c==="br"?"pt-f-br":c==="ink"?"pt-f-ink":"pt-f-mu"}"/>`
-        +`<text x="${(x0+sc(v)+8).toFixed(1)}" y="${y+43}" class="pt-g-n${c==="br"?" br":""}">+${nf0.format(v)}${NB}%</text>`; }).join(""),
+  // la casa: tres barras desde 2015 (solo hay punto de partida y de llegada, así que no se dibuja una línea)
+  casa(D){ const C=D.casa, R=[["Comprar una vivienda",C.compra[0],"br"],["Alquilarla",C.alquiler[0],"br"],["El sueldo mediano",C.sueldo[0],"ink"]];
+    const x0=24, x1=326, mx=Math.max(...R.map(r=>r[1])), sc=v=>(x1-x0)*v/mx;   // deja sitio a la cifra a la derecha
+    return ptSvg(`<text x="${x0}" y="22" class="pt-g-t">Cuánto ha subido desde 2015</text>`+R.map(([l,v,c],i)=>{ const y=56+i*80;
+      return `<text x="${x0}" y="${y+14}" class="pt-g-l${c==="br"?" br":""}">${l}</text><rect x="${x0}" y="${y+24}" width="${Math.max(2,sc(v)).toFixed(1)}" height="32" rx="3" class="${c==="br"?"pt-f-br":"pt-f-ink"}"/>`
+        +`<text x="${(x0+sc(v)+10).toFixed(1)}" y="${y+49}" class="pt-g-n${c==="br"?" br":""}">+${nf0.format(v)}${NB}%</text>`; }).join(""),
       `Desde 2015 comprar una vivienda cuesta un ${nf0.format(C.compra[0])} % más, alquilarla un ${nf0.format(C.alquiler[0])} % más, y el sueldo mediano ha subido un ${nf0.format(C.sueldo[0])} %.`); },
-  tope(){ const x0=40,x1=400, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1);
-    return ptSvg(`<text x="${x0}" y="62" class="pt-g-l">Sin el tope (estimado)</text><rect x="${x0}" y="74" width="${(a-x0).toFixed(1)}" height="44" rx="3" class="pt-g-ghost"/>`
-      +`<text x="${(a-12).toFixed(1)}" y="105" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
-      +`<text x="${x0}" y="162" class="pt-g-l br">Con el tope (lo que pasó)</text><rect x="${x0}" y="174" width="${(b-x0).toFixed(1)}" height="44" rx="3" class="pt-f-br"/>`
-      +`<text x="${(b-12).toFixed(1)}" y="205" text-anchor="end" class="pt-g-n on">+3,1${NB}%</text>`
-      +`<line x1="${b.toFixed(1)}" x2="${b.toFixed(1)}" y1="226" y2="248" class="pt-g-tick"/><line x1="${a.toFixed(1)}" x2="${a.toFixed(1)}" y1="122" y2="248" class="pt-g-tick dash"/><line x1="${b.toFixed(1)}" x2="${a.toFixed(1)}" y1="244" y2="244" class="pt-g-tick"/>`
-      +`<text x="${((a+b)/2).toFixed(1)}" y="272" text-anchor="middle" class="pt-g-g">unos 7${NB}€ al mes</text>`,
+  tope(){ const x0=24,x1=416, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1);
+    return ptSvg(`<text x="${x0}" y="52" class="pt-g-l">Sin el tope (estimado)</text><rect x="${x0}" y="64" width="${(a-x0).toFixed(1)}" height="48" rx="3" class="pt-f-mu"/>`
+      +`<text x="${(a-12).toFixed(1)}" y="98" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
+      +`<text x="${x0}" y="156" class="pt-g-l br">Con el tope (lo que pasó)</text><rect x="${x0}" y="168" width="${(b-x0).toFixed(1)}" height="48" rx="3" class="pt-f-br"/>`
+      +`<text x="${(b-12).toFixed(1)}" y="202" text-anchor="end" class="pt-g-n on">+3,1${NB}%</text>`
+      +`<text x="${x0}" y="260" class="pt-g-g">En un piso de Barcelona, unos 7${NB}€ al mes</text>`,
       "Sin el tope el alquiler habría subido un 3,7 %; subió un 3,1 %."); },
   contratos(D){ const {meses:M,temporales:T,antes}=D.contratos, idx=T.map((v,i)=>i).filter(i=>T[i]!=null), n=M.length, last=idx[idx.length-1];
     const X=i=>40+(330-40)*i/(n-1), Yv=v=>262-(262-26)*(v-40)/(100-40), ir=M.indexOf("2022-04");
@@ -6342,20 +6341,19 @@ const ptCharts={
       +`<text x="${X(0).toFixed(1)}" y="${(Yv(antes)-12).toFixed(1)}" class="pt-g-n">${nf0.format(antes)}${NB}%</text>`
       +`<circle cx="${X(last).toFixed(1)}" cy="${Yv(T[last]).toFixed(1)}" r="4.5" class="pt-f-br"/><text x="${(X(last)+12).toFixed(1)}" y="${(Yv(T[last])-4).toFixed(1)}" class="pt-g-l br">Hoy</text><text x="${(X(last)+12).toFixed(1)}" y="${(Yv(T[last])+21).toFixed(1)}" class="pt-g-n br">${nf0.format(T[last])}${NB}%</text>`,
       `Antes de 2022, el ${nf0.format(antes)} % de los contratos nuevos eran temporales; hoy, el ${nf0.format(T[last])} %.`); },
-  // infraestructuras: columnas apiladas (carreteras en gris, tren en granate), con el máximo, el último dato y la caída
+  // infraestructuras: una sola línea con el total invertido, el máximo, el último dato y la caída
   infra(D){ const I=D.infra, Yr=I.years, n=Yr.length, tot=Yr.map((y,i)=>I.road[i]+I.rail[i]), pk=tot.indexOf(Math.max(...tot)), li=n-1;
-    const x0=40,x1=PTW-14,y0=PTH-36,y1=66, w=(x1-x0)/n, Yv=v=>y0-(y0-y1)*v/24, cx=i=>x0+i*w+w/2, caida=Math.round((1-tot[li]/tot[pk])*100), f1=v=>nf1.format(v);
-    let s=[0,10,20].map(g=>`<line x1="${x0}" x2="${x1}" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="${x0-6}" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">${g}</text>`).join("");
-    s+=Yr.map((y,i)=>{ const a=I.road[i], b=I.rail[i], bx=(x0+i*w+w*.12).toFixed(1), bw=(w*.76).toFixed(1);
-      return `<rect x="${bx}" y="${Yv(a).toFixed(1)}" width="${bw}" height="${(y0-Yv(a)).toFixed(1)}" class="pt-f-mu"/><rect x="${bx}" y="${Yv(a+b).toFixed(1)}" width="${bw}" height="${(Yv(a)-Yv(a+b)).toFixed(1)}" class="pt-f-br"/>`; }).join("");
-    s+=`<line x1="${cx(pk).toFixed(1)}" x2="${x1}" y1="${Yv(tot[pk]).toFixed(1)}" y2="${Yv(tot[pk]).toFixed(1)}" class="pt-g-base"/><line x1="${cx(li).toFixed(1)}" x2="${cx(li).toFixed(1)}" y1="${Yv(tot[pk]).toFixed(1)}" y2="${(Yv(tot[li])-4).toFixed(1)}" class="pt-g-tick"/>`;
-    s+=[1995,2005,2015,2024].filter(y=>Yr.includes(y)).map(y=>`<text x="${cx(Yr.indexOf(y)).toFixed(1)}" y="${y0+18}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("");
-    s+=`<text x="8" y="18" class="pt-g-l">Lo que se invierte cada año en carreteras y trenes</text><text x="8" y="35" class="pt-g-t">en miles de millones de euros de 2015; en granate, el tren</text>`;
-    const halo=` style="paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round"`, yp=Yv(tot[pk]);
-    s+=`<text x="${cx(pk).toFixed(1)}" y="${(yp-9).toFixed(1)}" text-anchor="middle" class="pt-g-l br"${halo}>${Yr[pk]}: ${f1(tot[pk])}</text>`
-      +`<text x="${(cx(li)-12).toFixed(1)}" y="${(yp+54).toFixed(1)}" text-anchor="end" class="pt-g-big"${halo}>−${caida}${NB}%</text>`
-      +`<text x="${(cx(li)-12).toFixed(1)}" y="${(yp+76).toFixed(1)}" text-anchor="end" class="pt-g-g"${halo}>en ${Yr[li]}: ${f1(tot[li])}</text>`;
-    return ptSvg(s,`La inversión en carreteras y ferrocarril pasa de ${f1(tot[pk])} mil millones de euros en ${Yr[pk]} a ${f1(tot[li])} en ${Yr[li]}: un ${caida} % menos.`); },
+    const x0=24,x1=PTW-24,y0=250,y1=62, X=i=>x0+(x1-x0)*i/(n-1), top=Math.ceil(tot[pk]), Yv=v=>y0-(y0-y1)*v/top, caida=Math.round((1-tot[li]/tot[pk])*100), f1=v=>nf1.format(v);
+    const ln=d3.line().curve(d3.curveMonotoneX)(tot.map((v,i)=>[X(i),Yv(v)])), halo=` style="paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round"`, yp=Yv(tot[pk]), ye=Yv(tot[li]);
+    return ptSvg(`<text x="${x0}" y="18" class="pt-g-t">Lo que se invierte cada año, en miles de millones de euros</text>`
+      +`<path d="${ln}L${X(li).toFixed(1)},${y0}L${X(0).toFixed(1)},${y0}Z" class="pt-g-area"/>`
+      +`<line x1="${X(pk).toFixed(1)}" x2="${X(li).toFixed(1)}" y1="${yp.toFixed(1)}" y2="${yp.toFixed(1)}" class="pt-g-base"/><line x1="${X(li).toFixed(1)}" x2="${X(li).toFixed(1)}" y1="${yp.toFixed(1)}" y2="${(ye-6).toFixed(1)}" class="pt-g-tick"/>`
+      +`<path d="${ln}" pathLength="1" class="pt-g-ln br"/><circle cx="${X(pk).toFixed(1)}" cy="${yp.toFixed(1)}" r="4.5" class="pt-f-br"/><circle cx="${X(li).toFixed(1)}" cy="${ye.toFixed(1)}" r="4.5" class="pt-f-br"/>`
+      +`<text x="${X(pk).toFixed(1)}" y="${(yp-12).toFixed(1)}" text-anchor="middle" class="pt-g-l br"${halo}>${Yr[pk]}: ${f1(tot[pk])}</text>`
+      +`<text x="${(X(li)-14).toFixed(1)}" y="${(yp+54).toFixed(1)}" text-anchor="end" class="pt-g-big"${halo}>−${caida}${NB}%</text>`
+      +`<text x="${(X(li)-14).toFixed(1)}" y="${(yp+76).toFixed(1)}" text-anchor="end" class="pt-g-g"${halo}>en ${Yr[li]}: ${f1(tot[li])}</text>`
+      +`<text x="${x0}" y="${y0+20}" class="pt-g-t">${Yr[0]}</text>`,
+      `La inversión en carreteras y ferrocarril pasa de ${f1(tot[pk])} mil millones de euros en ${Yr[pk]} a ${f1(tot[li])} en ${Yr[li]}: un ${caida} % menos.`); },
 };
 // cifras de los textos, calculadas con las mismas series que los gráficos
 const ptNums=D=>{ const o={};

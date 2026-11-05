@@ -86,17 +86,13 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   add("crecer","Pueblos de 50 habitantes o más que han ganado vecinos entre 2005 y hoy, por tercios de distancia a la ciudad más cercana y de edad media. Fuente: INE, padrón y censo.",
     `Han ganado vecinos un ${nf(D[0].v)} % de los pueblos cercanos a una ciudad y un ${nf(D[2].v)} % de los lejanos; y un ${nf(E[0].v)} % de los jóvenes frente a un ${nf(E[2].v)} % de los mayores.`,s); }
 
-// ---------- 5. pensiones: pirámide de España hoy y en 2005 ----------
-{ const sh2=(A,B)=>{ const t=d3.sum(A)+d3.sum(B); return [A.map(v=>v/t),B.map(v=>v/t)]; }, [h,m]=sh2(PIR.es.H,PIR.es.M), [ph,pm]=sh2(PIR.pasado.es.H,PIR.pasado.es.M), mx=d3.max([...h,...m,...ph,...pm]);
-  const cx=150, top=26, bh=(H-top-30)/21, X=v=>v/mx*125, o65=d3.sum(h.slice(13))+d3.sum(m.slice(13)), p65=d3.sum(ph.slice(13))+d3.sum(pm.slice(13));
+// ---------- 5. pensiones: la pirámide de España hoy; en granate, los mayores de 65 ----------
+{ const sh2=(A,B)=>{ const t=d3.sum(A)+d3.sum(B); return [A.map(v=>v/t),B.map(v=>v/t)]; }, [h,m]=sh2(PIR.es.H,PIR.es.M), [ph,pm]=sh2(PIR.pasado.es.H,PIR.pasado.es.M), mx=d3.max([...h,...m]);
+  const cx=136, bh=(H-30)/21, X=v=>v/mx*118, o65=d3.sum(h.slice(13))+d3.sum(m.slice(13)), p65=d3.sum(ph.slice(13))+d3.sum(pm.slice(13));
   let s="";
-  h.forEach((v,i)=>{ const y=H-30-(i+1)*bh, c=i>=13?"pt-f-br":"pt-f-mu"; s+=R(cx-X(v),y,X(v),bh-1.2,c,0)+R(cx+1,y,X(m[i]),bh-1.2,c,0); });
-  const st=(a,sg)=>{ const pts=[]; a.forEach((v,i)=>{ const y=H-30-(i+1)*bh; pts.push([cx+sg*X(v),y+bh],[cx+sg*X(v),y]); }); return PL(pts,"ink")+""; };
-  s+=st(ph,-1).replace('class="pt-g-ln ink"','class="pt-g-ln ink" style="stroke-width:1.4"')+st(pm,1).replace('class="pt-g-ln ink"','class="pt-g-ln ink" style="stroke-width:1.4"');
-  s+=T(cx-X(mx)-2,H-12,"Hombres","pt-g-t")+T(cx+X(mx)+2,H-12,"Mujeres","pt-g-t","end")+T(cx,H-12,"edad →","pt-g-t","middle");
-  s+=T(300,64,"Mayores de 65","pt-g-l br")+T(300,98,pc(o65*100),"pt-g-big")+T(300,120,"de la población hoy","pt-g-t")+T(300,160,pc(p65*100),"pt-g-n")+T(300,180,"en 2005 (línea)","pt-g-t");
-  s+=T(300,222,"Se jubilan las","pt-g-g")+T(300,242,"generaciones más","pt-g-g")+T(300,262,"numerosas","pt-g-g");
-  add("pensiones","Pirámide de población de España hoy (barras) y en 2005 (línea); en granate, los mayores de 65. Fuente: INE.",
+  h.forEach((v,i)=>{ const y=H-12-(i+1)*bh, c=i>=13?"pt-f-br":"pt-f-mu"; s+=R(cx-X(v),y,X(v),bh-1.2,c,0)+R(cx+1,y,X(m[i]),bh-1.2,c,0); });
+  s+=T(290,112,pc(o65*100),"pt-g-big")+T(290,138,"mayores","pt-g-l br")+T(290,156,"de 65 años","pt-g-l br")+T(290,196,`En 2005, el ${pc(p65*100)}`,"pt-g-t");
+  add("pensiones","Pirámide de población de España hoy; en granate, los mayores de 65. Fuente: INE.",
     `Los mayores de 65 pasan del ${nf(p65*100)} % de la población en 2005 al ${nf(o65*100)} % hoy.`,s); }
 
 // ---------- 6. pandemia y turismo: noches de hotel de 2017 a hoy, las diez provincias más turísticas frente al resto (2019 = 100) ----------
@@ -122,13 +118,12 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   EST.rows.forEach(r=>{ const m=r[sf.mun]&&r[sf.mun][0], pad=r[sf.pad]; if(!m||!pad||!pad[pi]||!pad[pj]) return; const pp=m.find(l=>l[0]==="PP"), ps=m.find(l=>l[0]==="PSOE"); if(!pp||!ps) return; pts.push({m:ps[1]-pp[1],y:(pad[pj]/pad[pi]-1)*100,pop:pad[pj]}); });
   const MG=5, sel=pts.filter(d=>d.pop>=250&&Math.abs(d.m)<=MG&&d.m!==0&&isFinite(d.y)&&d.y>-40&&d.y<60);
   const G=[["Ganó el PP por poco",sel.filter(d=>d.m<0),"pt-f-ink",""],["Ganó el PSOE por poco",sel.filter(d=>d.m>0),"pt-f-br"," br"]].map(([l,g,c,cl])=>({l,n:g.length,v:d3.mean(g,d=>d.y),c,cl}));
-  const x0=24,x1=W-90, mx=Math.max(...G.map(g=>g.v),1)*1.08, sc=v=>(x1-x0)*Math.max(0,v)/mx;
-  let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-l");
-  s+=T(x0,38,`Municipios donde PP y PSOE quedaron a menos de ${MG} puntos`,"pt-g-t");
-  G.forEach((g,i)=>{ const y=78+i*80; s+=T(x0,y,g.l,"pt-g-l"+g.cl)+R(x0,y+12,sc(g.v),34,g.c,3)+T(x0+sc(g.v)+10,y+40,(g.v>=0?"+":"−")+nf(Math.abs(g.v),1)+NB+"%","pt-g-n"+g.cl); });
+  const x0=24,x1=W-100, mx=Math.max(...G.map(g=>g.v),1)*1.08, sc=v=>(x1-x0)*Math.max(0,v)/mx;
+  let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-t");
+  G.forEach((g,i)=>{ const y=62+i*80; s+=T(x0,y,g.l,"pt-g-l"+g.cl)+R(x0,y+12,sc(g.v),38,g.c,3)+T(x0+sc(g.v)+10,y+42,(g.v>=0?"+":"−")+nf(Math.abs(g.v),1)+NB+"%","pt-g-n"+g.cl); });
   const dif=G[1].v-G[0].v, se=Math.sqrt(d3.variance(sel.filter(d=>d.m>0),d=>d.y)/G[1].n+d3.variance(sel.filter(d=>d.m<0),d=>d.y)/G[0].n), mar=1.96*se;
-  s+=T(x0,H-22,`Diferencia de ${nf(Math.abs(dif),1)} puntos, dentro del margen de error (±${nf(mar,1)})`,"pt-g-g")+T(x0,H-4,"cuánto creció el pueblo","pt-g-g");
-  add("quien-gobierna",`Media de los municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en 2019 y quedaron a menos de ${MG} puntos (${G[0].n} donde ganó el PP y ${G[1].n} donde ganó el PSOE). Fuente: Ministerio del Interior e INE (padrón).`,
+  s+=T(x0,H-10,`Diferencia dentro del margen de error (±${nf(mar,1)})`,"pt-g-g");
+  add("quien-gobierna",`Media de los municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en 2019 y quedaron a menos de ${MG} puntos (${G[0].n} donde ganó el PP y ${G[1].n} donde ganó el PSOE). Diferencia de ${nf(Math.abs(dif),1)} puntos. Fuente: Ministerio del Interior e INE (padrón).`,
     `Donde el PP ganó por poco la población creció un ${nf(G[0].v,1)} % de 2019 a 2025, y donde ganó el PSOE por poco, un ${nf(G[1].v,1)} %.`,s); }
 
 // ---------- mapas ----------
@@ -184,40 +179,39 @@ const short=n=>String(n).replace(/\s*(Alta Velocidad|AV|Guiomar|Miguel Hernánde
 // ---------- 12. estudiar: renta según titulados ----------
 { const rs=ROWS.filter(r=>r[F.superiores]!=null&&r[F.renta]&&r[F.pop]>=100), qs=d3.range(0,1.001,.2).map(q=>d3.quantile(rs.map(r=>r[F.superiores]).sort(d3.ascending),q));
   const B=d3.range(5).map(i=>{ const g=rs.filter(r=>r[F.superiores]>=qs[i]&&(i===4?r[F.superiores]<=qs[5]:r[F.superiores]<qs[i+1])); return {a:qs[i],b:qs[i+1],v:d3.median(g,r=>r[F.renta])}; });
-  const x0=14,x1=W-14,y0=H-56,y1=60,w=(x1-x0)/5, Y=d3.scaleLinear().domain([0,d3.max(B,b=>b.v)]).range([y0,y1]); let s=T(x0,18,"Renta por persona según los titulados del municipio","pt-g-t");
-  B.forEach((b,i)=>{ const x=x0+i*w, hi=i===4; s+=R(x+6,Y(b.v),w-12,y0-Y(b.v),hi?"pt-f-br":i===0?"pt-f-ink":"pt-f-mu",3)+T(x+w/2,Y(b.v)-8,nf(Math.round(b.v/100)*100)+NB+"€","pt-g-n"+(hi?" br":""),"middle").replace("pt-g-n","pt-g-l")+T(x+w/2,y0+18,`${nf(b.a)}–${nf(b.b)}${NB}%`,"pt-g-t","middle"); });
-  s+=T(x0,H-8,"Cinco grupos de municipios, de menos a más titulados","pt-g-t");
+  const x0=24,x1=W-24,y0=H-42,y1=64,w=(x1-x0)/5, Y=d3.scaleLinear().domain([0,d3.max(B,b=>b.v)]).range([y0,y1]); let s=T(x0,18,"Renta por persona, según los titulados de cada municipio","pt-g-t");
+  B.forEach((b,i)=>{ const x=x0+i*w, hi=i===4; s+=R(x+6,Y(b.v),w-12,y0-Y(b.v),hi?"pt-f-br":"pt-f-mu",3); if(i===0||hi) s+=T(x+w/2,Y(b.v)-9,nf(Math.round(b.v/100)*100)+NB+"€","pt-g-l"+(hi?" br":""),"middle"); });
+  s+=T(x0,y0+22,"Menos titulados","pt-g-t")+T(x1,y0+22,"Más titulados","pt-g-t","end");
   add("estudiar","Mediana de la renta neta por persona en cada quinto de municipios (100 habitantes o más) según su parte de titulados superiores. Fuente: INE, Atlas de renta y censo.",
     `Los municipios con más titulados superiores tienen una renta mediana de ${nf(Math.round(B[4].v/100)*100)} euros por persona, frente a ${nf(Math.round(B[0].v/100)*100)} en los que menos.`,s); }
 
-// ---------- 13. paro en el sur ----------
-{ const P=PROVS.map(p=>({p,v:wmean(ROWS.filter(r=>r[F.code].slice(0,2)===p),r=>r[F.paroReg])})).filter(d=>d.v!=null).sort((a,b)=>b.v-a.v), sel=[...P.slice(0,6),...P.slice(-4)];
-  const x0=104,x1=W-56, mx=d3.max(sel,d=>d.v), sc=v=>(x1-x0)*v/mx; let s=T(x0,16,"Paro registrado: parados por cada 100 personas de 16 a 64 años","pt-g-t");
-  sel.forEach((d,i)=>{ const y=30+i*24+(i>=6?14:0), hi=i<6; s+=T(x0-8,y+14,PN[d.p],"pt-g-l"+(hi?" br":""),"end")+R(x0,y+2,sc(d.v),17,hi?"pt-f-br":"pt-f-mu",2)+T(x0+sc(d.v)+7,y+16,pc(d.v,1),"pt-g-l"+(hi?" br":"")); });
-  s+=T(x0-8,30+6*24+8,"· · ·","pt-g-t","end");
-  add("paro-sur","Paro registrado medio de 2025 (SEPE) en cada provincia, ponderado por la población de sus municipios: las seis más altas y las cuatro más bajas.",
+// ---------- 13. paro en el sur: las tres provincias con más paro y las dos con menos ----------
+{ const P=PROVS.map(p=>({p,v:wmean(ROWS.filter(r=>r[F.code].slice(0,2)===p),r=>r[F.paroReg])})).filter(d=>d.v!=null).sort((a,b)=>b.v-a.v), sel=[...P.slice(0,3),...P.slice(-2)];
+  const x0=124,x1=W-104, mx=d3.max(sel,d=>d.v), sc=v=>(x1-x0)*v/mx; let s=T(24,18,"Paro registrado, % de las personas de 16 a 64 años","pt-g-t");
+  sel.forEach((d,i)=>{ const y=40+i*42+(i>=3?26:0), hi=i<3; s+=T(x0-12,y+25,PN[d.p],"pt-g-l"+(hi?" br":""),"end")+R(x0,y+4,sc(d.v),30,hi?"pt-f-br":"pt-f-mu",3)+T(x0+sc(d.v)+10,y+28,pc(d.v,1),"pt-g-n"+(hi?" br":"")); });
+  add("paro-sur","Paro registrado medio de 2025 (SEPE) en cada provincia, ponderado por la población de sus municipios: las tres más altas y las dos más bajas.",
     `El paro registrado va del ${nf(P[P.length-1].v,1)} % en ${PN[P[P.length-1].p]} al ${nf(P[0].v,1)} % en ${PN[P[0].p]}.`,s); }
 
+// ---------- 14. sueldos: la mediana y, debajo, de dónde a dónde va la fila ----------
+{ const E=SUE.ees.es, i=SUE.ees["años"].length-1, yr=SUE.ees["años"][i], md=E.Mediana[i], lo=E["Percentil 10"][i], hi=E["Percentil 90"][i];
+  const x0=28,x1=W-28, sc=v=>x0+(x1-x0)*v/hi, ys=196, k=v=>nf(Math.round(v/100)*100)+NB+"€";
+  let s=T(x0,18,`Sueldo bruto anual de los asalariados, ${yr}`,"pt-g-t")+T(x0,92,k(md),"pt-g-big")+T(x0,120,"La mitad cobra menos que esto","pt-g-g");
+  s+=R(sc(lo),ys-6,sc(hi)-sc(lo),12,"pt-f-mu",6)+C(sc(lo),ys,6,"pt-f-ink")+C(sc(hi),ys,6,"pt-f-ink")+C(sc(md),ys,9,"pt-f-br");
+  s+=T(sc(lo),ys-20,k(lo),"pt-g-l","middle")+T(sc(hi)+8,ys-20,k(hi),"pt-g-l","end")+T(sc(md),ys+34,"La mitad","pt-g-t","middle");
+  s+=T(x0,ys+62,"El 10 % que menos cobra","pt-g-t")+T(x1,ys+62,"El 10 % que más cobra","pt-g-t","end");
+  add("sueldos",`La mediana y los extremos de la fila de sueldos (percentiles 10 y 90). Fuente: INE, Encuesta de Estructura Salarial.`,
+    `La mitad de los asalariados cobra menos de ${nf(Math.round(md/100)*100)} euros brutos al año; el 10 % que menos cobra, menos de ${nf(Math.round(lo/100)*100)}.`,s); }
 
-// ---------- 14. sueldos: la fila de los asalariados ----------
-{ const E=SUE.ees.es, i=SUE.ees["años"].length-1, K=[["Percentil 10","El 10 % que menos cobra"],["Cuartil inferior","Un cuarto cobra menos de"],["Mediana","La mitad cobra menos de"],["Cuartil superior","Tres cuartos cobran menos de"],["Percentil 90","El 10 % que más cobra"]];
-  const x0=186,x1=W-70, mx=E["Percentil 90"][i], sc=v=>(x1-x0)*v/mx; let s=T(x0,16,"Sueldo bruto anual de los asalariados, último año publicado","pt-g-t");
-  K.forEach(([k,l],j)=>{ const y=34+j*44, v=E[k][i], hi=k==="Mediana"; s+=T(x0-10,y+22,l,"pt-g-t"+(hi?" br":""),"end").replace('class="pt-g-t br"','class="pt-g-l br"')+R(x0,y+6,sc(v),26,hi?"pt-f-br":"pt-f-mu",3)+T(x0+sc(v)+8,y+26,nf(Math.round(v/100)*100)+NB+"€","pt-g-n"+(hi?" br":"")).replace("pt-g-n","pt-g-l"); });
-  add("sueldos","Sueldo bruto anual de los asalariados en 2024, por escalón de la fila. Fuente: INE, Encuesta de Estructura Salarial.",
-    `La mitad de los asalariados cobra menos de ${nf(Math.round(E.Mediana[i]/100)*100)} euros brutos al año; el 10 % que menos cobra, menos de ${nf(Math.round(E["Percentil 10"][i]/100)*100)}.`,s); }
-
-// ---------- 15. gobiernos: paro de España y de la UE, con los presidentes de fondo ----------
-{ const PA=J("paises.json"), ES=PA.paises.ES.paro, EU=PA.paises.EU27_2020.paro, G=PA.gobiernos.ES, Yr=Object.keys(ES).map(Number).filter(y=>EU[y]!=null).sort((a,b)=>a-b);
-  const x0=34,x1=W-12,y0=H-30,y1=52, X=d3.scaleLinear().domain([Yr[0],Yr[Yr.length-1]]).range([x0,x1]), Y=d3.scaleLinear().domain([0,Math.ceil(d3.max(Yr,y=>ES[y])/5)*5]).range([y0,y1]);
-  const yr=d=>{ const t=new Date(d); return t.getFullYear()+t.getMonth()/12; }; let s="";
-  G.forEach((g,i)=>{ const a=Math.max(yr(g.desde),Yr[0]), b=Math.min(g.hasta?yr(g.hasta):Yr[Yr.length-1],Yr[Yr.length-1]); if(b<=a) return;
-    if(i%2) s+=`<rect x="${r1(X(a))}" y="${y1-20}" width="${r1(X(b)-X(a))}" height="${r1(y0-y1+20)}" class="pt-g-area" style="fill:var(--ink);fill-opacity:.05"/>`;
-    const nm=g.p.split(" ").slice(-1)[0].replace("Calvo-Sotelo","").replace("Suárez",""); if(nm&&X(b)-X(a)>30) s+=T((X(a)+X(b))/2,y1-8,nm,"pt-g-t","middle"); });
-  s+=[0,10,20].filter(g=>g<=Y.domain()[1]).map(g=>L(x0,Y(g),x1,Y(g))+T(x0-6,Y(g)+4,g+NB+"%","pt-g-t","end")).join("");
+// ---------- 15. gobiernos: paro de España y de la UE ----------
+{ const PA=J("paises.json"), ES=PA.paises.ES.paro, EU=PA.paises.EU27_2020.paro, Yr=Object.keys(ES).map(Number).filter(y=>EU[y]!=null).sort((a,b)=>a-b);
+  const x0=40,x1=W-16,y0=H-34,y1=40, X=d3.scaleLinear().domain([Yr[0],Yr[Yr.length-1]]).range([x0,x1]), Y=d3.scaleLinear().domain([0,Math.ceil(d3.max(Yr,y=>ES[y])/5)*5]).range([y0,y1]);
+  let s=[10,20].filter(g=>g<=Y.domain()[1]).map(g=>L(x0,Y(g),x1,Y(g))+T(x0-8,Y(g)+4,g+NB+"%","pt-g-t","end")).join("");
+  s+=[Yr[0],2000,2010,Yr[Yr.length-1]].filter((y,i,a)=>a.indexOf(y)===i).map(y=>T(X(y),y0+22,String(y),"pt-g-t","middle")).join("");
   s+=PL(Yr.map(y=>[X(y),Y(EU[y])]),"ink")+PL(Yr.map(y=>[X(y),Y(ES[y])]),"br");
-  const my=Yr.reduce((a,b)=>ES[b]>ES[a]?b:a); s+=T(X(my),Y(ES[my])-8,`${my}: ${pc(ES[my])}`,"pt-g-l br","middle",true)+T(x1-2,Y(ES[Yr[Yr.length-1]])-10,"España","pt-g-l br","end",true)+T(x1-2,Y(EU[Yr[Yr.length-1]])+16,"Unión Europea","pt-g-l","end",true);
-  add("gobiernos","Tasa de paro de España (granate) y de la Unión Europea (negro); de fondo, el presidente que gobernó cada año. Fuente: Eurostat y Banco Mundial.",
-    `El paro de España sube y baja más que el de la Unión Europea con cualquier presidente: llega al ${nf(ES[my])} % en ${my}.`,s); }
+  const my=Yr.reduce((a,b)=>ES[b]>ES[a]?b:a), ly=Yr[Yr.length-1];
+  s+=C(X(my),Y(ES[my]),4.5,"pt-f-br")+T(X(my),Y(ES[my])-12,`${my}: ${pc(ES[my])}`,"pt-g-l br","middle",true)+T(x1,Y(ES[ly])-12,"España","pt-g-l br","end",true)+T(x1,Y(EU[ly])+22,"Unión Europea","pt-g-l","end",true);
+  add("gobiernos","Tasa de paro de España (granate) y de la Unión Europea (negro). Fuente: Eurostat y Banco Mundial.",
+    `El paro de España sube y baja más que el de la Unión Europea, con cualquier presidente: llega al ${nf(ES[my])} % en ${my}.`,s); }
 
 fs.writeFileSync(path.join(ROOT,"data/covers.json"),JSON.stringify({w:W,h:H,covers:OUT}));
 console.log(Object.keys(OUT).length,"gráficos,",Math.round(JSON.stringify(OUT).length/1024),"KB");
