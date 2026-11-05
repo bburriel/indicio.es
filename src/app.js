@@ -7009,14 +7009,14 @@ function heroType(root){
     const tw=document.createTreeWalker(L,NodeFilter.SHOW_TEXT); let n, c=0;
     while((n=tw.nextNode())){ if(c+n.length>=i){ const rg=document.createRange(); rg.setStart(n,i-c-1); rg.setEnd(n,i-c); return rg.getBoundingClientRect().right-v.left; } c+=n.length; }
     return L.getBoundingClientRect().right-v.left; };
-  const stepTo=async(L,from,to)=>{ const d=to>from?1:-1; for(let i=from;i!==to;){ i+=d; cur.style.left=cx(L,i)+"px"; await sleep(rnd(28,58)); } };
-  const jump=async(L,i,q)=>{ cur.style.left=cx(L,i)+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; await sleep(rnd(70,140)); };
+  const stepTo=async(L,from,to)=>{ const d=to>from?1:-1; for(let i=from;i!==to;){ i+=d; cur.style.left=cx(L,i)+"px"; await sleep(rnd(52,92)); } };
+  const jump=async(L,i,q)=>{ cur.style.left=cx(L,i)+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; await sleep(rnd(130,230)); };
   const go=async el=>{ const from=at, n1=L1.textContent.length, n2=W.textContent.length; at=el; busy(true); cur.classList.add("ty");
     if(from===W){ await stepTo(L2,n2,0); await jump(L1,n1,pos(OA)); await stepTo(L1,n1,idx(OA)); }
     else { await stepTo(L1,idx(OA),n1); await jump(L2,0,pos(W)); await stepTo(L2,0,n2); } };
   const edit=async(el,to)=>{ busy(true); cur.classList.add("ty"); let t=el.textContent;
-    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(rnd(35,70)); } await sleep(rnd(120,330));
-    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(rnd(70,125)); } };
+    while(t.length){ t=t.slice(0,-1); el.textContent=t; put(el); await sleep(rnd(65,115)); } await sleep(rnd(120,330));
+    while(t.length<to.length){ t=to.slice(0,t.length+1); el.textContent=t; put(el); await sleep(rnd(85,140)); } };
   // primero la «a» y luego «Indicio»; después elige al azar cuál toca, y se queda parado solo un segundo
   (async()=>{ let k=0, oa="o", next=OA, first=true; await sleep(1300);
     while(live()){
