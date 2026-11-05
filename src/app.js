@@ -4072,7 +4072,7 @@ function exCruce(out){
       <div class="czs" id="czs2"><div class="k" id="czk2"></div><div class="v" id="czeur"></div><div id="czevd"></div></div>
       <div class="czs" id="czs3"></div>
     </div>
-    <div class="czpar" id="czpar"><h3>¿Y si es por otra cosa?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Compara solo municipios parecidos en:</p><div class="czchips" id="cztags"></div><div class="czbar" id="czbar"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div></div>
+    <div class="czpar" id="czpar"><h3>¿Pasa lo mismo entre municipios parecidos?${czIt("Muchas relaciones se explican por una tercera cosa. Por ejemplo, los municipios grandes tienen más renta y también más estudios. Al igualar esas cosas, comparamos municipios que se parecen en ellas y vemos si la relación sigue ahí.","Por qué igualar municipios")}</h3><p class="czlead">Elige en qué deben parecerse y mira si la relación sigue ahí.</p><div class="czchips" id="cztags"></div><p class="czc-s" id="czsum"></p><div id="cznotes" aria-live="polite"></div></div>
     </section>`;
   if(tst) czTipBind(tst);
   const more=document.getElementById("lbmore");
@@ -4086,7 +4086,7 @@ function exCruce(out){
 }
 
 // ---------- veredicto, etiquetas, gráfico «lo que queda», barra y efecto en unidades ----------
-const CZTIPQ="Cuánto de la relación original sigue ahí después de igualar lo que has marcado. 100 % es que nada cambia; 0 %, que desaparece.";
+const CZTIPQ="Compara solo municipios que se parecen en lo que has marcado, para quitar de en medio esas diferencias. Si la relación se mantiene, no dependía de ellas; si se debilita o desaparece, buena parte venía de ahí.";
 let CZMORE=false;
 const CZI=new Set();   // avisos abiertos con la «i» (clave: «control|risk» o «control|sus»)
 // escala del veredicto: cuatro tramos de |r|; devuelve la posición del marcador (0-100)
@@ -4120,7 +4120,7 @@ function czNotes(){
   const ks=[...CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y&&!vf.has(k)),...cs.filter(k=>!CKNOWN[k])]; let h=vForbidNote(x,y);
   ks.forEach(k=>{ const on=cs.includes(k), rk=ctrlRisk(x,y,k);
     if(rk&&(on||CZI.has(k+"|risk"))) h+=`<div class="czn2 risk"><b>Cuidado con igualar ${CNAME[k]}.</b> ${rk.m}</div>`;
-    if(k===CZ.suspect&&(on||CZI.has(k+"|sus"))) h+=`<div class="czn2 sus">${czSusNote(k)}</div>`; });
+    if(k===CZ.suspect&&CZI.has(k+"|sus")) h+=`<div class="czn2 sus">${czSusNote(k)}</div>`; });
   box.innerHTML=h;
   tg.querySelectorAll(".czi").forEach(b=>{ const k=b.dataset.i.split("|")[0]; b.setAttribute("aria-expanded",String(cs.includes(k)||CZI.has(b.dataset.i))); });
 }
@@ -4132,17 +4132,17 @@ function czRefresh(animate){
   const wt=k=>{ const p=solo[k]; if(p==null||a0<0.1) return ""; if(Math.sign(p)!==sgn&&Math.abs(p)>=0.1) return "invierte";
     const d=((Math.sign(p)===sgn?Math.abs(p):0)-a0)/a0*100; return Math.abs(d)<5?"":(d<0?"−":"+")+nf0.format(Math.min(100,Math.abs(d)))+NB+"%"; };
   const chip=(k,lab,on)=>{ const rk=ctrlRisk(x,y,k), sus=k===CZ.suspect, t=wt(k);
-    const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Qué significa «${txt}» en ${esc(lab)}">${IQ_SVG}</button>`;
-    return `<span class="czchip${on?" on":""}${sus?" sus":""}${rk?" risk":""}"><button type="button" class="czpick" data-k="${k}" aria-pressed="${on}"${t?` title="${esc(`Si igualas solo esto, la relación cambia un ${t.replace(/^[+−]/,"").replace(NB," ")}${t[0]==="+"?" más":" menos"} (r pasa de ${rFmt(base.r)} a ${rFmt(solo[k])})`)}"`:""}>${esc(cap(lab))}</button>${rk?`<button type="button" class="czwarn2 czi" data-i="${k}|risk" aria-expanded="false" aria-label="Cuidado con igualar ${esc(lab)}">!</button>`:""}${sus?tag("su","la que más pesa","sus"):""}</span>`; };
+    const tag=(cls,txt,type)=>`<span class="czt ${cls}">${txt}</span><button type="button" class="iq czi" data-i="${k}|${type}" aria-expanded="false" aria-label="Por qué conviene probar ${esc(lab)}">${IQ_SVG}</button>`;
+    return `<span class="czchip${on?" on":""}${sus?" sus":""}${rk?" risk":""}"><button type="button" class="czpick" data-k="${k}" aria-pressed="${on}"${t?` title="${esc(`Si igualas solo esto, la relación cambia un ${t.replace(/^[+−]/,"").replace(NB," ")}${t[0]==="+"?" más":" menos"} (r pasa de ${rFmt(base.r)} a ${rFmt(solo[k])})`)}"`:""}>${esc(cap(lab))}</button>${rk?`<button type="button" class="czwarn2 czi" data-i="${k}|risk" aria-expanded="false" aria-label="Cuidado con igualar ${esc(lab)}">!</button>`:""}${sus?tag("su","prueba esta","sus"):""}</span>`; };
   const allK=CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y&&!vf.has(k)), lossOf=k=>{ const p=solo[k]; return p==null?0:a0-(Math.sign(p)===sgn?Math.abs(p):0); },
-    ranked=[...allK].sort((a,b)=>(b===CZ.suspect)-(a===CZ.suspect)||lossOf(b)-lossOf(a)), topK=new Set(ranked.slice(0,3)),
+    ranked=[...allK].sort((a,b)=>(b===CZ.suspect)-(a===CZ.suspect)||lossOf(b)-lossOf(a)), topK=new Set(ranked.slice(0,4)),
     shown=ranked.filter(k=>CZMORE||cs.includes(k)||topK.has(k)), nHid=allK.length-shown.length;
   tg.innerHTML=shown.map(k=>chip(k,CSHORT[k],cs.includes(k))).join("")
     +cs.filter(k=>!CKNOWN[k]).map(k=>chip(k,low(labK(k)),true)).join("")
-    +(nHid>0||CZMORE?` <button type="button" class="czadd czmorebtn" id="czmorebtn" aria-expanded="${CZMORE}">${CZMORE?"Ver menos ▴":`Ver ${nHid} más ▾`}</button>`:"")
-    +` <button type="button" class="czadd" id="czadd">+ otra variable</button>`;
+    +(nHid>0||CZMORE?` <button type="button" class="czadd czmorebtn" id="czmorebtn" aria-expanded="${CZMORE}">${CZMORE?"Menos opciones ▴":`Más opciones ▾`}</button>`:"")
+    +(CZMORE?` <button type="button" class="czadd" id="czadd">+ otro dato</button>`:"");
   const mb=document.getElementById("czmorebtn"); if(mb) mb.addEventListener("click",()=>{ CZMORE=!CZMORE; czRefresh(false); });
-  document.getElementById("czadd").addEventListener("click",e=>openPicker(e.currentTarget,{current:null,excl:[x,y,...EX.c,...vForbid(x,y)],onPick:v=>{ EX.c=[...EX.c.filter(c=>c!==v),v]; exSetHash(); czRefresh(true); }}));
+  const ad=document.getElementById("czadd"); if(ad) ad.addEventListener("click",e=>openPicker(e.currentTarget,{current:null,excl:[x,y,...EX.c,...vForbid(x,y)],onPick:v=>{ EX.c=[...EX.c.filter(c=>c!==v),v]; exSetHash(); czRefresh(true); }}));
   tg.querySelectorAll("button.czpick").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.k, on=b.getAttribute("aria-pressed")==="true"; EX.c=on?EX.c.filter(c=>c!==k):[...EX.c.filter(c=>c!==k),k]; exSetHash(); czRefresh(true); }));
   tg.querySelectorAll("button.czi").forEach(b=>{ const show=()=>tipShow(b,czTip(b.dataset.i));
     b.addEventListener("mouseenter",show); b.addEventListener("focus",show); b.addEventListener("mouseleave",tipHide); b.addEventListener("blur",tipHide);
@@ -4155,16 +4155,15 @@ function czRefresh(animate){
     document.getElementById("ctlreset").addEventListener("click",()=>{ EX.c=[]; exSetHash(); czRefresh(true); });
     adjScatter(plot,x,y,cs,w,animate); }
   else { note.innerHTML=""; if(LBPOS){ LBPOS=null; drawRel(); } }
-  // barra «queda» y frase
-  const bar=document.getElementById("czbar"), sum=document.getElementById("czsum");
-  if(!cs.length){ bar.innerHTML=`<span class="trk"><span class="kp" style="width:100%"></span></span><span class="pc">Queda el <b>100${NB}%</b> de la relación${czIt(CZTIPQ,"Qué mide la relación que queda")}</span>`; czTipBind(bar);
-    sum.innerHTML="";
-    czVerdict(base.r,false); czEuros(x,y,cs,w); czNotes(); return; }
+  // frase: qué pasa con la relación al comparar solo municipios parecidos
+  const sum=document.getElementById("czsum");
+  if(!cs.length){ sum.innerHTML=""; czVerdict(base.r,false); czEuros(x,y,cs,w); czNotes(); return; }
   const pfin=partialR(x,y,cs,w), left=pfin&&Math.sign(pfin.r)===Math.sign(base.r)?Math.min(a0,Math.abs(pfin.r)):0, share=a0?left/a0:0;
+  const lvl=a=>["ninguna","débil","moderada","fuerte"][a<.1?0:a<.3?1:a<.5?2:3];
   let prev=a0, top=null; cs.forEach((c,i)=>{ const p=partialR(x,y,cs.slice(0,i+1),w); const now=p?(Math.sign(p.r)===Math.sign(base.r)?Math.abs(p.r):0):prev; const lost=Math.max(0,prev-now); if(!top||lost>top.lost) top={c,lost}; prev=Math.min(prev,now); });
-  bar.innerHTML=`<span class="trk"><span class="kp" style="width:${Math.max(0,Math.min(100,share*100)).toFixed(1)}%"></span></span><span class="pc">Queda el <b>${nf0.format(share*100)}${NB}%</b> de la relación${czIt(CZTIPQ,"Qué mide la relación que queda")}</span>`; czTipBind(bar);
   const flip=pfin&&Math.sign(pfin.r)!==Math.sign(base.r)&&Math.abs(pfin.r)>=0.1, verb=flip?"cambia de sentido":share<0.25?"casi desaparece":share<0.6?"se debilita mucho":share<0.85?"se debilita algo":"apenas cambia";
-  sum.innerHTML=`Si los municipios fueran iguales en ${cs.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")}, la relación <b>${verb}</b>${top&&top.lost/a0>=0.15?`: ${top.c==="prov"?"la provincia":CNAME[top.c]} es lo que más pesa`:""}.`;
+  const aft=flip?Math.abs(pfin.r):left, same=lvl(aft)===lvl(a0)&&!flip;
+  sum.innerHTML=`Entre municipios parecidos en ${cs.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")}, la relación <b>${verb}</b>${flip?"":same?`: sigue siendo ${lvl(a0)}`:`: pasa de ${lvl(a0)} a ${lvl(aft)}`}${top&&top.lost/a0>=0.15&&cs.length>1?`. Lo que más pesa es ${top.c==="prov"?"la provincia":CNAME[top.c]}`:""}.${czIt(CZTIPQ,"Qué significa igualar")}`; czTipBind(sum);
   czVerdict(pfin?pfin.r:base.r,true); czEuros(x,y,cs,w); czNotes();
 }
 // efecto en unidades: «por cada X más de A, B es Y mayor», con intervalo, antes y después de descontar
@@ -4496,7 +4495,7 @@ function exCausal(x,y){
   const VD=[["Desaparece","ko"],["Se debilita mucho","ko"],["Sigue ahí, con una pega","mu"],["Sigue ahí","ok"]][lev];
   const whyTop=CZ.suspect?(top.c==="prov"?"Lo explica sobre todo la provincia.":`Lo explica sobre todo ${low(CNAME[top.c])}.`):"";
   const vsub=lev===3?"Pasa todas las comprobaciones.":lev===2?`${fails.length>1?"Fallan":"Falla"}: ${fails.join(", ").replace(/, ([^,]*)$/," y $1")}.`:`${whyTop?whyTop+" ":""}${fails.length?`${fails.length>1?"Fallan":"Falla"}: ${fails.join(", ").replace(/, ([^,]*)$/," y $1")}.`:""}`;
-  box.innerHTML=`<div class="czout"><p class="czverd"><span class="m ${VD[1]}" aria-hidden="true"></span><b>${VD[0]}</b></p>
+  box.innerHTML=`<div class="czout"><p class="czverd"><span class="m ${VD[1]}" aria-hidden="true"></span><span><span class="czkk">Resultado de las ${T.length} comprobaciones</span><b>${VD[0]}</b></span></p>
     <p class="czvs">${vsub} Que siga no prueba que uno cause el otro.</p>
     <details class="czd czdet2"><summary><span class="czdt">Ver las ${T.length} comprobaciones</span></summary><div class="czdb">
     <ul class="czrows" aria-label="Pruebas">${rows}</ul>
