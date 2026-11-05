@@ -2082,31 +2082,29 @@ details.chk > section{margin-top:18px}
 /* las pestañas del carrusel se deslizan con el dedo cuando no caben */
 .pt-tabs{overflow-x:auto; scroll-snap-type:x mandatory}
 .pt-tabs button{scroll-snap-align:start}
-/* laboratorio: banda oscura con la escalera de niveles */
-.pt-labx{background:#1c1b19; color:#fafaf8; margin:clamp(48px,7vw,80px) calc(50% - 50vw) 0; padding:clamp(48px,7vw,96px) 0}
-.pt-labx-in{max-width:1120px; margin:0 auto; padding:0 clamp(16px,4vw,40px); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:48px 72px; align-items:center}
-.pt-labx .ed-k{color:#d6a0a8}
-.pt-labx h2{font-family:var(--serif); font-weight:500; font-size:clamp(36px,5.2vw,64px); line-height:1.03; letter-spacing:-.022em; margin:12px 0 0; text-wrap:balance}
-.pt-labx h2 em{color:#e3b3ba}
-.pt-labx-lead{font-family:var(--serif); font-size:20px; line-height:1.5; color:#d8d6cf; max-width:30em; margin:20px 0 0}
-.pt-labx-h{font-size:14px; color:#a9a8a2; margin-top:26px}
+/* laboratorio: banda clara con un mapa que cambia de capa */
+.pt-labx{background:var(--band); margin:clamp(48px,7vw,80px) calc(50% - 50vw) 0; padding:clamp(48px,7vw,96px) 0}
+.pt-labx-in{max-width:1120px; margin:0 auto; padding:0 clamp(16px,4vw,40px); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:40px 64px; align-items:center}
+.pt-labx h2{font-family:var(--serif); font-weight:500; font-size:clamp(34px,4.8vw,58px); line-height:1.04; letter-spacing:-.022em; margin:12px 0 0; text-wrap:balance}
+.pt-labx h2 em{color:var(--brand)}
+.pt-labx-lead{font-family:var(--serif); font-size:20px; line-height:1.5; color:var(--ink-2); max-width:30em; margin:20px 0 0}
+.pt-labx-h{font-size:14px; color:var(--muted); margin-top:26px}
 .pt-labx-q{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
-.pt-labx-q a{font-size:14.5px; text-decoration:none; border:1px solid #6a6963; border-radius:999px; padding:9px 16px; color:#fafaf8}
-.pt-labx-q a:hover{border-color:#fafaf8}
+.pt-labx-q button{all:unset; box-sizing:border-box; cursor:pointer; font-size:14.5px; border:1px solid var(--rule-2); border-radius:999px; padding:8px 16px; background:var(--bg); transition:background .25s,color .25s,border-color .25s}
+.pt-labx-q button:hover{border-color:var(--ink)}
+.pt-labx-q button.on{background:var(--brand); border-color:var(--brand); color:#fff}
+.pt-labx-q button:focus-visible{outline:2px solid var(--brand); outline-offset:3px}
 .pt-labx-go{margin:30px 0 0}
-.pt-labx .btn{background:#fafaf8; color:#1c1b19; border-color:#fafaf8}
-.pt-labx .btn:hover{background:#e3b3ba; border-color:#e3b3ba; color:#1c1b19}
-.pt-labx-lv>p{font-size:13.5px; line-height:1.5; color:#a9a8a2; margin:0 0 14px}
-.pt-labx .lv{display:flex; gap:18px; align-items:center; border:1px solid #4c4b48; border-radius:8px; padding:16px 18px; margin-top:14px; color:#a9a8a2}
-.pt-labx .lv.on{border-color:#e3b3ba}
-.pt-labx .lv svg{width:84px; height:64px; flex:none}
-.pt-labx .lv small{display:block; font-size:11.5px; font-weight:600; letter-spacing:.07em; text-transform:uppercase}
-.pt-labx .lv b{display:block; font-family:var(--serif); font-weight:400; font-size:22px; color:#fafaf8; margin-top:2px}
-.pt-labx .lv span{display:block; font-size:14px; line-height:1.45; margin-top:2px}
-.pt-labx .lv .a,.pt-labx .lv small.a{color:#e3b3ba; fill:#e3b3ba}
-.pt-labx .lv .aS{stroke:#e3b3ba}
-:root[data-theme="dark"] .pt-labx{background:#262522}
-@media (max-width:900px){ .pt-labx-in{grid-template-columns:minmax(0,1fr)} }
+.pt-labx-map{margin:0}
+.pt-labx-map .labmap svg{display:block; width:100%; max-width:none!important; height:auto}
+.pt-labx-map figcaption{display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px; margin-top:10px; font-size:14px; color:var(--ink-2)}
+.pt-labx-map figcaption b{font-family:var(--serif); font-weight:500; font-size:18px; color:var(--ink)}
+.pt-labx-map .leg{display:inline-flex; align-items:center; gap:2px; font-size:12px; color:var(--muted)}
+.pt-labx-map .leg i{width:18px; height:8px}
+.pt-labx-map .leg em{font-style:normal; margin:0 6px}
+.pt-labx-map small{flex-basis:100%; color:var(--muted); font-size:13px}
+:root[data-theme="dark"] .pt-labx{--brand:#d0505f}
+@media (max-width:900px){ .pt-labx-in{grid-template-columns:minmax(0,1fr)} .pt-labx-q{flex-wrap:nowrap; overflow-x:auto; scroll-snap-type:x proximity; padding-bottom:8px; margin-right:calc(-1*clamp(16px,4vw,40px))} .pt-labx-q button{flex:none; white-space:nowrap; scroll-snap-align:start} }
 @media (max-width:720px){ .ho-l2{white-space:normal} }
 
 .pt-all{margin:22px 0 0; text-align:left}
