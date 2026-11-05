@@ -12,7 +12,7 @@ import {STUDIES as BASE} from "./content.mjs";
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"..");
 const DIR=path.join(ROOT,"contenido","analisis");
 // nombre en la cabecera → campo interno
-const KEYS={titulo:"t",entradilla:"d",respuesta:"a",tema:"tema",metodo:"m",evidencia:"ev",actualizado:"upd",publicado:"pub",oculto:"oculto",orden:"orden",motivo:"motivo"};
+const KEYS={titulo:"t",entradilla:"d",respuesta:"a",cifra:"cifra",cifra_texto:"cifraT",tema:"tema",metodo:"m",evidencia:"ev",actualizado:"upd",publicado:"pub",oculto:"oculto",orden:"orden",motivo:"motivo"};
 const YES=/^(s[ií]|true|1|yes)$/i;
 
 export function parseMD(raw){
