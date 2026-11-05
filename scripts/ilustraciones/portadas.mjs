@@ -86,11 +86,12 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   add("crecer","Pueblos de 50 habitantes o más que han ganado vecinos entre 2005 y hoy, por tercios de distancia a la ciudad más cercana y de edad media. Fuente: INE, padrón y censo.",
     `Han ganado vecinos un ${nf(D[0].v)} % de los pueblos cercanos a una ciudad y un ${nf(D[2].v)} % de los lejanos; y un ${nf(E[0].v)} % de los jóvenes frente a un ${nf(E[2].v)} % de los mayores.`,s); }
 
-// ---------- 5. pensiones: la pirámide de España hoy; en granate, los mayores de 65 ----------
+// ---------- 5. pensiones: la pirámide de España hoy, como una silueta; en granate, los mayores de 65 ----------
 { const sh2=(A,B)=>{ const t=d3.sum(A)+d3.sum(B); return [A.map(v=>v/t),B.map(v=>v/t)]; }, [h,m]=sh2(PIR.es.H,PIR.es.M), [ph,pm]=sh2(PIR.pasado.es.H,PIR.pasado.es.M), mx=d3.max([...h,...m]);
-  const cx=136, bh=(H-30)/21, X=v=>v/mx*118, o65=d3.sum(h.slice(13))+d3.sum(m.slice(13)), p65=d3.sum(ph.slice(13))+d3.sum(pm.slice(13));
-  let s="";
-  h.forEach((v,i)=>{ const y=H-12-(i+1)*bh, c=i>=13?"pt-f-br":"pt-f-mu"; s+=R(cx-X(v),y,X(v),bh-1.2,c,0)+R(cx+1,y,X(m[i]),bh-1.2,c,0); });
+  const cx=136, y0=H-14, hh=(H-28)/21, X=v=>v/mx*118, o65=d3.sum(h.slice(13))+d3.sum(m.slice(13)), p65=d3.sum(ph.slice(13))+d3.sum(pm.slice(13));
+  const pts=d3.range(21).map(i=>({y:y0-(i+.5)*hh,l:cx-X(h[i]),r:cx+X(m[i])})); pts.unshift({y:y0,l:pts[0].l,r:pts[0].r}); pts.push({y:y0-21*hh,l:cx,r:cx});
+  const d=d3.area().y(p=>p.y).x0(p=>p.l).x1(p=>p.r).curve(d3.curveMonotoneY)(pts).replace(/\d+\.\d+/g,v=>r1(+v)), yc=y0-13*hh;
+  let s=`<clipPath id="pen-c"><rect x="0" y="0" width="${W}" height="${r1(yc)}"/></clipPath><path d="${d}" class="pt-f-mu"/><path d="${d}" class="pt-f-br" clip-path="url(#pen-c)"/>`;
   s+=T(290,112,pc(o65*100),"pt-g-big")+T(290,138,"mayores","pt-g-l br")+T(290,156,"de 65 años","pt-g-l br")+T(290,196,`En 2005, el ${pc(p65*100)}`,"pt-g-t");
   add("pensiones","Pirámide de población de España hoy; en granate, los mayores de 65. Fuente: INE.",
     `Los mayores de 65 pasan del ${nf(p65*100)} % de la población en 2005 al ${nf(o65*100)} % hoy.`,s); }
@@ -118,11 +119,13 @@ function placer(){ const boxes=[]; return (x,y,t,{size=12.5,pad=4}={})=>{ const 
   EST.rows.forEach(r=>{ const m=r[sf.mun]&&r[sf.mun][0], pad=r[sf.pad]; if(!m||!pad||!pad[pi]||!pad[pj]) return; const pp=m.find(l=>l[0]==="PP"), ps=m.find(l=>l[0]==="PSOE"); if(!pp||!ps) return; pts.push({m:ps[1]-pp[1],y:(pad[pj]/pad[pi]-1)*100,pop:pad[pj]}); });
   const MG=5, sel=pts.filter(d=>d.pop>=250&&Math.abs(d.m)<=MG&&d.m!==0&&isFinite(d.y)&&d.y>-40&&d.y<60);
   const G=[["Ganó el PP por poco",sel.filter(d=>d.m<0),"pt-f-ink",""],["Ganó el PSOE por poco",sel.filter(d=>d.m>0),"pt-f-br"," br"]].map(([l,g,c,cl])=>({l,n:g.length,v:d3.mean(g,d=>d.y),c,cl}));
-  const x0=30,x1=W-30, X=v=>x0+(x1-x0)*v/4, y=140, dif=G[1].v-G[0].v, se=Math.sqrt(d3.variance(sel.filter(d=>d.m>0),d=>d.y)/G[1].n+d3.variance(sel.filter(d=>d.m<0),d=>d.y)/G[0].n), mar=1.96*se;
-  let s=T(x0,18,"Cuánto creció la población de 2019 a 2025","pt-g-t")+L(x0,y,x1,y)+C(X(G[0].v),y,15,"pt-f-ink")+C(X(G[1].v),y,15,"pt-f-br");
-  s+=T(X(G[0].v),y-58,"Ganó el PP por poco","pt-g-l","middle")+T(X(G[0].v),y-32,"+"+nf(G[0].v,1)+NB+"%","pt-g-n","middle");
-  s+=T(X(G[1].v),y+58,(G[1].v>=0?"+":"−")+nf(Math.abs(G[1].v),1)+NB+"%","pt-g-n br","middle")+T(X(G[1].v),y+80,"Ganó el PSOE por poco","pt-g-l br","middle");
-  s+=T(x0,H-8,`Diferencia dentro del margen de error (±${nf(mar,1)})`,"pt-g-g");
+  const mar=(()=>{ const se=Math.sqrt(d3.variance(sel.filter(d=>d.m>0),d=>d.y)/G[1].n+d3.variance(sel.filter(d=>d.m<0),d=>d.y)/G[0].n); return 1.96*se; })(), dif=G[1].v-G[0].v;
+  const x0=34,x1=W-24, X=d3.scaleLinear().domain([-12,24]).range([x0,x1]), yb=[96,176], rnd=(a,k)=>{ let h=2166136261^k; h=Math.imul(h^Math.round(a*1000),16777619); return ((h>>>0)%1000)/1000; };
+  let s=T(24,18,"Cuánto creció cada pueblo de 2019 a 2025","pt-g-t")+L(x0,H-30,x1,H-30);
+  [-10,0,10,20].forEach(v=>{ s+=T(X(v),H-10,(v>0?"+":v<0?"−":"")+Math.abs(v)+NB+"%","pt-g-t","middle"); });
+  [[sel.filter(d=>d.m<0),"pt-f-ink",0],[sel.filter(d=>d.m>0),"pt-f-br",1]].forEach(([g,c,k])=>{ g.filter(d=>d.y>-12&&d.y<24).forEach((d,i)=>{ s+=`<circle cx="${r1(X(d.y))}" cy="${r1(yb[k]+(rnd(d.y,i+k*999)-.5)*52)}" r="3.4" class="${c}" style="fill-opacity:.5"/>`; }); });
+  G.forEach((g,k)=>{ s+=L(X(g.v),yb[k]-32,X(g.v),yb[k]+32,k?"pt-g-tick":"pt-g-tick").replace('class="pt-g-tick"','class="pt-g-tick" style="stroke:var(--ink);stroke-width:2"'); });
+  s+=T(x0,yb[0]-36,"Ganó el PP por poco","pt-g-l")+T(x1,yb[0]-36,"media "+(G[0].v>=0?"+":"−")+nf(Math.abs(G[0].v),1)+NB+"%","pt-g-l","end")+T(x0,yb[1]+50,"Ganó el PSOE por poco","pt-g-l br")+T(x1,yb[1]+50,"media "+(G[1].v>=0?"+":"−")+nf(Math.abs(G[1].v),1)+NB+"%","pt-g-l br","end");
   add("quien-gobierna",`Media de los municipios de 250 habitantes o más donde PP y PSOE fueron las dos listas más votadas en 2019 y quedaron a menos de ${MG} puntos (${G[0].n} donde ganó el PP y ${G[1].n} donde ganó el PSOE). Diferencia de ${nf(Math.abs(dif),1)} puntos. Fuente: Ministerio del Interior e INE (padrón).`,
     `Donde el PP ganó por poco la población creció un ${nf(G[0].v,1)} % de 2019 a 2025, y donde ganó el PSOE por poco, un ${nf(G[1].v,1)} %.`,s); }
 
@@ -197,13 +200,21 @@ const short=n=>String(n).replace(/\s*(Alta Velocidad|AV|Guiomar|Miguel Hernánde
   add("paro-sur","Paro registrado medio de 2025 (SEPE) en cada provincia, ponderado por la población de sus municipios: las tres más altas y las dos más bajas.",
     `El paro registrado va del ${nf(P[P.length-1].v,1)} % en ${PN[P[P.length-1].p]} al ${nf(P[0].v,1)} % en ${PN[P[0].p]}.`,s); }
 
-// ---------- 14. sueldos: la mediana y, debajo, de dónde a dónde va la fila ----------
+// ---------- 14. sueldos: la distribución de los sueldos, estimada a partir de los percentiles publicados ----------
 { const E=SUE.ees.es, i=SUE.ees["años"].length-1, yr=SUE.ees["años"][i], md=E.Mediana[i], lo=E["Percentil 10"][i], hi=E["Percentil 90"][i];
-  const x0=28,x1=W-28, sc=v=>x0+(x1-x0)*v/hi, ys=196, k=v=>nf(Math.round(v/100)*100)+NB+"€";
-  let s=T(x0,18,`Sueldo bruto anual de los asalariados, ${yr}`,"pt-g-t")+T(x0,92,k(md),"pt-g-big")+T(x0,120,"La mitad cobra menos que esto","pt-g-g");
-  s+=R(sc(lo),ys-6,sc(hi)-sc(lo),12,"pt-f-mu",6)+C(sc(lo),ys,6,"pt-f-ink")+C(sc(hi),ys,6,"pt-f-ink")+C(sc(md),ys,9,"pt-f-br");
-  s+=T(sc(lo),ys-20,k(lo),"pt-g-l","middle")+T(sc(hi)+8,ys-20,k(hi),"pt-g-l","end");
-  add("sueldos",`La mediana y los extremos de la fila de sueldos (percentiles 10 y 90). Fuente: INE, Encuesta de Estructura Salarial.`,
+  // el logaritmo del sueldo como función suave de la posición en la fila (z de una normal), por los cinco percentiles; cola recta fuera
+  const Zs=[-1.2816,-.6745,0,.6745,1.2816], Ls=[lo,E["Cuartil inferior"][i],md,E["Cuartil superior"][i],hi].map(Math.log);
+  const dl=Zs.slice(1).map((z,j)=>(Ls[j+1]-Ls[j])/(z-Zs[j])), sl=Zs.map((z,j)=>j===0?dl[0]:j===4?dl[3]:dl[j-1]*dl[j]<=0?0:2*dl[j-1]*dl[j]/(dl[j-1]+dl[j]));
+  const lw=z=>{ if(z<=Zs[0]) return Ls[0]+sl[0]*(z-Zs[0]); if(z>=Zs[4]) return Ls[4]+sl[4]*(z-Zs[4]); const j=Zs.findIndex((q,k)=>z>=q&&z<Zs[k+1]), h=Zs[j+1]-Zs[j], t=(z-Zs[j])/h, t2=t*t, t3=t2*t;
+    return (2*t3-3*t2+1)*Ls[j]+(t3-2*t2+t)*h*sl[j]+(-2*t3+3*t2)*Ls[j+1]+(t3-t2)*h*sl[j+1]; };
+  const dz=1e-3, phi=z=>Math.exp(-z*z/2)/Math.sqrt(2*Math.PI), G=d3.range(-2.6,3.2,.02).map(z=>{ const w=Math.exp(lw(z)), d=(lw(z+dz)-lw(z-dz))/(2*dz); return {w,f:phi(z)/(w*d)}; }).filter(p=>p.w<=80000);
+  const x0=24,x1=W-24,y0=214,ytop=96, X=v=>x0+(x1-x0)*v/80000, fm=d3.max(G,p=>p.f), Y=f=>y0-(y0-ytop)*f/fm, k=v=>nf(Math.round(v/100)*100)+NB+"€";
+  const path=a=>"M"+a.map(p=>r1(X(p.w))+","+r1(Y(p.f))).join("L"), left=G.filter(p=>p.w<=md), area=a=>path(a)+`L${r1(X(a[a.length-1].w))},${y0}L${r1(X(a[0].w))},${y0}Z`;
+  let s=T(24,18,`Sueldo bruto anual de los asalariados, ${yr}`,"pt-g-t")+`<path d="${area(G)}" class="pt-f-mu"/><path d="${area(left)}" class="pt-f-lt"/><path d="${path(G)}" class="pt-g-ln ink" style="stroke-width:1.6"/>`+L(x0,y0,x1,y0,"pt-g-base");
+  s+=L(X(md),y0,X(md),Y(G.reduce((q,p)=>Math.abs(p.w-md)<Math.abs(q.w-md)?p:q).f),"pt-g-tick")+C(X(md),y0,6,"pt-f-br");
+  s+=T(x1,70,k(md),"pt-g-big","end")+T(x1,92,"La mitad cobra menos","pt-g-g","end");
+  s+=C(X(lo),y0,4,"pt-f-ink")+C(X(hi),y0,4,"pt-f-ink")+T(X(lo),y0+24,k(lo),"pt-g-t","middle")+T(X(hi),y0+24,k(hi),"pt-g-t","middle");
+  add("sueldos",`Cuántos asalariados cobran cada sueldo bruto anual, en ${yr}. La forma de la curva es una estimación a partir de los percentiles publicados (10, 25, 50, 75 y 90); en granate, la mitad que cobra menos que la mediana, y los puntos marcan el 10 % que menos y el que más cobra. Fuente: INE, Encuesta de Estructura Salarial.`,
     `La mitad de los asalariados cobra menos de ${nf(Math.round(md/100)*100)} euros brutos al año; el 10 % que menos cobra, menos de ${nf(Math.round(lo/100)*100)}.`,s); }
 
 // ---------- 15. gobiernos: paro de España y de la UE ----------
