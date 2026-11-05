@@ -2253,11 +2253,11 @@ details.chk > section{margin-top:18px}
 .mf-acts a:hover,.mf-acts button:hover{color:var(--brand)!important; text-decoration-color:var(--brand)}
 .mf-acts #mychip{display:inline-flex; align-items:center; min-height:40px!important; padding:0 18px!important; border-radius:3px!important; background:var(--brand)!important; color:#fff!important; text-decoration:none; font-weight:600; transition:background .15s}
 .mf-acts #mychip:hover{background:var(--brand-2)!important; color:#fff!important}
-.mf-acts #mychip.ismine{background:transparent!important; color:var(--brand)!important; box-shadow:inset 0 0 0 1.5px var(--brand); font-weight:600!important}
-.mf-acts #mychip.ismine:hover{background:color-mix(in srgb, var(--brand) 8%, transparent)!important}
+.mf-acts #mychip-on{background:transparent!important; color:var(--brand)!important; box-shadow:inset 0 0 0 1.5px var(--brand); font-weight:600!important}
+.mf-acts #mychip-on:hover{background:color-mix(in srgb, var(--brand) 8%, transparent)!important}
 .mf-acts .muted{flex-basis:100%; font-size:13px!important; margin-top:2px}
 :root[data-theme="dark"] .mf-acts a:hover,:root[data-theme="dark"] .mf-acts button:hover{color:var(--ink)!important}
-:root[data-theme="dark"] .mf-acts #mychip.ismine{color:var(--ink)!important; box-shadow:inset 0 0 0 1.5px var(--ink-2)}
+:root[data-theme="dark"] .mf-acts #mychip-on{color:var(--ink)!important; box-shadow:inset 0 0 0 1.5px var(--ink-2)}
 @media (max-width:860px){ .mf-acts{gap:4px 22px} .mf-acts a,.mf-acts button{padding:9px 0!important} .mf-acts #mychip{padding:0 18px!important; margin-bottom:4px} }
 
 /* Municipios: segunda frase del titular en granate (noviembre 2026) */
@@ -2354,3 +2354,7 @@ details.chk > section{margin-top:18px}
 .mi-que b{display:block; font-weight:500; font-size:1.25em; line-height:1.2; color:var(--ink); margin-bottom:2px}
 @media (max-width:760px){ .mi-que{grid-template-columns:minmax(0,1fr)} .mi-que p{padding:14px 0 0; border-left:0} }
 .pt-tools button.btn{font-family:inherit; cursor:pointer; line-height:inherit}
+.mf-acts #mychip-on{display:inline-flex; align-items:center; gap:7px; min-height:40px; padding:0; border-radius:0; box-shadow:none; background:transparent!important; color:var(--brand)!important; font-weight:600!important; cursor:default; user-select:none}
+.mf-acts #mychip-on:hover{background:transparent!important}
+:root[data-theme="dark"] .mf-acts #mychip-on{color:var(--ink)!important; box-shadow:none}
+@media (max-width:860px){ .mf-acts #mychip-on{padding:0; margin-bottom:4px} }
