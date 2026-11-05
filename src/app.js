@@ -2054,10 +2054,10 @@ function psMandatos(){ const G=(PAIS&&PAIS.gobiernos.ES)||[], now=new Date();
     for(let y=a.getFullYear();y<=b.getFullYear();y++){ const s=new Date(Math.max(a,new Date(y,0,1))), e=new Date(Math.min(b,new Date(y,11,31))); if((e-s)/864e5>=183) ys.push(y); }
     return {...g,a,b,ys,ape:g.p.split(" ").slice(-1)[0].replace("Zapatero","Zapatero")}; }).map(g=>({...g,ape:{"José Luis Rodríguez Zapatero":"Zapatero","Leopoldo Calvo-Sotelo":"Calvo-Sotelo"}[g.p]||g.p.split(" ").slice(-1)[0]})); }
 // ---------- gráfico de líneas por años con los gobiernos de España de fondo (laboratorio «Países» y análisis) ----------
-function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height,base0=false}){
+function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height,base0=false,over,extra}){
   const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:138,b:26,l:52};
   const X=d3.scaleLinear().domain(d3.extent(years)).range([m.l,W-m.r]);
-  const vals=series.flatMap(s=>years.map(y=>s.v[y])).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(zero?[0]:[])); const pad=(hi-lo)*0.08||1;
+  const vals=series.flatMap(s=>years.map(y=>s.v[y])).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(zero?[0]:[],extra||[])); const pad=(hi-lo)*0.08||1;
   const Y=d3.scaleLinear().domain([base0&&lo>=0?0:lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
   const svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",title||"");
   if(gob) psMandatos().forEach((g,i)=>{ const a=Math.max(years[0],g.ys[0])-0.5, b=Math.min(years[years.length-1],g.ys[g.ys.length-1])+0.5, x0=Math.max(m.l,X(a)), x1=Math.min(W-m.r,X(b)); if(!g.ys.length||x1<=x0) return;
@@ -2067,6 +2067,7 @@ function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=
   svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(tick||(v=>nf0.format(v)));
   svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/90))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-6).attr("text-anchor","middle").text(String);
   if(Y.domain()[0]<0&&Y.domain()[1]>0) svg.append("line").attr("x1",m.l).attr("x2",W).attr("y1",Y(0)).attr("y2",Y(0)).attr("stroke",css("--ink")).attr("stroke-width",1);
+  if(over) over(svg,X,Y,m,W,H);
   const line=d3.line().defined(d=>d[1]!=null).x(d=>X(d[0])).y(d=>Y(d[1])), ends=[];
   series.slice().reverse().forEach(s=>{ const c=css(s.c), pts=years.map(y=>[y,s.v[y]??null]);
     svg.append("path").attr("d",line(pts)).attr("fill","none").attr("stroke",c).attr("stroke-width",s.main?3:1.8).attr("stroke-dasharray",s.dash?"5 4":null);
@@ -2209,37 +2210,36 @@ function itsFit(v,t0){
   const nOut=rows.filter(r=>r.out).length, dir=d3.mean(rows,r=>r.dev), pre0=pre[0];
   return {ok:true,lg,pre,post,at,rows,nOut,dev:dir,slope:lg?(Math.exp(b)-1)*100:b,pre0,sd,n};
 }
-function psEvent(out,ser,years,{idx,u,prop,unit=""}){
-  const E=psSuceso(); if(!E) return;
-  const pc=v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+NB+"%", nm0=s=>s.n.replace(/ \(.*\)$/,"");
-  const R=ser.map(s=>({s,r:itsFit(s.v,E.y)}));
-  const main=R.find(o=>o.r.ok)||R[0], r=main.r, f=fig(out,{title:`¿Se sale de su tendencia tras ${low(E.l.replace(/ \(.*\)$/,""))}?`,sub:r.ok?`${nm0(main.s)}: lo que marcaba la tendencia de ${r.pre0}–${E.y-1}, frente a lo que ocurrió`:"",source:"Tendencia previa: recta ajustada a los años anteriores al suceso, proyectada hacia delante con su intervalo del 95 %. Medias anuales."});
-  f.classList.add("its-fig");
-  if(!r.ok){ const why=!r.pre.length||r.pre.length<4?`Hay solo ${r.pre.length} año${r.pre.length===1?"":"s"} con dato antes de ${E.y}; hacen falta cuatro para saber qué tendencia traía.`:`No hay datos de ${nm0(main.s)} desde ${E.y}.`; f.body.innerHTML=`<p class="loading">${why} Prueba con otra serie, otro año o ensancha el periodo.</p>`; return; }
-  const all=Object.keys(main.s.v).map(Number).filter(y=>y>=E.y-16).sort((a,b)=>a-b), last=all[all.length-1], pro=d3.range(E.y-1,last+1).filter(y=>y>=E.y-1).map(y=>r.at(y));
-  const W=Math.max(300,f.body.clientWidth||760), H=Math.min(340,Math.max(240,W*.36)), m={t:16,r:20,b:28,l:52};
-  const X=d3.scaleLinear().domain([all[0],last]).range([m.l,W-m.r]), vs=all.map(y=>main.s.v[y]).concat(pro.flatMap(p=>[p.lo,p.hi])).filter(v=>v!=null&&isFinite(v)), lo=d3.min(vs), hi=d3.max(vs), pd=(hi-lo)*.08||1;
-  const Y=d3.scaleLinear().domain([lo-pd,hi+pd]).nice(5).range([H-m.b,m.t]), svg=d3.select(f.body).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",`${nm0(main.s)}: serie y tendencia previa`);
-  svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",Y).attr("y2",Y);
-  svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>idx?nf0.format(v):(u==="€"&&v>=5000?nf0.format(v/1000)+" mil":(hi-lo<20?nf1:nf0).format(v)));
-  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/80))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-8).attr("text-anchor","middle").text(String);
-  const ys0=d3.range(E.y-1,last+1), pts=ys0.map((y,i)=>({y,...pro[i]}));
-  svg.append("path").attr("d",d3.area().x(d=>X(d.y)).y0(d=>Y(d.lo)).y1(d=>Y(d.hi))(pts)).attr("fill",css("--slate")).attr("opacity",.16);
-  const xm=X(E.y-0.5); svg.append("line").attr("x1",xm).attr("x2",xm).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",css("--muted")).attr("stroke-dasharray","4 3");
-  svg.append("text").attr("class","lab").attr("x",xm+5).attr("y",m.t+10).style("fill",css("--muted")).text("suceso →");
-  svg.append("path").attr("d",d3.line().x(d=>X(d.y)).y(d=>Y(d.m))(pts)).attr("fill","none").attr("stroke",css("--slate")).attr("stroke-width",2).attr("stroke-dasharray","6 4");
-  const ob=all.map(y=>[y,main.s.v[y]]); svg.append("path").attr("d",d3.line().x(d=>X(d[0])).y(d=>Y(d[1]))(ob)).attr("fill","none").attr("stroke",css("--rust")).attr("stroke-width",2.8);
-  svg.append("g").selectAll("circle").data(ob).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",2.8).attr("fill",css("--rust")).append("title").text(d=>`${d[0]}: ${idx?nf1.format(d[1]):nf0.format(d[1])}`);
-  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",Y(ob[ob.length-1][1])+(ob[ob.length-1][1]<pro[pro.length-1].m?16:-8)).attr("text-anchor","end").style("fill",css("--rust")).text("Lo que ocurrió");
-  svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",ob[ob.length-1][1]<pro[pro.length-1].m?Y(pro[pro.length-1].m)-8:Y(pro[pro.length-1].lo)+15).attr("text-anchor","end").style("fill",css("--slate")).text("Tendencia previa");
-  // frase
-  const yl=prop?nm0(main.s):low(nm0(main.s)), pre=r.slope, dirTxt=pre>=0?"subiendo":"bajando", ab=nf1.format(Math.abs(r.dev))+(r.lg?NB+"%":unit), where=r.dev>=0?"por encima":"por debajo", un=r.lg?"un ":"";
+// prepara el suceso: el ajuste y lo que hay que dibujar encima del gráfico principal (un solo gráfico)
+function psEvPrep(ser,years,{prop,unit=""}){
+  const E=psSuceso(); if(!E) return null;
+  const nm0=s=>s.n.replace(/ \(.*\)$/,"");
+  const R=ser.map(s=>({s,r:itsFit(s.v,E.y)})), main=R.find(o=>o.r.ok)||R[0], r=main.r, ev={E,R,main,r,prop,unit,nm0};
+  if(!r.ok) return ev;
+  const last=years[years.length-1], from=Math.max(E.y-1,years[0]), pts=d3.range(from,last+1).map(y=>({y,...r.at(y)})), ob=years.filter(y=>main.s.v[y]!=null), lastObs=main.s.v[ob[ob.length-1]], endP=pts[pts.length-1];
+  ev.extra=pts.flatMap(p=>[p.lo,p.hi]).filter(v=>isFinite(v));
+  ev.sub=` Banda: lo que marcaba la tendencia${R.length>1?` de ${nm0(main.s)}`:""} en ${r.pre0}–${E.y-1}, con su intervalo del 95 %.`;
+  ev.src=" Tendencia previa: recta ajustada a los años anteriores al suceso y proyectada hacia delante.";
+  ev.over=(svg,X,Y,m,W,H)=>{
+    svg.append("path").attr("d",d3.area().x(d=>X(d.y)).y0(d=>Y(d.lo)).y1(d=>Y(d.hi))(pts)).attr("fill",css("--slate")).attr("opacity",.16);
+    const xm=X(E.y-0.5); svg.append("line").attr("x1",xm).attr("x2",xm).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",css("--muted")).attr("stroke-dasharray","4 3");
+    svg.append("text").attr("class","lab").attr("x",xm+5).attr("y",m.t+10).style("fill",css("--muted")).text("suceso →");
+    svg.append("path").attr("d",d3.line().x(d=>X(d.y)).y(d=>Y(d.m))(pts)).attr("fill","none").attr("stroke",css("--slate")).attr("stroke-width",2).attr("stroke-dasharray","6 4");
+    svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",lastObs<endP.m?Y(endP.m)-8:Y(endP.lo)+15).attr("text-anchor","end").style("fill",css("--slate")).text("Tendencia previa");
+  };
+  return ev;
+}
+// el veredicto, debajo del gráfico
+function psEvText(out,ev){
+  if(!ev) return; const {E,R,main,r,prop,unit,nm0}=ev, nf=nm0(main.s);
+  if(!r.ok){ const why=!r.pre.length||r.pre.length<4?`Hay solo ${r.pre.length} año${r.pre.length===1?"":"s"} con dato antes de ${E.y}; hacen falta cuatro para saber qué tendencia traía.`:`No hay datos de ${nf} desde ${E.y}.`; add(out,"p","muted",`${why} Prueba con otra serie, otro año o ensancha el periodo.`).style.cssText="max-width:var(--medida)"; return; }
+  const yl=prop?nf:low(nf), pre=r.slope, dirTxt=pre>=0?"subiendo":"bajando", ab=nf1.format(Math.abs(r.dev))+(r.lg?NB+"%":unit), where=r.dev>=0?"por encima":"por debajo", un=r.lg?"un ":"";
   const nP=r.rows.length, ver=r.nOut>=1&&r.nOut>=Math.min(2,nP)?(r.dev>0?"Se sale por arriba":"Se sale por abajo"):"Sigue su tendencia";
   const cls=ver==="Sigue su tendencia"?"mu":"ko";
   const trend=`Desde ${r.pre0} venía ${dirTxt} ${nf1.format(Math.abs(pre))}${r.lg?NB+"% al año":unit+" al año"}.`;
   const body=ver==="Sigue su tendencia"?`${trend} Tras ${E.y}, ${yl} queda ${un}${ab} ${where} de lo que marcaba esa tendencia, dentro de lo normal en esta serie: no se ve ruptura.`
     :`${trend} Tras ${E.y}, ${yl} queda ${un}${ab} ${where} de lo que marcaba esa tendencia, fuera del rango normal en ${r.nOut} de ${nP} año${nP===1?"":"s"}.`;
-  const g=add(out,"div","czout its-out"); g.innerHTML=`<p class="czverd"><span class="m ${cls}" aria-hidden="true"></span><span><span class="czkk">Resultado</span><b>${ver}</b></span></p><p class="czvs">${body}${nP<2?" Solo hay un año de datos tras el suceso: conviene esperar a tener más.":""} Una serie sola no separa el suceso de todo lo demás que pasó a la vez: es una pista, no una prueba.${E.lab?` <a href="/laboratorio/antes/?ev=${E.lab}">Compáralo con municipios que no lo vivieron →</a>`:""}</p>`;
+  const g=add(out,"div","czout its-out"); g.innerHTML=`<p class="czverd"><span class="m ${cls}" aria-hidden="true"></span><span><span class="czkk">¿Se sale de su tendencia tras ${esc(low(E.l.replace(/ \(.*\)$/,"")))}?</span><b>${ver}</b></span></p><p class="czvs">${body}${nP<2?" Solo hay un año de datos tras el suceso: conviene esperar a tener más.":""} Una serie sola no separa el suceso de todo lo demás que pasó a la vez: es una pista, no una prueba.${E.lab?` <a href="/laboratorio/antes/?ev=${E.lab}">Compáralo con municipios que no lo vivieron →</a>`:""}</p>`;
   const rest=R.filter(o=>o!==main);
   if(rest.length){ const row=o=>{ const q=o.r; if(!q.ok) return `<li class="na"><span class="em" aria-hidden="true">○</span><span class="rl">${esc(nm0(o.s))}</span><span class="rv">sin datos suficientes</span></li>`; const up=q.nOut>=Math.min(2,q.rows.length)&&q.nOut>=1; return `<li class="${up?"ko":"ok"}"><span class="em" aria-hidden="true">${up?"✗":"✓"}</span><span class="rl">${esc(nm0(o.s))}</span><span class="rv">${up?(q.lg?nf1.format(Math.abs(q.dev))+NB+"%":nf1.format(Math.abs(q.dev)))+(q.dev>0?" por encima":" por debajo")+" de la tendencia":"sigue su tendencia"}</span></li>`; };
     g.insertAdjacentHTML("beforeend",`<ul class="czrows its-rows" aria-label="Las otras series">${rest.map(row).join("")}</ul>`); }
@@ -2258,10 +2258,11 @@ function psDrawES(out){
     return {n:nm(o),tip:o.d,b0,pts:o.u==="%"&&!idx,c:k==="ipc_general"?"--ink":["--rust","--slate","--mustard","--plum","--olive","--stone","--ink-2"][i%7],main:i===0,dash:k==="ipc_general",v:Object.fromEntries(years.filter(y=>o.v[y]!=null).map(y=>[y,idx?val(o,y)/b*100:val(o,y)]))}; });
   const u=units[0], fmt=idx?(v=>nf1.format(v)):u==="€"?(v=>nf0.format(v)+NB+"€"):u==="%"?(v=>nf1.format(v)+NB+"%"):(v=>nf0.format(v));
   const wh=[...new Set(ks.map(k=>SE[k].where).filter(w=>w&&w!=="España"))];
-  govChart(out,{title:listY(ks.map(k=>SE[k].l.replace(/ \(.*\)$/,""))).replace(/^./,c=>c.toUpperCase())+(wh.length?" · "+wh.join(", "):""),
-    sub:(idx?`Índice: ${y0} = 100${units.length>1&&!PS.idx?" (las series tienen unidades distintas)":""}`:`${u==="€"?(real?`Euros de ${yI}, descontando la inflación`:"Euros de cada año"):u||"Número"}`)+(idx&&real?`. En euros de ${yI}`:"")+". Medias anuales",
-    source:`Fuente: ${[...new Set(ks.map(k=>SE[k].src))].join("; ")}.${PS.gob?" Fondo: presidente del Gobierno; cada año se asigna a quien gobernó más de la mitad.":""}`,years,series:ser,fmt,tick:v=>idx?nf0.format(v):u==="€"&&v>=10000?nf0.format(v/1000)+" mil":nf0.format(v),gob:!!PS.gob,ref:idx?y0:null});
-  if(PS.su) psEvent(out,ser,years,{idx,u});
+  const ev=PS.su?psEvPrep(ser,years,{}):null, evk=ev&&ev.r.ok?ev:null;
+  govChart(out,{over:evk&&evk.over,extra:evk&&evk.extra,title:listY(ks.map(k=>SE[k].l.replace(/ \(.*\)$/,""))).replace(/^./,c=>c.toUpperCase())+(wh.length?" · "+wh.join(", "):""),
+    sub:(idx?`Índice: ${y0} = 100${units.length>1&&!PS.idx?" (las series tienen unidades distintas)":""}`:`${u==="€"?(real?`Euros de ${yI}, descontando la inflación`:"Euros de cada año"):u||"Número"}`)+(idx&&real?`. En euros de ${yI}`:"")+". Medias anuales."+(evk?evk.sub:""),
+    source:`Fuente: ${[...new Set(ks.map(k=>SE[k].src))].join("; ")}.${evk?evk.src:""}${PS.gob&&!evk?" Fondo: presidente del Gobierno; cada año se asigna a quien gobernó más de la mitad.":""}`,years:evk?years.filter(y=>y>=evk.E.y-16):years,series:ser,fmt,tick:v=>idx?nf0.format(v):u==="€"&&v>=10000?nf0.format(v/1000)+" mil":nf0.format(v),gob:evk?false:!!PS.gob,ref:idx?y0:null});
+  psEvText(out,ev);
   const ch=ser.map(s=>{ const ys=Object.keys(s.v).map(Number), a=s.v[ys[0]], b=s.v[ys[ys.length-1]]; return a&&b?{n:s.n,g:s.pts?b-a:(b/a-1)*100,pts:s.pts,a:ys[0],z:ys[ys.length-1]}:null; }).filter(Boolean);
   if(ch.length) add(out,"p",null,`${ch.map(c=>`<b>${esc(c.n.replace(/ \(.*\)$/,""))}</b> ${c.pts?(c.g>0?"+":c.g<0?"−":"")+nf1.format(Math.abs(c.g))+NB+"puntos":sgn(c.g)} <small class="muted">(${c.a}–${c.z})</small>`).join(" · ")}.`).style.cssText="max-width:var(--medida);font-size:15px;margin-top:4px";
   if(ks.includes("viv_esfuerzo")) add(out,"p","muted",`<b>Esfuerzo de pagar el alquiler:</b> alquiler medio de cada año (× 12) entre el sueldo mediano anual, en %. Es una cuenta aproximada: usa el alquiler medio de todos los inquilinos, con contratos antiguos incluidos, y el sueldo de una sola persona. Quien firma hoy un contrato nuevo paga más que esa media.`).style.cssText="max-width:var(--medida);font-size:14px";
@@ -2275,11 +2276,13 @@ function psDrawPais(out){
   const years=psRange([...new Set(sel.flatMap(g=>Object.keys(P[g][PS.k]).map(Number)))].sort((a,b)=>a-b).filter(y=>sel.some(g=>val(g,y)!=null)));
   if(years.length<2){ out.innerHTML='<p class="loading">No hay datos para esta combinación o la ventana es demasiado corta.</p>'; return; }
   const fmt=PS.rel?(I.t==="nivel"?v=>sgn(v):v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" pts"):I.f;
-  govChart(out,{title:PS.rel?`${I.l}: diferencia con ${refN}`:I.l,sub:PS.rel?(I.t==="nivel"?`% por encima (o por debajo) de ${refN}`:`Puntos por encima (o por debajo) de ${refN}`):I.u,
-    source:`Fuente: Eurostat${years[0]<1995?" (desde 1995) y Banco Mundial (antes)":""}.${PS.gob?" Fondo: presidente del Gobierno de España; cada año se asigna a quien gobernó más de la mitad.":""}`,
-    years,series:sel.map((g,i)=>({n:P[g].n,c:PSCOL[i%PSCOL.length],main:g==="ES",v:Object.fromEntries(years.map(y=>[y,val(g,y)]).filter(([,v])=>v!=null))})),fmt,
-    tick:v=>PS.rel||I.u!=="€ de 2020"?nf0.format(v):nf0.format(v/1000)+" mil",zero:PS.rel||I.t==="flujo",gob:!!PS.gob});
-  if(PS.su) psEvent(out,sel.map((g,i)=>({n:P[g].n,main:g==="ES",v:Object.fromEntries(years.map(y=>[y,val(g,y)]).filter(([,v])=>v!=null))})),years,{idx:false,prop:true,unit:PS.rel?" puntos":"",u:PS.rel?"":I.u==="€ de 2020"?"€":""});
+  const sers=sel.map((g,i)=>({n:P[g].n,c:PSCOL[i%PSCOL.length],main:g==="ES",v:Object.fromEntries(years.map(y=>[y,val(g,y)]).filter(([,v])=>v!=null))}));
+  const ev=PS.su?psEvPrep(sers.slice().sort((a,b)=>(b.main?1:0)-(a.main?1:0)),years,{prop:true,unit:PS.rel?" puntos":""}):null, evk=ev&&ev.r.ok?ev:null;
+  govChart(out,{over:evk&&evk.over,extra:evk&&evk.extra,title:PS.rel?`${I.l}: diferencia con ${refN}`:I.l,sub:(PS.rel?(I.t==="nivel"?`% por encima (o por debajo) de ${refN}`:`Puntos por encima (o por debajo) de ${refN}`):I.u)+(evk?"."+evk.sub:""),
+    source:`Fuente: Eurostat${years[0]<1995?" (desde 1995) y Banco Mundial (antes)":""}.${evk?evk.src:""}${PS.gob&&!evk?" Fondo: presidente del Gobierno de España; cada año se asigna a quien gobernó más de la mitad.":""}`,
+    years:evk?years.filter(y=>y>=evk.E.y-16):years,series:sers,fmt,
+    tick:v=>PS.rel||I.u!=="€ de 2020"?nf0.format(v):nf0.format(v/1000)+" mil",zero:PS.rel||I.t==="flujo",gob:evk?false:!!PS.gob});
+  psEvText(out,ev);
   if(PS.gob){ const OT=[...new Set([PS.ref,...PS.c.filter(g=>g!=="ES")])].filter(g=>P[g]&&P[g][PS.k]);
     const lab=I.t==="flujo"?"Media anual":I.t==="nivel"?"Crecimiento medio anual":"Cambio en puntos";
     psMandTable(out,[{n:"España",v:P.ES[PS.k]},...OT.map(c=>({n:P[c].n.replace("Unión Europea","UE"),v:P[c][PS.k]}))],I.t,`${I.l} con cada Gobierno`,`${lab} en los años de cada mandato, en España y en los países elegidos`,
