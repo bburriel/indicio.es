@@ -2737,8 +2737,8 @@ function coverOf(id,{C,D}){
   const c=C[id]; return c?{svg:c.svg,cap:c.cap}:null; }
 // el titular de los análisis del carrusel lleva el mismo final en granate que en la portada, para que la transición encaje
 const shTitle=S=>{ const h=(typeof HEROQ!=="undefined"?HEROQ:[]).find(x=>x.id===S.id); return h&&h.em&&S.t.endsWith(h.em)?esc(S.t.slice(0,-h.em.length))+`<em>${esc(h.em)}</em>`:esc(S.t); };
-function studyHead(S){ const {v}=splitA(S.a);
-  return `<header class="sh"><div class="sh-t"><h1 class="sh-q">${shTitle(S)}</h1>${v?`<p class="sh-v">${esc(v)}</p>`:""}<p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
+function studyHead(S){
+  return `<header class="sh"><div class="sh-t"><h1 class="sh-q">${shTitle(S)}</h1><p class="sh-d">${esc(S.d)}</p><p class="byline">${byline(S)}</p></div>`
     +`<figure class="sh-f" id="shf"><div class="sh-ph"></div></figure></header>`; }
 function studyCover(S){ loadCovers().then(cv=>{ const f=document.getElementById("shf"); if(!f||!document.body.contains(f)) return; const c=coverOf(S.id,cv);
   if(c) f.innerHTML=c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`; else { f.parentNode.classList.add("nofig"); f.remove(); } }); }

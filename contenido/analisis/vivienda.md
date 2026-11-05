@@ -1,6 +1,6 @@
 ---
 titulo: ¿Por qué cuesta tanto pagar una casa?
-entradilla: El alquiler y el precio de compra han subido mucho más que los sueldos, y más aún para quien busca piso hoy. Contamos qué ha pasado, a quién le golpea y por qué, y medimos cuánto pueden aportar las dos ideas que se discuten: construir más o que cada casa sea para vivir.
+entradilla: Alquilar y comprar han subido mucho más que los sueldos. Vemos a quién golpea y por qué.
 respuesta: Porque hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual. Movilizar viviendas vacías y turísticas donde hay demanda puede aportar entre 200.000 y 300.000 de una vez; construir es lo único que sigue sumando cada año. El alquiler ha subido sobre todo donde llega gente: es lo que más separa a unos municipios de otros. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
