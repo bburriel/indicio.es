@@ -7021,6 +7021,19 @@ function heroType(root){
       busy(false); await sleep(rnd(850,1150)); if(!live()) break;
       next=first?W:(Math.random()<.5?OA:W); first=false; } })();
 }
+// laboratorio de la portada: un mapa de los municipios que cambia de capa cada 4 s (o cuando se elige una pregunta; al elegirla deja de cambiar solo)
+function heroLab(root){
+  const sec=root.querySelector(".pt-labx"); if(!sec) return;
+  const box=sec.querySelector("#labmap"), cap=sec.querySelector("#labcap"), btns=[...sec.querySelectorAll(".pt-labx-q button")], K=btns.map(b=>b.dataset.k);
+  let i=0, api=null, vis=false, user=false;
+  const show=(n,dur)=>{ i=n; btns.forEach((b,j)=>{ b.classList.toggle("on",j===n); b.setAttribute("aria-pressed",j===n?"true":"false"); });
+    const m=MAPLAYERS.find(q=>q[0]===K[n]); cap.textContent=m?m[2]:K[n]; if(api) api.set(K[n],{dur}); };
+  btns.forEach((b,j)=>b.addEventListener("click",()=>{ user=true; show(j,700); }));
+  loadTopo().then(()=>{ if(!document.body.contains(box)) return; api=spainMap(box,{refine:true,width:560,height:440}); show(i,0); }).catch(()=>{});
+  const io="IntersectionObserver" in window?new IntersectionObserver(es=>{ vis=es[0].isIntersecting; },{threshold:.3}):null; if(io) io.observe(sec); else vis=true;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const t=setInterval(()=>{ if(!document.body.contains(sec)){ clearInterval(t); io&&io.disconnect(); return; } if(!user&&vis&&api) show((i+1)%K.length,1100); },4200);
+}
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
   // mientras llega portada.json (unos cientos de bytes) sigue a la vista la portada pre-renderizada
@@ -7033,15 +7046,14 @@ async function renderInicio(){
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Empieza por una pregunta</a><a class="ho-lk" href="#" data-go=".pt-mun">Mira cómo está tu pueblo</a></p></section>
   ${heroCarHTML(D)}
   <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todos los análisis →</a></p>
-  <section class="pt-labx"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>¿Crees que lo sabes? <em>Demuéstralo.</em></h2>
-      <p class="pt-labx-lead">Cruza dos datos de los ${nMun} municipios y mira si la relación aguanta o solo lo parecía. Sin saber estadística y sin registrarte. Si la respuesta cambia al comparar entre iguales, lo verás tú antes que nadie.</p>
-      <div class="pt-labx-h">Empieza por una duda real</div>
-      <div class="pt-labx-q">${[0,2,5,8].map(i=>`<a href="#" data-q="${i}">${EXQ[i][0]}</a>`).join("")}</div>
-      <p class="pt-labx-go"><a class="btn" href="/laboratorio/">Hacer mi primera prueba →</a></p></div>
-    <div class="pt-labx-lv"><p>Cada hallazgo sube de nivel solo si supera la prueba. Así sabes cuánto fiarte.</p>
-      <div class="lv"><svg viewBox="0 0 84 64" aria-hidden="true"><g fill="currentColor"><circle cx="8" cy="52" r="3"/><circle cx="18" cy="44" r="3"/><circle cx="26" cy="49" r="3"/><circle cx="36" cy="36" r="3"/><circle cx="45" cy="40" r="3"/><circle cx="54" cy="26" r="3"/><circle cx="63" cy="30" r="3"/><circle cx="74" cy="14" r="3"/></g></svg><div><small>Nivel 1</small><b>Se ve en los datos</b><span>Dos cosas suelen ir juntas. Aún no sabemos por qué.</span></div></div>
-      <div class="lv"><svg viewBox="0 0 84 64" aria-hidden="true"><g class="a"><circle cx="10" cy="44" r="3"/><circle cx="22" cy="38" r="3"/><circle cx="34" cy="31" r="3"/><circle cx="46" cy="24" r="3"/></g><g fill="currentColor" opacity=".55"><circle cx="30" cy="54" r="3"/><circle cx="46" cy="48" r="3"/><circle cx="62" cy="40" r="3"/><circle cx="76" cy="32" r="3"/></g></svg><div><small class="a">Nivel 2</small><b>Aguanta entre iguales</b><span>Sigue ahí al comparar municipios parecidos.</span></div></div>
-      <div class="lv on"><svg viewBox="0 0 84 64" aria-hidden="true" fill="none"><path d="M4 40 L40 34 L80 28" stroke="currentColor" stroke-width="2" stroke-dasharray="3 4" opacity=".5"/><path d="M4 40 L40 34" stroke="currentColor" stroke-width="2.2"/><path d="M40 34 L40 52 L80 46" class="aS" stroke-width="2.4" stroke-linejoin="round"/><path d="M40 8 V60" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3"/></svg><div><small class="a">Nivel 3</small><b>Hay un antes y un después</b><span>Una ley cambió algo y podemos medirlo.</span></div></div></div></div></section>
+  <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
+      <p class="pt-labx-lead">Elige lo que quieras comparar (renta, vivienda, edad, voto, sueldos, pensiones…) y míralo en un mapa, un ranking o un gráfico. Después comprueba si la relación aguanta al comparar lo que es comparable, o qué pasó antes y después de una ley.</p>
+      <div class="pt-labx-h" id="labq-t">Empieza por una pregunta</div>
+      <div class="pt-labx-q" role="group" aria-labelledby="labq-t"><button type="button" class="on" aria-pressed="true" data-k="renta">¿Dónde se gana más?</button><button type="button" aria-pressed="false" data-k="edad">¿Dónde viven los más mayores?</button><button type="button" aria-pressed="false" data-k="varPob">¿Qué pueblos ganan vecinos?</button><button type="button" aria-pressed="false" data-k="alquiler">¿Dónde se vive de alquiler?</button><button type="button" aria-pressed="false" data-k="paro">¿Dónde cuesta más tener trabajo?</button><button type="button" aria-pressed="false" data-k="vt">¿Dónde hay más pisos turísticos?</button></div>
+      <p class="pt-labx-go"><a class="btn" href="/laboratorio/">Hacer mi propia pregunta →</a></p></div>
+    <figure class="pt-labx-map"><div class="labmap" id="labmap" role="img" aria-label="Mapa de España por municipios, coloreado según la pregunta elegida"></div>
+      <figcaption><b id="labcap">Renta por persona, 2024</b><span class="leg" aria-hidden="true"><em>menos</em><i style="background:var(--ramp-0)"></i><i style="background:var(--ramp-1)"></i><i style="background:var(--ramp-2)"></i><i style="background:var(--ramp-3)"></i><i style="background:var(--ramp-4)"></i><i style="background:var(--ramp-5)"></i><i style="background:var(--ramp-6)"></i><em>más</em></span>
+        <small>Cada municipio, coloreado por su dato. En gris, sin dato.</small></figcaption></figure></div></section>
   <section class="pt-land pt-mun"><div class="pt-land-tx"><div class="ed-k">El dato público, a tu alcance</div><h2>Tu pueblo, <em>frente a España entera.</em></h2>
       <p class="pt-land-lead">Escribe dónde vives y mira en un minuto cuánto se gana, cuánto cuesta el alquiler y qué lo distingue de los demás. Las cifras son de los ${nMun} municipios, desde un pueblo de diez vecinos hasta Madrid.</p></div>
     <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Enfrentar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
@@ -7057,7 +7069,7 @@ async function renderInicio(){
   heroCarBind(view.querySelector(".pt-car"));
   heroType(view.querySelector(".ho"));
   view.querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const t=view.querySelector(x.dataset.go); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
-  view.querySelectorAll(".pt-labx-q a").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const [l,v,o]=EXQ[+x.dataset.q]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null,sz:"",col:"",q:0,bv:0}; if(o.ser){ Object.assign(PS,{s:o.ser.slice(),idx:o.idx===0?0:1,b:o.b||null,desde:null,hasta:null,real:0}); } navTo(exHash()); }));
+  heroLab(view);
   bindBig("q2");
   // la nube de municipios: imagen fija y, encima, qué municipio es cada punto
   const ar=document.getElementById("qhart");
