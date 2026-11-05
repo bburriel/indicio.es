@@ -88,7 +88,7 @@ copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
 }
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+i18n+CONTENT)).replace("__JS__",JS).replace("__I18N__",I18N).replace("__CSS__",CSS));
-fs.writeFileSync(path.join(OUT,"manifest.webmanifest"),rd("manifest.webmanifest").replace(/"\.\/#?(\w*)"/g,(m,k)=>`"/${({inicio:"",preguntas:"preguntas/",municipio:"municipio/",explorar:"laboratorio/"})[k]??""}"`).replace('"scope": "./"','"scope": "/"'));
+fs.writeFileSync(path.join(OUT,"manifest.webmanifest"),rd("manifest.webmanifest").replace(/"\.\/#?(\w*)"/g,(m,k)=>`"/${({inicio:"",preguntas:"preguntas/",municipios:"#municipios",explorar:"laboratorio/"})[k]??""}"`).replace('"scope": "./"','"scope": "/"'));
 
 // ---------- datos para las fichas ----------
 const ix=JSON.parse(rd("data/index.json")), CAT=JSON.parse(rd("data/indicadores.json"));
@@ -158,7 +158,7 @@ const urls=[]; const addUrl=(loc,pri,mod)=>urls.push({loc:SITE.url+loc,pri,mod:m
 }
 
 // ---------- laboratorio, municipios, quién soy, comparar ----------
-for(const route of ["/laboratorio/","/laboratorio/metodo/","/laboratorio/datos/","/municipio/","/quien-soy/","/quien-soy/contacto/","/comparar/"]){
+for(const route of ["/laboratorio/","/laboratorio/metodo/","/laboratorio/datos/","/quien-soy/","/quien-soy/contacto/","/comparar/"]){
   const P=PAGES[route];
   const main=snapshot(route)||`<header class="phead"><h1>${esc(P.t.replace(" · Indicio",""))}</h1><p class="dek">${esc(P.d)}</p></header><p class="loading">Cargando datos…</p>`;
   page({route,title:P.t,desc:P.d,main,robots:route==="/comparar/"?"noindex,follow":""});
@@ -226,14 +226,14 @@ for(const r of rows){
   const lead=`<b>${pop!=null?nf0.format(pop)+" habitantes":"Municipio de la provincia de "+esc(prov)}</b>${vs("varPob")!=null?`, un ${nf0.format(Math.abs(vs("varPob")))} % ${vs("varPob")>=0?"más":"menos"} que en 2015`:""}.${renta!=null?` Cada vecino ingresa de media ${nf0.format(renta)} € netos al año${esMean.renta?` (${Math.abs(renta/esMean.renta-1)<0.03?"como la media de España":`un ${nf0.format(Math.abs(renta/esMean.renta-1)*100)} % ${renta>esMean.renta?"por encima":"por debajo"} de la media de España`})`:""}.`:""}`;
   const table=groups.map(g=>{ const cs=CAT.filter(c=>c.g===g&&F[c.k]!=null&&r[F[c.k]]!=null); if(!cs.length) return ""; return `<tr class="grp"><th colspan="3">${esc(g)}</th></tr>`+cs.map(c=>`<tr><td>${esc(c.l)}</td><td class="r num">${fmt(c,r[F[c.k]])}</td><td class="r num muted">${esMean[c.k]!=null?fmt(c,esMean[c.k]):"—"}</td></tr>`).join(""); }).join("");
   const desc=`${name} (${prov}): ${pop!=null?nf0.format(pop)+" habitantes":""}${renta!=null?", renta media de "+nf0.format(renta)+" € por persona":""}${vs("paroReg")!=null?", paro registrado del "+nf1.format(vs("paroReg"))+" %":""}. Renta, población, paro, vivienda y voto comparados con España.`;
-  const main=`<nav class="crumbs"><a href="/municipio/">Municipios</a> › <a href="/provincia/${provSlug(r[F.prov])}/">Provincia de ${esc(prov)}</a></nav><header class="phead"><h1>${esc(name)}</h1><p class="dek">${lead}</p><p class="muted">Código INE ${code}.</p></header>
+  const main=`<nav class="crumbs"><a href="/provincia/">Municipios</a> › <a href="/provincia/${provSlug(r[F.prov])}/">Provincia de ${esc(prov)}</a></nav><header class="phead"><h1>${esc(name)}</h1><p class="dek">${lead}</p><p class="muted">Código INE ${code}.</p></header>
     <section class="finding"><h2>Todos los datos de ${esc(name)}</h2><table class="glance"><thead><tr><th>Dato</th><th class="r">${esc(name)}</th><th class="r">España</th></tr></thead><tbody>${table}</tbody></table><p class="muted" style="font-size:13px">La media de España es la de sus municipios, ponderada por población. Al abrir la página se cargan los gráficos, la evolución desde 2015 y los municipios parecidos.</p></section>
     <section class="finding"><h2>Compáralo</h2><div class="txt"><p><a href="/laboratorio/cruce/?d=renta,paroReg&t=g1&m=${code}">Verlo en el laboratorio →</a> · <a href="/comparar/${code}/">Comparar con otro municipio →</a></p></div></section>${sources}`;
   const plist=byProv[r[F.prov]].slice().sort((a,b)=>(b[F.pop]||0)-(a[F.pop]||0)), pi=plist.indexOf(r);
   const near=plist.slice(Math.max(0,pi-5),pi).concat(plist.slice(pi+1,pi+6)).slice(0,10);
   const after=`<div class="wrap seo-extra" data-key="m${code}"><section class="finding"><h2>Otros municipios de la provincia de ${esc(prov)}</h2><p class="near">${near.map(x=>`<a href="${munPath(x)}">${esc(x[F.name])}</a>`).join(" · ")}</p><p><a href="/provincia/${provSlug(r[F.prov])}/">Los ${nf0.format(plist.length)} municipios de la provincia de ${esc(prov)}, con su renta, población y paro →</a> · <a href="/rankings/">Rankings de municipios de España →</a></p><p class="muted" style="font-size:13px">Datos actualizados el ${fechaES(SITE.dataUpdated)}. Cada cifra indica su fuente y su año.</p></section></div>`;
   const jsonld=[{"@context":"https://schema.org","@type":"City",name,url:SITE.url+route,identifier:code,containedInPlace:{"@type":"AdministrativeArea",name:"Provincia de "+prov,url:SITE.url+"/provincia/"+provSlug(r[F.prov])+"/"},...(pop!=null?{population:pop}:{})},
-    breadcrumb([["Municipios","/municipio/"],["Provincia de "+prov,"/provincia/"+provSlug(r[F.prov])+"/"],[name,route]]),
+    breadcrumb([["Municipios","/provincia/"],["Provincia de "+prov,"/provincia/"+provSlug(r[F.prov])+"/"],[name,route]]),
     {"@context":"https://schema.org","@type":"WebPage",name:`${name}: renta, población, paro y vivienda`,url:SITE.url+route,inLanguage:"es",dateModified:SITE.dataUpdated,about:{"@type":"City",name},author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url}}];
   const ogImage=pop>=20000?ogFor("m-"+code,{k:"Provincia de "+prov,t:name,stats:[["Habitantes",nf0.format(pop),vs("varPob")!=null?`${vs("varPob")>=0?"+":"−"}${nf1.format(Math.abs(vs("varPob")))} % desde 2015`:""],["Renta por persona",renta!=null?nf0.format(renta)+" €":"—",renta!=null?`España: ${nf0.format(esMean.renta)} €`:""],["Paro registrado",vs("paroReg")!=null?pctS(vs("paroReg")):"—",`España: ${pctS(esMean.paroReg)}`]]}):null;
   page({route,title:`${name}: renta, población, paro y vivienda · Indicio`,desc,ogTitle:`${name} en datos`,main,jsonld,after,ogImage});
@@ -318,7 +318,7 @@ seg.hidden=false;})();</script>`;
       </aside>
     </div>
     <details class="pmap-list"><summary>Ver la lista de provincias</summary><ul>${plist.map(p=>`<li><a href="/provincia/${provSlug(p)}/">${esc(provShort(PROVS[p]))}</a> <small>${nf0.format(byProv[p].length)}</small></li>`).join("")}</ul></details>${pmScript}${sources}`;
-  page({route:"/provincia/",title:"Municipios por provincia: renta, población y paro · Indicio",desc:"Todos los municipios de cada provincia de España con su renta por persona, población, paro registrado y edad media.",main:idx,jsonld:breadcrumb([["Municipios","/municipio/"],["Provincias","/provincia/"]])});
+  page({route:"/provincia/",title:"Municipios por provincia: renta, población y paro · Indicio",desc:"Todos los municipios de cada provincia de España con su renta por persona, población, paro registrado y edad media.",main:idx,jsonld:breadcrumb([["Municipios","/provincia/"],["Provincias","/provincia/"]])});
   addUrl("/provincia/",0.7);
   for(const p of plist){
     const list=byProv[p].slice().sort((a,b)=>(b[F.pop]||0)-(a[F.pop]||0)), prov=provShort(PROVS[p]), route="/provincia/"+provSlug(p)+"/";
@@ -332,7 +332,7 @@ seg.hidden=false;})();</script>`;
       paroHi?`El paro registrado más alto entre los de más de 1.000 habitantes está en ${paroHi[F.name]} (${pctS(paroHi[F.paroReg])} de la población de 16 a 64 años); la media de la provincia es del ${pctS(wm("paroReg"))} (SEPE, media de 2025).`:"",
       young?`El municipio más joven de más de 1.000 habitantes es ${young[F.name]}, con una edad media de ${nf1.format(young[F.edad])} años.`:""].filter(Boolean);
     const cell=(r,k,f)=>r[F[k]]==null?"—":f(r[F[k]]);
-    const main=`<nav class="crumbs"><a href="/municipio/">Municipios</a> › <a href="/provincia/">Provincias</a></nav><header class="phead"><h1>Municipios de la provincia de ${esc(prov)}</h1><p class="dek">${esc(facts[0])}</p></header>
+    const main=`<nav class="crumbs"><a href="/provincia/">Municipios</a> › <a href="/provincia/">Provincias</a></nav><header class="phead"><h1>Municipios de la provincia de ${esc(prov)}</h1><p class="dek">${esc(facts[0])}</p></header>
       <section class="finding"><div class="txt">${facts.slice(1).map(f=>`<p>${esc(f)}</p>`).join("")}</div></section>
       <section class="finding" id="provtab"><h2 id="provtab-h">Los ${nf0.format(list.length)} municipios, de más a menos habitantes</h2><div class="extable"><table class="glance"><thead><tr><th aria-sort="none"><button type="button" class="sortb" data-k="name" style="text-align:left">Municipio</button></th><th class="r" aria-sort="descending"><button type="button" class="sortb on" data-k="pop">Habitantes ↓</button></th><th class="r" aria-sort="none"><button type="button" class="sortb" data-k="renta">Renta por persona</button></th><th class="r" aria-sort="none"><button type="button" class="sortb" data-k="paro">Paro registrado</button></th><th class="r" aria-sort="none"><button type="button" class="sortb" data-k="edad">Edad media</button></th></tr></thead><tbody>
       ${list.map(r=>{ const v=k=>r[F[k]]==null?"":r[F[k]]; return `<tr><td data-v="${esc(r[F.name])}">${L(r)}</td><td class="r num" data-v="${v("pop")}">${cell(r,"pop",nf0.format)}</td><td class="r num" data-v="${v("renta")}">${cell(r,"renta",x=>nf0.format(x)+" €")}</td><td class="r num" data-v="${v("paroReg")}">${cell(r,"paroReg",pctS)}</td><td class="r num" data-v="${v("edad")}">${cell(r,"edad",x=>nf1.format(x))}</td></tr>`; }).join("")}
@@ -341,7 +341,7 @@ seg.hidden=false;})();</script>`;
     const after=PROVSORT;
     const ogImage=ogFor("p-"+provSlug(p),{k:"Provincia de "+prov,t:`Los ${nf0.format(list.length)} municipios de ${prov}`,text:rich&&poor&&rich!==poor?`El de más renta: ${rich[F.name]} (${nf0.format(rich[F.renta])} €). El de menos: ${poor[F.name]} (${nf0.format(poor[F.renta])} €).`:facts[0]});
     page({route,title:`Municipios de ${prov}: renta, población y paro · Indicio`,desc:facts.slice(0,2).join(" ").slice(0,300),ogTitle:`Municipios de la provincia de ${prov}`,main,after,ogImage,
-      jsonld:[breadcrumb([["Municipios","/municipio/"],["Provincias","/provincia/"],["Provincia de "+prov,route]]),{"@context":"https://schema.org","@type":"Dataset",name:`Municipios de la provincia de ${prov}: renta, población, paro y edad`,description:facts.join(" "),url:SITE.url+route,license:"https://creativecommons.org/licenses/by/4.0/",creator:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},isBasedOn:["https://www.ine.es","https://www.sepe.es"],spatialCoverage:{"@type":"Place",name:"Provincia de "+prov+", España"},variableMeasured:["Habitantes","Renta neta media por persona","Paro registrado","Edad media"]}]});
+      jsonld:[breadcrumb([["Municipios","/provincia/"],["Provincias","/provincia/"],["Provincia de "+prov,route]]),{"@context":"https://schema.org","@type":"Dataset",name:`Municipios de la provincia de ${prov}: renta, población, paro y edad`,description:facts.join(" "),url:SITE.url+route,license:"https://creativecommons.org/licenses/by/4.0/",creator:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},isBasedOn:["https://www.ine.es","https://www.sepe.es"],spatialCoverage:{"@type":"Place",name:"Provincia de "+prov+", España"},variableMeasured:["Habitantes","Renta neta media por persona","Paro registrado","Edad media"]}]});
     addUrl(route,0.7);
   }
 }
@@ -375,23 +375,23 @@ seg.hidden=false;})();</script>`;
   const rkCard=id=>{const R=RANKS.find(x=>x.id===id), top=pick(R,1000)[0]; if(!top) return "";
     return `<a class="rk-card" href="/rankings/${R.id}/"><span class="rk-t">${esc(R.t)}</span><span class="rk-fig"><span class="rk-v">${esc(R.f(top[F[R.k]]))}</span><span class="rk-n"><span>${esc(top[F.name])} · ${esc(provShort(PROVS[top[F.prov]]))}</span>${RK_ARROW}</span><small>${esc(RK_PER[id]||"")}</small></span></a>`};
   const rkGrid=`<div class="rk-grid">${RK_GROUPS.map(([h,ids])=>`<section class="rk-box"><h2>${h}</h2><div class="rk-rows">${ids.map(rkCard).join("")}</div></section>`).join("")}</div>`;
-  const idx=`<nav class="crumbs"><a href="/municipio/">Municipios</a></nav><header class="phead"><h1>Rankings de municipios de España</h1><p class="dek">Los municipios con más y menos renta, paro, población, edad, alquiler o pisos turísticos, con los datos oficiales más recientes.</p></header>
+  const idx=`<nav class="crumbs"><a href="/provincia/">Municipios</a></nav><header class="phead"><h1>Rankings de municipios de España</h1><p class="dek">Los municipios con más y menos renta, paro, población, edad, alquiler o pisos turísticos, con los datos oficiales más recientes.</p></header>
     ${rkGrid}${sources}`;
-  page({route:"/rankings/",title:"Rankings de municipios de España · Indicio",desc:"Los municipios más ricos, con más paro, más envejecidos, que más crecen, con más pisos turísticos… con datos oficiales del INE y el SEPE.",main:idx,jsonld:breadcrumb([["Municipios","/municipio/"],["Rankings","/rankings/"]])});
+  page({route:"/rankings/",title:"Rankings de municipios de España · Indicio",desc:"Los municipios más ricos, con más paro, más envejecidos, que más crecen, con más pisos turísticos… con datos oficiales del INE y el SEPE.",main:idx,jsonld:breadcrumb([["Municipios","/provincia/"],["Rankings","/rankings/"]])});
   addUrl("/rankings/",0.8);
   for(const R of RANKS){
     const route="/rankings/"+R.id+"/", big=pick(R,1000), cities=pick(R,50000), all=pick(R,0);
     if(!big.length) continue;
     const src=srcOf(R.k), top3=big.slice(0,3), c1=cities[0];
     const lead=`Entre los municipios de más de 1.000 habitantes, encabeza la lista ${top3[0][F.name]} (${provShort(PROVS[top3[0][F.prov]])}), con ${R.f(top3[0][F[R.k]])}, seguido de ${top3[1][F.name]} (${R.f(top3[1][F[R.k]])}) y ${top3[2][F.name]} (${R.f(top3[2][F[R.k]])}).${c1?(c1===top3[0]?` ${c1[F.name]} es también la primera entre las ciudades de más de 50.000 habitantes.`:` Entre las ciudades de más de 50.000 habitantes, la primera es ${c1[F.name]} (${R.f(c1[F[R.k]])}).`):""} La media de España es ${R.f(esMean[R.k])}.`;
-    const main=`<nav class="crumbs"><a href="/municipio/">Municipios</a> › <a href="/rankings/">Rankings</a></nav><header class="phead"><h1>${esc(R.t)}</h1><p class="dek">${esc(lead)}</p></header>
+    const main=`<nav class="crumbs"><a href="/provincia/">Municipios</a> › <a href="/rankings/">Rankings</a></nav><header class="phead"><h1>${esc(R.t)}</h1><p class="dek">${esc(lead)}</p></header>
       <section class="finding"><h2>Los 50 primeros, entre los municipios de más de 1.000 habitantes</h2>${tbl(big,R,50)}<p class="muted" style="font-size:13px">Dato: ${esc(R.what)}. Fuente: ${esc(src)}. Se dejan fuera los municipios de menos de 1.000 habitantes porque en ellos unas pocas personas cambian mucho el resultado.</p></section>
       ${cities.length>=10?`<section class="finding"><h2>Las ciudades de más de 50.000 habitantes</h2>${tbl(cities,R,20)}</section>`:""}
       ${all.length>big.length&&all[0]!==big[0]?`<section class="finding"><h2>Contando también los pueblos más pequeños</h2><div class="txt"><p>Si se incluyen todos los municipios, el primero es ${L(all[0])} (${PL(all[0])}, ${nf0.format(all[0][F.pop])} habitantes), con ${R.f(all[0][F[R.k]])}.</p></div></section>`:""}
       <section class="finding"><div class="txt"><p>${RANKS.filter(x=>x!==R).slice(0,6).map(x=>`<a href="/rankings/${x.id}/">${esc(x.t)}</a>`).join(" · ")}</p><p><a href="/laboratorio/tabla/?d=${R.k}&t=g1">Ordena y filtra este dato tú mismo en el laboratorio →</a></p><p class="muted" style="font-size:13px">Datos actualizados el ${fechaES(SITE.dataUpdated)}.</p></div></section>${sources}`;
     const ogImage=ogFor("r-"+R.id,{k:"Ranking de municipios",t:R.t,list:big.slice(0,5).map((r,i)=>[i+1,r[F.name],provShort(PROVS[r[F.prov]]),R.f(r[F[R.k]])])});
     page({route,title:`${R.t} · Indicio`,desc:lead.slice(0,300),ogTitle:R.t,main,ogImage,
-      jsonld:[breadcrumb([["Municipios","/municipio/"],["Rankings","/rankings/"],[R.t,route]]),
+      jsonld:[breadcrumb([["Municipios","/provincia/"],["Rankings","/rankings/"],[R.t,route]]),
         {"@context":"https://schema.org","@type":"ItemList",name:R.t,itemListOrder:R.desc?"https://schema.org/ItemListOrderDescending":"https://schema.org/ItemListOrderAscending",numberOfItems:Math.min(50,big.length),itemListElement:big.slice(0,50).map((r,i)=>({"@type":"ListItem",position:i+1,name:r[F.name],url:SITE.url+munPath(r)}))},
         {"@context":"https://schema.org","@type":"FAQPage",mainEntity:[{"@type":"Question",name:R.q,acceptedAnswer:{"@type":"Answer",text:lead+" Fuente: "+src+"."}}]}]});
     addUrl(route,0.8);
@@ -432,7 +432,7 @@ fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"
 // Netlify: el dominio antiguo redirige al nuevo; las rutas dinámicas que no tienen HTML propio caen en la app
 // Cloudflare Pages: las reglas de _redirects se aplican aunque exista el fichero, así que solo se reescriben rutas que no existen
 // (apartados de la ficha y comparaciones). La redirección de www y del dominio antiguo se hace en Cloudflare (reglas de redirección).
-fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301","/temas/ /preguntas/ 301","/temas /preguntas/ 301","/temas/* /preguntas/ 301"].join("\n")+"\n");
+fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/ / 301","/municipio / 301","/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301","/temas/ /preguntas/ 301","/temas /preguntas/ 301","/temas/* /preguntas/ 301"].join("\n")+"\n");
 fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));
