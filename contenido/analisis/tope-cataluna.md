@@ -2,7 +2,6 @@
 titulo: ¿Funcionó el tope del alquiler en Cataluña?
 entradilla: Desde marzo de 2024, 140 municipios catalanes ponen techo a los contratos nuevos de alquiler. El alquiler subió menos de lo que habría subido, y a la vez se vendieron más pisos. Medimos las dos cosas.
 respuesta: Frenó la subida, pero no bajó el alquiler. En 2024 subió un 3,1 % donde hay tope y, sin él, habría subido en torno a un 3,7 %, y el freno es mayor en los contratos nuevos. En esos municipios se vendieron además más pisos de lo esperable, y los datos no dicen si salieron del alquiler.
-tema: vivienda
 metodo: Alquiler declarado a Hacienda, INE, 2015–2024
 evidencia: natural
 publicado: 2026-10-22

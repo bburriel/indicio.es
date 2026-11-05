@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import {spawn} from "node:child_process";
-import {TOPICS,SITE} from "./src/content.mjs";
+import {SITE} from "./src/content.mjs";
 import {ALL as STUDIES} from "./src/analisis.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
@@ -17,7 +17,7 @@ const server=spawn(process.execPath,[path.join(ROOT,"serve.mjs")],{env:{...proce
 await new Promise(r=>setTimeout(r,800));
 fs.mkdirSync(path.join(ROOT,"snapshots"),{recursive:true}); fs.mkdirSync(path.join(ROOT,"og"),{recursive:true});
 
-const routes=["/","/preguntas/","/temas/",...TOPICS.filter(T=>T.id!=="vivienda").map(T=>"/temas/"+T.id+"/"),...STUDIES.map(S=>"/preguntas/"+S.id+"/"),"/laboratorio/","/laboratorio/metodo/","/municipio/","/quien-soy/"];
+const routes=["/","/preguntas/",...STUDIES.map(S=>"/preguntas/"+S.id+"/"),"/laboratorio/","/laboratorio/metodo/","/municipio/","/quien-soy/"];
 const fname=r=>(r==="/"?"index":r.replace(/^\/|\/$/g,"").replace(/\//g,"__"))+".html";
 const browser=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
 const ctx=await browser.newContext({locale:"es-ES",timezoneId:"Europe/Madrid",viewport:{width:1280,height:900},deviceScaleFactor:2,reducedMotion:"reduce"});
@@ -104,7 +104,7 @@ for(const S of STUDIES){
   .rv-bars rect,.rv-spikes g path,.rv-tiles rect,.rv-turnout circle{opacity:1!important;transform:none!important}.rv-ridge path[fill="none"],.rv-scatter line{stroke-dashoffset:0!important}
   </style></head><body><div class="og">
   <div class="brand">Indic<span class="lg-i">ı</span>o</div>
-  <div style="padding-top:40px"><div class="k">${(TOPICS.find(T=>T.id===S.tema)||{}).l||""} · ${S.m}</div><h1>${S.t}</h1><p><b>${S.a.split(". ")[0]}.</b> ${S.a.split(". ").slice(1).join(". ")}</p></div>
+  <div style="padding-top:40px"><div class="k">${S.m}</div><h1>${S.t}</h1><p><b>${S.a.split(". ")[0]}.</b> ${S.a.split(". ").slice(1).join(". ")}</p></div>
   <div class="art">${art}</div>
   <div class="foot">indicio.es · Preguntas reales, respuestas con datos públicos</div></div></body></html>`;
   await ogPage.setContent(html,{waitUntil:"networkidle"}); await ogPage.evaluate(()=>document.fonts.ready); await ogPage.waitForTimeout(600);

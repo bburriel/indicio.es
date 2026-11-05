@@ -2,7 +2,6 @@
 titulo: ¿Cómo ha gestionado España estos años frente a sus vecinos?
 entradilla: Déficit, deuda, gasto, paro y pobreza de España frente a la mediana de 13 países europeos, de 2015 a 2025. Qué hizo distinto, qué resultó distinto y qué no se puede atribuir a nadie.
 respuesta: España sostuvo el empleo con un déficit alto y puntual, y lo pagó con una deuda que sigue casi donde estaba en 2019. El paro ha bajado 3,6 puntos mientras el del vecino mediano ha bajado 0,2, pero España parte de más arriba y sigue siendo la que más paro tiene, y la segunda con más pobreza y exclusión de los 14 países.
-tema: voto
 metodo: Eurostat y Banco Mundial, 2015–2025
 evidencia: desc
 publicado: 2026-11-03

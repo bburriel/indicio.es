@@ -7,7 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import {ROWS} from "../src/i18n-textos.mjs";
-import {TOPICS,PAGES} from "../src/content.mjs";
+import {PAGES} from "../src/content.mjs";
 
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"..");
 // Páginas que ya se dan por cerradas: lo que falte aquí hay que traducirlo. El resto (análisis, temas…) cambia
@@ -48,9 +48,8 @@ const fuentes=()=>{
     f.push(["snapshots/"+n,textosDeHtml(fs.readFileSync(path.join(sn,n),"utf8")),CERRADAS.includes(nombre)]);
   }
   const c=[];
-  for(const t of TOPICS) c.push(t.l,t.q,t.d);
   for(const k of Object.keys(PAGES)) c.push(PAGES[k].t.replace(/ · Indicio$/,""),PAGES[k].d);
-  f.push(["src/content.mjs (temas y páginas)",c.map(norm).filter(hasLetters),false]);
+  f.push(["src/content.mjs (páginas)",c.map(norm).filter(hasLetters),false]);
   return f;
 };
 

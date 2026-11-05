@@ -1,4 +1,4 @@
-// Build de Indicio: genera en dist/ una página HTML real por cada ruta (portada, preguntas, temas,
+// Build de Indicio: genera en dist/ una página HTML real por cada ruta (portada, preguntas,
 // laboratorio, quién soy y una ficha por municipio), con título, descripción, canonical, Open Graph,
 // JSON-LD, sitemap, RSS y robots. Sin dependencias: `node build.mjs`.
 //
@@ -8,14 +8,13 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
-import {SITE,QUICK,TOPICS,PAGES,EVIDENCE} from "./src/content.mjs";
+import {SITE,QUICK,PAGES,EVIDENCE} from "./src/content.mjs";
 import {ROWS as I18N_ROWS} from "./src/i18n-textos.mjs";
 import {faltan as i18nFaltan, validar as i18nValidar} from "./scripts/i18n-faltan.mjs";
 import {STUDIES,ALL,HIDDEN,MDBODY} from "./src/analisis.mjs";
 import {ILLUS,TILL,FOCUS} from "./src/illus.mjs";
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
-const tHref=id=>id==="vivienda"?"/preguntas/vivienda/":"/temas/"+id+"/";
 const OUT=path.join(ROOT,"dist");
 const rd=p=>fs.readFileSync(path.join(ROOT,p),"utf8");
 const exists=p=>fs.existsSync(path.join(ROOT,p));
@@ -35,7 +34,9 @@ const provShort=n=>n?n.split("/")[0].replace(/^(.*), (A|Las|La|Les|Illes|Os)$/,"
 try{ fs.rmSync(OUT,{recursive:true,force:true}); }catch(e){ /* sin permiso de borrado: se sobrescribe encima */ }
 fs.mkdirSync(OUT,{recursive:true});
 const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.readdirSync(from,{withFileTypes:true})){ const a=path.join(from,e.name), b=path.join(to,e.name); if(e.isDirectory()) copyDir(a,b); else fs.writeFileSync(b,fs.readFileSync(a)); } };
-const css=rd("src/styles.css"), js=rd("src/app.js"), tpl=rd("src/template.html"), body=rd("src/body.html");
+const css=rd("src/styles.css"), js=rd("src/app.js"), tpl=rd("src/template.html");
+const MENUAN=STUDIES.map(S=>`      <a href="/preguntas/${S.id}/">${esc(S.t)}</a>`).join("\n");
+const body=rd("src/body.html").replace("{{MENUAN}}",MENUAN);
 const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
 const i18n="var ROWS="+JSON.stringify(I18N_ROWS)+";\n"+rd("src/i18n.js"), CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js", I18N="/assets/i18n."+h8(i18n)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
@@ -43,7 +44,7 @@ fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js)
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
 // Los análisis con «oculto» no se publican: ni página, ni datos en content.js. Para revisarlos en local: MOSTRAR_OCULTOS=1 npm run build
 const SHOW_HIDDEN=!!process.env.MOSTRAR_OCULTOS;
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:SHOW_HIDDEN?HIDDEN:[],md:SHOW_HIDDEN?MDBODY:Object.fromEntries(Object.entries(MDBODY).filter(([id])=>STUDIES.some(S=>S.id===id))),quick:QUICK,topics:TOPICS,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:SHOW_HIDDEN?HIDDEN:[],md:SHOW_HIDDEN?MDBODY:Object.fromEntries(Object.entries(MDBODY).filter(([id])=>STUDIES.some(S=>S.id===id))),quick:QUICK,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 
@@ -122,50 +123,32 @@ const urls=[]; const addUrl=(loc,pri,mod)=>urls.push({loc:SITE.url+loc,pri,mod:m
 // ---------- portada ----------
 {
   const lead=STUDIES[0];
-  const cards=STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · ${esc(S.m)}${S.ev?` <span class="ev ev-${S.ev}">${esc(EVIDENCE[S.ev].l)}</span>`:""}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta →</div></a>`).join("");
+  const cards=STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(S.m)}${S.ev?` <span class="ev ev-${S.ev}">${esc(EVIDENCE[S.ev].l)}</span>`:""}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta →</div></a>`).join("");
   const main=snapshot("/")||`<section class="qh"><div class="kk2">Preguntas reales. Respuestas con datos públicos.</div><h1 class="qh-q">${esc(lead.t)}</h1><p class="qh-a"><b>${esc(lead.a.split(". ")[0])}.</b> ${esc(lead.a.split(". ").slice(1).join(". "))} <a href="/preguntas/${lead.id}/">Ver la respuesta →</a></p></section>
   <section class="ed-sec"><div class="ed-k">Preguntas respondidas</div><h2 class="ed-h2">Lo que dicen los datos</h2><div class="qg">${cards}</div><p style="margin-top:20px"><a class="ed-go" href="/preguntas/">Todas las preguntas →</a></p></section>
-  <section class="ed-sec"><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rows.length)} municipios, si la relación aguanta entre municipios parecidos y qué pasó antes y después de una ley.</p><p><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></section>
-  <section class="ed-sec"><div class="ed-k">Preguntas por tema</div><div class="ed-temas">${TOPICS.map(T=>`<a href="${tHref(T.id)}">${T.l}</a>`).join("")}</div></section>${sources}`;
+  <section class="ed-sec"><div class="ed-k">Laboratorio</div><h2 class="ed-h2">¿Tienes otra pregunta? Pruébala tú.</h2><p class="ed-lead">Elige dos cosas (el paro y la edad, la renta y el voto…) y mira si van juntas en los ${nf0.format(rows.length)} municipios, si la relación aguanta entre municipios parecidos y qué pasó antes y después de una ley.</p><p><a class="ed-go" href="/laboratorio/">Abrir el laboratorio →</a></p></section>${sources}`;
   page({route:"/",title:PAGES["/"].t,desc:PAGES["/"].d,ogTitle:SITE.name+" · "+SITE.tagline,main,
     jsonld:{"@context":"https://schema.org","@type":"WebSite",name:SITE.name,url:SITE.url,description:SITE.description,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},potentialAction:{"@type":"SearchAction",target:SITE.url+"/municipio/?q={search_term_string}","query-input":"required name=search_term_string"}}});
   addUrl("/",1.0);
 }
-function topicName(id){ return (TOPICS.find(T=>T.id===id)||{}).l||""; }
 
 // ---------- preguntas ----------
 {
-  const cards=[...STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k">${esc(topicName(S.tema))} · <span class="k-m">${esc(S.m)}</span>${S.ev?` <span class="ev ev-${S.ev}">${esc(EVIDENCE[S.ev].l)}</span>`:""}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta → <time datetime="${S.pub}">${fechaES(S.pub)}</time></div></a>`),
-    ...QUICK.map(Q=>`<a href="${Q.href}"><div class="k">${esc(topicName(Q.tema))}</div><div class="q">${esc(Q.t)}</div><div class="a">${esc(Q.a)}</div><div class="go">Ver la respuesta →</div></a>`)].join("");
-  const main=snapshot("/preguntas/")||`<header class="phead"><h1>Preguntas</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
-  page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Preguntas",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
+  const cards=[...STUDIES.map(S=>`<a href="/preguntas/${S.id}/"><div class="k"><span class="k-m">${esc(S.m)}</span>${S.ev?` <span class="ev ev-${S.ev}">${esc(EVIDENCE[S.ev].l)}</span>`:""}</div><div class="q">${esc(S.t)}</div><div class="a">${esc(S.a)}</div><div class="go">Ver la respuesta → <time datetime="${S.pub}">${fechaES(S.pub)}</time></div></a>`),
+    ...QUICK.map(Q=>`<a href="${Q.href}"><div class="k">${Q.ev?`<span class="ev ev-${Q.ev}">${esc(EVIDENCE[Q.ev].l)}</span>`:""}</div><div class="q">${esc(Q.t)}</div><div class="a">${esc(Q.a)}</div><div class="go">Ver la respuesta →</div></a>`)].join("");
+  const main=snapshot("/preguntas/")||`<header class="phead"><h1>Análisis</h1><p class="dek">${esc(PAGES["/preguntas/"].d)}</p></header><div class="qg">${cards}</div>${sources}`;
+  page({route:"/preguntas/",title:PAGES["/preguntas/"].t,desc:PAGES["/preguntas/"].d,main,jsonld:{"@context":"https://schema.org","@type":"CollectionPage",name:"Análisis",url:SITE.url+"/preguntas/",hasPart:STUDIES.map(S=>({"@type":"Article",headline:S.t,url:SITE.url+"/preguntas/"+S.id+"/"}))}});
   addUrl("/preguntas/",0.9);
   for(const S of (SHOW_HIDDEN?ALL:STUDIES)){
     const route="/preguntas/"+S.id+"/";
-    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Preguntas</a> › ${esc(topicName(S.tema))} › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p>${ILLUS[S.id]||""}</header>
+    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Análisis</a> › ${esc(S.m)}</nav><header class="phead"><h1>${esc(S.t)}</h1><p class="dek">${esc(S.d)}</p><p class="byline">Por <a href="/quien-soy/">${esc(SITE.author.name)}</a> · <time datetime="${S.pub}">${fechaES(S.pub)}</time> · ${esc(S.m)}</p>${ILLUS[S.id]||""}</header>
       <section class="finding"><h2>La respuesta corta</h2><div class="txt"><p>${esc(S.a)}</p><p>La respuesta completa, con los gráficos y el método paso a paso, se calcula con los datos al abrir la página. <a href="/laboratorio/">Ponla a prueba en el laboratorio →</a></p></div></section>${sources}`;
     const og=exists("og/"+S.id+".png")?"/og/"+S.id+".png":null;
     page({route,title:S.t+" · Indicio",desc:S.a,ogTitle:S.t,main,type:"article",ogImage:og,robots:S.oculto?"noindex":"",
-      jsonld:[{"@context":"https://schema.org","@type":"Article",headline:S.t,description:S.d,datePublished:S.pub,dateModified:S.upd||S.pub,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url},mainEntityOfPage:SITE.url+route,image:SITE.url+(og||"/og-image.png"),articleSection:topicName(S.tema)},
-        breadcrumb([["Preguntas","/preguntas/"],[S.t,route]]),
+      jsonld:[{"@context":"https://schema.org","@type":"Article",headline:S.t,description:S.d,datePublished:S.pub,dateModified:S.upd||S.pub,inLanguage:"es",author:{"@type":"Person",name:SITE.author.name,url:SITE.author.url},publisher:{"@type":"Organization",name:SITE.name,url:SITE.url},mainEntityOfPage:SITE.url+route,image:SITE.url+(og||"/og-image.png")},
+        breadcrumb([["Análisis","/preguntas/"],[S.t,route]]),
         {"@context":"https://schema.org","@type":"FAQPage",mainEntity:[{"@type":"Question",name:S.t,acceptedAnswer:{"@type":"Answer",text:S.a}}]}]});
     if(!S.oculto) addUrl(route,0.8,S.upd||S.pub);
-  }
-}
-
-// ---------- temas ----------
-{
-  const main=snapshot("/temas/")||`<header class="phead"><h1>Temas</h1><p class="dek">${esc(PAGES["/temas/"].d)}</p></header><div class="studies">${TOPICS.map(T=>`<a class="study" href="${tHref(T.id)}"><span>${esc(T.l)}</span><b>${esc(T.q)}</b><p>${esc(T.d)}</p></a>`).join("")}</div>${sources}`;
-  page({route:"/temas/",title:PAGES["/temas/"].t,desc:PAGES["/temas/"].d,main});
-  addUrl("/temas/",0.7);
-  for(const T of TOPICS){
-    if(T.id==="vivienda") continue; // fusionada con su análisis: /temas/vivienda/ redirige
-    const route="/temas/"+T.id+"/", qs=STUDIES.filter(S=>S.tema===T.id);
-    const main=snapshot(route)||`<nav class="crumbs"><a href="/preguntas/">Preguntas</a> › ${esc(T.l)}</nav><header class="phead"><h1>${esc(T.q)}</h1><p class="dek">${esc(T.d)}</p></header>
-      ${qs.length?`<section class="finding"><h2>Preguntas sobre ${esc(T.l.toLowerCase())}</h2><div class="studies">${qs.map(S=>`<a class="study" href="/preguntas/${S.id}/"><span>${esc(S.m)}</span><b>${esc(S.t)}</b><p>${esc(S.a)}</p></a>`).join("")}</div></section>`:""}
-      <section class="finding"><h2>Míralo en el laboratorio</h2><div class="txt"><p>Los datos de este tema, municipio a municipio, en mapas, rankings y cruces: <a href="/laboratorio/">abrir el laboratorio →</a></p></div></section>${sources}`;
-    page({route,title:T.q+" · "+T.l+" · Indicio",desc:T.d,ogTitle:T.q,main,jsonld:breadcrumb([["Preguntas","/preguntas/"],[T.l,route]])});
-    addUrl(route,0.7);
   }
 }
 
@@ -437,19 +420,16 @@ ${STUDIES.map(S=>`- [${S.t}](${SITE.url}/preguntas/${S.id}/): ${S.a}`).join("\n"
 - [Rankings de municipios](${SITE.url}/rankings/): los municipios con más y menos renta, paro, población, edad, alquiler, pisos turísticos, extranjeros, desigualdad y estudios.
 - [Laboratorio](${SITE.url}/laboratorio/): mapas, rankings y cruces de cualquier par de datos, con pruebas para distinguir correlación de causa.
 
-## Temas
-${TOPICS.map(T=>`- [${T.q}](${SITE.url}${tHref(T.id)}): ${T.d}`).join("\n")}
-
 ## Datos en bruto
 - ${SITE.url}/data/index.json: todos los municipios con sus indicadores principales (campos en «fields»).
 - ${SITE.url}/data/indicadores.json: descripción, unidad y fuente de cada indicador.
 `);
 const rfc=d=>new Date(d+"T08:00:00+02:00").toUTCString();
-fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Indicio · Preguntas</title><link>${SITE.url}/</link><description>${esc(SITE.tagline)}</description><language>es</language><atom:link href="${SITE.url}/feed.xml" rel="self" type="application/rss+xml"/>\n${[...STUDIES].sort((a,b)=>(b.upd||b.pub).localeCompare(a.upd||a.pub)).map(S=>`<item><title>${esc(S.t)}</title><link>${SITE.url}/preguntas/${S.id}/</link><guid>${SITE.url}/preguntas/${S.id}/</guid><pubDate>${rfc(S.pub)}</pubDate><category>${esc(topicName(S.tema))}</category><description>${esc(S.a)}</description></item>`).join("\n")}\n</channel></rss>\n`);
+fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Indicio · Preguntas</title><link>${SITE.url}/</link><description>${esc(SITE.tagline)}</description><language>es</language><atom:link href="${SITE.url}/feed.xml" rel="self" type="application/rss+xml"/>\n${[...STUDIES].sort((a,b)=>(b.upd||b.pub).localeCompare(a.upd||a.pub)).map(S=>`<item><title>${esc(S.t)}</title><link>${SITE.url}/preguntas/${S.id}/</link><guid>${SITE.url}/preguntas/${S.id}/</guid><pubDate>${rfc(S.pub)}</pubDate><category>${esc((EVIDENCE[S.ev]||{}).l||"Análisis")}</category><description>${esc(S.a)}</description></item>`).join("\n")}\n</channel></rss>\n`);
 // Netlify: el dominio antiguo redirige al nuevo; las rutas dinámicas que no tienen HTML propio caen en la app
 // Cloudflare Pages: las reglas de _redirects se aplican aunque exista el fichero, así que solo se reescriben rutas que no existen
 // (apartados de la ficha y comparaciones). La redirección de www y del dominio antiguo se hace en Cloudflare (reglas de redirección).
-fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301"].join("\n")+"\n");
+fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301","/temas/ /preguntas/ 301","/temas /preguntas/ 301","/temas/* /preguntas/ 301"].join("\n")+"\n");
 fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));

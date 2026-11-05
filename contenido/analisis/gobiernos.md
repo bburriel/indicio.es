@@ -2,7 +2,6 @@
 titulo: ¿Cómo le fue a España con cada Gobierno?
 entradilla: Crecimiento, paro, deuda y déficit con cada presidente desde 1977, comparados con lo que pasaba a la vez en el resto de Europa. Porque buena parte de lo que pasa en un mandato no lo decide quien gobierna.
 respuesta: Cada Gobierno tuvo su gran ola, y casi ninguna la eligió. La economía española sigue al ciclo europeo, pero lo exagera: crece más en las buenas y destruye mucho más empleo en las malas. Comparado con Europa en los mismos años, el paro bajó más que la media con Aznar, Rajoy y Sánchez, y subió mucho más con González (en la crisis de 1993) y con Zapatero (en la de 2008). En poder de compra, España está hoy, frente a la media europea, donde estaba en 1995.
-tema: voto
 metodo: Eurostat y Banco Mundial, 1977–2025
 evidencia: desc
 publicado: 2026-10-25
