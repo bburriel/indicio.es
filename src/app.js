@@ -7000,7 +7000,7 @@ function heroType(root){
   const live=()=>document.body.contains(root), sleep=ms=>new Promise(r=>setTimeout(r,ms));
   // posición del cursor: al final del texto de la palabra (o al principio de su hueco si está vacía)
   const pos=el=>{ const v=vis.getBoundingClientRect(), fs=parseFloat(getComputedStyle(el).fontSize), h=fs*.78;
-    let x,y; if(el.textContent){ const rg=document.createRange(); rg.selectNodeContents(el); const rs=rg.getClientRects(), r=rs[rs.length-1]; x=r.right; y=r.top+r.height/2; el._y=y-v.top; }
+    let x,y; if(el.textContent){ const rg=document.createRange(); rg.selectNodeContents(el); const rs=rg.getClientRects(), r=rs[rs.length-1]; x=r.right+(/\.$/.test(el.textContent)?fs*.06:0); y=r.top+r.height/2; el._y=y-v.top; }
     else { x=el.getBoundingClientRect().left; y=el._y!=null?el._y+v.top:el.getBoundingClientRect().top+el.getBoundingClientRect().height/2; }   // vacía: se queda en su línea
     return {x:x-v.left, y:y-v.top-h/2+fs*.06, h}; };
   const put=el=>{ const q=pos(el); cur.style.left=q.x+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; };
@@ -7012,7 +7012,7 @@ function heroType(root){
   const L1=root.querySelector(".ho-l1"), L2=root.querySelector(".ho-l2"), idx=el=>el===OA?10:W.textContent.length, rnd=(a,b)=>a+Math.random()*(b-a);
   const cx=(L,i)=>{ const v=vis.getBoundingClientRect(); if(i<=0) return L.getBoundingClientRect().left-v.left;
     const tw=document.createTreeWalker(L,NodeFilter.SHOW_TEXT); let n, c=0;
-    while((n=tw.nextNode())){ if(c+n.length>=i){ const rg=document.createRange(); rg.setStart(n,i-c-1); rg.setEnd(n,i-c); return rg.getBoundingClientRect().right-v.left; } c+=n.length; }
+    while((n=tw.nextNode())){ if(c+n.length>=i){ const rg=document.createRange(); rg.setStart(n,i-c-1); rg.setEnd(n,i-c); return rg.getBoundingClientRect().right-v.left+(n.data[i-c-1]==="."?parseFloat(getComputedStyle(L).fontSize)*.06:0); } c+=n.length; }
     return L.getBoundingClientRect().right-v.left; };
   const stepTo=async(L,from,to)=>{ const d=to>from?1:-1; for(let i=from;i!==to;){ i+=d; cur.style.left=cx(L,i)+"px"; await sleep(rnd(52,92)); } };
   const jump=async(L,i,q)=>{ cur.style.left=cx(L,i)+"px"; cur.style.top=q.y+"px"; cur.style.height=q.h+"px"; await sleep(rnd(130,230)); };
@@ -7069,8 +7069,8 @@ async function renderInicio(){
     <p class="ho-sub">Democratizando el acceso al dato público</p>
     <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Ver las preguntas</a><a class="ho-lk" href="#" data-go=".pt-labx">Abrir el laboratorio</a><a class="ho-lk" href="#" data-go=".pt-mun">Buscar mi municipio</a></p></section>
-  ${heroCarHTML(D)}
-  <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p>
+  <div class="pt-carband">${heroCarHTML(D)}
+  <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p></div>
   <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
       <p class="pt-labx-lead">Elige lo que quieras comparar (renta, vivienda, edad, voto, sueldos, pensiones…) y míralo en un mapa, un ranking o un gráfico. Después comprueba si la relación aguanta al comparar lo que es comparable, o qué pasó antes y después de una ley.</p>
       <div class="pt-labx-h" id="labq-t">Empieza por una pregunta</div>
