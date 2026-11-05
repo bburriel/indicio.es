@@ -13,6 +13,10 @@ export const ROWS=[
  ["INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.","INE, SEPE, Seguretat Social i Eurostat. Cada gràfic diu d'on surt.","INE, SEPE, Seguridade Social e Eurostat. Cada gráfico di de onde sae.","INE, SEPE, Gizarte Segurantza eta Eurostat. Grafiko bakoitzak zehazten du nondik datorren.","INE, SEPE, Social Security and Eurostat. Every chart says where it comes from."],
  ["Tres niveles de prueba","Tres nivells de prova","Tres niveis de proba","Hiru froga maila","Three levels of proof"],
  ["Cada respuesta dice si describe, compara casos parecidos o es un experimento natural.","Cada resposta diu si descriu, compara casos semblants o és un experiment natural.","Cada resposta di se describe, compara casos parecidos ou é un experimento natural.","Erantzun bakoitzak dio deskribatzen duen, antzeko kasuak alderatzen dituen ala esperimentu natural bat den.","Each answer says whether it describes, compares similar cases or is a natural experiment."],
+ // ficha: cifras clave, posición entre municipios
+ ["Por encima del {#} % de los municipios","Per sobre del {#} % dels municipis","Por riba do {#} % dos municipios","Udalerrien % {#} baino gehiago","Above {#}% of municipalities"],
+ ["Por debajo del {#} % de los municipios","Per sota del {#} % dels municipis","Por baixo do {#} % dos municipios","Udalerrien % {#} baino gutxiago","Below {#}% of municipalities"],
+ ["En la franja central de los municipios","A la franja central dels municipis","Na franxa central dos municipios","Udalerrien tarte erdian","In the middle range of municipalities"],
  // cabecera
  ["Preguntas","Preguntes","Preguntas","Galderak","Questions"],
  ["Municipios","Municipis","Municipios","Udalerriak","Municipalities"],

@@ -2392,3 +2392,26 @@ details.chk > section{margin-top:18px}
 .mun-hero .mun-card p.mun-otro{margin:18px 0 2px; font-size:13.5px}
 .mun-hero .mun-card .bigsearch input{font-size:17px!important; padding-top:8px!important; padding-bottom:8px!important}
 @media (max-width:860px){ .mun-hero .mun-card h3{font-size:22px} }
+
+/* Cifras clave de la ficha: escala visible, cifra en serifa y posición entre municipios (noviembre 2026) */
+.cp-kpis{border-top:2px solid var(--ink); padding-top:16px}
+.cp-kpis .cp-key{padding-bottom:6px}
+.cp-k{grid-template-columns:minmax(0,300px) minmax(0,1fr) 190px; padding:24px 0}
+.cp-k .cp-l .yr{font-weight:400; color:var(--muted); font-size:14px; margin-left:4px}
+.cp-trk.ax-on{height:44px}
+.cp-trk .ax{position:absolute; top:31px; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap}
+.cp-trk .ax.l{left:-8px} .cp-trk .ax.r{right:-8px}
+.cp-trk.ax-on::after{content:""; position:absolute; left:-8px; right:-8px; top:26px; height:4px; border-left:1px solid var(--rule-2); border-right:1px solid var(--rule-2)}
+.cp-k .cp-vv b{font-family:'Newsreader',Georgia,serif; font-weight:500; font-size:32px; line-height:1.05; letter-spacing:-.01em}
+.cp-k .cp-vv small{font-size:13px}
+.cp-k .cp-vv em{display:block; font-style:normal; font-size:12px; color:var(--ink-2); margin-top:7px; padding-top:7px; border-top:1px solid var(--rule); line-height:1.35}
+@media (max-width:760px){
+  .cp-k{grid-template-columns:minmax(0,1fr); gap:6px; padding:22px 0}
+  .cp-k .cp-t,.cp-k .cp-trk,.cp-k .cp-vv{grid-column:1; grid-row:auto}
+  .cp-k .cp-t p{font-size:16px}
+  .cp-k .cp-trk{margin:10px 8px 0}
+  .cp-k .cp-vv{display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 12px; text-align:left; margin-top:6px}
+  .cp-k .cp-vv b{display:inline; font-size:30px}
+  .cp-k .cp-vv small{display:inline; margin:0; font-size:13.5px}
+  .cp-k .cp-vv em{flex:0 0 100%; max-width:none; margin:4px 0 0; padding:0; border:0; font-size:13px; color:var(--muted)}
+}

@@ -671,7 +671,8 @@ function kpis(box,r,d){
     return Math.abs(d)<1?["","Se vota casi igual que en España",vs]:[`En ${nm} se vota `,mas,` que en España${vs}`]; };
   box.innerHTML=`<div class="cp-key"><span><i class="me"></i>${en}</span><span><i class="es"></i>España</span><span><i class="bd"></i>Donde está el 80 % de los municipios</span></div>`+K.map(([kk,l,v,e,mode,nota])=>{
     const ph=v==null?["","No hay dato de "+nm,"."]:e==null?[`${nm}: `,fmtK(kk)(v),"."]:sent(kk,v,e), f=fmtK(kk);
-    return `<div class="cp-r cp-k"><div class="cp-t"><div class="cp-l">${esc(l)}</div>${nota?`<div class="cp-s">${esc(nota)}</div>`:""}<p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${cpTrk(kk,[["a",v]],e)}<div class="cp-vv"><b>${v==null?"sin dato":f(v)}</b>${e==null?"":`<small>España ${f(e)}</small>`}</div></div>`; }).join("");
+    const [lt,ly]=l.split(" · "), vs=rowsAll().map(q=>q[F[kk]]).filter(z=>z!=null).sort(d3.ascending), ends=vs.length?[f(d3.quantile(vs,.01)),f(d3.quantile(vs,.99))]:null;
+    return `<div class="cp-r cp-k"><div class="cp-t"><div class="cp-l">${esc(lt)}${ly?` <span class="yr">${esc(ly)}</span>`:""}</div>${nota?`<div class="cp-s">${esc(nota)}</div>`:""}<p>${esc(ph[0])}<b>${esc(ph[1])}</b>${esc(ph[2])}</p></div>${cpTrk(kk,[["a",v]],e,ends)}<div class="cp-vv"><b>${v==null?"sin dato":f(v)}</b>${e==null?"":`<small>España ${f(e)}</small>`}${v==null?"":`<em>${esc(cpRank(kk,v))}</em>`}</div></div>`; }).join("");
 }
 // ---------- minigráficos de cambio ----------
 function smalls(box,r,d){
@@ -1438,9 +1439,12 @@ function cpBig(k,A,Bm,va,vb){
   return [z,`+${nf0.format((r-1)*100)}${NB}%`,`de ${c.n} en ${H}.`,det];
 }
 // pista de un dato: de menos a más entre los municipios de España (del 1 % al 99 %), con la franja donde está el 80 % de ellos
-function cpTrk(k,pts,e){ const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length||pts.every(p=>p[1]==null)) return "<div></div>";
+function cpTrk(k,pts,e,ends){ const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null).sort(d3.ascending); if(!vals.length||pts.every(p=>p[1]==null)) return "<div></div>";
   const lo=d3.quantile(vals,.01), hi=d3.quantile(vals,.99), X=z=>Math.max(0,Math.min(1,(z-lo)/((hi-lo)||1)))*100, b0=X(d3.quantile(vals,.1)), b1=X(d3.quantile(vals,.9));
-  return `<div class="cp-trk" aria-hidden="true"><i class="bd" style="left:${b0}%;width:${b1-b0}%"></i>${e==null?"":`<i class="es" style="left:${X(e)}%"></i>`}${pts.map(([c,v])=>v==null?"":`<i class="me ${c}" style="left:${X(v)}%"></i>`).join("")}</div>`; }
+  const ax=ends?`<span class="ax l">${esc(ends[0])}</span><span class="ax r">${esc(ends[1])}</span>`:"";
+  return `<div class="cp-trk${ends?" ax-on":""}" aria-hidden="true"><i class="bd" style="left:${b0}%;width:${b1-b0}%"></i>${e==null?"":`<i class="es" style="left:${X(e)}%"></i>`}${pts.map(([c,v])=>v==null?"":`<i class="me ${c}" style="left:${X(v)}%"></i>`).join("")}${ax}</div>`; }
+// posición de un valor entre todos los municipios (parte de ellos con un valor menor)
+function cpRank(k,v){ const vals=rowsAll().map(q=>q[F[k]]).filter(z=>z!=null); if(!vals.length||v==null) return ""; const p=Math.round(vals.filter(z=>z<v).length/vals.length*100); return p>=40&&p<=60?"En la franja central de los municipios":p>60?`Por encima del ${p}${NB}% de los municipios`:`Por debajo del ${100-p}${NB}% de los municipios`; }
 
 async function renderComparar(a,b){
   document.title="Comparar · Indicio";
