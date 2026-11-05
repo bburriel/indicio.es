@@ -2325,13 +2325,21 @@ details.chk > section{margin-top:18px}
 .sel:disabled{opacity:.5;cursor:not-allowed}
 .lb-step .psb{display:block;margin-top:8px}
 
-/* Municipios en la portada (nov. 2026): titular en dos frases, gráfico sin el fondo claro y ficha mínima bajo el buscador */
-.pt-mun h2 em{display:block}
+/* Municipios en la portada (nov. 2026): todo apilado a ancho completo, gráfico sin el fondo claro y ficha mínima bajo el buscador */
+.pt-land.pt-mun{grid-template-columns:minmax(0,1fr); align-items:start; gap:22px 0}
+.pt-mun .pt-land-lead{max-width:44em}
+.pt-mun-q{max-width:760px; width:100%}
 /* el JPG lleva un fondo casi blanco: con «darken» solo se ve lo que es más oscuro que la banda, es decir, los puntos y las etiquetas */
 .pt-mun-art .qimg{mix-blend-mode:darken}
 :root[data-theme="dark"] .pt-mun-art .qimg{mix-blend-mode:normal}
-.pt-mun-fi{display:none}
-.pt-mun-fi.on{display:block; grid-column:1/-1; border-top:1px solid var(--ink); padding-top:20px; margin-top:6px}
+.pt-mun-fi{grid-column:1/-1; margin-top:6px}
+.mi-facts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-top:1px solid var(--rule-2)}
+.mi-facts p{margin:0; padding:16px 22px 0; border-left:1px solid var(--rule-2); font:clamp(16px,1.6vw,18px)/1.45 var(--serif); color:var(--ink-2)}
+.mi-facts p:first-child{padding-left:0; border-left:0}
+.mi-facts b{font-weight:500; font-size:1.7em; line-height:1.1; color:var(--brand); display:block; letter-spacing:-.01em}
+.mi-facts a{color:var(--ink); text-decoration-color:var(--rule-2)}
+@media (max-width:760px){ .mi-facts{grid-template-columns:minmax(0,1fr)} .mi-facts p{padding:14px 0 0; border-left:0} }
+.pt-mun-fi.on{border-top:1px solid var(--ink); padding-top:20px}
 .mi-h{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:14px 32px}
 .mi-h .kk{display:block}
 .mi-h h3{font-family:var(--serif); font-weight:500; font-size:clamp(30px,4vw,44px); line-height:1.05; letter-spacing:-.01em; margin:4px 0 6px}

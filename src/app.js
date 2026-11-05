@@ -6575,9 +6575,19 @@ function munMini(code){
     <div class="mi-go"><a class="btn" href="${munPath(code)}">Ver su ficha completa →</a><a class="mi-lk" href="/comparar/${code}/">Comparar con otro →</a></div></div>
     <div class="mi-g">${MINI_KS.map(cell).join("")}</div>`;
 }
+// tres cifras de los municipios para el hueco de la ficha, mientras no se elige ninguno
+function munFacts(){
+  const R=rowsAll(), n=R.length, pop=r=>r[F.pop]||0, tot=d3.sum(R,pop);
+  const v=R.filter(r=>r[F.var0525]!=null), pierden=v.filter(r=>r[F.var0525]<0).length/v.length;
+  const peq=R.filter(r=>pop(r)<5000), gr=R.filter(r=>pop(r)>=100000), pc=x=>nf0.format(Math.round(x*100))+NB+"%";
+  return `<div class="mi-facts"><p><b>${pc(pierden)}</b> de los municipios tienen hoy menos vecinos que en 2005.</p>
+    <p><b>${pc(peq.length/n)}</b> tienen menos de 5.000 habitantes, y entre todos suman el ${pc(d3.sum(peq,pop)/tot)} de la población.</p>
+    <p><b>${pc(d3.sum(gr,pop)/tot)}</b> de la población vive en solo ${nf0.format(gr.length)} municipios, los de más de 100.000 habitantes.</p></div>`;
+}
 function munHome(){
   const box=document.getElementById("munfi"); if(!box) return;
   const show=code=>{ box.innerHTML=munMini(code); box.classList.add("on"); };
+  try{ box.innerHTML=munFacts(); }catch(e){ console.error(e); }
   bindBig("q2",r=>show(r[F.code]));
   // «Seguir con…» y los ejemplos enseñan la ficha mínima en vez de llevar a otra página
   document.querySelectorAll(".pt-mun-q .chipsq a").forEach(a=>a.addEventListener("click",e=>{ const c=/(\d{5})/.exec(a.getAttribute("href")||""); if(!c||!BYCODE.has(c[1])) return; e.preventDefault(); e.stopPropagation(); show(c[1]); }));
