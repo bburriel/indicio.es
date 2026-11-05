@@ -826,6 +826,8 @@ export const ROWS=[
  ["Qué son los datos", "Què són les dades", "Que son os datos", "Zer dira datuak", "What the data are"],
  ["Qué son los números", "Què són els números", "Que son os números", "Zer dira zenbakiak", "What the numbers are"],
  ["Qué tendría que ser cierto para que fuera causa","Què hauria de ser cert perquè fos causa","Que tería que ser certo para que fose causa","Kausa izateko, zer izan beharko litzateke egia","What would have to be true for it to be a cause"],
+ ["Rango probable","Rang probable","Rango probable","Ziurrenik dagoen tartea","Likely range"],
+ ["Qué mide cada dato","Què mesura cada dada","Que mide cada dato","Zer neurtzen duen datu bakoitzak","What each figure measures"],
  // bloque «¿Aguanta al comparar?» del laboratorio (noviembre 2026)
  ["¿Aguanta al comparar?","Aguanta quan es compara?","Aguanta ao comparar?","Eutsi egiten al dio konparatzean?","Does it hold up when compared?"],
  ["Se explica por otra cosa.","S'explica per una altra cosa.","Explícase por outra cousa.","Beste zerbaitek azaltzen du.","Something else explains it."],
