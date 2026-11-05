@@ -6865,15 +6865,6 @@ const HEROQ=[
     a:N=>`En ${N.infPicoY} España invirtió ${N.infPico} mil millones de euros en carreteras y trenes; en ${N.infUltY}, ${N.infUlt}: un ${N.infCaida}${NB}% menos. Hoy destina a las dos cosas menos del 1${NB}% del PIB, por debajo de Francia y Alemania, cuando antes de la crisis invertía casi el doble que Alemania. Del mantenimiento hay menos datos, y los que hay vienen del propio sector.`,
     cap:()=>`Inversión anual en carreteras (gris) y ferrocarril (granate), en miles de millones de euros de 2015, con dinero público y privado. Fuente: Foro Internacional del Transporte (OCDE).`},
 ];
-// «Puesto a prueba»: preguntas que no están en el carrusel, con el veredicto y un párrafo corto que lo explica (en el móvil, solo el veredicto)
-const PTIRA=[
-  ["pisos-turisticos","Menos de lo que se dice.","Es la explicación que más se oye cada vez que sube el alquiler. Pero donde más han crecido los pisos turísticos no es, en general, donde más ha subido; si hay efecto, está en barrios concretos."],
-  ["pensiones","Depende de cuánto se quiera gastar: con lo previsto, justo en el borde.",`Ahora se jubilan las generaciones más numerosas. Si solo cambia la demografía, el gasto pasa del 13,2${NB}% al 24,9${NB}% del PIB en 2050. Con lo previsto tras las reformas queda en el 16,5${NB}%, a tres décimas del límite del 16,2${NB}% (el gasto de hoy más tres puntos, cerca de lo que proyectan la AIReF y Fedea): cabe por poco o se pasa por poco. Para asegurarlo, cada pensión tendría que pesar algo menos frente a lo que ganan los trabajadores.`],
-  ["quien-gobierna","No se ve que cambie nada, pero solo se descartan diferencias grandes.","Miramos los pueblos donde el PP y el PSOE se jugaron la alcaldía por un puñado de votos, donde ganar fue casi cuestión de suerte. Gobernara uno u otro, la población, el paro, la renta y la deuda siguieron caminos parecidos. Con tan pocos pueblos, los datos solo habrían visto diferencias grandes: no prueban que un alcalde no importe."],
-  ["pandemia-turismo","Sí, y se recuperaron.","En la primavera de 2020 cerraron los hoteles y los aviones se quedaron en tierra. Ese año el paro subió más y la renta bajó más en las provincias más turísticas que en el resto, y después se recuperaron."],
-  ["ave","Poco, por ahora.","Entre 2021 y 2023 la alta velocidad llegó a Galicia, Extremadura, Burgos, Murcia, Elche y Asturias. Dos o cuatro años después, los pueblos con estación nueva apenas se distinguen de otros casi idénticos que se quedaron sin ella."],
-  ["convergencia","Sí, poco a poco, y sobre todo por el trabajo.","Entre 2015 y 2024 la renta subió en casi toda España, pero no igual para todos. Los sitios que partían de abajo han recortado distancia, y lo que más lo explica son los salarios; las pensiones y prestaciones ayudan, pero menos."],
-];
 // Quien ya tenía portada.json en caché (navegador o service worker) no trae la serie de infraestructuras: se completa desde infra.json,
 // que es un fichero nuevo y no puede estar viejo. Así la diapositiva no aparece con la portada pre-renderizada y desaparece al pintar.
 const infraDeFit=F=>{ const I=F.itf; return {years:I.years,road:I.road_q.map(v=>Math.round(v)/1000),rail:I.rail_q.map(v=>Math.round(v)/1000)}; };
@@ -7035,15 +7026,13 @@ async function renderInicio(){
   // mientras llega portada.json (unos cientos de bytes) sigue a la vista la portada pre-renderizada
   const D=await loadPortada(); if(location.pathname!=="/") return;
   const byId=Object.fromEntries(STUDIES.map(S=>[S.id,S]));
-  // «Puesto a prueba»: una pieza por fila, gráfico y texto, alternando el lado del gráfico; en el móvil, el gráfico debajo del texto
-  const tira=PTIRA.filter(([id])=>byId[id]).map(([id,b,t])=>{ const S=byId[id];
-    return `<a class="pt-n" href="/preguntas/${id}/"><figure class="pt-fig" data-cv="${id}"></figure><div class="pt-tx"><div class="pt-k">${esc(TOPICL(S.tema))}</div><h3>${esc(S.t)}</h3><p class="pt-vd">${esc(b)}</p><p class="pt-sm">${esc(t)}</p><span class="pt-go">Ver la respuesta →</span></div></a>`; }).join("");
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio</span><i class="ho-cur"></i></span></span></h1>
     <p class="ho-sub">Democratizando el acceso al dato público</p>
     <p class="ho-p">Los datos públicos no deberían ser cosa de especialistas. Aquí cada pregunta llega con su respuesta, su gráfico y la letra pequeña dicha en voz alta: hasta dónde llega lo que sabemos. ¿Dudas? Abre el laboratorio, cruza los datos tú mismo y comprueba si la respuesta aguanta.</p>
     <p class="ho-go"><a class="btn" href="#" data-go=".pt-car">Empieza por una pregunta</a><a class="ho-lk" href="#" data-go=".pt-mun">Mira cómo está tu pueblo</a></p></section>
   ${heroCarHTML(D)}
+  <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todos los análisis →</a></p>
   <section class="pt-labx"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>¿Crees que lo sabes? <em>Demuéstralo.</em></h2>
       <p class="pt-labx-lead">Cruza dos datos de los ${nMun} municipios y mira si la relación aguanta o solo lo parecía. Sin saber estadística y sin registrarte. Si la respuesta cambia al comparar entre iguales, lo verás tú antes que nadie.</p>
       <div class="pt-labx-h">Empieza por una duda real</div>
@@ -7058,10 +7047,6 @@ async function renderInicio(){
     <div class="pt-mun-q">${bigSearchHTML("q2","¿Dónde vives?")}${exampleChips()}<p class="pt-tools"><a href="/municipio/#comparar">Enfrentar dos municipios</a><a href="/provincia/">Por provincia</a><a href="/rankings/">Ver los rankings</a></p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
-  <section class="ed-sec pt-pap"><div class="ed-k">Puesto a prueba</div><h2 class="ed-h2">Lo que se da por hecho, con los datos delante</h2>
-    <p class="pt-lead">Algunas confirman lo que pensabas. Otras, no.</p>
-    <div class="pt-grid">${tira}</div>
-    <p class="pt-more"><a class="ed-go" href="/preguntas/">Ver las ${STUDIES.length} preguntas →</a></p></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
     <div class="ci-steps" style="padding:0">
       <div><i>1</i><span><b>Datos que puedes comprobar</b>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></div>
@@ -7073,9 +7058,6 @@ async function renderInicio(){
   heroType(view.querySelector(".ho"));
   view.querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const t=view.querySelector(x.dataset.go); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
   view.querySelectorAll(".pt-labx-q a").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const [l,v,o]=EXQ[+x.dataset.q]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null,sz:"",col:"",q:0,bv:0}; if(o.ser){ Object.assign(PS,{s:o.ser.slice(),idx:o.idx===0?0:1,b:o.b||null,desde:null,hasta:null,real:0}); } navTo(exHash()); }));
-  // el gráfico de cabecera de cada análisis (data/covers.json), con su pie; si falta, su ilustración
-  loadCovers().then(cv=>view.querySelectorAll(".pt-fig[data-cv]").forEach(f=>{ const c=coverOf(f.dataset.cv,cv);
-    f.innerHTML=c?c.svg+`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`:`<div class="pt-im">${ptIll(byId[f.dataset.cv])}</div>`; }));
   bindBig("q2");
   // la nube de municipios: imagen fija y, encima, qué municipio es cada punto
   const ar=document.getElementById("qhart");
