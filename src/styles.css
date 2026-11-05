@@ -2270,16 +2270,15 @@ details.chk > section{margin-top:18px}
 .mun-hero #mlmap svg{max-width:900px!important}
 @media (max-width:860px){ .mun-hero .linkrow{padding-top:14px} }
 
-/* Rankings: tarjetas clicables con fondo gris suave para que se vean como enlaces (noviembre 2026) */
-.rk-card{background:color-mix(in srgb, var(--ink) 5%, var(--card)); border-color:color-mix(in srgb, var(--ink) 16%, var(--rule))}
-.rk-card .rk-n,.rk-card .rk-fig small{color:var(--ink-2)}
-.rk-card:hover,.rk-card:focus-visible{background:color-mix(in srgb, var(--ink) 9%, var(--card)); border-color:var(--brand)}
-:root[data-theme="dark"] .rk-card{background:color-mix(in srgb, var(--ink) 7%, var(--card)); border-color:color-mix(in srgb, var(--ink) 20%, var(--rule))}
-:root[data-theme="dark"] .rk-card:hover,:root[data-theme="dark"] .rk-card:focus-visible{background:color-mix(in srgb, var(--ink) 12%, var(--card))}
-/* Municipios: los ejemplos del buscador, en píldora como .btn pero con contorno (noviembre 2026) */
-.mun-hero .chipsq{gap:10px; margin-top:16px; align-items:center}
-.mun-hero .chipsq > span{font-size:15px; color:var(--muted)}
-.mun-hero .chipsq a{display:inline-block; background:transparent; color:var(--ink); text-decoration:none; font-weight:600; font-size:15px; line-height:1.4; min-height:0; padding:9px 18px; border-radius:999px!important; border:1.5px solid var(--ink)!important; transition:background .15s, border-color .15s, color .15s}
-.mun-hero .chipsq a b{font-weight:700}
-.mun-hero .chipsq a:hover{background:var(--band); color:var(--ink)}
-.mun-hero .chipsq a:active{transform:translateY(1px)}
+/* Rankings: tarjetas clicables con sombra suave, filete granate y flecha en círculo (noviembre 2026) */
+.rk-card{position:relative; overflow:hidden; background:var(--card); border-color:var(--rule); box-shadow:0 1px 2px rgba(28,27,25,.05), 0 12px 28px -22px rgba(28,27,25,.35); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+.rk-card::before{content:""; position:absolute; left:0; top:0; height:3px; width:44px; background:var(--brand); border-radius:0 0 3px 0; transition:width .35s ease}
+.rk-card:hover,.rk-card:focus-visible{transform:translateY(-3px); border-color:color-mix(in srgb, var(--brand) 35%, var(--rule)); box-shadow:0 2px 4px rgba(28,27,25,.05), 0 22px 36px -22px rgba(110,20,35,.38)}
+.rk-card:hover::before,.rk-card:focus-visible::before{width:100%; border-radius:0}
+.rk-ar{box-sizing:border-box; width:34px; height:34px; padding:8px; border:1px solid color-mix(in srgb, var(--brand) 35%, var(--rule)); border-radius:50%; transition:background .25s ease, color .25s ease, border-color .25s ease, transform .25s ease}
+.rk-card:hover .rk-ar,.rk-card:focus-visible .rk-ar{background:var(--brand); border-color:var(--brand); color:#fff; transform:none}
+.rk-n{margin-top:12px}
+:root[data-theme="dark"] .rk-card{background:var(--card); box-shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 28px -20px rgba(0,0,0,.7)}
+:root[data-theme="dark"] .rk-card:hover,:root[data-theme="dark"] .rk-card:focus-visible{box-shadow:0 2px 4px rgba(0,0,0,.3), 0 22px 36px -20px rgba(0,0,0,.8); border-color:color-mix(in srgb, var(--brand) 60%, var(--rule))}
+:root[data-theme="dark"] .rk-card:hover .rk-ar,:root[data-theme="dark"] .rk-card:focus-visible .rk-ar{color:#1a1213}
+@media (prefers-reduced-motion:reduce){ .rk-card:hover,.rk-card:focus-visible{transform:none} .rk-card::before{transition:none} }
