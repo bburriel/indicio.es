@@ -6477,7 +6477,7 @@ function homeReveal(root){
   if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{threshold:.12,rootMargin:"0px 0px -8% 0px"});
   [[".pt-all",0],[".pt-labx-tx",0],[".pt-labx-map",.14],[".pt-mun .pt-land-tx",0],[".pt-mun .pt-mun-q",.1],[".pt-mun .pt-mun-art",.18],[".pt-why",0],[".ed-sec",0]].forEach(([q,d])=>root.querySelectorAll(q).forEach(el=>{
-    if(el.getBoundingClientRect().top<innerHeight) return; el.classList.add("pv"); el.style.setProperty("--d",d+"s"); io.observe(el); }));
+    if(el.getBoundingClientRect().top<innerHeight) return; el.classList.add("entra"); el.style.setProperty("--d",d+"s"); io.observe(el); }));
 }
 async function renderInicio(){
   document.title="Indicio · Preguntas reales, respuestas con datos públicos";
