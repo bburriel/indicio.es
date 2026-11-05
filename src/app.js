@@ -6571,7 +6571,7 @@ async function renderInicio(){
   <div class="pt-carband">${heroCarHTML(D)}
   <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p></div>
   <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
-      <p class="pt-labx-lead">Elige lo que quieras comparar (renta, vivienda, edad, voto, sueldos, pensiones…) y míralo en un mapa, un ranking o un gráfico. Después comprueba si la relación aguanta al comparar lo que es comparable, o qué pasó antes y después de una ley.</p>
+      <p class="pt-labx-lead">Elige un dato (renta, vivienda, edad, voto, pensiones…) y míralo en el mapa. Luego comprueba si la relación se sostiene.</p>
       <div class="pt-labx-h" id="labq-t">Empieza por una pregunta</div>
       <div class="pt-labx-q" role="group" aria-labelledby="labq-t"><button type="button" class="on" aria-pressed="true" data-k="renta">¿Dónde se gana más?</button><button type="button" aria-pressed="false" data-k="edad">¿Dónde viven los más mayores?</button><button type="button" aria-pressed="false" data-k="varPob">¿Qué pueblos ganan vecinos?</button><button type="button" aria-pressed="false" data-k="alquiler">¿Dónde se vive de alquiler?</button><button type="button" aria-pressed="false" data-k="paro">¿Dónde cuesta más tener trabajo?</button><button type="button" aria-pressed="false" data-k="vt">¿Dónde hay más pisos turísticos?</button></div>
       <p class="pt-labx-go"><a class="btn" href="/laboratorio/">Hacer mi propia pregunta →</a></p></div>
