@@ -2282,3 +2282,19 @@ details.chk > section{margin-top:18px}
 :root[data-theme="dark"] .rk-card:hover,:root[data-theme="dark"] .rk-card:focus-visible{box-shadow:0 2px 4px rgba(0,0,0,.3), 0 22px 36px -20px rgba(0,0,0,.8); border-color:color-mix(in srgb, var(--brand) 60%, var(--rule))}
 :root[data-theme="dark"] .rk-card:hover .rk-ar,:root[data-theme="dark"] .rk-card:focus-visible .rk-ar{color:#1a1213}
 @media (prefers-reduced-motion:reduce){ .rk-card:hover,.rk-card:focus-visible{transform:none} .rk-card::before{transition:none} }
+/* Rankings: tarjetas clicables con fondo gris suave para que se vean como enlaces (noviembre 2026) */
+.rk-card{background:color-mix(in srgb, var(--ink) 5%, var(--card)); border-color:color-mix(in srgb, var(--ink) 16%, var(--rule))}
+.rk-card .rk-n,.rk-card .rk-fig small{color:var(--ink-2)}
+.rk-card:hover,.rk-card:focus-visible{background:color-mix(in srgb, var(--ink) 9%, var(--card)); border-color:var(--brand)}
+:root[data-theme="dark"] .rk-card{background:color-mix(in srgb, var(--ink) 7%, var(--card)); border-color:color-mix(in srgb, var(--ink) 20%, var(--rule))}
+:root[data-theme="dark"] .rk-card:hover,:root[data-theme="dark"] .rk-card:focus-visible{background:color-mix(in srgb, var(--ink) 12%, var(--card))}
+
+/* LABORATORIO · sucesos en una serie y «Antes y después» más compacto (noviembre 2026) */
+.its-out{margin:6px 0 0}
+.its-out .czvs{max-width:var(--medida)}
+.its-rows{margin:12px 0 0 19px; max-width:620px}
+.ad-rows{margin:14px 0 0; max-width:none}
+.ad-det{margin:10px 0 0}
+.ad-det .czdb{padding-top:4px}
+@media(max-width:760px){ .its-rows{margin-left:0} }
+.its-fig{margin-top:26px}
