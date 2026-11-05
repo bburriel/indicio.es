@@ -2147,3 +2147,36 @@ details.chk > section{margin-top:18px}
 .cz .czhit b{color:var(--brand-2)} .cz .czhit a{color:var(--brand); text-decoration:underline; text-underline-offset:3px}
 .cz .czlk{margin:14px 0 0; font-size:14px}
 @media (max-width:620px){ .cz .czvt{font-size:21px} .czrows>li{grid-template-columns:20px minmax(0,1fr)} .czrows .rv{grid-column:2; text-align:left} }
+/* ===== CABECERA (noviembre 2026): logo, lupa o «tu municipio», idioma y Menú ===== */
+.top .top-in{flex-wrap:nowrap; align-items:center; gap:8px 12px; padding-block:9px}
+.top .top-in .logo{flex:none}
+.top .top-in .mymun{order:2; margin-left:auto}
+.top .top-in .langsw{order:3; flex:none}
+.top .top-in .navdd{order:4; flex:none}
+.top .mymun{display:inline-flex; align-items:center; gap:7px; min-width:0; max-width:min(300px,42vw); border:1px solid transparent!important; background:none!important; color:var(--ink)!important; border-radius:999px; padding:6px 10px!important; font:inherit; font-size:14.5px!important; cursor:pointer; white-space:nowrap}
+.top .mymun:hover,.top .mymun:focus-visible{border-color:var(--rule-2)!important; background:var(--card)!important}
+.top .mymun .mm-i{display:inline-flex; flex:none}
+.top .mymun.is-set{border-color:var(--rule-2)!important; padding:5px 13px 5px 9px!important}
+.top .mymun.is-set .mm-i{color:var(--brand)}
+.top .mymun .t{overflow:hidden; text-overflow:ellipsis}
+.top .navdd,.top .navdd:hover{background:none!important; border-radius:0}
+.top .navdd .menubtn,.top .navdd .menubtn:hover{display:inline-flex; align-items:center; gap:7px; padding:5px 13px!important; border:1px solid var(--rule-2); border-radius:999px; background:none; font:inherit; font-size:14.5px!important; line-height:1.4; color:var(--ink)!important; cursor:pointer}
+.top .navdd .menubtn:after{content:none}
+.top .navdd .menubtn:hover,.top .navdd .menubtn[aria-expanded="true"]{border-color:var(--ink)}
+.top .navdd:hover .menubtn{color:var(--ink)!important}
+.mega-wrap{display:flex; justify-content:flex-end}
+.mega-menu{grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px 22px; width:min(900px,100%); padding:20px 22px 16px; margin-left:auto}
+.mm-col{display:flex; flex-direction:column; min-width:0}
+.mega .mm-col a,.mm-col .mm-h{display:block; text-decoration:none; padding:5px 10px; border-radius:6px; font-size:15px; color:var(--ink)}
+.mega .mm-col a:hover,.mega .mm-col a:focus-visible{background:var(--band); color:var(--brand)}
+.mega .mm-col .mm-h{font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--acc-ink); margin:0 0 4px; padding:5px 10px 7px}
+.mega .mm-col a.mm-h:hover{background:none; color:var(--brand)}
+.mega .mm-col a[aria-current="page"]{color:var(--brand); font-weight:600}
+@media (max-width:760px){
+  .top .top-in{gap:6px 8px; padding-block:8px}
+  .top .top-in .mymun{max-width:46vw; padding:6px 8px!important}
+  .top .top-in .mymun.is-set{padding:5px 11px 5px 8px!important}
+  .top .mymun small{display:none}
+  .mega-menu{grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; padding:14px 12px 10px; max-height:calc(100vh - 70px); overflow-y:auto}
+}
+@media (max-width:420px){ .top .navdd .menubtn span{display:none} .top .navdd .menubtn{padding:6px 9px!important} }

@@ -1,42 +1,34 @@
 <header class="top" id="top">
   <div class="wrap top-in">
     <a class="logo" href="/" aria-label="Indicio, portada"><span aria-hidden="true" translate="no" id="logotxt">Indic<span class="lg-i">ı</span>o</span></a>
-    <nav class="nav" aria-label="Secciones">
-      <span class="navdd" id="navdd" data-mega="mega-an"><a href="/preguntas/" id="nav-preguntas" title="Preguntas ya respondidas, por tema">Preguntas</a><button type="button" class="ddb" id="nav-an-btn" aria-expanded="false" aria-controls="mega-an" aria-label="Abrir el menú de Preguntas"></button></span>
-      <span class="navdd" id="navdd-mun" data-mega="mega-mun"><a href="/municipio/" id="nav-municipio" title="Fichas, comparador y rankings de los municipios de España">Municipios</a><button type="button" class="ddb" id="nav-mun-btn" aria-expanded="false" aria-controls="mega-mun" aria-label="Abrir el menú de Municipios"></button></span>
-      <span class="navdd" id="navdd-lab" data-mega="mega-lab"><a href="/laboratorio/" id="nav-lab" title="Cruza datos, comprueba si una relación aguanta y mide antes y después">Laboratorio</a><button type="button" class="ddb" id="nav-lab-btn" aria-expanded="false" aria-controls="mega-lab" aria-label="Abrir el menú del Laboratorio"></button></span>
-      <a href="/quien-soy/" id="nav-sobre" class="navsobre">Quién soy</a>
-    </nav>
+    <button type="button" class="mymun" id="mymun" aria-haspopup="dialog" aria-label="Busca tu municipio" title="Elige tu municipio y lo verás destacado en toda la web"><span class="mm-i" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
     <div class="langsw"><label for="langsel">Idioma</label><select id="langsel" translate="no"><option value="es" lang="es" title="Castellano">ES</option><option value="ca" lang="ca" title="Català">CA</option><option value="gl" lang="gl" title="Galego">GL</option><option value="eu" lang="eu" title="Euskara">EU</option><option value="en" lang="en" title="English">EN</option></select></div>
+    <span class="navdd" id="navdd" data-mega="mega"><button type="button" class="ddb menubtn" id="nav-menu-btn" aria-expanded="false" aria-controls="mega"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4.5h12M2 8h12M2 11.5h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Menú</span></button></span>
   </div>
-  <div class="wrap mega-wrap"><div class="mega mega-one" id="mega-an" role="region" aria-label="Menú de Preguntas">
-    <div class="mega-col mega-t"><div class="mega-h">Por tema</div><div class="mega-grid">
-          <a href="/preguntas/?tema=riqueza"><b>Riqueza</b><small>¿Cómo se reparte la riqueza?</small></a>
-          <a href="/preguntas/?tema=vivienda"><b>Vivienda</b><small>¿Por qué cuesta tanto encontrar casa?</small></a>
-          <a href="/preguntas/?tema=poblacion"><b>Población</b><small>¿Quién llega y quién se va?</small></a>
-          <a href="/preguntas/?tema=trabajo"><b>Trabajo</b><small>¿De qué vivimos?</small></a>
-          <a href="/preguntas/?tema=gasto"><b>Dinero público</b><small>¿En qué se gasta?</small></a>
-          <a href="/preguntas/?tema=voto"><b>Voto</b><small>¿Cómo vota cada España?</small></a>
-    </div></div>
-    <a class="mega-all" href="/preguntas/">Ver todas las preguntas →</a>
-  </div></div>
-  <div class="wrap mega-wrap"><div class="mega mega-one mega-m" id="mega-mun" role="region" aria-label="Menú de Municipios">
-    <div class="mega-col"><div class="mega-h">Cada municipio, con sus datos</div>
-      <div class="search mega-s" id="mq-s" role="combobox" aria-expanded="false" aria-haspopup="listbox"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="mq" type="search" placeholder="Busca tu municipio" autocomplete="off" aria-label="Buscar un municipio" aria-autocomplete="list" aria-controls="mq-r"><ul id="mq-r" class="results" role="listbox" hidden></ul></div>
-      <div class="mega-grid">
-        <a href="/municipio/"><b>Fichas de municipios</b><small>Cómo sale cada uno, en el mapa</small></a>
-        <a href="/comparar/"><b>Comparar dos municipios</b><small>Lado a lado, dato a dato</small></a>
-        <a href="/provincia/"><b>Municipios por provincia</b><small>Todos, con su renta y su paro</small></a>
-        <a href="/rankings/"><b>Rankings de municipios</b><small>Los más ricos, con más paro, que más crecen…</small></a>
-      </div>
+  <div class="wrap mega-wrap"><div class="mega mega-menu" id="mega" role="region" aria-label="Menú">
+    <div class="mm-col"><a class="mm-h" id="nav-preguntas" href="/preguntas/">Preguntas</a>
+      <a href="/preguntas/?tema=riqueza">Riqueza</a>
+      <a href="/preguntas/?tema=vivienda">Vivienda</a>
+      <a href="/preguntas/?tema=poblacion">Población</a>
+      <a href="/preguntas/?tema=trabajo">Trabajo</a>
+      <a href="/preguntas/?tema=gasto">Dinero público</a>
+      <a href="/preguntas/?tema=voto">Voto</a>
     </div>
-  </div></div>
-  <div class="wrap mega-wrap"><div class="mega mega-one" id="mega-lab" role="region" aria-label="Menú del Laboratorio">
-    <div class="mega-col"><div class="mega-h">Laboratorio</div><div class="mega-grid mega-1c">
-      <a href="/laboratorio/"><b>Explorar los datos</b><small>Mapas, rankings y gráficos para cruzar datos</small></a>
-      <a href="/laboratorio/datos/"><b>Qué significa cada dato</b><small>Qué mide, de dónde sale y qué tener en cuenta</small></a>
-      <a href="/laboratorio/metodo/"><b>De la relación a la causa</b><small>Cuándo «van juntos» no quiere decir «uno causa el otro»</small></a>
-    </div></div>
+    <div class="mm-col"><a class="mm-h" id="nav-municipio" href="/municipio/">Municipios</a>
+      <a href="/comparar/">Comparar dos municipios</a>
+      <a href="/provincia/">Municipios por provincia</a>
+      <a href="/rankings/">Rankings de municipios</a>
+    </div>
+    <div class="mm-col"><a class="mm-h" id="nav-lab" href="/laboratorio/">Laboratorio</a>
+      <a href="/laboratorio/">Explorar los datos</a>
+      <a href="/laboratorio/datos/">Qué significa cada dato</a>
+      <a href="/laboratorio/metodo/">De la relación a la causa</a>
+    </div>
+    <div class="mm-col"><span class="mm-h" translate="no">Indicio</span>
+      <a id="nav-sobre" href="/quien-soy/">Quién soy</a>
+      <a href="/quien-soy/contacto/">Escríbeme</a>
+      <a href="/feed.xml">RSS</a>
+    </div>
   </div></div>
 </header>
 
