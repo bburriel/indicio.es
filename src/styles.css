@@ -2142,19 +2142,19 @@ details.chk > section{margin-top:18px}
 .top .top-in .logo{flex:none}
 .top .top-in .mymun{order:2; margin-left:auto}
 .top .top-in .langsw{order:3; flex:none}
-.top .top-in .navdd{order:4; flex:none}
+.top .top-in .navdd-m{order:4; flex:none}
 .top .mymun{display:inline-flex; align-items:center; gap:7px; min-width:0; max-width:min(300px,42vw); border:1px solid transparent!important; background:none!important; color:var(--ink)!important; border-radius:999px; padding:6px 10px!important; font:inherit; font-size:14.5px!important; cursor:pointer; white-space:nowrap}
 .top .mymun:hover,.top .mymun:focus-visible{border-color:var(--rule-2)!important; background:var(--card)!important}
 .top .mymun .mm-i{display:inline-flex; flex:none}
 .top .mymun.is-set{border-color:var(--rule-2)!important; padding:5px 13px 5px 9px!important}
 .top .mymun.is-set .mm-i{color:var(--brand)}
 .top .mymun .t{overflow:hidden; text-overflow:ellipsis}
-.top .navdd,.top .navdd:hover{background:none!important; border-radius:0}
+.top .navdd-m,.top .navdd-m:hover{background:none!important; border-radius:0}
 .top .navdd .menubtn,.top .navdd .menubtn:hover{display:inline-flex; align-items:center; gap:7px; padding:5px 13px!important; border:1px solid var(--rule-2); border-radius:999px; background:none; font:inherit; font-size:14.5px!important; line-height:1.4; color:var(--ink)!important; cursor:pointer}
 .top .navdd .menubtn:after{content:none}
 .top .navdd .menubtn:hover,.top .navdd .menubtn[aria-expanded="true"]{border-color:var(--ink)}
 .top .navdd:hover .menubtn{color:var(--ink)!important}
-.mega-wrap{display:flex; justify-content:flex-end}
+.mega-wrap-m{display:flex; justify-content:flex-end}
 .mega-menu{grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px 22px; width:min(900px,100%); padding:20px 22px 16px; margin-left:auto}
 .mm-col{display:flex; flex-direction:column; min-width:0}
 .mega .mm-col a,.mm-col .mm-h{display:block; text-decoration:none; padding:5px 10px; border-radius:6px; font-size:15px; color:var(--ink)}
@@ -2176,14 +2176,14 @@ details.chk > section{margin-top:18px}
 .pt-carband .pt-car{padding-top:0}
 .pt-carband .pt-all{margin-top:28px}
 
-/* Cabecera en pantallas anchas (noviembre 2026): las secciones a la vista; el botón «Menú» queda para móvil y tablet */
+/* Cabecera por anchos (noviembre 2026): desplegables en pantallas anchas; botón «Menú» en móvil y tablet */
 .top .top-in .nav{display:none}
+.mega-one .mega-grid>a{font-size:15px}
 @media (min-width:861px){
-  .top .top-in .nav{display:flex; order:1; flex-wrap:nowrap; gap:0; margin-left:12px}
-  .top .top-in .nav a{padding:6px 12px; font-size:15px; white-space:nowrap; border-radius:0}
-  .top .top-in .nav a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--brand)}
-  .top .top-in .navdd,.top .mega-wrap{display:none!important}
+  .top .top-in .nav{display:flex; order:1; margin-left:12px}
+  .top .top-in .navdd-m,.top .mega-wrap-m{display:none!important}
 }
+@media (max-width:860px){ .top .mega-wrap-d{display:none!important} }
 
 /* Laboratorio: tarjetas «Cuánto van juntos» y «En euros» más compactas (noviembre 2026) */
 .czb-e .czsent{margin:2px 0 0; font-size:16px; line-height:1.5; color:var(--ink-2)}

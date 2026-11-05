@@ -204,7 +204,7 @@ function route(){
 }
 let INIT_T=null;
 const saveMun=()=>{ try{ localStorage.setItem("cifrario.mun",lastMun); }catch(e){} };
-// botón «Menú»: abre el panel con las secciones solo al pulsar
+// desplegables de escritorio (al pasar por encima, o con la flecha en táctil) y botón «Menú» de móvil y tablet (al pulsar)
 const TOP=document.getElementById("top");
 const DDS=[...document.querySelectorAll(".navdd")].map(dd=>({dd, btn:dd.querySelector(".ddb"), mega:document.getElementById(dd.dataset.mega)})).filter(x=>x.btn&&x.mega);
 let MEGA_T=null;
@@ -212,8 +212,12 @@ function megaOpen(x){ clearTimeout(MEGA_T); if(!TOP) return; DDS.forEach(y=>{ co
 function ddClose(){ clearTimeout(MEGA_T); if(!TOP) return; TOP.classList.remove("mega-open"); DDS.forEach(y=>{ y.mega.classList.remove("on"); y.btn.setAttribute("aria-expanded","false"); }); const r=document.getElementById("mq-r"); if(r) r.hidden=true; }
 const megaSoon=()=>{ clearTimeout(MEGA_T); MEGA_T=setTimeout(ddClose,180); };
 if(DDS.length){
+  const HOVER=!!(window.matchMedia&&matchMedia("(hover:hover)").matches);
   DDS.forEach(x=>{
-    x.btn.addEventListener("click",e=>{ e.stopPropagation(); x.mega.classList.contains("on")?ddClose():megaOpen(x); });
+    const esc_=x.dd.classList.contains("navdd-d");   // desplegables de escritorio; el botón «Menú» (móvil y tablet) solo alterna al pulsar
+    // con ratón, el panel ya se abre al pasar por encima: el clic en la flecha lo deja abierto; en táctil alterna
+    x.btn.addEventListener("click",e=>{ e.stopPropagation(); ((esc_&&HOVER)||!x.mega.classList.contains("on"))?megaOpen(x):ddClose(); });
+    if(esc_&&HOVER){ [x.dd,x.mega].forEach(el=>{ el.addEventListener("mouseenter",()=>megaOpen(x)); el.addEventListener("mouseleave",megaSoon); }); }
     x.mega.addEventListener("click",e=>{ if(e.target.closest("a")) ddClose(); });
   });
   document.addEventListener("click",e=>{ if(TOP.classList.contains("mega-open")&&!DDS.some(x=>x.mega.contains(e.target)||x.dd.contains(e.target))) ddClose(); });
