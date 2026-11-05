@@ -1,0 +1,445 @@
+{
+ "fuente": "SERPAVI (Ministerio de Vivienda), INE, Seguridad Social; scripts/datos/vivienda_tipos.py",
+ "tipos": [
+  {
+   "k": "gran",
+   "l": "Grandes ciudades",
+   "def": "100.000 habitantes o más",
+   "n": 62,
+   "pob": 18907448,
+   "subida": {
+    "med": 41.8,
+    "p25": 40.0,
+    "p75": 47.6
+   },
+   "perfil": {
+    "varPob": 6.27334957102619,
+    "extr": 14.184388104624166,
+    "inmigReciente": 15.781858508879676,
+    "noPrincipal": 18.07873961097235,
+    "vt": 0.886068155787074,
+    "compHab": 12.553526991056644,
+    "superiores": 37.05622884696021,
+    "alquiler": 19.975651198406048
+   },
+   "motores": [
+    {
+     "c": "varPob",
+     "l": "Población que ha llegado desde 2015",
+     "r": 0.5471374966013026,
+     "lo": 0.36848263074103205,
+     "hi": 0.6752220094364043,
+     "n": 62
+    },
+    {
+     "c": "afilVar19",
+     "l": "Empleo (afiliados) que ha crecido desde 2019",
+     "r": 0.5989556035354734,
+     "lo": 0.4268645873914956,
+     "hi": 0.7061981155517167,
+     "n": 53
+    },
+    {
+     "c": "inmigReciente",
+     "l": "Peso de los llegados del extranjero desde 2011",
+     "r": 0.43094437548857967,
+     "lo": 0.2539957088618649,
+     "hi": 0.5853627057451083,
+     "n": 62
+    },
+    {
+     "c": "noPrincipal",
+     "l": "Viviendas vacías o secundarias",
+     "r": -0.03071401586701926,
+     "lo": -0.24821963010463421,
+     "hi": 0.17178131627748497,
+     "n": 62
+    },
+    {
+     "c": "vt",
+     "l": "Pisos turísticos",
+     "r": 0.23134573347519644,
+     "lo": 0.013033895992828145,
+     "hi": 0.4279704991167535,
+     "n": 62
+    },
+    {
+     "c": "compHab",
+     "l": "Compraventas por habitante",
+     "r": 0.13003942239935898,
+     "lo": -0.0917760192455775,
+     "hi": 0.35581037931506887,
+     "n": 62
+    },
+    {
+     "c": "alquiler",
+     "l": "Peso del alquiler en el pueblo",
+     "r": 0.18760861352474495,
+     "lo": -0.03742796183072671,
+     "hi": 0.38129888913050036,
+     "n": 62
+    }
+   ],
+   "ej": [
+    "Madrid",
+    "Barcelona",
+    "València",
+    "Zaragoza",
+    "Sevilla"
+   ]
+  },
+  {
+   "k": "corona",
+   "l": "Coronas de las grandes ciudades",
+   "def": "a 30 km o menos de una ciudad de 100.000",
+   "n": 797,
+   "pob": 11061094,
+   "subida": {
+    "med": 43.0,
+    "p25": 36.1,
+    "p75": 51.3
+   },
+   "perfil": {
+    "varPob": 8.974020047203288,
+    "extr": 10.493869467161204,
+    "inmigReciente": 10.288097678222424,
+    "noPrincipal": 20.76489971064345,
+    "vt": 0.37967455208318457,
+    "compHab": 13.142521840079558,
+    "superiores": 31.56619789145631,
+    "alquiler": 14.146441961346682
+   },
+   "motores": [
+    {
+     "c": "varPob",
+     "l": "Población que ha llegado desde 2015",
+     "r": 0.34503862852092965,
+     "lo": 0.29452940367124275,
+     "hi": 0.3945825700664017,
+     "n": 797
+    },
+    {
+     "c": "afilVar19",
+     "l": "Empleo (afiliados) que ha crecido desde 2019",
+     "r": 0.23644511136457338,
+     "lo": 0.17249670873663542,
+     "hi": 0.30503344614752814,
+     "n": 522
+    },
+    {
+     "c": "inmigReciente",
+     "l": "Peso de los llegados del extranjero desde 2011",
+     "r": 0.33846280634181664,
+     "lo": 0.28194381112913763,
+     "hi": 0.3867156748555459,
+     "n": 797
+    },
+    {
+     "c": "noPrincipal",
+     "l": "Viviendas vacías o secundarias",
+     "r": -0.0733710522100216,
+     "lo": -0.13108367849206873,
+     "hi": -0.015023095313807619,
+     "n": 797
+    },
+    {
+     "c": "vt",
+     "l": "Pisos turísticos",
+     "r": -0.02319318000668268,
+     "lo": -0.08863888656969837,
+     "hi": 0.04043169333587302,
+     "n": 797
+    },
+    {
+     "c": "compHab",
+     "l": "Compraventas por habitante",
+     "r": 0.16768792029993193,
+     "lo": 0.10503186853694751,
+     "hi": 0.22678152051225872,
+     "n": 796
+    },
+    {
+     "c": "alquiler",
+     "l": "Peso del alquiler en el pueblo",
+     "r": 0.22207780589397533,
+     "lo": 0.1645291166094243,
+     "hi": 0.2771621885372254,
+     "n": 797
+    }
+   ],
+   "ej": [
+    "Rozas de Madrid, Las",
+    "Sant Cugat del Vallès",
+    "San Sebastián de los Reyes",
+    "San Fernando",
+    "Guadalajara"
+   ]
+  },
+  {
+   "k": "costa",
+   "l": "Costa con turismo o extranjeros",
+   "def": "con costa y muchos extranjeros, pisos turísticos o segundas residencias",
+   "n": 289,
+   "pob": 5849481,
+   "subida": {
+    "med": 47.4,
+    "p25": 38.8,
+    "p75": 57.1
+   },
+   "perfil": {
+    "varPob": 11.203206728938856,
+    "extr": 21.57387077588593,
+    "inmigReciente": 18.8514835418732,
+    "noPrincipal": 41.83213832133141,
+    "vt": 4.354237931536148,
+    "compHab": 23.608387051774336,
+    "superiores": 25.28774645135184,
+    "alquiler": 17.74139982675386
+   },
+   "motores": [
+    {
+     "c": "varPob",
+     "l": "Población que ha llegado desde 2015",
+     "r": 0.43987092439181075,
+     "lo": 0.35748268088130064,
+     "hi": 0.5161680151422445,
+     "n": 289
+    },
+    {
+     "c": "afilVar19",
+     "l": "Empleo (afiliados) que ha crecido desde 2019",
+     "r": 0.26598148774057656,
+     "lo": 0.16117172111195194,
+     "hi": 0.3670025440585569,
+     "n": 214
+    },
+    {
+     "c": "inmigReciente",
+     "l": "Peso de los llegados del extranjero desde 2011",
+     "r": 0.2799038263032006,
+     "lo": 0.18565863318255613,
+     "hi": 0.37722271066729135,
+     "n": 289
+    },
+    {
+     "c": "noPrincipal",
+     "l": "Viviendas vacías o secundarias",
+     "r": -0.04937699861683743,
+     "lo": -0.15034772585946768,
+     "hi": 0.05325503009353749,
+     "n": 289
+    },
+    {
+     "c": "vt",
+     "l": "Pisos turísticos",
+     "r": 0.04278165327010663,
+     "lo": -0.057765681448425754,
+     "hi": 0.14165259568741076,
+     "n": 289
+    },
+    {
+     "c": "compHab",
+     "l": "Compraventas por habitante",
+     "r": 0.11211077300656676,
+     "lo": -0.002171300804850033,
+     "hi": 0.19880769947823776,
+     "n": 289
+    },
+    {
+     "c": "alquiler",
+     "l": "Peso del alquiler en el pueblo",
+     "r": 0.20932706013601574,
+     "lo": 0.11478670854276866,
+     "hi": 0.2995518500012335,
+     "n": 289
+    }
+   ],
+   "ej": [
+    "Lorca",
+    "Torrevieja",
+    "Mijas",
+    "Ejido, El",
+    "Chiclana de la Frontera"
+   ]
+  },
+  {
+   "k": "mediana",
+   "l": "Ciudades medianas",
+   "def": "de 20.000 a 100.000 habitantes, sin costa turística ni gran ciudad cerca",
+   "n": 74,
+   "pob": 3020033,
+   "subida": {
+    "med": 37.0,
+    "p25": 30.8,
+    "p75": 44.2
+   },
+   "perfil": {
+    "varPob": 2.1128258201152104,
+    "extr": 10.616278265833518,
+    "inmigReciente": 10.145057487782418,
+    "noPrincipal": 27.017977816798695,
+    "vt": 0.41398726106635264,
+    "compHab": 14.037426710237934,
+    "superiores": 28.86809683867693,
+    "alquiler": 14.164422938424844
+   },
+   "motores": [
+    {
+     "c": "varPob",
+     "l": "Población que ha llegado desde 2015",
+     "r": 0.6022144075309893,
+     "lo": 0.4553930147515125,
+     "hi": 0.7312123719737904,
+     "n": 74
+    },
+    {
+     "c": "afilVar19",
+     "l": "Empleo (afiliados) que ha crecido desde 2019",
+     "r": 0.40623915227916324,
+     "lo": 0.1914307845887068,
+     "hi": 0.5819911576000452,
+     "n": 69
+    },
+    {
+     "c": "inmigReciente",
+     "l": "Peso de los llegados del extranjero desde 2011",
+     "r": 0.4471187680728349,
+     "lo": 0.2970452739275498,
+     "hi": 0.5764766981020718,
+     "n": 74
+    },
+    {
+     "c": "noPrincipal",
+     "l": "Viviendas vacías o secundarias",
+     "r": -0.05226207322379618,
+     "lo": -0.27515201683805557,
+     "hi": 0.14462449551432216,
+     "n": 74
+    },
+    {
+     "c": "vt",
+     "l": "Pisos turísticos",
+     "r": 0.294943176548101,
+     "lo": 0.11262830064255716,
+     "hi": 0.46297539593840814,
+     "n": 74
+    },
+    {
+     "c": "compHab",
+     "l": "Compraventas por habitante",
+     "r": 0.30182950060261116,
+     "lo": 0.12502575802600865,
+     "hi": 0.47971270810000005,
+     "n": 74
+    },
+    {
+     "c": "alquiler",
+     "l": "Peso del alquiler en el pueblo",
+     "r": 0.3460102822356028,
+     "lo": 0.15006719926466047,
+     "hi": 0.5156266458781967,
+     "n": 74
+    }
+   ],
+   "ej": [
+    "Cáceres",
+    "Toledo",
+    "Melilla",
+    "Talavera de la Reina",
+    "Palencia"
+   ]
+  },
+  {
+   "k": "pueblo",
+   "l": "Pueblos y villas",
+   "def": "menos de 20.000 habitantes, lejos de una gran ciudad",
+   "n": 561,
+   "pob": 3336573,
+   "subida": {
+    "med": 35.3,
+    "p25": 27.2,
+    "p75": 44.5
+   },
+   "perfil": {
+    "varPob": 2.3982401703784095,
+    "extr": 11.399611427653465,
+    "inmigReciente": 9.706875641619346,
+    "noPrincipal": 36.23105755516214,
+    "vt": 0.5998031063609278,
+    "compHab": 14.501664481181411,
+    "superiores": 24.675562890426797,
+    "alquiler": 11.380422397471898
+   },
+   "motores": [
+    {
+     "c": "varPob",
+     "l": "Población que ha llegado desde 2015",
+     "r": 0.44252465308636063,
+     "lo": 0.38512085875348895,
+     "hi": 0.49566640157592085,
+     "n": 561
+    },
+    {
+     "c": "afilVar19",
+     "l": "Empleo (afiliados) que ha crecido desde 2019",
+     "r": 0.32084906058344725,
+     "lo": 0.23825720869670797,
+     "hi": 0.39782672941052033,
+     "n": 413
+    },
+    {
+     "c": "inmigReciente",
+     "l": "Peso de los llegados del extranjero desde 2011",
+     "r": 0.14474140932813215,
+     "lo": 0.07894485227155211,
+     "hi": 0.21185508820383345,
+     "n": 560
+    },
+    {
+     "c": "noPrincipal",
+     "l": "Viviendas vacías o secundarias",
+     "r": -0.14931030967832268,
+     "lo": -0.2182942797534355,
+     "hi": -0.07920397400258908,
+     "n": 561
+    },
+    {
+     "c": "vt",
+     "l": "Pisos turísticos",
+     "r": 0.11765803909635683,
+     "lo": 0.05085003015831835,
+     "hi": 0.1824589284700471,
+     "n": 561
+    },
+    {
+     "c": "compHab",
+     "l": "Compraventas por habitante",
+     "r": 0.10043171220052755,
+     "lo": 0.030007997703109825,
+     "hi": 0.16724218055582046,
+     "n": 559
+    },
+    {
+     "c": "alquiler",
+     "l": "Peso del alquiler en el pueblo",
+     "r": 0.24971655676007118,
+     "lo": 0.18707709327157543,
+     "hi": 0.315905193856409,
+     "n": 561
+    }
+   ],
+   "ej": [
+    "Cabra",
+    "Arahal",
+    "Marchena",
+    "Nucia, la",
+    "Tàrrega"
+   ]
+  }
+ ],
+ "total": {
+  "n": 1783,
+  "pob": 42174629,
+  "subida": 41.9
+ }
+}
