@@ -36,7 +36,7 @@ fs.mkdirSync(OUT,{recursive:true});
 const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.readdirSync(from,{withFileTypes:true})){ const a=path.join(from,e.name), b=path.join(to,e.name); if(e.isDirectory()) copyDir(a,b); else fs.writeFileSync(b,fs.readFileSync(a)); } };
 const css=rd("src/styles.css"), js=rd("src/app.js"), tpl=rd("src/template.html");
 const MENUAN=STUDIES.map(S=>`      <a href="/preguntas/${S.id}/">${esc(S.t)}</a>`).join("\n");
-const body=rd("src/body.html").replace("{{MENUAN}}",MENUAN);
+const body=rd("src/body.html").replaceAll("{{MENUAN}}",MENUAN);
 const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
 const i18n="var ROWS="+JSON.stringify(I18N_ROWS)+";\n"+rd("src/i18n.js"), CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js", I18N="/assets/i18n."+h8(i18n)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});
