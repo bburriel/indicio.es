@@ -6454,7 +6454,7 @@ function heroCarHTML(D){
       +`<div class="pt-st"><div class="kk2">${esc(h.kk)}</div><${H} class="pt-q">${tit(S.t,h.em)}</${H}><p class="pt-v">${h.v(N)}</p><p class="pt-a">${h.a(N)}</p>`
       +`<p class="pt-cta"><a class="btn" href="/preguntas/${S.id}/"${i?` tabindex="-1"`:""}>${esc(h.cta)}</a></p></div>`
       +`<figure class="pt-sc">${ptCharts[h.chart](D)}<figcaption class="pt-cap">${h.cap(N)}</figcaption></figure></div>`; }).join("");
-  const tabs=L.map((h,i)=>`<button type="button" role="tab" class="${i?"":"on"}" aria-selected="${i?"false":"true"}" aria-controls="pts${i}"><span class="pt-bar"><span></span></span><b>${esc(h.tab)}</b><small>${esc(byId[h.id].t)}</small></button>`).join("");
+  const tabs=L.map((h,i)=>`<button type="button" role="tab" class="${i?"":"on"}" aria-selected="${i?"false":"true"}" aria-controls="pts${i}"><span class="pt-bar"><span></span></span><b>${esc(h.tab)}</b></button>`).join("");
   return `<section class="pt-car" aria-roledescription="carrusel" aria-label="Preguntas destacadas"><div class="pt-stack">${slides}</div><div class="pt-tabs" role="tablist" aria-label="Elige una pregunta">${tabs}</div></section>`;
 }
 // Pasa sola cada 7 s; la barrita de la pestaña marca el tiempo. Se pausa con el ratón encima, con el foco de teclado dentro,
@@ -6566,17 +6566,13 @@ async function renderInicio(){
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio.</span><i class="ho-cur"></i></span></span></h1>
     <p class="ho-sub">Los datos públicos, a tu alcance.</p>
-    <p class="ho-p">Indicio parte de preguntas de la calle, como qué pasó con el alquiler o dónde se dejó de invertir, y las contesta con datos públicos. Si dudas, compruébalo tú en el laboratorio.</p>
-    <ul class="ho-f" aria-label="Qué es Indicio">
-      <li><b>${nMun} municipios</b><span>De un pueblo de diez vecinos a Madrid.</span></li>
-      <li><b>Fuentes públicas</b><span>INE, SEPE, Seguridad Social y Eurostat. Cada gráfico dice de dónde sale.</span></li>
-      <li><b>Tres niveles de prueba</b><span>Cada respuesta dice si describe, compara casos parecidos o es un experimento natural.</span></li></ul></section>
+    <p class="ho-p">Indicio parte de preguntas de la calle, como qué pasó con el alquiler o dónde se dejó de invertir, y las contesta con datos públicos. Si dudas, compruébalo tú en el laboratorio.</p></section>
   <div class="pt-carband">${heroCarHTML(D)}
   <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p></div>
   <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
       <p class="pt-labx-lead">Elige un dato (renta, vivienda, edad, voto, pensiones…) y míralo en el mapa. Luego comprueba si la relación se sostiene.</p>
       <div class="pt-labx-h" id="labq-t">Empieza por una pregunta</div>
-      <div class="pt-labx-q" role="group" aria-labelledby="labq-t"><button type="button" class="on" aria-pressed="true" data-k="renta">¿Dónde se gana más?</button><button type="button" aria-pressed="false" data-k="edad">¿Dónde viven los más mayores?</button><button type="button" aria-pressed="false" data-k="varPob">¿Qué pueblos ganan vecinos?</button><button type="button" aria-pressed="false" data-k="alquiler">¿Dónde se vive de alquiler?</button><button type="button" aria-pressed="false" data-k="paro">¿Dónde cuesta más tener trabajo?</button><button type="button" aria-pressed="false" data-k="vt">¿Dónde hay más pisos turísticos?</button></div>
+      <div class="pt-labx-q" role="group" aria-labelledby="labq-t"><button type="button" class="on" aria-pressed="true" data-k="renta">¿Dónde se gana más?</button><button type="button" aria-pressed="false" data-k="edad">¿Dónde viven los más mayores?</button><button type="button" aria-pressed="false" data-k="varPob">¿Qué pueblos ganan vecinos?</button><button type="button" aria-pressed="false" data-k="vt">¿Dónde hay más pisos turísticos?</button></div>
       <p class="pt-labx-go"><a class="btn" href="/laboratorio/">Hacer mi propia pregunta →</a></p></div>
     <figure class="pt-labx-map"><div class="labmap" id="labmap" role="img" aria-label="Mapa de España por municipios, coloreado según la pregunta elegida"></div>
       <figcaption><b id="labcap">Renta por persona, 2024</b><span class="leg" aria-hidden="true"><em>menos</em><i style="background:var(--ramp-0)"></i><i style="background:var(--ramp-1)"></i><i style="background:var(--ramp-2)"></i><i style="background:var(--ramp-3)"></i><i style="background:var(--ramp-4)"></i><i style="background:var(--ramp-5)"></i><i style="background:var(--ramp-6)"></i><em>más</em></span>
@@ -6584,7 +6580,6 @@ async function renderInicio(){
   <section class="pt-land pt-mun" id="municipios"><div class="pt-land-tx"><div class="ed-k">Municipios</div><h2>En España hay ${nMun} municipios. <em>En uno de ellos vives tú.</em></h2>
       <p class="pt-land-lead">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
     <div class="pt-mun-q"><p class="pt-tools"><button type="button" class="btn" id="mi-go">Ve a tu municipio →</button></p></div>
-    <div class="mi-que"><p><b>Su ficha</b>Renta, paro, alquiler y edad, frente a España.</p><p><b>Cómo ha cambiado</b>Población, renta, paro y alquiler desde 2015.</p><p><b>A quién se parece</b>Los cinco municipios que más se le parecen.</p></div>
     <figure class="pt-mun-art"><div class="qh-art" id="qhart" role="img" aria-label="Cada municipio como un punto, según cuántos vecinos ha ganado o perdido desde 2005 y su edad media."></div>
       <figcaption class="pt-cap">Cada punto es un municipio, colocado según cuántos vecinos ha ganado o perdido desde 2005 y su edad media. <span class="pt-hint">Pasa por encima de un punto para ver cuál es y pulsa para abrir su ficha.</span></figcaption></figure></section>
   <section class="pt-why"><h2>Por qué fiarte de estas respuestas</h2>
