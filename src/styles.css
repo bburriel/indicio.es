@@ -2118,3 +2118,32 @@ details.chk > section{margin-top:18px}
 .pv{opacity:0; transform:translateY(28px); transition:opacity .8s cubic-bezier(.2,.7,.2,1) var(--d,0s), transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
 .pv.in{opacity:1; transform:none}
 @media (prefers-reduced-motion:reduce){ .pv{opacity:1; transform:none; transition:none} }
+
+/* Laboratorio: bloque «¿Aguanta al comparar?» (noviembre 2026): veredicto, una fila por prueba y un solo detalle */
+.cz .czk{font:600 12px/1.2 var(--font); letter-spacing:.08em; text-transform:uppercase; color:var(--brand); margin:0 0 6px}
+.cz .czvt{font-family:var(--serif); font-weight:500; font-size:24px; line-height:1.2; letter-spacing:-.01em}
+.cz .czvs{font-size:14.5px; color:var(--ink-2); margin:4px 0 12px; max-width:var(--medida)}
+.czrows{list-style:none; margin:0; padding:0; border-top:1px solid var(--rule)}
+.czrows>li{display:grid; grid-template-columns:22px minmax(0,1fr) auto; gap:4px 10px; align-items:baseline; padding:10px 0; border-bottom:1px solid var(--rule); font-size:15.5px}
+.czrows .em{font-weight:700; text-align:center}
+.czrows .ok .em{color:var(--ok)} .czrows .ko .em{color:var(--ko)} .czrows .na{color:var(--muted)}
+.czrows .rv{font-variant-numeric:tabular-nums; color:var(--ink-2); font-size:14.5px; text-align:right; white-space:nowrap}
+.czrows .rl{min-width:0}
+.czrows .rs{display:block; grid-column:2/-1}
+/* la tarjeta de controles vive ahora dentro de la primera fila */
+.czrows .rs .czpar{border:0; margin:6px 0 0; padding:0; background:none}
+.czrows .rs .czpar>h3{display:none}
+.czrows .rs .czpar .czlead{font-size:13.5px; color:var(--muted); margin:0 0 4px}
+.czrows .rs .czpar .czchips{margin-top:6px; gap:8px}
+.czrows .rs .czpar .czpick{padding:5px 12px 5px 10px; font-size:13.5px}
+.czrows .rs .czpar .czbar{margin:12px 0 0}
+.czrows .rs .czpar .czbar .pc{font-size:14.5px}
+.czrows .rs .czpar .czc-s{font-size:14px}
+.cz .czdet2{margin-top:10px; padding:10px 0 0; border:0; background:none}
+.cz .czdet2>summary .czdt{font:600 14.5px var(--font); color:var(--brand)}
+.cz .czreq{font:600 14.5px var(--font); margin:26px 0 6px}
+.cz .czreql{margin:0; padding-left:20px; font-size:14px; line-height:1.5; color:var(--ink-2)} .cz .czreql li{margin:4px 0}
+.cz .czhit{margin-top:14px; background:var(--band); border-radius:8px; padding:10px 14px; font-size:14.5px}
+.cz .czhit b{color:var(--brand-2)} .cz .czhit a{color:var(--brand); text-decoration:underline; text-underline-offset:3px}
+.cz .czlk{margin:14px 0 0; font-size:14px}
+@media (max-width:620px){ .cz .czvt{font-size:21px} .czrows>li{grid-template-columns:20px minmax(0,1fr)} .czrows .rv{grid-column:2; text-align:left} }
