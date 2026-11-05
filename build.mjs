@@ -34,7 +34,9 @@ const provShort=n=>n?n.split("/")[0].replace(/^(.*), (A|Las|La|Les|Illes|Os)$/,"
 try{ fs.rmSync(OUT,{recursive:true,force:true}); }catch(e){ /* sin permiso de borrado: se sobrescribe encima */ }
 fs.mkdirSync(OUT,{recursive:true});
 const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.readdirSync(from,{withFileTypes:true})){ const a=path.join(from,e.name), b=path.join(to,e.name); if(e.isDirectory()) copyDir(a,b); else fs.writeFileSync(b,fs.readFileSync(a)); } };
-const css=rd("src/styles.css"), js=rd("src/app.js"), tpl=rd("src/template.html");
+// covers.json y portada.json llevan una versión en la URL (?v=…): sin ella el service worker y la caché del navegador siguen sirviendo la copia vieja
+const DV=crypto.createHash("sha256").update(["covers","alimentos","sueldos","vivienda","causales","infra"].map(f=>rd("data/"+f+".json")).join("")).digest("hex").slice(0,8);
+const css=rd("src/styles.css"), js=rd("src/app.js").replaceAll("__DV__",DV), tpl=rd("src/template.html");
 const MENUAN=STUDIES.map(S=>`      <a href="/preguntas/${S.id}/">${esc(S.t)}</a>`).join("\n");
 const body=rd("src/body.html").replaceAll("{{MENUAN}}",MENUAN);
 const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
@@ -111,7 +113,7 @@ function page({route,title,desc,ogTitle,main,jsonld,ogImage,type="website",robot
     .replace(/\{\{OGTITLE\}\}/g,esc(stripTags(ogTitle||title))).replace("{{OGTYPE}}",type).replace(/\{\{OGIMG\}\}/g,SITE.url+(ogImage||"/og-image.png"))
     .replace("{{ROBOTS}}",robots?`<meta name="robots" content="${robots}">`:"").replace("{{CSS}}",CSS).replace("{{JS}}",JS).replace("{{I18N}}",I18N).replace("{{CONTENT}}",CONTENT)
     .replace("{{JSONLD}}",jsonld?`<script type="application/ld+json">${JSON.stringify(jsonld)}</script>`:"")
-    .replace("{{PRELOAD}}",route==="/"?'<link rel="preload" href="/data/portada.json" as="fetch" crossorigin>':route==="/preguntas/"?'<link rel="preload" href="/data/municipios.topo.json" as="fetch" crossorigin>':"").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
+    .replace("{{PRELOAD}}",route==="/"?'<link rel="preload" href="/data/portada.json?v='+DV+'" as="fetch" crossorigin>':route==="/preguntas/"?'<link rel="preload" href="/data/municipios.topo.json" as="fetch" crossorigin>':"").replace("{{BODY}}",body.replace("{{MAIN}}",main).replace("{{AFTER}}",typeof after==="string"?after:"").replace("{{DATAUPD}}",fechaES(SITE.dataUpdated)));
   const dir=path.join(OUT,route); fs.mkdirSync(dir,{recursive:true}); fs.writeFileSync(path.join(dir,"index.html"),html);
 }
 const breadcrumb=items=>({"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:items.map(([n,u],i)=>({"@type":"ListItem",position:i+1,name:n,item:SITE.url+u}))});
