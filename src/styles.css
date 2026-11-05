@@ -2386,3 +2386,12 @@ details.chk > section{margin-top:18px}
 .np-rd time{display:block} .np-rd .np-go{display:inline-block; padding-top:10px; color:var(--ink)}
 .np-row:hover .np-q{color:var(--brand)} .np-row:hover .np-go{color:var(--brand)}
 @media (max-width:760px){ .np-row{grid-template-columns:minmax(0,1fr); gap:10px} .np-row[data-ev="natural"]::before{left:-12px} .np-rd{text-align:left; display:flex; gap:14px; align-items:baseline} .np-rd .np-go{padding-top:0} }
+
+/* Análisis: un solo destacado arriba (nov. 2026) */
+.np-top{padding:34px 0 38px; border-bottom:1px solid var(--rule-2)}
+.np-lt{display:flex; flex-direction:column; align-items:flex-start}
+.np-lt .np-lgo{margin-top:22px}
+.np-ltime{font:13px var(--font); color:var(--muted); margin-top:14px}
+.np-lead:hover .np-lq{color:var(--brand)}
+.np-top .np-lf{margin:0; min-height:0; aspect-ratio:440/300}
+@media (max-width:980px){ .np-lead{grid-template-columns:minmax(0,1fr)} .np-top .np-lf{order:-1} }
