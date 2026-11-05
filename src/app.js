@@ -6593,7 +6593,6 @@ async function renderInicio(){
       <div><i>2</i><span><b>Cada respuesta dice cuánto aguanta</b>Una etiqueta te avisa si los datos solo describen, si comparan casos parecidos o si una ley hizo de experimento.</span></div>
       <div><i>3</i><span><b>Sin bando</b>Si los datos no dan para una conclusión, lo decimos, aunque el titular quede peor.</span></div></div></section>
   ${methodNote()}`;
-  heroCarBind(view.querySelector(".pt-car"));
   heroType(view.querySelector(".ho"));
   view.querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",ev=>{ ev.preventDefault(); const t=view.querySelector(x.dataset.go); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
   heroLab(view); homeReveal(view);
@@ -6751,20 +6750,21 @@ new MutationObserver(()=>{ clearTimeout(revealObserve._t); revealObserve._t=setT
 // antiguo, cada uno con su gráfico, su titular en forma de pregunta y su veredicto en una frase.
 async function renderPreguntas(){
   document.title="Análisis · Indicio";
-  // el mismo carrusel que la portada; mientras llega portada.json sigue a la vista la página pre-renderizada
-  const D=await loadPortada(); if(!/^\/preguntas\/?$/.test(location.pathname)) return;
+  await loadPortada(); if(!/^\/preguntas\/?$/.test(location.pathname)) return;
   const all=[...STUDIES.map(S=>({id:S.id,href:"/preguntas/"+S.id+"/",t:S.t,d:S.d,ev:S.ev,a:S.a||S.d,cifra:S.cifra||"",cifraT:S.cifraT||"",pub:S.pub||"",upd:S.upd||S.pub||""})),
     ...QUICKQ.map(Q=>({id:Q.id,href:Q.href,t:Q.t,d:Q.d||"",ev:Q.ev,a:Q.a,cifra:Q.cifra||"",cifraT:Q.cifraT||"",pub:"",upd:""}))]
     .sort((x,y)=>(y.pub||"").localeCompare(x.pub||"")||(y.upd||"").localeCompare(x.upd||""));
   const row=e=>{ const v=e.d||splitA(e.a).v; return `<a class="np-row" data-ev="${e.ev||""}" href="${e.href}"><div class="np-n">${e.cifra?`<b>${esc(e.cifra)}</b><small>${esc(e.cifraT)}</small>`:""}</div><div class="np-rt"><div class="np-k">${evSpan(e.ev).trim()}</div><h3 class="np-q">${esc(e.t)}</h3><p class="np-v">${esc(v)}</p></div><div class="np-rd">${e.pub?`<time datetime="${e.pub}">${fechaES(e.pub)}</time>`:""}<span class="np-go">Leer →</span></div></a>`; };
-  const evs=[...new Set(all.map(e=>e.ev).filter(k=>EVID[k]))], chips=evs.length>1?`<div class="np-chips" role="group" aria-label="Filtrar por tipo de análisis"><button type="button" class="on" data-f="" aria-pressed="true">Todos <small>${all.length}</small></button>${evs.map(k=>`<button type="button" data-f="${k}" aria-pressed="false" title="${esc(EVID[k].d)}">${esc(EVID[k].l)} <small>${all.filter(e=>e.ev===k).length}</small></button>`).join("")}</div>`:"";
+  // un solo destacado arriba (el más reciente); la lista de debajo no lo repite
+  const [lead,...rest]=all;
+  const top=lead?`<section class="np-top"><a class="np-lead" href="${lead.href}"><div class="np-lt"><div class="np-k">${evSpan(lead.ev).trim()}</div><h2 class="np-lq">${esc(lead.t)}</h2><p class="np-ld">${esc(lead.d||splitA(lead.a).v)}</p><span class="np-lgo btn">Leer el análisis →</span>${lead.pub?`<time class="np-ltime" datetime="${lead.pub}">${fechaES(lead.pub)}</time>`:""}</div><figure class="np-fig np-lf" data-cv="${lead.id}"></figure></a></section>`:"";
+  const evs=[...new Set(rest.map(e=>e.ev).filter(k=>EVID[k]))], chips=evs.length>1?`<div class="np-chips" role="group" aria-label="Filtrar por tipo de análisis"><button type="button" class="on" data-f="" aria-pressed="true">Todos <small>${rest.length}</small></button>${evs.map(k=>`<button type="button" data-f="${k}" aria-pressed="false" title="${esc(EVID[k].d)}">${esc(EVID[k].l)} <small>${rest.filter(e=>e.ev===k).length}</small></button>`).join("")}</div>`:"";
   const labBlock=`<section class="np-lab"><div class="np-lab-t"><div class="kk2">Laboratorio</div><h2>Si tu pregunta no está, pruébala tú</h2><p>Elige dos datos, como el paro y la edad o la renta y el voto, y mira si van juntos de verdad en los ${nf0.format(rowsAll().length)} municipios y cuánto aguanta la relación cuando se compara entre iguales. También puedes ver qué pasó antes y después de una ley.</p><p class="np-lab-b"><a class="btn" href="/laboratorio/">Abrir el laboratorio →</a> <a class="ed-go" href="/laboratorio/metodo/">Cómo buscar causas →</a></p></div><a class="np-lab-i" href="/laboratorio/" aria-hidden="true" tabindex="-1">${tIll("laboratorio")}</a></section>`;
   view.innerHTML=`<div class="np"><header class="np-mast"><div class="kk2">Análisis</div><h1>Lo que dicen los datos</h1><p>${all.length} preguntas respondidas con datos públicos. Cada respuesta dice hasta dónde llega.</p></header>
-    ${heroCarHTML(D)}${all.length?`<section class="np-sec"><div class="np-sh"><h2>Todos los análisis</h2></div>${chips}<div class="np-list">${all.map(row).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`}
+    ${top}${rest.length?`<section class="np-sec"><div class="np-sh"><h2>Más análisis</h2></div>${chips}<div class="np-list">${rest.map(row).join("")}</div></section>`:`<p class="an-vacio">Todavía no hay análisis. Prueba tus propias preguntas en <a href="/laboratorio/">el laboratorio</a>.</p>`}
     <section class="ed-sec an-sec ed-two"><div><div class="ed-k">Por municipio</div><h2 class="ed-h2">Mira cómo sale el tuyo</h2><p class="ed-lead">Su ficha, con las cifras clave frente a España y los municipios que más se le parecen.</p></div><div>${bigSearchHTML("q3","Busca tu municipio…")}<p class="an-links"><a class="ed-go" href="/comparar/">Comparar dos municipios →</a> <a class="ed-go" href="/provincia/">Municipios por provincia →</a></p></div></section>
     ${labBlock}</div>`;
   bindBig("q3");
-  heroCarBind(view.querySelector(".pt-car"));
   view.querySelectorAll(".np-chips button").forEach(b=>b.addEventListener("click",()=>{ view.querySelectorAll(".np-chips button").forEach(x=>{ const on=x===b; x.classList.toggle("on",on); x.setAttribute("aria-pressed",on); }); view.querySelectorAll(".np-row").forEach(r=>{ r.hidden=!!b.dataset.f&&r.dataset.ev!==b.dataset.f; }); }));
   loadCovers().then(cv=>{ view.querySelectorAll("[data-cv]").forEach(f=>{ const c=coverOf(f.dataset.cv,cv); if(c) f.innerHTML=c.svg+(f.dataset.cap?`<figcaption class="pt-cap">${esc(c.cap)}</figcaption>`:""); else f.remove(); }); });
 }
