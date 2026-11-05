@@ -12,7 +12,7 @@ import {PAGES} from "../src/content.mjs";
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"..");
 // Páginas que ya se dan por cerradas: lo que falte aquí hay que traducirlo. El resto (análisis, temas…) cambia
 // todavía y se traducirá cuando esté más cerrado. Para cerrar una más, añade su nombre de snapshots/ (sin .html).
-export const CERRADAS=["quien-soy","laboratorio","laboratorio__metodo","municipio"];
+export const CERRADAS=["quien-soy","laboratorio","laboratorio__metodo"];
 
 const NUMRE=/\d[\d.,]*\d|\d/g;
 const norm=s=>s.replace(/\s+/g," ").trim().replace(NUMRE,"{#}");
