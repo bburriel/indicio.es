@@ -4266,13 +4266,13 @@ function czSummary(cs){
   const clear=()=>{ lad.innerHTML=""; vc.innerHTML=""; if(h) h.innerHTML=""; };
   const D0=adjData(x,y,[],w); if(!D0||!D0.c){ clear(); return; }
   const st=niceStep(x,D0.X.map((v,i)=>({x:v,y:D0.Y[i],w:D0.w[i]}))), e0=czEst(x,y,[],w,st); if(!e0){ clear(); return; }
-  const use=cs.length?cs:(CZ.suspect?[CZ.suspect]:[]), prev=!cs.length&&use.length, e1=use.length?czEst(x,y,use,w,st):null;
+  const use=cs, prev=false, e1=use.length?czEst(x,y,use,w,st):null;
   const xl=low(labK(x)), yl=low(labK(y)), stTxt=unitTxt(x,st).replace(/^1 punto$/,"punto"), sv=v=>(v<0?"−":"+")+unitTxt(y,v), shn=czShortF(y);
   const nm=use.map(k=>CSHORT[k]||low(labK(k))), nj=czJoin(nm), same=use.length?"Entre municipios "+czJoin(use.map(czSame)):"";
   const sn=e0.b<0?"menos":"más", sgnTxt=e0.b<0?"menos":"más";
   let i, txt, full, h2="";
   if(!czSig(e0)){ i=1; txt="Ni sin igualar se distingue de «ningún efecto»."; full="Ya sin igualar nada, el rango incluye el 0: con estos datos no se puede asegurar que haya relación."; h2="Pero con estos datos no se puede asegurar."; }
-  else if(!e1){ i=3; txt="No hemos encontrado nada que la explique."; full="No hemos encontrado nada que la explique de forma clara. Puedes probar con otro dato."; h2="Aún no sabemos si es por esto."; }
+  else if(!e1){ i=-1; txt=""; full=""; }
   else {
     const q=e1.b/e0.b; i=q<0.1?0:!czSig(e1)?1:q<0.5?2:3;
     const near=e1.ci?(e0.b<0?e1.ci[1]:e1.ci[0]):null, expl=czJoin(use.map(k=>CKNOWN[k]||low(labK(k))));
@@ -4288,12 +4288,13 @@ function czSummary(cs){
   const nd=e1?e0.n-e1.n:0, nTxt=nd>0?` Faltan datos de ${nf0.format(nd)} municipio${nd===1?"":"s"} en lo que descuentas.`:"", e=e1||e0;
   const rng=o=>`${sv(o.b)}${o.ci?` (entre ${shn(o.ci[0])} y ${shn(o.ci[1])})`:""}`;
   const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${e1?`Sin igualar: ${rng(e0)}<br>Igualando: ${rng(e1)}`:rng(e0)}<br>Si repitiéramos el cálculo con otras provincias, el resultado caería dentro de este rango 95 de cada 100 veces. Remuestreamos provincias enteras porque los municipios de una misma provincia se parecen entre sí.<br>Calculado con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
-  const rows=[{lab:"Sin igualar",b:e0.b,ci:e0.ci,cls:"a"}];
-  if(e1) rows.push({lab:prev?`Si igualas ${esc(nj)} (lo que más pesa)`:`Igualando ${esc(nj)}`,b:e1.b,ci:e1.ci,cls:"b"});
-  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">La línea es el rango probable${czIt("La línea de cada fila es el rango probable. Si cruza el 0, no se distingue de «ningún efecto».<br>"+tipCI,"Qué es el rango probable")}</p>`;
+  const rows=[e1?{lab:`Igualando ${esc(nj)}`,b:e1.b,ci:e1.ci,cls:"b"}:{lab:"Sin igualar",b:e0.b,ci:e0.ci,cls:"a"}];
+  const capT=e1?`Antes de igualar: ${sv(e0.b)} por ${stTxt}`:"La línea es el rango probable";
+  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">${capT}${czIt("La línea es el rango probable. Si cruza el 0, no se distingue de «ningún efecto».<br>"+tipCI,e1?"Antes y después de igualar":"Qué es el rango probable")}</p>`;
   czTipBind(lad);
   // veredicto
   const rule="<br><br><b>Cómo se decide.</b> Desaparece: cambia de signo o queda menos del 10 %. Dudosa: el rango toca el 0. Se reduce: queda menos de la mitad. Se mantiene: queda la mitad o más.<br><br>No demuestra que una cosa cause la otra.";
+  if(i<0){ vc.innerHTML=`<p class="czvt czvt0">Marca abajo lo que quieras igualar y verás si la relación se mantiene entre municipios parecidos.</p>`; return; }
   vc.innerHTML=`<div class="czq">Al comparar municipios parecidos</div>
     <div class="czscale" role="img" aria-label="Veredicto: ${CZST[i]}">${CZST.map((t,k)=>`<span class="${k===i?"act":""}"><i></i><em>${t}</em></span>`).join("")}</div>
     <p class="czvt">${txt}${czIt(full+rule,"Qué significa este veredicto")}</p>`;
