@@ -1790,6 +1790,15 @@ function bootCI(rows,stat,{B=200,seed=7}={}){
   for(let b=0;b<B;b++){ const s=new Array(n); for(let i=0;i<n;i++) s[i]=rows[(R()*n)|0]; const v=stat(s); if(v!=null&&isFinite(v)) out.push(v); }
   if(out.length<20) return null; out.sort((a,b)=>a-b); return [out[Math.floor(out.length*0.025)],out[Math.ceil(out.length*0.975)-1]];
 }
+// Igual que bootCI, pero remuestrea grupos enteros (p. ej. provincias): los municipios de un mismo grupo se parecen y no cuentan como datos independientes.
+// Si hay menos de 8 grupos no se puede remuestrear así y vuelve al remuestreo de municipios.
+function bootCIg(rows,key,stat,{B=200,seed=7}={}){
+  const G=new Map(); rows.forEach(r=>{ const k=key(r); if(!G.has(k)) G.set(k,[]); G.get(k).push(r); });
+  const gs=[...G.values()], m=gs.length; if(m<8) return bootCI(rows,stat,{B,seed});
+  const R=rng(seed), out=[];
+  for(let b=0;b<B;b++){ let s=[]; for(let i=0;i<m;i++) s=s.concat(gs[(R()*m)|0]); const v=stat(s); if(v!=null&&isFinite(v)) out.push(v); }
+  if(out.length<20) return null; out.sort((a,b)=>a-b); return [out[Math.floor(out.length*0.025)],out[Math.ceil(out.length*0.975)-1]];
+}
 // Correlación parcial con intervalo: {r,n,ci}
 // (el remuestreo se hace sobre los pares de residuos ya calculados: con miles de municipios, la incertidumbre de estimar los controles es despreciable frente a la de la correlación)
 function partialRCI(x,y,ctrls,weighted,{B=200}={}){
@@ -4256,8 +4265,8 @@ const CZE={};
 function czEst(x,y,cs,w,st){
   const key=[x,y,w?1:0,st,cs.join(","),JSON.stringify(typeof EXF!=="undefined"?EXF:null),EX.p,EX.t].join("|"); if(key in CZE) return CZE[key];
   const D=adjData(x,y,cs,w); if(!D||!D.c) return CZE[key]=null;
-  const pts=D.X.map((v,i)=>({x:v,y:D.Y[i],w:D.w[i]})), b=D.c.b*st, ci=bootCI(pts,s=>{ const k=wcorr(s); return k?k.b*st:null; },{B:120});
-  return CZE[key]={b,ci,n:D.rs.length};
+  const pts=D.X.map((v,i)=>({x:v,y:D.Y[i],w:D.w[i],g:D.rs[i][F.prov]})), b=D.c.b*st, ci=bootCIg(pts,p=>p.g,s=>{ const k=wcorr(s); return k?k.b*st:null; },{B:200});
+  return CZE[key]={b,ci,n:D.rs.length,ng:new Set(pts.map(p=>p.g)).size};
 }
 function czEuros(x,y,cs,w){
   const box=document.getElementById("czeur"), kh=document.getElementById("czk2"); if(!box) return;
@@ -4270,7 +4279,7 @@ function czEuros(x,y,cs,w){
   const ok=sig(e), vd=document.getElementById("czevd");
   if(vd){ vd.innerHTML=`<span class="czvd ${ok?"ok":"nz"}">${ok?"✓ Efecto claro":"Sin efecto claro"}${czIt(ok?"El rango probable no toca el cero, así que es poco probable que sea casualidad.":"El rango probable incluye el cero: con estos datos no se puede asegurar que haya efecto, podría ser casualidad.","Qué significa")}</span>`; czTipBind(vd); }
   const rr=(e1?[["Sin igualar",e0],["Tras igualar",e1]]:[["",e0]]).map(([lab,o])=>`${lab?lab.toLowerCase()+": ":""}<b>${sv(o.b)}</b>${o.ci?` (entre ${shn(o.ci[0])} y ${shn(o.ci[1])})`:""}`).join("<br>");
-  const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${rr}<br>Si repitiéramos el cálculo con otros municipios parecidos, el resultado caería dentro de este rango 95 de cada 100 veces.<br>Calculado con ${nf0.format(e.n)} municipios.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
+  const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${rr}<br>Si repitiéramos el cálculo con otras provincias, el resultado caería dentro de este rango 95 de cada 100 veces. Remuestreamos provincias enteras porque los municipios de una misma provincia se parecen entre sí.<br>Calculado con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
   if(kh){ kh.innerHTML=`${cs.length?"Entre municipios parecidos, por":"Por"} cada ${stTxt} más de ${low(labK(x))}${czIt(tipCI,"Qué es el rango probable")}`; czTipBind(kh); }
   box.innerHTML=`<span class="czv" tabindex="0">${e.b>=0?"+":"−"}${unitTxt(y,e.b)}</span> <small>de ${yl}</small>`;
   const cv=box.querySelector(".czv"); if(cv){ const sh=()=>tipShow(cv,tipCI); cv.addEventListener("mouseenter",sh); cv.addEventListener("focus",sh); cv.addEventListener("mouseleave",tipHide); cv.addEventListener("blur",tipHide); }
