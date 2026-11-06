@@ -1632,7 +1632,7 @@ details.chk > section{margin-top:18px}
 @media (max-width:700px){ .czc .czg{grid-template-columns:1fr} .czc .czg .czb-e{border-top:1px solid var(--rule); padding-top:20px} .czc .czbar{flex-wrap:wrap} .czc .czbar .trk{flex:1 1 100%} .czc .czbar .pc{white-space:normal} .czc .czg .czb,.czc .czpar{padding:16px 18px} }
 
 /* panel de comparar: tarjeta de abajo más limpia */
-.czpar .czchips,.czdb .czchips{gap:10px; margin-top:12px}
+.czpar .czchips{gap:10px; margin-top:12px}
 .czpar .czchip{background:var(--card)}
 .czpar .czchip.on{background:var(--brand); border-color:var(--brand)}
 .czpar .czchip.on .czpick{color:#fff}
@@ -2442,11 +2442,11 @@ details.chk > section{margin-top:18px}
 :root[data-theme="dark"] .czbt i.b{background:#d0505f}
 .czpickrow{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 0 6px}
 .czpl{font-size:16px; color:var(--ink-2); margin-right:4px}
-.czpar .czchips,.czdb .czchips{display:inline-flex; flex-wrap:wrap; align-items:center; gap:10px}
-.czpar .lbchip,.czdb .lbchip{display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:8px 14px; font-size:15px; font-weight:600; border:1.5px solid var(--rule-2); background:transparent; color:var(--ink); font-family:inherit}
-.czpar .lbchip.on,.czdb .lbchip.on{background:color-mix(in srgb,var(--brand) 9%,transparent); border-color:transparent; color:var(--brand); padding-right:10px}
-:root[data-theme="dark"] .czpar .lbchip.on,:root[data-theme="dark"] .czdb .lbchip.on{color:#e48a95}
-.czpar .lbchip .czwarn2,.czdb .lbchip .czwarn2{margin:0}
+.czpar .czchips{display:inline-flex; flex-wrap:wrap; align-items:center; gap:10px}
+.czpar .lbchip{display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:8px 14px; font-size:15px; font-weight:600; border:1.5px solid var(--rule-2); background:transparent; color:var(--ink); font-family:inherit}
+.czpar .lbchip.on{background:color-mix(in srgb,var(--brand) 9%,transparent); border-color:transparent; color:var(--brand); padding-right:10px}
+:root[data-theme="dark"] .czpar .lbchip.on{color:#e48a95}
+.czpar .lbchip .czwarn2{margin:0}
 .czx{border:0; background:transparent; color:inherit; font-size:14px; cursor:pointer; padding:0 2px; line-height:1}
 .lbpick{cursor:pointer}
 .lbadd{background:transparent; border:1.5px dashed var(--rule-2); border-radius:999px; padding:8px 16px; font:500 15px/1.2 inherit; font-family:inherit; color:var(--ink-2); cursor:pointer}
@@ -2549,57 +2549,3 @@ a.mm-card:hover .mm-go{text-decoration:underline}
 .cp-k .cp-vv b{font-size:36px; font-weight:400; letter-spacing:-.015em}
 .cp-k .cp-vv small{margin-top:7px}
 @media (max-width:760px){ .cp-k{grid-template-columns:minmax(0,1fr); gap:6px; padding:24px 0} .cp-trk.cp-dist{margin:12px 6px 0} .cp-k .cp-vv b{font-size:32px} }
-
-/* ---------- Laboratorio: escalera en unidades, veredicto de cuatro estados y desplegables (noviembre 2026) ---------- */
-.czc .czh{font-family:var(--serif); font-weight:400; font-size:clamp(26px,3.6vw,38px); line-height:1.15; letter-spacing:-.01em; margin:0 0 20px; max-width:30ch; color:var(--ink)}
-.czc .czh .czh2{color:var(--brand)}
-:root[data-theme="dark"] .czc .czh .czh2{color:#e48a95}
-.czld{max-width:720px; padding:0 14px}
-.czr2{margin-bottom:12px}
-.czrh{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:4px}
-.czrh b{font-weight:600; font-size:14.5px}
-.czrh span{font-family:var(--serif); font-size:22px; white-space:nowrap}
-.czrh span.b{color:var(--brand)}
-:root[data-theme="dark"] .czrh span.b{color:#e48a95}
-.czrt{position:relative; height:36px; border-radius:8px; background:var(--band)}
-.czrt .z{position:absolute; top:-5px; bottom:-5px; width:0; border-left:2px solid var(--ink)}
-.czrt .ci{position:absolute; top:16px; height:4px; border-radius:2px; background:var(--rule-2)}
-.czrt .ci.b{background:color-mix(in srgb,var(--brand) 45%,var(--card))}
-.czrt .dt{position:absolute; top:9px; width:18px; height:18px; margin-left:-9px; border-radius:50%; background:var(--muted); border:2px solid var(--card)}
-.czrt .dt.b{background:var(--brand)}
-.czax{position:relative; height:20px}
-.czax span{position:absolute; transform:translateX(-50%); font-size:12px; color:var(--muted); white-space:nowrap}
-.czax span.z0{font-weight:600; color:var(--ink)}
-.czcap{margin:2px 0 0; font-size:13px; color:var(--muted); max-width:640px}
-.czvc{margin-top:20px; padding:16px 18px; border:1px solid var(--rule); border-radius:14px; background:var(--card); max-width:720px}
-.czq{font-size:15.5px; font-weight:600; line-height:1.3}
-.czpills{display:flex; border:1px solid var(--rule-2); border-radius:999px; overflow:hidden; font-size:13px; font-weight:500; margin-top:12px}
-.czpills span{flex:1; text-align:center; padding:8px 4px; color:var(--muted); transition:background .3s}
-.czpills span.act{background:var(--brand); color:#fff}
-.czvt{margin:12px 0 0; font-size:15px; line-height:1.45}
-.czvn{margin:6px 0 0; font-size:13px; color:var(--muted)}
-.czacc{margin-top:22px; border-top:1px solid var(--ink); max-width:720px}
-.czd{border-bottom:1px solid var(--rule)}
-.czd>summary{list-style:none; cursor:pointer; display:grid; grid-template-columns:1fr 24px; gap:10px; align-items:center; padding:12px 0; min-height:56px}
-.czd>summary::-webkit-details-marker{display:none}
-.czd>summary::after{content:"+"; font-size:20px; text-align:center; color:var(--ink)}
-.czd[open]>summary::after{content:"−"}
-.czd>summary b{display:block; font-family:var(--serif); font-size:19px; font-weight:600; line-height:1.2}
-.czd>summary small{display:block; font-size:13px; color:var(--muted); margin-top:2px; line-height:1.35}
-.czdb{padding:4px 0 18px}
-.czdb .czhint{margin:4px 0 8px; font-size:14px}
-.czdb .czpickrow{margin:6px 0}
-.czno{display:grid; grid-template-columns:26px 1fr; gap:12px; border:1px dashed var(--rule-2); border-radius:12px; padding:11px 14px; margin-top:8px; font-size:14px}
-.czno .muted{font-size:13px}
-.czic{width:22px; height:22px; border-radius:50%; border:1.5px solid var(--muted); color:var(--muted); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600}
-.czstrip{position:relative; margin-top:10px; background:var(--band); border-radius:8px}
-.czstrip i{position:absolute; width:9px; height:9px; margin-left:-4.5px; border-radius:50%}
-.czstrip i.s{background:var(--brand)}
-.czstrip i.o{background:var(--card); border:1.5px solid var(--muted)}
-.czstrip i.z{top:0; bottom:0; width:0; height:auto; margin:0; border-radius:0; border-left:2px solid var(--ink)}
-.czstrip i.m{top:0; bottom:0; width:0; height:auto; margin:0; border-radius:0; border-left:2px dashed var(--brand)}
-.czax2{margin-top:2px}
-.czd .czhowb,.czd #czhowb{padding-top:4px}
-@media(max-width:560px){ .czld{padding:0 14px} .czpills{font-size:11.5px} .czpills span{padding:8px 1px; white-space:nowrap} }
-.czdb p{margin:0 0 10px; font-size:14.5px; line-height:1.5}
-.czdb p.czhint{font-size:14px}
