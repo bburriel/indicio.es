@@ -38,8 +38,7 @@ const copyDir=(from,to)=>{ fs.mkdirSync(to,{recursive:true}); for(const e of fs.
 // covers.json y portada.json llevan una versión en la URL (?v=…): sin ella el service worker y la caché del navegador siguen sirviendo la copia vieja
 const DV=crypto.createHash("sha256").update(["covers","alimentos","sueldos","vivienda","causales","infra"].map(f=>rd("data/"+f+".json")).concat(rd("build.mjs")).join("")).digest("hex").slice(0,8);
 const css=rd("src/styles.css"), js=rd("src/app.js").replaceAll("__DV__",DV), tpl=rd("src/template.html");
-const MENUAN=STUDIES.map(S=>`      <a href="/preguntas/${S.id}/">${esc(S.t)}</a>`).join("\n");
-const body=rd("src/body.html").replaceAll("{{MENUAN}}",MENUAN);
+const body=rd("src/body.html");
 const h8=s=>crypto.createHash("sha256").update(s).digest("hex").slice(0,8);
 const i18n="var ROWS="+JSON.stringify(I18N_ROWS)+";\n"+rd("src/i18n.js"), CSS="/assets/styles."+h8(css)+".css", JS="/assets/app."+h8(js)+".js", I18N="/assets/i18n."+h8(i18n)+".js";
 fs.mkdirSync(path.join(OUT,"assets"),{recursive:true});

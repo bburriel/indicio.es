@@ -2646,3 +2646,10 @@ a.mm-card:hover .mm-go{text-decoration:underline}
 .czax span{font-size:11.5px}
 .czvc{margin-top:14px}
 .czq{font-size:13.5px; font-weight:500; color:var(--muted)}
+
+/* Menú «Análisis» sin desplegable (6 nov 2026): solo lleva a la portada de análisis. */
+.navdd-solo a,.navdd-solo a:hover{padding-right:11px!important; border-radius:20px!important}
+.navdd-solo a[aria-current="page"]{border-radius:20px!important}
+@media (max-width:480px){ .navdd-solo a,.navdd-solo a:hover{padding-right:8px!important} }
+.mm-col-solo{grid-column:1/-1}
+.mega .mm-col-solo .mm-h{margin:0; padding-bottom:5px}
