@@ -2654,3 +2654,4 @@ a.mm-card:hover .mm-go{text-decoration:underline}
 .mm-col-solo{grid-column:1/-1}
 .mega .mm-col-solo .mm-h{margin:0; padding-bottom:5px}
 .czvt0{font-size:15px; color:var(--muted)}
+.czfix{margin:6px 0 0; font-size:13px; line-height:1.4; color:var(--muted); max-width:56ch}
