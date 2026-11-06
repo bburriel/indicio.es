@@ -2428,3 +2428,41 @@ details.chk > section{margin-top:18px}
 .calc.dist .distg svg{width:100%; height:auto; display:block}
 .calc.dist .res{display:flex; flex-direction:column; gap:2px}
 .calc.dist .res .muted{font-size:14px; color:var(--muted)}
+/* ---------- Laboratorio: «historia primero» (noviembre 2026) ---------- */
+.lbsr{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.czstory{font-family:var(--serif); font-weight:500; font-size:clamp(21px,3.4vw,28px); line-height:1.35; letter-spacing:-.01em; margin:0 0 18px; max-width:46ch; color:var(--ink)}
+.czstory .czres{color:var(--brand)}
+:root[data-theme="dark"] .czstory .czres{color:#d0505f}
+.czbars{display:flex; flex-direction:column; gap:10px; max-width:520px; margin:0 0 20px}
+.czbar2{display:grid; grid-template-columns:200px minmax(0,1fr); align-items:center; column-gap:14px}
+.czbl{font-size:15px; color:var(--muted)} .czbl.on{color:var(--ink); font-weight:600}
+.czbt{display:block; height:12px; background:var(--rule); border-radius:6px; overflow:hidden}
+.czbt i{display:block; height:12px; border-radius:6px; transition:width .5s ease}
+.czbt i.a{background:var(--rule-2)} .czbt i.b{background:var(--brand)}
+:root[data-theme="dark"] .czbt i.b{background:#d0505f}
+.czpickrow{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 0 6px}
+.czpl{font-size:16px; color:var(--ink-2); margin-right:4px}
+.czpar .czchips{display:inline-flex; flex-wrap:wrap; align-items:center; gap:10px}
+.czpar .lbchip{display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:8px 14px; font-size:15px; font-weight:600; border:1.5px solid var(--rule-2); background:transparent; color:var(--ink); font-family:inherit}
+.czpar .lbchip.on{background:color-mix(in srgb,var(--brand) 9%,transparent); border-color:transparent; color:var(--brand); padding-right:10px}
+:root[data-theme="dark"] .czpar .lbchip.on{color:#e48a95}
+.czpar .lbchip .czwarn2{margin:0}
+.czx{border:0; background:transparent; color:inherit; font-size:14px; cursor:pointer; padding:0 2px; line-height:1}
+.lbpick{cursor:pointer}
+.lbadd{background:transparent; border:1.5px dashed var(--rule-2); border-radius:999px; padding:8px 16px; font:500 15px/1.2 inherit; font-family:inherit; color:var(--ink-2); cursor:pointer}
+.lbopts{display:flex; flex-wrap:wrap; gap:8px; flex-basis:100%; margin-top:4px}
+.lbopts .czt.su{font-weight:500; font-size:12px; color:var(--brand); margin-left:2px}
+.czhow{border-top:1px solid var(--rule); margin-top:18px; padding-top:14px}
+.czhow>summary{cursor:pointer; font-weight:600; font-size:16px; list-style:none; display:inline-flex; align-items:center; gap:10px}
+.czhow>summary::-webkit-details-marker{display:none}
+.czhow>summary::before{content:""; width:0; height:0; border-left:8px solid currentColor; border-top:5px solid transparent; border-bottom:5px solid transparent; transition:transform .15s}
+.czhow[open]>summary::before{transform:rotate(90deg)}
+.czhowb{padding-top:12px}
+.lbhow{margin:0 0 8px; font-size:16px; color:var(--ink-2)}
+.czhowb .czrows{list-style:none; margin:0; padding:0}
+.czhowb .czrows li{display:grid; grid-template-columns:32px minmax(0,1fr); align-items:baseline; column-gap:8px; padding:9px 0; border-top:1px solid var(--rule); font-size:17px; line-height:1.4}
+.czhowb .czrows li:last-child{border-bottom:1px solid var(--rule)}
+.czhowb .czrows .em{font-size:19px; font-weight:600; color:#3d6b3f}
+.czhowb .czrows li.ko .em{color:var(--brand)} .czhowb .czrows li.na .em,.czhowb .czrows li.na{color:var(--muted)}
+.lbnote{margin:12px 0 0; font-size:15px; color:var(--muted)}
+@media (max-width:560px){ .czbar2{grid-template-columns:1fr; row-gap:4px} }
