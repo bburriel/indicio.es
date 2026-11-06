@@ -4276,25 +4276,25 @@ function czSummary(cs){
   else {
     const q=e1.b/e0.b; i=q<0.1?0:!czSig(e1)?1:q<0.5?2:3;
     const near=e1.ci?(e0.b<0?e1.ci[1]:e1.ci[0]):null, expl=czJoin(use.map(k=>CKNOWN[k]||low(labK(k))));
-    if(i===0){ const flip=q<0&&czSig(e1); txt=flip?"La diferencia cambia de sentido.":"La diferencia se esfuma."; full=`${same}, ${flip?`la diferencia cambia de sentido (${sv(e1.b)})`:"la diferencia se esfuma"}. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, desaparece."; }
-    else if(i===1){ txt=`Quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad.`; full=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, ya no es seguro."; }
-    else if(i===2){ txt=`Baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}.`; full=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, ${unitTxt(y,e1.b)}.`; }
-    else { txt=`Sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}).`; full=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="Y se mantiene entre municipios parecidos."; }
+    if(i===0){ const flip=q<0&&czSig(e1); txt=flip?"Cambia de sentido.":"La diferencia se esfuma."; full=`${same}, ${flip?`la diferencia cambia de sentido (${sv(e1.b)})`:"la diferencia se esfuma"}. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, la diferencia desaparece."; }
+    else if(i===1){ txt="Podría ser casualidad."; full=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, no podemos asegurar que siga."; }
+    else if(i===2){ txt="Hay efecto, pero más pequeño."; full=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, la diferencia baja a ${unitTxt(y,e1.b)}.`; }
+    else { txt="Casi igual que sin igualar."; full=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="La diferencia se mantiene entre municipios parecidos."; }
   }
   CZ.e0=e0; CZ.e1=e1; CZ.st=st; CZ.use=use; CZ.prev=prev;
   // titular
-  if(h) h.innerHTML=`Cada ${stTxt} más de ${esc(xl)} va con ${unitTxt(y,e0.b)} ${sn} de ${esc(yl)}.${h2?` <span class="czh2">${h2}</span>`:""}`;
+  if(h) h.innerHTML=`Por cada ${stTxt} más de ${esc(xl)}, hay ${unitTxt(y,e0.b)} ${sn} de ${esc(yl)}.`;
   // escalera
   const nd=e1?e0.n-e1.n:0, nTxt=nd>0?` Faltan datos de ${nf0.format(nd)} municipio${nd===1?"":"s"} en lo que descuentas.`:"", e=e1||e0;
   const rng=o=>`${sv(o.b)}${o.ci?` (entre ${shn(o.ci[0])} y ${shn(o.ci[1])})`:""}`;
   const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${e1?`Sin igualar: ${rng(e0)}<br>Igualando: ${rng(e1)}`:rng(e0)}<br>Si repitiéramos el cálculo con otras provincias, el resultado caería dentro de este rango 95 de cada 100 veces. Remuestreamos provincias enteras porque los municipios de una misma provincia se parecen entre sí.<br>Calculado con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
   const rows=[{lab:"Sin igualar",b:e0.b,ci:e0.ci,cls:"a"}];
   if(e1) rows.push({lab:prev?`Si igualas ${esc(nj)} (lo que más pesa)`:`Igualando ${esc(nj)}`,b:e1.b,ci:e1.ci,cls:"b"});
-  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">${cap(esc(yl))} por cada ${esc(stTxt)} más de ${esc(xl)}${czIt("La línea de cada fila es el rango probable. Si cruza el 0, no se distingue de «ningún efecto».<br>"+tipCI,"Qué es el rango probable")}</p>`;
+  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">La línea es el rango probable${czIt("La línea de cada fila es el rango probable. Si cruza el 0, no se distingue de «ningún efecto».<br>"+tipCI,"Qué es el rango probable")}</p>`;
   czTipBind(lad);
   // veredicto
   const rule="<br><br><b>Cómo se decide.</b> Desaparece: cambia de signo o queda menos del 10 %. Dudosa: el rango toca el 0. Se reduce: queda menos de la mitad. Se mantiene: queda la mitad o más.<br><br>No demuestra que una cosa cause la otra.";
-  vc.innerHTML=`<div class="czq">Entre municipios parecidos, ¿sigue habiendo ${sgnTxt} ${esc(yl)} donde hay más ${esc(xl)}?</div>
+  vc.innerHTML=`<div class="czq">Al comparar municipios parecidos</div>
     <div class="czscale" role="img" aria-label="Veredicto: ${CZST[i]}">${CZST.map((t,k)=>`<span class="${k===i?"act":""}"><i></i><em>${t}</em></span>`).join("")}</div>
     <p class="czvt">${txt}${czIt(full+rule,"Qué significa este veredicto")}</p>`;
   czTipBind(vc);

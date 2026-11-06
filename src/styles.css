@@ -2633,3 +2633,16 @@ a.mm-card:hover .mm-go{text-decoration:underline}
 #czhowb .czmore summary{font-weight:500; font-size:14px; color:var(--muted)}
 #czhowb .czlk{margin:10px 0 0; font-size:14px}
 @media (max-width:620px){ #czhowb .czrows li{grid-template-columns:18px minmax(0,1fr) 24px} #czhowb .czrows .rv{grid-column:2; grid-row:2; font-size:13px} #czhowb .czrows .iq{grid-column:3; grid-row:1} }
+
+/* escalera más ligera (6 nov. 2026) */
+.czrh{margin-bottom:3px}
+.czrh b{font-weight:500; font-size:14px; color:var(--ink-2)}
+.czrh span{font-size:18px}
+.czrt{height:22px; border-radius:6px}
+.czrt .z{top:-3px; bottom:-3px; border-left-width:1.5px}
+.czrt .ci{top:9px; height:3px}
+.czrt .dt{top:5px; width:12px; height:12px; margin-left:-6px; border-width:1.5px}
+.czr2{margin-bottom:8px}
+.czax span{font-size:11.5px}
+.czvc{margin-top:14px}
+.czq{font-size:13.5px; font-weight:500; color:var(--muted)}
