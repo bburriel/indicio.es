@@ -4271,15 +4271,15 @@ function czSummary(cs){
   const nm=use.map(k=>CSHORT[k]||low(labK(k))), nj=czJoin(nm), same=use.length?"Entre municipios "+czJoin(use.map(czSame)):"";
   const sn=e0.b<0?"menos":"más", sgnTxt=e0.b<0?"menos":"más";
   let i, txt, full, h2="";
-  if(!czSig(e0)){ i=1; txt="Ni sin igualar se distingue de «ningún efecto»."; full="Ya sin igualar nada, el rango incluye el 0: con estos datos no se puede asegurar que haya relación."; h2="Pero con estos datos no podemos asegurar que haya relación."; }
-  else if(!e1){ i=3; txt="No hemos encontrado nada que la explique."; full="No hemos encontrado nada que la explique de forma clara. Puedes probar con otro dato."; h2="¿Se debe a esto o a otra cosa?"; }
+  if(!czSig(e0)){ i=1; txt="Ni sin igualar se distingue de «ningún efecto»."; full="Ya sin igualar nada, el rango incluye el 0: con estos datos no se puede asegurar que haya relación."; h2="Pero con estos datos no se puede asegurar."; }
+  else if(!e1){ i=3; txt="No hemos encontrado nada que la explique."; full="No hemos encontrado nada que la explique de forma clara. Puedes probar con otro dato."; h2="Aún no sabemos si es por esto."; }
   else {
     const q=e1.b/e0.b; i=q<0.1?0:!czSig(e1)?1:q<0.5?2:3;
     const near=e1.ci?(e0.b<0?e1.ci[1]:e1.ci[0]):null, expl=czJoin(use.map(k=>CKNOWN[k]||low(labK(k))));
-    if(i===0){ const flip=q<0&&czSig(e1); txt=flip?"La diferencia cambia de sentido.":"La diferencia se esfuma."; full=`${same}, ${flip?`la diferencia cambia de sentido (${sv(e1.b)})`:"la diferencia se esfuma"}. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, la diferencia desaparece."; }
-    else if(i===1){ txt=`Quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad.`; full=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, ya no podemos asegurar que haya relación."; }
-    else if(i===2){ txt=`Baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}.`; full=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, quedan ${unitTxt(y,e1.b)}.`; }
-    else { txt=`Sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}).`; full=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="Y resiste al compararlo entre municipios parecidos."; }
+    if(i===0){ const flip=q<0&&czSig(e1); txt=flip?"La diferencia cambia de sentido.":"La diferencia se esfuma."; full=`${same}, ${flip?`la diferencia cambia de sentido (${sv(e1.b)})`:"la diferencia se esfuma"}. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, desaparece."; }
+    else if(i===1){ txt=`Quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad.`; full=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, ya no es seguro."; }
+    else if(i===2){ txt=`Baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}.`; full=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, ${unitTxt(y,e1.b)}.`; }
+    else { txt=`Sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}).`; full=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="Y se mantiene entre municipios parecidos."; }
   }
   CZ.e0=e0; CZ.e1=e1; CZ.st=st; CZ.use=use; CZ.prev=prev;
   // titular
@@ -4640,21 +4640,21 @@ function exCausal(x,y){
   CZ.lev=lev; CZ.passed=passed; CZ.total=done.length;
   const cx2=CHG[x], cy2=CHG[y];
   const SENT={
-    prov:t=>t.na?(EX.p?"Dentro de cada provincia: no aplica, estás mirando una sola":"Dentro de cada provincia: no se puede hacer aquí"):t.ok?"Se repite en la mayoría de provincias":"No se repite en la mayoría de provincias",
-    chg:t=>t.na?"Con el paso del tiempo: aún no tenemos datos":t.ok?"También se ve en cómo cambian los municipios con el tiempo":"No se ve en cómo cambian los municipios con el tiempo",
-    tw:t=>t.na?"Parejas de municipios casi iguales: no hay suficientes":t.ok?"Se repite entre parejas de municipios casi iguales":"No se repite entre parejas de municipios casi iguales",
-    st:t=>t.ok?"Se mantiene de un tramo al siguiente, de menos a más":"No se mantiene en todos los tramos, de menos a más"};
-  const nOf=t=>t.na||t.k==="chg"||(t.k==="prov"&&!BP)||!/\d/.test(t.v||"")?"":` <span class="muted">(${t.v})</span>`;
-  const rows=T.filter(t=>t.k!=="par"&&t.k!=="prov"&&SENT[t.k]).map(t=>`<li class="${t.na?"na":t.ok?"ok":"ko"}"><span class="em" aria-hidden="true">${t.na?"○":t.ok?"✓":"✗"}</span><span class="rl">${SENT[t.k](t)}${nOf(t)}</span></li>`).join("");
-  { const stx=document.getElementById("czst"), tT=T.find(t=>t.k==="tw"), tS=T.find(t=>t.k==="st"), tC=T.find(t=>t.k==="chg");
-    if(stx) stx.textContent=[tC&&!tC.na?(tC.ok?"Tiempo ✓":"Tiempo ✗"):null,tT&&!tT.na?`Parejas ${tT.v.replace(" de cada "," de ")}`:null,tS?`Tramos ${tS.v}`:null].filter(Boolean).join(" · ")||"Sin datos suficientes"; }
+    prov:t=>t.na?"Dentro de cada provincia: no se puede hacer aquí":t.ok?"Se repite en la mayoría de provincias":"No se repite en la mayoría de provincias",
+    chg:t=>t.na?"Cambio con el tiempo: aún sin datos":t.ok?"Se ve en el cambio con el tiempo":"No se ve en el cambio con el tiempo",
+    tw:t=>t.na?"Parejas casi iguales: no hay suficientes":t.ok?"Se repite entre parejas casi iguales":"No se repite entre parejas casi iguales",
+    st:t=>t.ok?"Sube de menos a más, tramo a tramo":"No sube de forma ordenada"};
+  const nOf=t=>t.na||t.k==="chg"||(t.k==="prov"&&!BP)||!/\d/.test(t.v||"")?"":t.v.replace(" de cada "," de ");
+  const rows=T.filter(t=>t.k!=="par"&&t.k!=="prov"&&SENT[t.k]).map(t=>`<li class="${t.na?"na":t.ok?"ok":"ko"}"><span class="em" aria-hidden="true">${t.na?"–":t.ok?"✓":"✗"}</span><span class="rl">${SENT[t.k](t)}</span><span class="rv">${nOf(t)}</span>${czIt(t.why,"Por qué importa: "+t.t)}</li>`).join("");
+  { const stx=document.getElementById("czst"), pr=T.filter(t=>t.k!=="par"&&t.k!=="prov"&&SENT[t.k]&&!t.na), okn=pr.filter(t=>t.ok).length;
+    if(stx) stx.textContent=pr.length?`Se cumplen ${okn} de ${pr.length}`:"Sin datos suficientes"; }
   const hb=document.getElementById("czhowb"); box.innerHTML="";
   if(hb) hb.innerHTML=`<ul class="czrows" aria-label="Comprobaciones">${rows}</ul>
-    <p class="czact">Más pruebas: ${cx2&&cy2&&cx2!==cy2?`<button type="button" class="ctag" data-a="chg">📈 Mirar los cambios, no los niveles</button> `:""}<button type="button" class="ctag" data-a="big" aria-pressed="${EX.t==="g10"}">Solo municipios de más de 10.000 hab.</button></p>
-    <details class="czmore"><summary>Por qué importa cada prueba${ex.length?" y parejas de gemelos":""}</summary>
-      <dl class="czwhy">${T.map(t=>`<dt>${em(t)} ${t.t}</dt><dd>${t.why}${t.extra&&!t.na?t.extra:""}</dd>`).join("")}</dl>${twinsH}</details>
+    <p class="czact"><span>Probar también</span>${cx2&&cy2&&cx2!==cy2?`<button type="button" class="czopt" data-a="chg">Cambios, no niveles</button>`:""}<button type="button" class="czopt" data-a="big" aria-pressed="${EX.t==="g10"}">Solo municipios de más de 10.000 hab.</button></p>
+    ${ex.length?`<details class="czmore"><summary>Ver parejas de gemelos</summary>${twinsH}</details>`:""}
     ${evs.length?`<div class="czhit"><b>Con un suceso real:</b> Indicio mide una relación de este tipo antes y después de una medida. ${evs.map(k=>`<a href="/preguntas/${CZSTUDY[k]}/">${ADEV[k].l}</a>`).join("; ")} →</div>`:""}
     <p class="czlk"><a href="/laboratorio/metodo/">Cómo saber si una cosa causa la otra →</a></p>`;
+  if(hb) czTipBind(hb);
   const root=hb||box;
   const chb=root.querySelector('[data-a="chg"]'); if(chb) chb.addEventListener("click",()=>{ EX.d=[cx2,cy2,...EX.d.slice(2).filter(k=>k!==cx2&&k!==cy2)]; EX.c=[]; exUpdate(); });
   root.querySelector('[data-a="big"]').addEventListener("click",()=>{ EX.t=EX.t==="g10"?"":"g10"; exUpdate(); });
