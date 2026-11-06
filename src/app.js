@@ -3229,7 +3229,7 @@ function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
   d3.select(box).selectAll(":scope > svg").remove();   // un mapa por caja, aunque se llame dos veces
   const svg=d3.select(box).append("svg").attr("viewBox",`0 0 ${width} ${height}`).attr("role","img").style("display","block").style("width","100%").style("max-width",width+"px").style("height","auto").style("margin","0 auto");
   const g=svg.append("g");
-  const ps=g.selectAll("path").data(FEATS).join("path").attr("d",path).attr("stroke",css("--geo-line")).attr("stroke-width",.12).attr("fill",css("--nodata"));
+  const ps=g.selectAll("path").data(FEATS).join("path").attr("class","mu").attr("d",path).attr("stroke",css("--geo-line")).attr("stroke-width",.12).attr("fill",css("--nodata"));
   if(onClick) ps.style("cursor","pointer").on("click",(e,f)=>{ if(BYCODE.has(f.id)) onClick(f.id); });
   const provMesh=topojson.mesh(TOPO,TOPO.objects.provinces,(a,b)=>a!==b);
   const isCan=f=>/^(35|38)/.test(f.id); let canDy=0;
@@ -3238,8 +3238,8 @@ function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
     g.append("path").attr("d",proj.getCompositionBorders()).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",.6);
   } else {
     // provincias: un filete de color papel por debajo y otro de tinta por encima, para que se lean sobre cualquier color
-    g.append("path").datum(provMesh).attr("fill","none").attr("stroke",css("--geo-line")).attr("stroke-width",1.3).attr("stroke-linejoin","round").attr("pointer-events","none").attr("d",path);
-    g.append("path").datum(provMesh).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-opacity",.55).attr("stroke-width",.45).attr("stroke-linejoin","round").attr("pointer-events","none").attr("d",path);
+    g.append("path").attr("class","mesh a").datum(provMesh).attr("fill","none").attr("stroke",css("--geo-line")).attr("stroke-width",1.3).attr("stroke-linejoin","round").attr("pointer-events","none").attr("d",path);
+    g.append("path").attr("class","mesh b").datum(provMesh).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-opacity",.55).attr("stroke-width",.45).attr("stroke-linejoin","round").attr("pointer-events","none").attr("d",path);
     // Canarias: sube al hueco de la izquierda (alineada por abajo con la península) y lleva marco entero y rótulo
     const uni=(a,[[x0,y0],[x1,y1]])=>a?[[Math.min(a[0][0],x0),Math.min(a[0][1],y0)],[Math.max(a[1][0],x1),Math.max(a[1][1],y1)]]:[[x0,y0],[x1,y1]];
     let cb=null, pb=null; FEATS.forEach(f=>{ const b=path.bounds(f); if(!isFinite(b[0][0])) return; if(isCan(f)) cb=uni(cb,b); else pb=uni(pb,b); });
@@ -3254,7 +3254,7 @@ function spainMap(box,{onClick,width=560,height=440,refine=false}={}){
       svg.attr("viewBox",`${x0} ${y0} ${x1-x0} ${y1-y0}`).style("overflow","visible");
     }
   }
-  const api={svg,paths:ps,proj,path,
+  const api={svg,g,paths:ps,proj,path,
     set(k,{dur=900,delay=0}={}){ const fi=F[k]; const ramp=[0,1,2,3,4,5,6].map(i=>css("--ramp-"+i));
       const vals=rowsAll().map(r=>r[fi]).filter(v=>v!=null), sc=d3.scaleQuantile().domain(vals).range(ramp);
       ps.transition().duration(dur).delay(delay).attr("fill",f=>{ const r=BYCODE.get(f.id); return r&&r[fi]!=null?sc(r[fi]):css("--nodata"); }); return sc; },
@@ -6686,21 +6686,15 @@ async function renderInicio(){
 // =====================================================================
 // TU MUNICIPIO (página /municipio/)
 // =====================================================================
-// las dos entradas de la portada de municipios: ver el tuyo (o buscarlo) y comparar
+// la barra de acceso de la portada de municipios, en una sola fila: ver el tuyo (o buscarlo) y comparar
 function munCards(){
   const lm=lastMun&&BYCODE.has(lastMun)?lastMun:null, nm=lm?esc(dispName(BYCODE.get(lm)[F.name])):"";
-  const mine=lm?`<span class="kk">Tu municipio</span><h3><span>${nm}</span></h3>
-      <p>Sus cifras frente a España, cómo ha cambiado desde 2015 y a qué municipios se parece.</p>
-      <a class="btn" href="#m${lm}">Ver su ficha →</a>
-      <p class="mun-otro">¿Otro municipio?</p>${bigSearchHTML("q2","Búscalo…")}`
-    :`<span class="kk">Tu municipio</span><h3>Búscalo y mira su ficha</h3>${bigSearchHTML("q2","Escribe tu municipio…")}${exampleChips()}`;
-  const cmp=lm?`<span class="kk">Comparar</span><h3><span>${nm}</span> frente a otro</h3>
-      <p>Elige un segundo municipio y míralos lado a lado, dato a dato.</p>
-      <a class="btn alt" href="#comparar-${lm}">Comparar con otro →</a>`
-    :`<span class="kk">Comparar</span><h3>Dos municipios, lado a lado</h3>
-      <p>Elige dos y compáralos dato a dato.</p>
-      <a class="btn" href="#comparar">Comparar dos municipios →</a>`;
-  return `<div class="mun-card">${mine}</div><div class="mun-card">${cmp}</div>`; }
+  return lm
+    ?`<div class="mun-bar has-me"><div class="mb-me"><span class="kk">Tu municipio</span><b class="mb-nm">${nm}</b></div>
+      <div class="mb-go"><a class="btn" href="#m${lm}">Ver su ficha →</a><a class="btn alt" href="#comparar-${lm}">Comparar con otro →</a></div>
+      <div class="mb-find">${bigSearchHTML("q2","¿Otro municipio?")}</div></div>`
+    :`<div class="mun-bar"><div class="mb-find">${bigSearchHTML("q2","Escribe tu municipio…")}</div>${exampleChips()}
+      <div class="mb-go"><a class="btn alt" href="#comparar">Comparar dos municipios →</a></div></div>`; }
 let MLTOK=0;   // cada render de la portada de municipios lleva su número: si llega otro mientras se descarga el mapa, el anterior no pinta
 async function renderMunLanding(){
   const tok=++MLTOK;
@@ -6708,7 +6702,7 @@ async function renderMunLanding(){
   view.innerHTML=`<section class="ci-hero mun-hero">
     <div class="mun-head"><span class="kk">Municipios</span><h1>En España hay 8.139 municipios. <span class="mh-hl">En uno de ellos vives tú.</span></h1>
       <p class="dek">Busca el tuyo y mira cómo sale en renta, paro y alquiler, qué ha cambiado desde 2015 y a qué municipios se parece.</p></div>
-    <div class="mun-cards">${munCards()}</div>
+    ${munCards()}
     <div class="ci-map"><div id="mlmap" style="min-height:240px"></div><div class="mleg" id="mleg"></div></div>
     <p class="mun-more">También puedes ver <a href="/provincia/">los municipios por provincia</a> · <a href="/rankings/">los rankings</a></p>
   </section>
@@ -6721,13 +6715,12 @@ async function renderMunLanding(){
   try{ await loadTopo(); }catch(e){ return; }
   if(tok!==MLTOK) return;
   const mb=document.getElementById("mlmap"); if(!mb) return; mb.style.minHeight=""; mb.querySelectorAll("svg").forEach(s=>s.remove());
-  const M=spainMap(mb,{onClick:code=>go(code),refine:true}); const sc=M.set("renta",{dur:0}); if(lastMun&&BYCODE.has(lastMun)) M.mark(lastMun);
+  const M=spainMap(mb,{refine:true}); munMapLive(M,mb,"renta"); const sc=M.set("renta",{dur:0}); if(lastMun&&BYCODE.has(lastMun)) M.mark(lastMun);
   M.svg.attr("aria-label","Mapa de España por municipios, coloreado por la renta neta media por persona");
-  M.paths.append("title").text(f=>{ const r=BYCODE.get(f.id); return r?r[F.name]:""; });
   // leyenda: la escala de colores con los cortes en euros (tres de los seis cortes de la escala por cuantiles)
   const L=document.getElementById("mleg");
   if(L){ const q=sc.quantiles(), tk=i=>`<span style="left:${(i+1)/7*100}%">${nf0.format(Math.round(q[i]/100)*100)}${NB}€</span>`;
-    L.innerHTML=`<div class="mleg-t"><b>Renta neta media por persona</b><span class="mleg-hint"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l8 4.2-3.4 1L5.6 10z" fill="currentColor"/></svg>Pulsa en un municipio</span></div>
+    L.innerHTML=`<div class="mleg-t"><b>Renta neta media por persona</b><span class="mleg-hint">${matchMedia("(hover:hover)").matches?"Acércate con + y − o con Ctrl + rueda":"Acércate con + y −"}</span></div>
       <div class="mleg-row"><em>menos</em><div class="mleg-bar" aria-hidden="true">${[0,1,2,3,4,5,6].map(i=>`<i style="background:var(--ramp-${i})"></i>`).join("")}</div><em>más</em></div>
       <div class="mleg-row"><em></em><div class="mleg-ticks" aria-hidden="true">${[1,3,5].map(tk).join("")}</div><em></em></div>`; }
   // los ejemplos enseñan en el mapa dónde está cada municipio al pasar el ratón o con el foco
@@ -6735,6 +6728,50 @@ async function renderMunLanding(){
   document.querySelectorAll(".mun-hero .chipsq a").forEach(a=>{ const c=/(\d{5})/.exec(a.getAttribute("href")||""); if(!c) return;
     const nm=a.textContent.trim().replace(/^Seguir con\s*/,""), on=()=>M.mark(c[1],nm);
     a.addEventListener("mouseenter",on); a.addEventListener("focus",on); a.addEventListener("mouseleave",rest); a.addEventListener("blur",rest); });
+}
+
+// mapa de la portada de municipios: el municipio bajo el cursor se perfila y sale en un panel, al pulsar se abre su ficha
+// y el zoom (botones, Ctrl + rueda, pellizco del trackpad, arrastre) deja llegar a los pequeños.
+// En pantallas táctiles el primer toque enseña el municipio y el segundo abre la ficha.
+function munMapLive(M,box,key){
+  const fi=F[key], frame=box.closest(".ci-map")||box.parentNode, svg=M.svg, g=M.g, svgN=svg.node(), vb=svg.attr("viewBox").split(" ").map(Number);
+  const hover=matchMedia("(hover:hover)").matches; let k=1, cur=null, sel=null, raf=0;
+  svg.classed("mm-live",true);
+  const card=el("a"); card.className="mm-card"; frame.insertBefore(card,frame.firstChild);
+  const tools=el("div"); tools.className="mm-tools"; frame.insertBefore(tools,card.nextSibling);
+  tools.innerHTML=`<button type="button" data-z="in" aria-label="Acercar">+</button><button type="button" data-z="out" aria-label="Alejar">−</button><button type="button" data-z="all" aria-label="Ver todo el mapa" hidden><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 5V1h4M9 1h4v4M13 9v4H9M5 13H1V9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>`;
+  const hov=g.append("path").attr("class","mm-hov"), ring=g.append("circle").attr("class","mm-hov"); hov.attr("display","none"); ring.attr("display","none"); let curN=null;
+  // un municipio más pequeño que unos píxeles no se ve al pasar por encima: se le pone un aro de tamaño fijo en pantalla
+  const place=()=>{ if(!curN) return; const bb=curN.getBBox(), u=vb[2]/svgN.getBoundingClientRect().width/k, tiny=Math.max(bb.width,bb.height)<10*u;
+    ring.attr("display",tiny?null:"none"); if(tiny) ring.attr("cx",bb.x+bb.width/2).attr("cy",bb.y+bb.height/2).attr("r",8*u); };
+  const idle=()=>{ cur=null; sel=null; curN=null; hov.attr("display","none"); ring.attr("display","none"); card.removeAttribute("href"); card.className="mm-card idle";
+    card.innerHTML=`<p>${hover?"Pasa el ratón por el mapa para ver cada municipio y púlsalo para abrir su ficha.":"Toca un municipio para ver su dato y abrir su ficha."}</p>`; };
+  const codeOf=t=>{ const d=t&&t.tagName==="path"&&t.__data__; return d&&d.id&&BYCODE.has(d.id)?d.id:null; };
+  const show=(code,node)=>{ if(code===cur) return; cur=code; const r=BYCODE.get(code), v=r[fi];
+    curN=node; node.parentNode.appendChild(hov.node()); node.parentNode.appendChild(ring.node()); hov.attr("d",node.getAttribute("d")).attr("display",null); place();
+    card.className="mm-card"; card.href=munPath(code);
+    card.innerHTML=`<span class="mm-k">${esc(provShort(PROVS[r[F.prov]]))}</span><b>${esc(dispName(r[F.name]))}</b><span class="mm-v">${v!=null?`${nf0.format(Math.round(v))}${NB}€ por persona`:"Sin dato de renta"}${r[F.pop]!=null?` · ${nf0.format(r[F.pop])} hab.`:""}</span><span class="mm-go">Ver su ficha →</span>`; };
+  card.addEventListener("click",e=>{ e.preventDefault(); if(cur) go(cur); });
+  svg.on("pointermove",e=>{ if(e.pointerType==="touch") return; const c=codeOf(e.target); if(c) show(c,e.target); });
+  svg.on("pointerleave",e=>{ if(e.pointerType==="touch"||card.contains(e.relatedTarget)) return; idle(); });
+  card.addEventListener("pointerleave",e=>{ if(e.pointerType!=="touch"&&!svgN.contains(e.relatedTarget)) idle(); });
+  svg.on("click",e=>{ const c=codeOf(e.target); if(!c) return;
+    if(!hover&&sel!==c){ sel=c; cur=null; show(c,e.target); return; }
+    go(c); });
+  // zoom
+  const ext=[[vb[0],vb[1]],[vb[0]+vb[2],vb[1]+vb[3]]];
+  const fixMk=()=>{ g.selectAll(".mk circle").attr("r",7/k).attr("stroke-width",1.6/k); g.selectAll(".mk-lbl").style("font-size",(11.5/k)+"px").style("stroke-width",(3/k)+"px"); };
+  const zoom=d3.zoom().scaleExtent([1,60]).extent(ext).translateExtent(ext)
+    .wheelDelta(e=>-e.deltaY*(e.deltaMode===1?.05:e.deltaMode?1:.002)*(e.ctrlKey&&Math.abs(e.deltaY)<50?5:1))   // una muesca de rueda ≈ ×1,2; el pellizco del trackpad llega con deltas pequeños
+    .filter(e=>e.type==="wheel"?(e.ctrlKey||e.metaKey):e.type.startsWith("touch")?k>1.001:!e.button)
+    .on("zoom",e=>{ k=e.transform.k; g.attr("transform",e.transform);
+      if(!raf) raf=requestAnimationFrame(()=>{ raf=0; svgN.style.setProperty("--k",k); fixMk(); place(); });
+      svgN.style.touchAction=k>1.001?"none":"pan-y"; tools.querySelector('[data-z="all"]').hidden=k<1.001; });
+  svg.call(zoom).on("dblclick.zoom",null); svgN.style.touchAction="pan-y";
+  tools.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const z=b.dataset.z, t=svg.transition().duration(280);
+    if(z==="in") t.call(zoom.scaleBy,2); else if(z==="out") t.call(zoom.scaleBy,.5); else t.call(zoom.transform,d3.zoomIdentity); });
+  const m0=M.mark; M.mark=(c,l)=>{ m0(c,l); fixMk(); };
+  idle();
 }
 const kpiDemo=()=>`<div class="bul" style="margin-top:20px"><span class="es" style="left:52%"></span><span class="me" style="left:38%"></span></div><div class="bul-l"><span>menos</span><span>más</span></div>`;
 
