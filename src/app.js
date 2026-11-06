@@ -1689,9 +1689,9 @@ async function exMapa(out){
   // listas
   const rows=exRows(k);
   if(!rows.length){ out.innerHTML=`<p class="loading">Ningún municipio de esta selección tiene dato de ${esc(low(labK(k)))}. Prueba con otro tamaño o provincia.</p>`; return; }
-  const minL=EX.t?0:(EX.p?0:5000), pool=rows.filter(r=>(r[F.pop]||0)>=minL).sort((a,b)=>b[F[k]]-a[F[k]]);
+  const pool=rows.slice().sort((a,b)=>b[F[k]]-a[F[k]]);
   const li=(arr,t)=>`<div class="lista"><h3>${t}</h3><ol>${arr.map(r=>`<li><span><a href="#m${r[F.code]}">${esc(r[F.name])}</a><small>${esc(provShort(PROVS[r[F.prov]]))}</small></span><span class="v">${f(r[F[k]])}</span></li>`).join("")}</ol></div>`;
-  right.innerHTML=li(pool.slice(0,8),"Valores más altos")+li(pool.slice(-8).reverse(),"Valores más bajos")+`<figcaption>${minL?"Municipios de 5.000 habitantes o más, para que los muy pequeños no copen las listas. ":""}Media de la selección: <b>${f(d3.sum(rows,r=>r[F[k]]*(r[F.pop]||0))/d3.sum(rows,r=>r[F.pop]||0))}</b>, ponderada por población. España: ${f(esMean(k))}.</figcaption><p style="margin-top:10px">${exLink("tabla",{d:EX.d,p:EX.p,t:EX.t,o:k},"Ver todos en la tabla")}</p>`;
+  right.innerHTML=li(pool.slice(0,8),"Valores más altos")+li(pool.slice(-8).reverse(),"Valores más bajos")+`<figcaption>Media de la selección: <b>${f(d3.sum(rows,r=>r[F[k]]*(r[F.pop]||0))/d3.sum(rows,r=>r[F.pop]||0))}</b>, ponderada por población. España: ${f(esMean(k))}.</figcaption><p style="margin-top:10px">${exLink("tabla",{d:EX.d,p:EX.p,t:EX.t,o:k},"Ver todos en la tabla")}</p>`;
   try{ await loadTopo(); }catch(e){ mb.innerHTML='<div class="maploading">No se pudo cargar el mapa.</div>'; return; }
   if(!document.body.contains(mb)) return;
   mb.innerHTML="";
@@ -3903,9 +3903,9 @@ function lbSay(){
   const k=EX.d[0], f=k?fmtK(k):null, rows=k?exRows(k):[], wm=rs=>{ const w=d3.sum(rs,r=>r[F.pop]||0); return w?d3.sum(rs,r=>r[F[k]]*(r[F.pop]||0))/w:null; };
   const mk=EX.m&&BYCODE.has(EX.m)?BYCODE.get(EX.m):null;
   const mtxt=mk&&k&&mk[F[k]]!=null?` <b>${esc(dispName(mk[F.name]))}</b> tiene ${f(mk[F[k]])}: más que el ${nf0.format(pctl(k,mk[F[k]]))}${NB}% de la población de España.`:"";
-  if(EX.v==="mapa"){ const pool=rows.filter(r=>(r[F.pop]||0)>=(EX.t||EX.p?0:5000)).sort((a,b)=>b[F[k]]-a[F[k]]); if(!pool.length) return "No hay datos para esta selección.";
+  if(EX.v==="mapa"){ const pool=rows.slice().sort((a,b)=>b[F[k]]-a[F[k]]); if(!pool.length) return "No hay datos para esta selección.";
     const nm=a=>a.map(r=>esc(dispName(r[F.name]))).join(", ").replace(/, ([^,]*)$/," y $1");
-    return `<b>Qué estás viendo:</b> ${low(labK(k))} en ${nf0.format(rows.length)} municipios. ${(()=>{ if(EX.bv&&EX.d[1]&&EX.d[1]!==k) return `El color combina dos datos, ${low(labK(k))} y ${low(labK(EX.d[1]))}: la cuadrícula de la leyenda dice qué color corresponde a cada combinación.`; const v=rows.map(r=>r[F[k]]).sort((a,b)=>a-b); return d3.quantile(v,.15)<0&&d3.quantile(v,.85)>0?"Los tonos azules son valores negativos y los cálidos, positivos; cuanto más intenso, más lejos de cero.":DARKER(); })()} Los valores más altos${EX.t||EX.p?"":" entre los de más de 5.000 habitantes"} están en ${nm(pool.slice(0,3))}; los más bajos, en ${nm(pool.slice(-3).reverse())}. La media de la selección es ${f(wm(rows))} (España: ${f(esMean(k))}).${mtxt}`; }
+    return `<b>Qué estás viendo:</b> ${low(labK(k))} en ${nf0.format(rows.length)} municipios. ${(()=>{ if(EX.bv&&EX.d[1]&&EX.d[1]!==k) return `El color combina dos datos, ${low(labK(k))} y ${low(labK(EX.d[1]))}: la cuadrícula de la leyenda dice qué color corresponde a cada combinación.`; const v=rows.map(r=>r[F[k]]).sort((a,b)=>a-b); return d3.quantile(v,.15)<0&&d3.quantile(v,.85)>0?"Los tonos azules son valores negativos y los cálidos, positivos; cuanto más intenso, más lejos de cero.":DARKER(); })()} Los valores más altos están en ${nm(pool.slice(0,3))}; los más bajos, en ${nm(pool.slice(-3).reverse())}. La media de la selección es ${f(wm(rows))} (España: ${f(esMean(k))}).${mtxt}`; }
   if(EX.v==="matriz"||EX.v==="composicion") return "";
   if(EX.v==="mapa"&&EX.u) return `<b>Qué estás viendo:</b> ${low(labK(k))} en cada ${EX.u==="prov"?"provincia":"comunidad"}. ${isReg(k)?"Es el dato oficial, que solo existe a esta escala.":"Es la media de sus municipios, ponderada por población: así cuentan más los municipios donde vive más gente."}`;
   if(EX.v==="burbujas") return `<b>Qué estás viendo:</b> cada provincia año a año, con ${low(labK(EX.d[0]))} en horizontal y ${low(labK(EX.d[1]))} en vertical; el tamaño es ${EX.sz&&CATK[EX.sz]?low(labK(EX.sz)):"el número de habitantes"}. Si las burbujas suben o se desplazan juntas, los dos datos cambian a la vez; si unas se quedan atrás, hay provincias que no siguen la tendencia.`;
