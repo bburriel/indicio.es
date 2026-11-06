@@ -1,45 +1,47 @@
 ---
 titulo: ¿Funcionó el tope del alquiler en Cataluña?
-entradilla: Desde marzo de 2024, 140 municipios catalanes ponen techo a los contratos nuevos de alquiler. Frenó la subida, pero no bajó los precios: el alquiler subió un 3,1 % donde hay tope y habría subido un 3,7 % sin él.
-respuesta: Frenó la subida, pero no bajó el alquiler. En 2024 subió un 3,1 % donde hay tope y, sin él, habría subido en torno a un 3,7 %, y el freno es mayor en los contratos nuevos. En esos municipios se vendieron además más pisos de lo esperable, y los datos no dicen si salieron del alquiler.
-cifra: +3,1 %
-cifra_texto: el alquiler con tope en 2024; sin tope, +3,7 %
-metodo: Alquiler declarado a Hacienda, INE, 2015–2024
+entradilla: Desde marzo de 2024, 140 municipios catalanes ponen techo a los contratos nuevos de alquiler. Frenó la subida, pero no bajó los precios: los contratos nuevos subieron un 7,5 % en 2024 y habrían subido un 8,6 % sin el tope.
+respuesta: Frenó la subida, pero no bajó el alquiler. Los contratos nuevos subieron un 7,5 % en Cataluña en 2024 y, sin tope, habrían subido en torno a un 8,6 %: unos 11 € al mes menos en un piso de Barcelona, entre 7 y 14 según cómo se mida. En el conjunto de los alquileres, que incluye a quien no ha cambiado de piso, el freno es de algo más de medio punto. En esos municipios se vendieron además más pisos de lo esperable, y los datos no dicen si salieron del alquiler.
+cifra: +7,5 %
+cifra_texto: los contratos nuevos de alquiler en Cataluña en 2024; sin tope, +8,6 %
+metodo: Índice de alquiler del INE (contratos nuevos y todos los contratos), 2015–2024
 evidencia: natural
 tema: vivienda
 publicado: 2026-10-22
-actualizado: 2026-11-03
+actualizado: 2026-11-06
 ---
 
-Un piso medio de Barcelona se alquila por unos {{bR|eur}} al mes. Si el tope ha funcionado, hoy cuesta unos **{{ahorroMes|eur}} menos** de lo que habría costado sin él.
+Un contrato nuevo de alquiler en Barcelona cuesta unos **{{ahorroNuevo|eur}} menos al mes** de lo que habría costado sin el tope. Con otras formas de medirlo, entre {{nLo|eur}} y {{nHi|eur}}.
 
-Es lo que ha conseguido, de media, el primer año del tope del alquiler en Cataluña: no bajar los alquileres, sino frenar su subida. Un freno real y pequeño, y mayor justo donde la norma actúa. Mientras tanto, en esos mismos municipios se vendieron más pisos de lo esperable, y nadie sabe aún si salieron del alquiler.
+Es lo que ha conseguido el primer año del tope del alquiler en Cataluña: no bajar los alquileres, sino frenar su subida, y casi solo en los contratos que se firman de nuevo. Un freno real y pequeño. Mientras tanto, en esos mismos municipios se vendieron más pisos de lo esperable, y nadie sabe aún si salieron del alquiler.
 
-## Subió menos de lo que habría subido
+## Los contratos nuevos subieron menos
 
 Desde el 16 de marzo de 2024, en {{tens}} municipios catalanes, donde vive el {{pobTens|pct0}} de la población de Cataluña, un contrato nuevo de alquiler no puede costar más que el anterior de ese mismo piso. Fue la primera vez que se aplicó la ley de vivienda de 2023, que permite poner techo al precio en las zonas tensionadas.
 
-El alquiler declarado a Hacienda siguió subiendo en esos municipios: un {{post24|pct1}} en 2024. Pero 2024 fue un año de subidas en toda España. En el resto del país el alquiler pasó de subir un {{restPre|pct1}} al año a un {{restPost|pct1}}. La pregunta no es si subió, sino cuánto habría subido sin el tope.
+El tope solo afecta a los contratos nuevos. Quien ya vivía de alquiler sigue con su contrato y con las subidas que tenía pactadas. Por eso hay que mirar aparte los contratos que se firmaron después de la norma, que el INE publica por provincias desde 2021.
 
-Para estimarlo se compara con municipios de fuera de Cataluña que, hasta 2023, subían igual que estos. Eran {{nTw}} parejas, y hasta 2023 iban pegadas. En 2024 se separan por primera vez:
-
-[[grafico:eventos]]
-
-Sin el tope, el alquiler habría subido un {{cf|pct1}}; con él, un {{post24|pct1}}. Son {{esPost|abs|pts1}} de diferencia: en un piso como el medio de Barcelona, unos {{ahorroMes|eur}} al mes, unos {{ahorroAnio|eur}} al año.
-
-> [Ojo] Es una media de todos los contratos, también de los que el tope todavía no había tocado, y fuera de Barcelona los alquileres son más bajos: para el conjunto de los municipios con tope, el ahorro por hogar es todavía menor.
-
-## Donde la norma actúa, el freno es mayor
-
-El tope solo afecta a los contratos nuevos. Quien ya vivía de alquiler sigue con su contrato y con las subidas que tenía pactadas. Por eso el efecto sobre el conjunto de los alquileres es pequeño, y por eso hay que mirar aparte los contratos que se firmaron después de la norma.
-
-Los contratos nuevos, que el INE publica por provincias desde 2021, cuentan otra historia. Hasta 2023 se encarecían en Cataluña a un ritmo parecido al del resto de España: un {{preC|pct1}} al año frente a un {{preO|pct1}}. En 2024 se dispararon en todas partes, pero menos en Cataluña: un {{postC|pct1}} frente a un {{postO|pct1}}. Descontada la tendencia previa, son **{{evNew|n1}} puntos menos**, unos {{ahorroNuevo|eur}} al mes en un piso como los de Barcelona.
+Hasta 2023 se encarecían en Cataluña a un ritmo parecido al del resto de España: un {{preC|pct1}} al año frente a un {{preO|pct1}}. En 2024 se dispararon en todas partes, pero menos en Cataluña: un {{postC|pct1}} frente a un {{postO|pct1}}. Descontada la tendencia previa, sin el tope habrían subido un {{sinTopeN|pct1}}: son **{{evNew|n1}} puntos menos**, unos {{ahorroNuevo|eur}} al mes en un piso como los de Barcelona.
 
 [[grafico:contratos]]
 
-No es algo que le pase a cualquier comunidad. Si se repite el cálculo como si el tope lo hubiera puesto otra, {{plTxt}} de las {{plN}} comunidades sale tan baja como Cataluña.
+La cifra aguanta otras formas de medirla. Si se toma como «antes» solo 2022 o solo 2023, el freno va de {{nLoP|n1}} a {{nHiP|n1}} puntos, entre {{nLo|eur}} y {{nHi|eur}} al mes. No es algo que le pase a cualquier comunidad: si se repite el cálculo como si el tope lo hubiera puesto otra, {{plTxt}} de las {{plN}} comunidades sale tan baja como Cataluña. Y donde el tope no llega se nota mucho menos: en los contratos que ya estaban en vigor, el mismo cálculo da {{evEx|n1}} puntos.
+
+> [Lo que no sabemos] Los euros son ese porcentaje aplicado al alquiler medio de Barcelona. Un contrato nuevo suele costar más que la media, así que el ahorro de quien firma hoy es probablemente algo mayor. Y el dato es provincial: incluye municipios sin tope, aunque el tope cubre a la mayor parte de la población.
 
 Queda una pregunta que estos datos no contestan: por qué los contratos nuevos subieron un {{postC|pct1}} con un techo que impide cobrar más que el inquilino anterior. Pueden influir los pisos exentos, el cambio en el tipo de vivienda que sale al mercado o contratos que no cumplen la norma.
+
+## En el conjunto de los alquileres, el freno es menor
+
+El índice del INE de todos los contratos mezcla a quien firmó este año con quien lleva diez en el mismo piso, así que el efecto se diluye. Es lo que medíamos antes en esta página, y sirve de comprobación.
+
+El alquiler declarado a Hacienda siguió subiendo en los municipios con tope: un {{post24|pct1}} en 2024, ponderando por población. Pero 2024 fue un año de subidas en toda España: en el resto del país el alquiler pasó de subir un {{restPre|pct1}} al año a un {{restPost|pct1}}. La pregunta no es si subió, sino cuánto habría subido sin el tope.
+
+Para estimarlo se compara con municipios de fuera de Cataluña que, hasta 2023, subían igual que estos. De los {{tens}} municipios con tope, el INE publica el índice en {{nMed}} (los de más de 10.000 habitantes): son los que se miden, cada uno con su pareja. Hasta 2023 iban pegadas. En 2024 se separan por primera vez:
+
+[[grafico:eventos]]
+
+Sin el tope, el alquiler de todos los contratos habría subido un {{cf|pct1}}; con él, un {{post24|pct1}}. Son {{esPostW|abs|pts1}} de diferencia ponderando por población ({{esPost|abs|pts1}} si cada municipio pesa lo mismo, como en el gráfico). En un piso como el medio de Barcelona, unos {{ahorroMes|eur}} al mes de media entre todos los inquilinos: menos que en los contratos nuevos porque incluye a quien no ha cambiado de piso.
 
 ## Y se vendieron más pisos
 
@@ -63,7 +65,7 @@ Al moverlos se ve que el balance cambia de signo según cómo se lean los datos.
 
 ## Qué significa
 
-Quien defiende el tope tiene un freno real desde el primer año, mayor en los contratos que la norma toca, y que debería crecer según se renueven los contratos. Quien lo critica tiene un ahorro pequeño, unos {{ahorroMes|eur}} al mes de media, unos contratos nuevos que aun así subieron un {{postC|pct1}} y más ventas de las esperables. Los datos no cierran el debate: Berlín, donde la congelación de 2020 abarató los pisos afectados pero hizo que salieran menos al mercado, sigue siendo la advertencia de unos y la excusa de otros.
+Quien defiende el tope tiene un freno real desde el primer año, mayor en los contratos que la norma toca, y que debería crecer según se renueven los contratos. Quien lo critica tiene un ahorro pequeño, unos {{ahorroNuevo|eur}} al mes para quien firma contrato nuevo y menos para el resto, unos contratos nuevos que aun así subieron un {{postC|pct1}} y más ventas de las esperables. Los datos no cierran el debate: Berlín, donde la congelación de 2020 abarató los pisos afectados pero hizo que salieran menos al mercado, sigue siendo la advertencia de unos y la excusa de otros.
 
 Lo que queda sin saber:
 
