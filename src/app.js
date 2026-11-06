@@ -4136,18 +4136,13 @@ function exCruce(out){
   LBPOS=null;
   out.innerHTML=scaleBar()+`<div id="ctlnote"></div><div id="cplot"></div>`; scaleWire(out);
   const tst=document.getElementById("lbtest"); if(tst) tst.innerHTML=`<section class="czc" aria-label="Cuánto van juntos y si es por otra cosa">
-    <h2 class="czh" id="czh"></h2>
-    <div class="czld" id="czladder"></div>
-    <div class="czvc" id="czvc" aria-live="polite"></div>
-    <div class="czacc" id="czacc">
-      <details class="czd" id="czd-q" open><summary><span><b>Qué más podría explicarlo</b><small id="czsq"></small></span></summary><div class="czdb"><p class="czhint">Igualar es quitar de en medio lo que podría explicar la relación. Conviene igualar lo que viene <b>antes</b>. Marca y se recalcula.</p><div class="czpickrow"><span class="czchips" id="cztags"></span></div><div id="cznotes" aria-live="polite"></div></div></details>
-      <details class="czd" id="czd-n"><summary><span><b>Qué no conviene igualar</b><small id="czsn"></small></span></summary><div class="czdb" id="czno"></div></details>
-      <details class="czd" id="czd-p"><summary><span><b>¿Pasa en todas partes?</b><small id="czsp"></small></span></summary><div class="czdb" id="czprov2"></div></details>
-      <details class="czd" id="czd-t"><summary><span><b>Otras pruebas</b><small id="czst"></small></span></summary><div class="czdb" id="czhowb"></div></details>
-      <details class="czd" id="czd-m"><summary><span><b>Método y fuentes</b><small>Cómo se calcula el rango, la muestra y los datos</small></span></summary><div class="czdb" id="czmet"></div></details>
+    <div class="czstats" id="czstats">
+      <div class="czs" id="czs1"></div>
+      <div class="czs" id="czs2"><div class="k" id="czk2"></div><div class="v" id="czeur"></div><div id="czevd"></div></div>
+      <div class="czs" id="czs3"></div>
     </div>
+    <div class="czpar" id="czpar"><h3 class="lbsr">¿Sigue igual entre municipios parecidos?</h3><p class="czstory" id="czstory"></p><div class="czbars" id="czbars" aria-hidden="true"></div><div class="czpickrow"><span class="czpl">Pruébalo con otra cosa:</span><span class="czchips" id="cztags"></span></div><div id="cznotes" aria-live="polite"></div><details class="czhow" id="czhow"><summary><span class="czdt">Cómo lo hemos comprobado</span></summary><div class="czhowb" id="czhowb"></div></details></div>
     </section>`;
-  if(tst&&window.matchMedia&&matchMedia("(max-width:760px)").matches) tst.querySelectorAll("details.czd").forEach(d=>d.name="czacc");
   if(tst) czTipBind(tst);
   const more=document.getElementById("lbmore");
   more.innerHTML=`<details class="howm"><summary>Más números de esta relación: por grupos, los que se salen de la norma y todas las relaciones</summary><div class="xsay" id="csay"></div><section class="finding" id="cquint"></section><section class="finding" id="cout"></section><section class="finding" id="cmat"></section><section class="finding" id="ccav"></section></details>`;
@@ -4167,6 +4162,17 @@ const CZI=new Set();   // avisos abiertos con la «i» (clave: «control|risk» 
 const czPos=a=>a<.1?a/.1*25:a<.3?25+(a-.1)/.2*25:a<.5?50+(a-.3)/.2*25:Math.min(100,75+(a-.5)/.5*25);
 const czIt=(t,l)=>`<button type="button" class="iq czit" data-t="${esc(t)}" aria-label="${esc(l||"Más información")}">${IQ_SVG}</button>`;
 const czTipBind=root=>tipBind(root.querySelectorAll(".czit"),b=>b.dataset.t);
+function czVerdict(r,adj){
+  const b1=document.getElementById("czs1"), b3=document.getElementById("czs3"); if(!b1||!CZ) return; const a=Math.abs(r), i=a<.1?0:a<.3?1:a<.5?2:3, xl=low(labK(CZ.x)), yl=low(labK(CZ.y));
+  const T=["Casi no hay relación","Relación débil","Relación moderada","Relación fuerte"], L=["Ninguna","Débil","Moderada","Fuerte"];
+  const tipR="La r mide cuánto van juntos dos datos, de −1 a +1. Cerca de 0, no van juntos. Cerca de +1, cuando uno sube el otro también. Cerca de −1, cuando uno sube el otro baja.";
+  const nd=Math.round(Math.min(1,a/0.7)*5);
+  const plain=a<.1?`Saber ${xl} apenas ayuda a adivinar ${yl}.`:`Donde hay más ${xl}, suele haber ${r>0?"más":"menos"} ${yl}.`;
+  const tipG=`${plain} ${tipR} En este caso, r = ${rFmt(r)}. Mide si los dos datos suben y bajan a la vez en los municipios; no dice que uno cause el otro.`;
+  b1.innerHTML=`<div class="k">Fuerza${czIt(tipG,"Qué mide la fuerza")}</div><div class="v"><span class="czdots" role="img" aria-label="${T[i]}">${[1,2,3,4,5].map(n=>`<i class="${n<=nd?"on":""}"></i>`).join("")}</span>${L[i]}</div>${adj?'<div class="czadj">tras igualar</div>':""}`;
+  b3.innerHTML=`<div class="k">Explica${czIt(`Las diferencias de ${xl} explican el ${nf0.format(r*r*100)}${NB}% de las de ${yl}; el resto depende de otras cosas.`,"Qué significa explicar")}</div><div class="v">${nf0.format(r*r*100)}${NB}% <small>de las diferencias de ${yl}</small></div>`;
+  czTipBind(b1); czTipBind(b3);
+}
 function czSusNote(k){
   const cn=CNAME[k], p=CZ.solo&&CZ.solo[k], a0=Math.abs(CZ.base.r), xl=low(labK(CZ.x)), yl=low(labK(CZ.y));
   const after=p==null?null:(Math.sign(p)===Math.sign(CZ.base.r)?Math.abs(p):0), lost=after==null||!a0?null:Math.round((1-Math.min(1,after/a0))*100);
@@ -4207,6 +4213,17 @@ function czWhy(z,x){
     case "distCosta": return up?"están más lejos del mar":"están más cerca del mar"; case "distCiudad": return up?"están más lejos de una gran ciudad":"están más cerca de una gran ciudad";
     default: return `tienen ${up?"más":"menos"} ${low(labK(z))}`; }
 }
+// frase y barras: qué pasa con la relación al comparar solo municipios parecidos (con lo marcado, o con lo que más pesa si aún no hay nada)
+function czStory(cs){
+  const {x,y,base,solo}=CZ, a0=Math.abs(base.r), sgn=Math.sign(base.r), xl=esc(low(labK(x))), yl=esc(low(labK(y)));
+  const first=`Donde hay más ${xl}, suele haber ${sgn>0?"más":"menos"} ${yl}.`, use=cs.length?cs:(CZ.suspect?[CZ.suspect]:[]);
+  if(!use.length) return {html:`${first} Hemos probado si lo explica otra cosa y ninguna pesa mucho. Puedes probar con otra.`,share:null};
+  const r=cs.length?(partialR(x,y,cs,CZ.w)||{}).r:solo[use[0]];
+  const flip=r!=null&&Math.sign(r)!==sgn&&Math.abs(r)>=0.1, left=r==null?a0:(Math.sign(r)===sgn?Math.min(a0,Math.abs(r)):0), share=flip||!a0?0:left/a0;
+  const res=flip?"la relación cambia de sentido":share<0.15?"la relación casi desaparece":share>=0.85?"la relación apenas cambia":`la relación se queda en un ${Math.round(share*20)*5}${NB}%`;
+  const why=use.length===1&&use[0]==="prov"?"Pero cada provincia tiene su propia realidad":`Pero esos municipios también ${czJoin(use.map(k=>czWhy(k,x)))}`;
+  return {html:`${first} ${why}, y eso podría explicarlo. Si comparamos solo municipios ${czJoin(use.map(czSame))}, <span class="czres">${res}.</span>`,share};
+}
 function czRefresh(animate){
   if(!CZ) return; const {x,y,w,base}=CZ, vf=vForbid(x,y), cs=EX.c.filter(c=>c!==x&&c!==y&&CNAME[c]&&!vf.has(c));
   const tg=document.getElementById("cztags"); if(!tg) return;
@@ -4228,6 +4245,10 @@ function czRefresh(animate){
   tg.querySelectorAll("button.czi").forEach(b=>{ const show=()=>tipShow(b,czTip(b.dataset.i));
     b.addEventListener("mouseenter",show); b.addEventListener("focus",show); b.addEventListener("mouseleave",tipHide); b.addEventListener("blur",tipHide);
     b.addEventListener("click",e=>{ e.stopPropagation(); tipHide(); const id=b.dataset.i; CZI.has(id)?CZI.delete(id):CZI.add(id); czNotes(); }); });
+  const st=czStory(cs), sd=document.getElementById("czstory"); if(sd) sd.innerHTML=st.html;
+  const bx=document.getElementById("czbars"); if(bx){ const prev=bx.querySelector(".b"), from=prev?prev.style.width:"100%";
+    bx.innerHTML=st.share==null?"":`<div class="czbar2"><span class="czbl">Entre todos los municipios</span><span class="czbt"><i class="a" style="width:100%"></i></span></div><div class="czbar2"><span class="czbl on">Entre municipios parecidos</span><span class="czbt"><i class="b" style="width:${from}"></i></span></div>`;
+    const nb=bx.querySelector(".b"); if(nb){ const to=Math.max(2,Math.round(st.share*100))+"%"; requestAnimationFrame(()=>requestAnimationFrame(()=>{ nb.style.width=to; })); } }
   // gráfico
   const note=document.getElementById("ctlnote"), plot=document.getElementById("cplot");
   const list=cs.map(c=>CNAME[c]).join(", ").replace(/, ([^,]*)$/," y $1");
@@ -4235,7 +4256,9 @@ function czRefresh(animate){
     document.getElementById("ctlreset").addEventListener("click",()=>{ EX.c=[]; exSetHash(); czRefresh(true); });
     adjScatter(plot,x,y,cs,w,animate); }
   else { note.innerHTML=""; if(LBPOS){ LBPOS=null; drawRel(); } }
-  czSummary(cs); czAcc(cs); czNotes();
+  if(!cs.length){ czVerdict(base.r,false); czEuros(x,y,cs,w); czNotes(); return; }
+  const pfin=partialR(x,y,cs,w);
+  czVerdict(pfin?pfin.r:base.r,true); czEuros(x,y,cs,w); czNotes();
 }
 // efecto en unidades: «por cada X más de A, B es Y mayor», con intervalo, antes y después de descontar
 const CZE={};
@@ -4245,91 +4268,21 @@ function czEst(x,y,cs,w,st){
   const pts=D.X.map((v,i)=>({x:v,y:D.Y[i],w:D.w[i],g:D.rs[i][F.prov]})), b=D.c.b*st, ci=bootCIg(pts,p=>p.g,s=>{ const k=wcorr(s); return k?k.b*st:null; },{B:200});
   return CZE[key]={b,ci,n:D.rs.length,ng:new Set(pts.map(p=>p.g)).size};
 }
-// ---------- escalera en unidades, veredicto de cuatro estados y desplegables (noviembre 2026) ----------
-// Una sola escala: lo que cambia el segundo dato por cada paso del primero, antes y después de igualar, con su rango (provincias remuestreadas).
-// Veredicto: solo con el efecto tras igualar (b1) frente al de partida (b0) y su rango. Desaparece: cambia de signo o queda menos del 10 %.
-// Dudosa: el rango toca el 0. Se reduce: queda menos del 50 %. Se mantiene: queda el 50 % o más y el rango no toca el 0.
-const CZST=["Desaparece","Dudosa","Se reduce","Se mantiene"];
-const czSig=o=>!!(o&&o.ci&&(o.ci[0]>0||o.ci[1]<0));
-function czShortF(y){ const f=(CATK[y]||{}).f; return v=>{ const ab=Math.abs(v), d=ab>=100||(f==="eur"&&ab>=1)?0:ab>=1?1:2, nf=new Intl.NumberFormat("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d}); return (v<0?"−":v>0?"+":"")+nf.format(ab)+(f==="eur"?NB+"€":""); }; }
-function czLadder(rows,y,sv){
-  const sh=czShortF(y), vals=rows.flatMap(r=>[r.b,...(r.ci||[])]).concat(0), mn=d3.min(vals), mx=d3.max(vals), pad=(mx-mn)*.06||1;
-  const sc=d3.scaleLinear().domain([mn-pad,mx+pad]).nice(4), [lo,hi]=sc.domain(), pos=v=>((v-lo)/(hi-lo)*100).toFixed(2);
-  return rows.map(r=>`<div class="czr2"><div class="czrh"><b>${r.lab}</b><span class="${r.cls||""}">${sv(r.b)}</span></div><div class="czrt"><i class="z" style="left:${pos(0)}%"></i>${r.ci?`<i class="ci ${r.cls||""}" style="left:${pos(r.ci[0])}%;width:${(pos(r.ci[1])-pos(r.ci[0])).toFixed(2)}%"></i>`:""}<i class="dt ${r.cls||""}" style="left:${pos(r.b)}%"></i></div></div>`).join("")
-    +`<div class="czax" aria-hidden="true">${sc.ticks(4).filter(t=>+pos(t)>4&&+pos(t)<96).map(t=>`<span class="${t===0?"z0":""}" style="left:${pos(t)}%">${t===0?"0":sh(t)}</span>`).join("")}</div>`;
-}
-function czSummary(cs){
-  if(!CZ) return; const {x,y,w}=CZ, lad=document.getElementById("czladder"), vc=document.getElementById("czvc"), h=document.getElementById("czh"); if(!lad||!vc) return;
-  const clear=()=>{ lad.innerHTML=""; vc.innerHTML=""; if(h) h.innerHTML=""; };
-  const D0=adjData(x,y,[],w); if(!D0||!D0.c){ clear(); return; }
-  const st=niceStep(x,D0.X.map((v,i)=>({x:v,y:D0.Y[i],w:D0.w[i]}))), e0=czEst(x,y,[],w,st); if(!e0){ clear(); return; }
-  const use=cs.length?cs:(CZ.suspect?[CZ.suspect]:[]), prev=!cs.length&&use.length, e1=use.length?czEst(x,y,use,w,st):null;
-  const xl=low(labK(x)), yl=low(labK(y)), stTxt=unitTxt(x,st).replace(/^1 punto$/,"punto"), sv=v=>(v<0?"−":"+")+unitTxt(y,v), shn=czShortF(y);
-  const nm=use.map(k=>CSHORT[k]||low(labK(k))), nj=czJoin(nm), same=use.length?"Entre municipios "+czJoin(use.map(czSame)):"";
-  const sn=e0.b<0?"menos":"más", sgnTxt=e0.b<0?"menos":"más";
-  let i, txt, h2="";
-  if(!czSig(e0)){ i=1; txt="Ya sin igualar nada, el rango incluye el 0: con estos datos no se puede asegurar que haya relación."; h2="Pero con estos datos no podemos asegurar que haya relación."; }
-  else if(!e1){ i=3; txt="No hemos encontrado nada que la explique de forma clara. Puedes probar con otro dato."; h2="¿Se debe a esto o a otra cosa?"; }
-  else {
-    const q=e1.b/e0.b; i=q<0.1?0:!czSig(e1)?1:q<0.5?2:3;
-    const near=e1.ci?(e0.b<0?e1.ci[1]:e1.ci[0]):null, expl=czJoin(use.map(k=>CKNOWN[k]||low(labK(k))));
-    if(i===0){ txt=q<0&&czSig(e1)?`${same}, la diferencia cambia de sentido (${sv(e1.b)}). Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`:`${same}, la diferencia se esfuma. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, la diferencia desaparece."; }
-    else if(i===1){ txt=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, ya no podemos asegurar que haya relación."; }
-    else if(i===2){ txt=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, quedan ${unitTxt(y,e1.b)}.`; }
-    else { txt=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="Y resiste al compararlo entre municipios parecidos."; }
-  }
-  CZ.e0=e0; CZ.e1=e1; CZ.st=st; CZ.use=use; CZ.prev=prev;
-  // titular
-  if(h) h.innerHTML=`Cada ${stTxt} más de ${esc(xl)} va con ${unitTxt(y,e0.b)} ${sn} de ${esc(yl)}.${h2?` <span class="czh2">${h2}</span>`:""}`;
-  // escalera
-  const nd=e1?e0.n-e1.n:0, nTxt=nd>0?` Faltan datos de ${nf0.format(nd)} municipio${nd===1?"":"s"} en lo que descuentas.`:"", e=e1||e0;
-  const rng=o=>`${sv(o.b)}${o.ci?` (entre ${shn(o.ci[0])} y ${shn(o.ci[1])})`:""}`;
-  const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${e1?`Sin igualar: ${rng(e0)}<br>Igualando: ${rng(e1)}`:rng(e0)}<br>Si repitiéramos el cálculo con otras provincias, el resultado caería dentro de este rango 95 de cada 100 veces. Remuestreamos provincias enteras porque los municipios de una misma provincia se parecen entre sí.<br>Calculado con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
-  const rows=[{lab:"Sin igualar",b:e0.b,ci:e0.ci,cls:"a"}];
-  if(e1) rows.push({lab:prev?`Si igualas ${esc(nj)} (lo que más pesa)`:`Igualando ${esc(nj)}`,b:e1.b,ci:e1.ci,cls:"b"});
-  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">${cap(esc(yl))} por cada ${esc(stTxt)} más de ${esc(xl)}. La línea es el rango probable${czIt(tipCI,"Qué es el rango probable")}; si cruza el 0, no se distingue de «ningún efecto».</p>`;
-  czTipBind(lad);
-  // veredicto
-  vc.innerHTML=`<div class="czq">Entre municipios parecidos, ¿sigue habiendo ${sgnTxt} ${esc(yl)} donde hay más ${esc(xl)}?</div>
-    <div class="czpills" role="img" aria-label="Veredicto: ${CZST[i]}">${CZST.map((t,k)=>`<span class="${k===i?"act":""}">${t}</span>`).join("")}</div>
-    <p class="czvt">${txt}</p>
-    <p class="czvn">${prev?"Vista previa con lo que más pesa. Marca lo que quieras en «Qué más podría explicarlo». ":""}No demuestra que una cosa cause la otra.</p>`;
-}
-function czAcc(cs){
-  if(!CZ||!CZ.e0) return; const {x,y,w,e0,st}=CZ, sv=v=>(v<0?"−":"+")+unitTxt(y,v), shn=czShortF(y), xl=low(labK(x)), yl=low(labK(y));
-  const stTxt=unitTxt(x,st).replace(/^1 punto$/,"punto");
-  // qué más podría explicarlo
-  const sq=document.getElementById("czsq"); if(sq) sq.textContent=cs.length?"Igualando "+czJoin(cs.map(k=>CSHORT[k]||low(labK(k)))):(CZ.suspect?"Ninguna marcada · la que más pesa: "+CSHORT[CZ.suspect]:"Ninguna marcada");
-  // qué no conviene igualar
-  { const vf=vForbid(x,y), own=[x,y].filter(k=>VBYK[k]).map(k=>`«${esc(vLow(labK(k)))}»`), T={casi:"casi lo mismo",cons:"consecuencia",med:"en medio del camino"}, items=[];
-    CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y).forEach(k=>{ if(vf.has(k)) items.push({k,t:"ya está dentro del cálculo",m:`Está dentro del cálculo de ${listY(own)}: la relación saldría deformada.`}); else { const rk=ctrlRisk(x,y,k); if(rk) items.push({k,t:T[rk.t]||"cuidado",m:rk.m}); } });
-    const sn=document.getElementById("czsn"), bx=document.getElementById("czno");
-    if(sn) sn.textContent=items.length?`${items.length===1?"1 dato":items.length+" datos"}: ${items.map(o=>CSHORT[o.k]||low(labK(o.k))).join(", ")}`:"Ninguno de los que ofrecemos da problemas aquí";
-    if(bx) bx.innerHTML=items.length?items.map(o=>`<div class="czno"><span class="czic" aria-hidden="true">!</span><div><b>${esc(cap(CSHORT[o.k]||low(labK(o.k))))}</b> · ${o.t}<div class="muted">${o.m}</div></div></div>`).join(""):`<p class="muted">Con estos dos datos, ninguno de los que ofrecemos para igualar se calcula con ellos ni parece consecuencia suya.</p>`; }
-  // ¿pasa en todas partes?
-  { const sp=document.getElementById("czsp"), bx=document.getElementById("czprov2"); if(sp&&bx){
-    const vf=vForbid(x,y); let D=null;
-    if(EX.p){ sp.textContent="No aplica: estás mirando una sola provincia"; bx.innerHTML=""; }
-    else if(vf.has("prov")){ sp.textContent="No se puede hacer aquí: uno de los datos ya está medido frente a la media de su provincia"; bx.innerHTML=""; }
-    else if(!(D=adjData(x,y,cs,w))||!D.c){ sp.textContent="Sin datos suficientes"; bx.innerHTML=""; }
-    else { const G=new Map(); D.X.forEach((v,i)=>{ const p=D.rs[i][F.prov]; if(!G.has(p)) G.set(p,[]); G.get(p).push({x:v,y:D.Y[i],w:D.w[i]}); });
-      const S=[]; G.forEach((pts,p)=>{ if(pts.length<12) return; const c=wcorr(pts); if(c) S.push({p,b:c.b*st}); });
-      if(S.length<8){ sp.textContent="Hay pocas provincias con datos para mirarlo"; bx.innerHTML=""; }
-      else { const sgn=Math.sign(e0.b), same=S.filter(o=>Math.sign(o.b)===sgn).length, med=d3.median(S,o=>o.b), vs=S.map(o=>o.b).sort(d3.ascending);
-        sp.textContent=`Se da en ${nf0.format(same)} de ${nf0.format(S.length)} provincias · mediana ${shn(med)}`;
-        const q1=d3.quantile(vs,.04), q2=d3.quantile(vs,.96), sc=d3.scaleLinear().domain([Math.min(q1,0),Math.max(q2,0)]).nice(4), [lo,hi]=sc.domain(), pos=v=>Math.max(1,Math.min(99,(v-lo)/(hi-lo)*100));
-        const out=S.filter(o=>o.b<lo||o.b>hi).length, lv=[]; const dots=S.slice().sort((a,b)=>a.b-b.b).map(o=>{ const l=pos(o.b); let k=0; while(lv[k]!==undefined&&l-lv[k]<2.4) k++; lv[k]=l; return `<i class="${Math.sign(o.b)===sgn?"s":"o"}" style="left:${l.toFixed(1)}%;top:${8+k*11}px" title="${esc(PROVS[o.p]||o.p)}: ${shn(o.b)}"></i>`; }).join("");
-        const H=Math.max(60,16+11*(lv.length));
-        bx.innerHTML=`<p class="muted czhint">Cada punto es una provincia: cuánto cambia ${esc(yl)} por cada ${esc(stTxt)} más de ${esc(xl)} dentro de ella${cs.length?", igualando "+esc(czJoin(cs.map(k=>CSHORT[k]||low(labK(k))))):""}. Los rellenos son las que van en el mismo sentido que el resultado general.</p>
-          <div class="czstrip" style="height:${H}px"><i class="z" style="left:${pos(0)}%"></i><i class="m" style="left:${pos(med)}%"></i>${dots}</div>
-          <div class="czax czax2" aria-hidden="true">${sc.ticks(4).filter(t=>pos(t)>4&&pos(t)<96).map(t=>`<span class="${t===0?"z0":""}" style="left:${pos(t)}%">${t===0?"0":shn(t)}</span>`).join("")}</div>
-          <p class="muted czhint">La línea discontinua es la mediana.${out?` ${out===1?"Una provincia queda":nf0.format(out)+" provincias quedan"} fuera del dibujo, en los extremos.`:""}</p>`; } } } }
-  // método y fuentes
-  { const bx=document.getElementById("czmet"); if(bx){ const base=CZ.base, pf=cs.length?partialR(x,y,cs,w):null, sx=srcSplit(CATK[x].src), sy=srcSplit(CATK[y].src), e=CZ.e1||CZ.e0;
-    bx.innerHTML=`<p>Se compara ${esc(low(labK(y)))} con ${esc(low(labK(x)))} en ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias, con una regresión lineal ponderada por población. Igualar es hacer la misma regresión después de quitar de los dos datos lo que explican las variables marcadas; el efecto es la pendiente que queda.</p>
-      <p>El rango probable es un intervalo del 95 %. Se calcula remuestreando provincias enteras (200 veces), porque los municipios de una provincia se parecen entre sí y remuestrear municipios sueltos daría un rango demasiado estrecho.</p>
-      <p>Correlación (r): ${rFmt(base.r)} sin igualar${pf?` y ${rFmt(pf.r)} igualando`:""}. De ahí sale que ${esc(low(labK(x)))} explica el ${nf0.format(base.r*base.r*100)}${NB}% de las diferencias de ${esc(low(labK(y)))} sin igualar${pf?` y el ${nf0.format(pf.r*pf.r*100)}${NB}% igualando`:""}.</p>
-      <p class="muted">Fuentes: ${esc(sx[0])}${sy[0]!==sx[0]?" y "+esc(sy[0]):""}. <a href="/laboratorio/metodo/">Cómo saber si una cosa causa la otra →</a></p>`; } }
+function czEuros(x,y,cs,w){
+  const box=document.getElementById("czeur"), kh=document.getElementById("czk2"); if(!box) return;
+  const D0=adjData(x,y,[],w); if(!D0||!D0.c){ box.innerHTML=""; if(kh) kh.innerHTML=""; return; }
+  const st=niceStep(x,D0.X.map((v,i)=>({x:v,y:D0.Y[i],w:D0.w[i]}))), e0=czEst(x,y,[],w,st), e1=cs.length?czEst(x,y,cs,w,st):null, e=e1||e0; if(!e){ box.innerHTML=""; if(kh) kh.innerHTML=""; return; }
+  const f=(CATK[y]||{}).f;
+  const sv=v=>(v<0?"−":"+")+unitTxt(y,v), shn=v=>{ const ab=Math.abs(v), d=ab>=100?0:ab>=1?1:2, nf=new Intl.NumberFormat("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d}); return (v<0?"−":"+")+nf.format(ab)+(f==="eur"?NB+"€":""); };
+  const sig=o=>o.ci&&(o.ci[0]>0||o.ci[1]<0), stTxt=unitTxt(x,st).replace(/^1 punto$/,"punto"), yl=low(labK(y));
+  const nd=e1?e0.n-e1.n:0, nTxt=nd>0?` Faltan datos de ${nf0.format(nd)} municipio${nd===1?"":"s"} en lo que descuentas.`:"";
+  const ok=sig(e), vd=document.getElementById("czevd");
+  if(vd){ vd.innerHTML=`<span class="czvd ${ok?"ok":"nz"}">${ok?"✓ Efecto claro":"Sin efecto claro"}${czIt(ok?"El rango probable no toca el cero, así que es poco probable que sea casualidad.":"El rango probable incluye el cero: con estos datos no se puede asegurar que haya efecto, podría ser casualidad.","Qué significa")}</span>`; czTipBind(vd); }
+  const rr=(e1?[["Sin igualar",e0],["Tras igualar",e1]]:[["",e0]]).map(([lab,o])=>`${lab?lab.toLowerCase()+": ":""}<b>${sv(o.b)}</b>${o.ci?` (entre ${shn(o.ci[0])} y ${shn(o.ci[1])})`:""}`).join("<br>");
+  const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${rr}<br>Si repitiéramos el cálculo con otras provincias, el resultado caería dentro de este rango 95 de cada 100 veces. Remuestreamos provincias enteras porque los municipios de una misma provincia se parecen entre sí.<br>Calculado con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
+  if(kh){ kh.innerHTML=`${cs.length?"Entre municipios parecidos, por":"Por"} cada ${stTxt} más de ${low(labK(x))}${czIt(tipCI,"Qué es el rango probable")}`; czTipBind(kh); }
+  box.innerHTML=`<span class="czv" tabindex="0">${e.b>=0?"+":"−"}${unitTxt(y,e.b)}</span> <small>de ${yl}</small>`;
+  const cv=box.querySelector(".czv"); if(cv){ const sh=()=>tipShow(cv,tipCI); cv.addEventListener("mouseenter",sh); cv.addEventListener("focus",sh); cv.addEventListener("mouseleave",tipHide); cv.addEventListener("blur",tipHide); }
 }
 function adjScatter(box,x,y,cs,w,animate){
   const D=adjData(x,y,cs,w), D0=adjData(x,y,[],w); if(!D){ box.innerHTML='<p class="loading">No hay datos suficientes.</p>'; return; }
@@ -4614,14 +4567,14 @@ function exCausal(x,y){
   const vf=vForbid(x,y), cand=["lpop","edad","renta","superiores","distCosta","distCiudad","prov"].filter(c=>c!==x&&c!==y&&!vf.has(c)).map(c=>({c,p:partialR(x,y,[c],w)})).filter(o=>o.p).map(o=>({...o,drop:a0-Math.abs(o.p.r)*(Math.sign(o.p.r)===sign?1:-1)})).sort((a,b)=>b.drop-a.drop);
   const top=cand[0];
   CZ={x,y,w,base,suspect:top&&top.drop>=a0*0.15?top.c:null,solo:Object.fromEntries(cand.map(o=>[o.c,o.p.r])),lev:null};
-  if(a0<0.1){ box.innerHTML=`<div class="cz"><h3>A fondo</h3><p class="intro">Aquí no hay mucho que comprobar: entre ${xl} y ${yl} la relación es casi nula (r = ${rFmt(base.r)}). Saber uno no ayuda a adivinar el otro.</p><p style="margin-top:10px;font-size:14px"><a href="/laboratorio/metodo/">Cómo se buscan causas con datos públicos →</a></p></div>`; ["czacc"].forEach(i=>{ const e=document.getElementById(i); if(e) e.remove(); }); return; }
+  if(a0<0.1){ box.innerHTML=`<div class="cz"><h3>A fondo</h3><p class="intro">Aquí no hay mucho que comprobar: entre ${xl} y ${yl} la relación es casi nula (r = ${rFmt(base.r)}). Saber uno no ayuda a adivinar el otro.</p><p style="margin-top:10px;font-size:14px"><a href="/laboratorio/metodo/">Cómo se buscan causas con datos públicos →</a></p></div>`; ["czpar"].forEach(i=>{ const e=document.getElementById(i); if(e) e.remove(); }); return; }
   const others=["lpop","edad","renta"].filter(c=>c!==x&&c!==y&&!vf.has(c)), pc=others.length?partialR(x,y,others,w):null, pp=EX.p||vf.has("prov")?null:partialR(x,y,["prov"],w);
   const cx=CHG[x], cy=CHG[y], cc=cx&&cy&&cx!==cy?wcorr(pairPts(cx,cy,{weighted:w})):null;
   const TW=twins(x,y,w,sign), BP=vf.has("prov")?null:byProvince(x,y,w,sign), ST=steps(x,y,w);
   const T=[];
   T.push({k:"par",v:pc?`${rFmt(base.r)} → ${rFmt(pc.r)}`:"sin datos",ok:holds(pc),na:!pc,t:"Entre municipios parecidos",d:pc?`Comparando municipios de ${others.map(c=>CNAME[c].replace(/^(el|la|los) /,"")).join(", ").replace(/, ([^,]*)$/," y $1")} parecidos, la relación ${how(pc)} (de ${rFmt(base.r)} a ${rFmt(pc.r)}).`:"No hay datos suficientes.",why:"Si dos cosas solo van juntas porque las dos dependen de una tercera, al comparar entre iguales la relación se esfuma."});
   const bpOk=BP?BP.filter(b=>b.ok).length:0;
-  T.push({k:"prov",v:EX.p||vf.has("prov")?"no aplica":BP?`${bpOk} de ${BP.length}`:(pp?rFmt(pp.r):"sin datos"),ok:holds(pp)&&(!BP||bpOk/BP.length>=0.5),na:!pp,t:"Dentro de cada provincia",d:EX.p?"No aplica: estás mirando una sola provincia.":vf.has("prov")?"No se puede hacer: uno de los datos ya está medido frente a la media de su provincia.":(BP?`Se cumple en <b>${bpOk} de ${BP.length}</b> provincias. `:"")+(pp?`Comparando solo dentro de la misma provincia, la relación ${how(pp)} (${rFmt(pp.r)}).`:""),why:"Así se quita lo que es común a cada zona: el clima, las leyes autonómicas, la historia o la economía de la región."});
+  T.push({k:"prov",v:EX.p||vf.has("prov")?"no aplica":BP?`${bpOk} de ${BP.length}`:(pp?rFmt(pp.r):"sin datos"),ok:holds(pp)&&(!BP||bpOk/BP.length>=0.5),na:!pp,t:"Dentro de cada provincia",d:EX.p?"No aplica: estás mirando una sola provincia.":vf.has("prov")?"No se puede hacer: uno de los datos ya está medido frente a la media de su provincia.":(BP?`Se cumple en <b>${bpOk} de ${BP.length}</b> provincias. `:"")+(pp?`Comparando solo dentro de la misma provincia, la relación ${how(pp)} (${rFmt(pp.r)}).`:""),why:"Así se quita lo que es común a cada zona: el clima, las leyes autonómicas, la historia o la economía de la región.",extra:BP?`<div class="czmini" id="czprov"></div>`:""});
   if(cc) T.push({k:"chg",v:`r = ${rFmt(cc.r)}`,ok:Math.sign(cc.r)===sign&&Math.abs(cc.r)>=0.1,t:"También en los cambios",d:`Comparando cambios en vez de niveles (${low(labK(cx))} frente a ${low(labK(cy))}), la relación ${Math.sign(cc.r)===sign&&Math.abs(cc.r)>=0.1?"se mantiene":"desaparece"} (r = ${rFmt(cc.r)}).`,why:"Comparar cambios en vez de niveles quita todo lo que es fijo en cada lugar."});
   else T.push({k:"chg",v:"sin datos",na:true,t:"También en los cambios",d:"No tenemos series de cambio para estos dos datos, así que esta prueba no se puede hacer.",why:"Comparar cambios en vez de niveles quita todo lo que es fijo en cada lugar."});
   if(TW&&TW.pairs.length>=15) T.push({k:"tw",v:`${nf0.format(TW.share*10)} de cada 10`,ok:TW.share>=0.6,t:"Municipios gemelos",d:`En <b>${nf0.format(TW.share*10)} de cada 10</b> parejas de gemelos (${nf0.format(TW.pairs.length)} parejas), el que tiene más ${xl} tiene ${sign>0?"más":"menos"} ${yl}.`,why:"Es la comparación más limpia: dos pueblos de la misma provincia casi iguales en todo menos en una cosa."});
@@ -4642,14 +4595,12 @@ function exCausal(x,y){
     tw:t=>t.na?"Parejas de municipios casi iguales: no hay suficientes":t.ok?"Se repite entre parejas de municipios casi iguales":"No se repite entre parejas de municipios casi iguales",
     st:t=>t.ok?"Se mantiene de un tramo al siguiente, de menos a más":"No se mantiene en todos los tramos, de menos a más"};
   const nOf=t=>t.na||t.k==="chg"||(t.k==="prov"&&!BP)||!/\d/.test(t.v||"")?"":` <span class="muted">(${t.v})</span>`;
-  const rows=T.filter(t=>t.k!=="par"&&t.k!=="prov"&&SENT[t.k]).map(t=>`<li class="${t.na?"na":t.ok?"ok":"ko"}"><span class="em" aria-hidden="true">${t.na?"○":t.ok?"✓":"✗"}</span><span class="rl">${SENT[t.k](t)}${nOf(t)}</span></li>`).join("");
-  { const stx=document.getElementById("czst"), tT=T.find(t=>t.k==="tw"), tS=T.find(t=>t.k==="st"), tC=T.find(t=>t.k==="chg");
-    if(stx) stx.textContent=[tC&&!tC.na?(tC.ok?"Tiempo ✓":"Tiempo ✗"):null,tT&&!tT.na?`Parejas ${tT.v.replace(" de cada "," de ")}`:null,tS?`Tramos ${tS.v}`:null].filter(Boolean).join(" · ")||"Sin datos suficientes"; }
+  const rows=T.filter(t=>t.k!=="par"&&SENT[t.k]).map(t=>`<li class="${t.na?"na":t.ok?"ok":"ko"}"><span class="em" aria-hidden="true">${t.na?"○":t.ok?"✓":"✗"}</span><span class="rl">${SENT[t.k](t)}${nOf(t)}</span></li>`).join("");
   const hb=document.getElementById("czhowb"); box.innerHTML="";
   if(hb) hb.innerHTML=`<p class="lbhow">Hemos mirado si lo mismo se ve de otras maneras:</p>
     <ul class="czrows" aria-label="Comprobaciones">${rows}</ul>
     <p class="czact">Más pruebas: ${cx2&&cy2&&cx2!==cy2?`<button type="button" class="ctag" data-a="chg">📈 Mirar los cambios, no los niveles</button> `:""}<button type="button" class="ctag" data-a="big" aria-pressed="${EX.t==="g10"}">Solo municipios de más de 10.000 hab.</button></p>
-    <details class="czmore"><summary>Por qué importa cada prueba${ex.length?" y parejas de gemelos":""}</summary>
+    <details class="czmore"><summary>Por qué importa cada prueba${ex.length?", parejas de gemelos":""}${BP?" y mapa por provincias":""}</summary>
       <dl class="czwhy">${T.map(t=>`<dt>${em(t)} ${t.t}</dt><dd>${t.why}${t.extra&&!t.na?t.extra:""}</dd>`).join("")}</dl>${twinsH}</details>
     ${evs.length?`<div class="czhit"><b>Con un suceso real:</b> Indicio mide una relación de este tipo antes y después de una medida. ${evs.map(k=>`<a href="/preguntas/${CZSTUDY[k]}/">${ADEV[k].l}</a>`).join("; ")} →</div>`:""}
     <p class="lbnote">Que dos cosas vayan juntas no prueba que una cause la otra.</p>
@@ -4657,6 +4608,12 @@ function exCausal(x,y){
   const root=hb||box;
   const chb=root.querySelector('[data-a="chg"]'); if(chb) chb.addEventListener("click",()=>{ EX.d=[cx2,cy2,...EX.d.slice(2).filter(k=>k!==cx2&&k!==cy2)]; EX.c=[]; exUpdate(); });
   root.querySelector('[data-a="big"]').addEventListener("click",()=>{ EX.t=EX.t==="g10"?"":"g10"; exUpdate(); });
+  if(BP) loadTopo().then(()=>{ const bx=document.getElementById("czprov"); if(!bx) return; const ok=new Map(BP.map(b=>[b.p,b.ok]));
+    const pv=topojson.feature(TOPO,TOPO.objects.provinces); pv.features.forEach(rewind);
+    const proj=d3.geoConicConformalSpain().fitSize([220,170],pv), path=d3.geoPath(proj);
+    const s=d3.select(bx).append("svg").attr("viewBox","0 0 220 170").attr("aria-hidden","true");
+    s.selectAll("path").data(pv.features).join("path").attr("d",path).attr("stroke",css("--card")).attr("stroke-width",.6).attr("fill",f=>{ const k=String(f.id).padStart(2,"0").slice(0,2); return ok.has(k)?(ok.get(k)?css("--ok"):css("--rule-2")):css("--band"); });
+    bx.insertAdjacentHTML("beforeend",`<div class="muted" style="font-size:12px">En verde, provincias donde se cumple; en gris, donde no.</div>`); }).catch(()=>{});
 }
 // =====================================================================
 // MÁS ESTUDIOS: convergencia de la renta, pandemia y turismo, qué hace crecer a un pueblo
