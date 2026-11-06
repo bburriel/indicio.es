@@ -22,8 +22,6 @@ export const ROWS=[
  ["Los análisis","Les anàlisis","As análises","Analisiak","The analyses"],
  ["Fichas, comparador y rankings de los municipios de España","Fitxes, comparador i rànquings dels municipis d'Espanya","Fichas, comparador e clasificacións dos concellos de España","Espainiako udalerrien fitxak, konparagailua eta sailkapenak","Profiles, comparison tool and rankings for Spain's municipalities"],
  ["Cruza datos, comprueba si una relación aguanta y mide antes y después","Creua dades, comprova si una relació resisteix i mesura l'abans i el després","Cruza datos, comproba se unha relación resiste e mide antes e despois","Gurutzatu datuak, egiaztatu erlazio bat sendoa den eta neurtu aurreko eta ondorengo egoera","Cross-reference data, test whether a relationship holds up and measure before and after"],
- ["Abrir el menú de Análisis","Obre el menú d'Anàlisi","Abrir o menú de Análises","Ireki Azterketen menua","Open the Analysis menu"],
- ["Menú de Análisis","Menú d'Anàlisi","Menú de Análises","Azterketen menua","Analysis menu"],
  ["Ver todos los análisis →","Mostra totes les anàlisis →","Ver todas as análises →","Ikusi azterketa guztiak →","See all analyses →"],
  ["Abrir el menú de Preguntas","Obre el menú de Preguntes","Abrir o menú de Preguntas","Ireki Galderen menua","Open the Questions menu"],
  ["Abrir el menú de Municipios","Obre el menú de Municipis","Abrir o menú de Concellos","Ireki Udalerrien menua","Open the Municipalities menu"],
