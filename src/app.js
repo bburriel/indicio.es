@@ -2058,7 +2058,7 @@ function psMandatos(){ const G=(PAIS&&PAIS.gobiernos.ES)||[], now=new Date();
     return {...g,a,b,ys,ape:g.p.split(" ").slice(-1)[0].replace("Zapatero","Zapatero")}; }).map(g=>({...g,ape:{"José Luis Rodríguez Zapatero":"Zapatero","Leopoldo Calvo-Sotelo":"Calvo-Sotelo"}[g.p]||g.p.split(" ").slice(-1)[0]})); }
 // ---------- gráfico de líneas por años con los gobiernos de España de fondo (laboratorio «Países» y análisis) ----------
 function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=true,height,base0=false,over,extra}){
-  const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:138,b:26,l:52};
+  const f=fig(parent,{title,sub,source}); const W=Math.max(320,parent.clientWidth||900), H=height||Math.min(380,Math.max(260,W*0.42)), m={t:gob?34:14,r:W<520?100:138,b:26,l:W<520?44:52};
   const X=d3.scaleLinear().domain(d3.extent(years)).range([m.l,W-m.r]);
   const vals=series.flatMap(s=>years.map(y=>s.v[y])).filter(v=>v!=null); let [lo,hi]=d3.extent(vals.concat(zero?[0]:[],extra||[])); const pad=(hi-lo)*0.08||1;
   const Y=d3.scaleLinear().domain([base0&&lo>=0?0:lo-pad,hi+pad]).nice(5).range([H-m.b,m.t]);
@@ -2068,7 +2068,7 @@ function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=
     if(x1-x0>34) svg.append("text").attr("x",(x0+x1)/2).attr("y",m.t-8).attr("text-anchor","middle").attr("font-size",11.5).attr("font-weight",700).attr("fill",PARTYC[g.partido]||"#666").text(x1-x0>70?`${g.ape} (${g.partido})`:g.ape); });
   svg.append("g").attr("class","grid").selectAll("line").data(Y.ticks(5)).join("line").attr("x1",m.l).attr("x2",W).attr("y1",Y).attr("y2",Y);
   svg.append("g").attr("class","axis").selectAll("text").data(Y.ticks(5)).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(tick||(v=>nf0.format(v)));
-  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/90))).filter(Number.isInteger)).join("text").attr("x",X).attr("y",H-6).attr("text-anchor","middle").text(String);
+  svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(Math.min(10,Math.floor(W/90))).filter(Number.isInteger).filter(y=>W>=520||y%10===0)).join("text").attr("x",X).attr("y",H-6).attr("text-anchor","middle").text(String);
   if(Y.domain()[0]<0&&Y.domain()[1]>0) svg.append("line").attr("x1",m.l).attr("x2",W).attr("y1",Y(0)).attr("y2",Y(0)).attr("stroke",css("--ink")).attr("stroke-width",1);
   if(over) over(svg,X,Y,m,W,H);
   const line=d3.line().defined(d=>d[1]!=null).x(d=>X(d[0])).y(d=>Y(d[1])), ends=[];
@@ -2077,7 +2077,7 @@ function govChart(parent,{title,sub,source,years,series,fmt,tick,zero=false,gob=
     svg.append("g").selectAll("circle").data(pts.filter(d=>d[1]!=null)).join("circle").attr("cx",d=>X(d[0])).attr("cy",d=>Y(d[1])).attr("r",s.main?2.6:1.8).attr("fill",c).append("title").text(d=>`${s.n}, ${d[0]}: ${fmt(d[1])}`);
     const l=pts.filter(d=>d[1]!=null).pop(); if(l) ends.push({y:Y(l[1]),x:X(l[0]),t:`${s.n} ${fmt(l[1])}`,tip:s.tip,c,main:s.main}); });
   ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<14) ends[i].y=ends[i-1].y+14;
-  ends.forEach(e=>{ const t=svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c), mc=W<520?14:18, nm=e.t.length>mc+6?e.t.replace(/ \([^)]*\)/,"").replace(/^(.*?)([−+-]?[\d.,]+(?:\u00a0\S+)?)$/,(m,a,b)=>(a.length>mc?a.slice(0,mc-1)+"… ":a)+b):e.t; t.text(nm); if(e.tip) t.append("title").text(e.t+"\n"+e.tip); else if(nm!==e.t) t.append("title").text(e.t); });
+  ends.forEach(e=>{ const t=svg.append("text").attr("x",e.x+6).attr("y",e.y+4).attr("font-size",12).attr("font-weight",e.main?700:400).attr("fill",e.c), mc=W<520?8:18, nm=e.t.length>mc+6?e.t.replace(/ \([^)]*\)/,"").replace(/^(.*?)([−+-]?[\d.,]+(?:\u00a0\S+)?)$/,(m,a,b)=>(a.length>mc?a.slice(0,mc-1)+"… ":a)+b):e.t; t.text(nm); if(e.tip) t.append("title").text(e.t+"\n"+e.tip); else if(nm!==e.t) t.append("title").text(e.t); });
   return f;
 }
 // cambio de un indicador en los años de un mandato: crecimiento medio anual (nivel), media (flujo) o cambio en puntos (tasa).
@@ -2227,12 +2227,13 @@ function psEvPrep(ser,years,{prop,unit=""}){
   ev.extra=pts.flatMap(p=>[p.lo,p.hi]).filter(v=>isFinite(v));
   ev.sub=` Banda: lo que marcaba la tendencia${R.length>1?` de ${nm0(main.s)}`:""} en ${r.pre0}–${E.y-1}, con su intervalo del 95 %.`;
   ev.src=" Tendencia previa: recta ajustada a los años anteriores al suceso y proyectada hacia delante.";
-  ev.over=(svg,X,Y,m,W,H)=>{
+  ev.over=(svg,X,Y,m,W,H)=>{ 
     svg.append("path").attr("d",d3.area().x(d=>X(d.y)).y0(d=>Y(d.lo)).y1(d=>Y(d.hi))(pts)).attr("fill",css("--slate")).attr("opacity",.16);
     const xm=X(E.y-0.5); svg.append("line").attr("x1",xm).attr("x2",xm).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",css("--muted")).attr("stroke-dasharray","4 3");
     svg.append("text").attr("class","lab").attr("x",xm+5).attr("y",m.t+10).style("fill",css("--muted")).text("suceso →");
     svg.append("path").attr("d",d3.line().x(d=>X(d.y)).y(d=>Y(d.m))(pts)).attr("fill","none").attr("stroke",css("--slate")).attr("stroke-width",2).attr("stroke-dasharray","6 4");
-    svg.append("text").attr("class","lab").attr("x",X(last)).attr("y",lastObs<endP.m?Y(endP.m)-8:Y(endP.lo)+15).attr("text-anchor","end").style("fill",css("--slate")).text("Tendencia previa");
+    const cerca=Math.abs(Y(lastObs)-Y(endP.m))<18, ly=cerca?Y(endP.lo)+16:Y(endP.m)+4;
+    svg.append("text").attr("class","lab").attr("x",X(last)+6).attr("y",ly).style("fill",css("--slate")).text(W<520?"Tendencia":"Tendencia previa");
   };
   return ev;
 }
@@ -3430,6 +3431,11 @@ async function renderExplorar(h){
   document.getElementById("lbcsv").addEventListener("click",exCSV);
   document.getElementById("lbedit").addEventListener("click",()=>{ const b=document.getElementById("exbar"); window.scrollTo({top:b.getBoundingClientRect().top+window.scrollY-(document.getElementById("top").offsetHeight+10),behavior:"smooth"}); });
   document.getElementById("lbimg").addEventListener("click",exPNG);
+  // en el móvil los mandos van debajo del gráfico: un botón flotante lleva de uno a otro
+  { const bar=document.getElementById("exbar"), fab=document.createElement("button"); fab.type="button"; fab.className="lbfab"; fab.id="lbfab"; view.appendChild(fab);
+    let en=false; const set=v=>{ en=v; fab.innerHTML=v?"<span aria-hidden=\"true\">↑</span> Ver el gráfico":"Cambiar gráfico <span aria-hidden=\"true\">↓</span>"; }; set(false);
+    fab.addEventListener("click",()=>{ const t=en?document.querySelector(".lb-canvas"):bar; window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-(document.getElementById("top").offsetHeight+10),behavior:"smooth"}); });
+    if("IntersectionObserver" in window){ const io=new IntersectionObserver(es=>{ if(!document.body.contains(fab)){ io.disconnect(); return; } set(es[0].isIntersecting); },{threshold:.15}); io.observe(bar); } }
   const lsv=document.getElementById("lbsaved"); if(lsv) lsv.addEventListener("click",()=>document.getElementById("lbnb").scrollIntoView({behavior:"smooth"}));
   view.querySelectorAll("[data-gq]").forEach(b=>b.addEventListener("click",()=>{ const [l,v,o]=EXQ[+b.dataset.gq]; EX={...EX,v,d:o.d||EX.d,t:o.t||"",p:"",c:o.c||[],gb:o.gb||EX.gb,o:o.o||null}; if(o.ser){ Object.assign(PS,{s:o.ser.slice(),idx:o.idx===0?0:1,b:o.b||null,desde:null,hasta:null,real:0}); } navTo(exHash()); }));
   lbTipsWatch(); exBar(); exDraw(); nbDraw();
