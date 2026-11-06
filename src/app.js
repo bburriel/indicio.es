@@ -6444,7 +6444,7 @@ const HEROQ=[
   {id:"tope-cataluna",tab:"Tope al alquiler",kk:"Alquiler",em:"en Cataluña?",chart:"tope",cta:"Ver qué pasó con el alquiler →",
     v:()=>`Frenó la subida, pero no bajó el alquiler.`,
     a:()=>`En 2024 el alquiler siguió subiendo donde hay tope: un 3,1${NB}%. Sin él habría subido en torno a un 3,7${NB}%, así que en un piso de Barcelona la diferencia son unos 7${NB}€ al mes. A la vez se vendieron más pisos de lo esperable, y los datos no dicen si salieron del alquiler.`,
-    cap:()=>`Alquiler en los municipios con tope (2023 = 100), frente al estimado sin él a partir de municipios parecidos de fuera de Cataluña; el tope entra en 2024. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
+    cap:()=>`Subida del alquiler en 2024 en los municipios con tope, frente a la estimada sin él a partir de municipios parecidos. Fuente: INE, Índice de Precios de Vivienda en Alquiler.`},
   {id:"infraestructuras",tab:"Transporte",kk:"Dinero público",em:"carreteras y trenes?",chart:"infra",cta:"Ver dónde se dejó de invertir →",
     v:()=>`Sí, y no se ha recuperado.`,
     a:N=>`En ${N.infPicoY} España invirtió ${N.infPico} mil millones de euros en carreteras y trenes; en ${N.infUltY}, ${N.infUlt}: un ${N.infCaida}${NB}% menos. Hoy destina a las dos cosas menos del 1${NB}% del PIB, por debajo de Francia y Alemania, cuando antes de la crisis invertía casi el doble que Alemania. Del mantenimiento hay menos datos, y los que hay vienen del propio sector.`,
@@ -6486,20 +6486,15 @@ const ptCharts={
       +[2018,2021,2024].filter(y=>y<=t1).map(y=>`<text x="${X(y).toFixed(1)}" y="${y0+24}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
       +lines+dots+ends.map(lab).join(""),
       `Desde 2015 comprar una vivienda cuesta un ${nf0.format(C.compra[0])} % más, alquilarla un ${nf0.format(C.alquiler[0])} % más, y el sueldo mediano ha subido un ${nf0.format(C.sueldo[0])} %.`); },
-  // el tope: el alquiler con tope y el estimado sin él, año a año (2023 = 100). Sale de studyTope: «con tope» es el índice ponderado de los
-  // municipios tensionados (y1) y «sin tope» es ese mismo índice más la diferencia con sus gemelos de fuera de Cataluña (esCompute). Si cambian allí, hay que cambiarlo aquí.
-  tope(){ const Y=[2021,2022,2023,2024], real=[95.14,97.5,100,103.06], sin=[95.12,97.45,100,103.74];
-    const x0=26,x1=296,y0=250,y1=40, lo=94, hi=105, X=i=>x0+(x1-x0)*i/3, Yv=v=>y0-(y0-y1)*(v-lo)/(hi-lo), pt=(v,i)=>`${X(i).toFixed(1)},${Yv(v).toFixed(1)}`;
-    const area="M"+sin.map((v,i)=>pt(v,i)).join(" L")+" L"+real.map((v,i)=>pt(v,i)).reverse().join(" L")+" Z", ys=Yv(sin[3]), yr=Yv(real[3]), m=(ys+yr)/2, a1=m-12, a2=m+42;
-    return ptSvg(`<text x="${x0}" y="20" class="pt-g-t">Alquiler en los municipios con tope (2023 = 100)</text>`
-      +`<line x1="${x0}" x2="${x1}" y1="${Yv(100).toFixed(1)}" y2="${Yv(100).toFixed(1)}" class="pt-g-base"/>`
-      +Y.map((y,i)=>`<text x="${X(i).toFixed(1)}" y="${y0+26}" text-anchor="middle" class="pt-g-t">${y}</text>`).join("")
-      +`<path d="${area}" class="pt-g-area"/><path d="M${sin.map((v,i)=>pt(v,i)).join(" L")}" pathLength="1" class="pt-g-ln ink" style="stroke-opacity:.6"/><path d="M${real.map((v,i)=>pt(v,i)).join(" L")}" pathLength="1" class="pt-g-ln br"/>`
-      +`<circle cx="${X(3).toFixed(1)}" cy="${ys.toFixed(1)}" r="4" class="pt-f-ink"/><circle cx="${X(3).toFixed(1)}" cy="${yr.toFixed(1)}" r="4.5" class="pt-f-br"/>`
-      +`<text x="${(x1+14).toFixed(1)}" y="${(a1-4).toFixed(1)}" class="pt-g-l">Sin el tope</text><text x="${(x1+14).toFixed(1)}" y="${(a1+21).toFixed(1)}" class="pt-g-n">+3,7${NB}%</text>`
-      +`<text x="${(x1+14).toFixed(1)}" y="${(a2+30).toFixed(1)}" class="pt-g-l br">Con el tope</text><text x="${(x1+14).toFixed(1)}" y="${(a2+55).toFixed(1)}" class="pt-g-n br">+3,1${NB}%</text>`
-      +`<text x="${(x1+14).toFixed(1)}" y="${(a2+86).toFixed(1)}" class="pt-g-g">unos 7${NB}€ al mes</text>`,
-      "Hasta 2023 el alquiler sube igual con y sin tope; en 2024 sube un 3,1 % con el tope y habría subido un 3,7 % sin él."); },
+  // el tope: el gráfico de siempre (barra estimada sin tope, barra real y la diferencia), con trazo más fino
+  tope(){ const x0=40,x1=400, sc=v=>x0+(x1-x0)*v/4.2, a=sc(3.7), b=sc(3.1), tk=` style="stroke-opacity:.55"`;
+    return ptSvg(`<text x="${x0}" y="66" class="pt-g-l">Sin el tope (estimado)</text><rect x="${x0}" y="78" width="${(a-x0).toFixed(1)}" height="38" rx="3" class="pt-g-ghost" style="stroke-opacity:.6"/>`
+      +`<text x="${(a-12).toFixed(1)}" y="105" text-anchor="end" class="pt-g-n">+3,7${NB}%</text>`
+      +`<text x="${x0}" y="162" class="pt-g-l br">Con el tope (lo que pasó)</text><rect x="${x0}" y="174" width="${(b-x0).toFixed(1)}" height="38" rx="3" class="pt-f-br"/>`
+      +`<text x="${(b-12).toFixed(1)}" y="200" text-anchor="end" class="pt-g-n on">+3,1${NB}%</text>`
+      +`<line x1="${b.toFixed(1)}" x2="${b.toFixed(1)}" y1="222" y2="246" class="pt-g-tick"${tk}/><line x1="${a.toFixed(1)}" x2="${a.toFixed(1)}" y1="120" y2="246" class="pt-g-tick dash"${tk}/><line x1="${b.toFixed(1)}" x2="${a.toFixed(1)}" y1="242" y2="242" class="pt-g-tick"${tk}/>`
+      +`<text x="${((a+b)/2).toFixed(1)}" y="270" text-anchor="middle" class="pt-g-g">unos 7${NB}€ al mes</text>`,
+      "Sin el tope el alquiler habría subido un 3,7 %; subió un 3,1 %."); },
   contratos(D){ const {meses:M,temporales:T,antes}=D.contratos, idx=T.map((v,i)=>i).filter(i=>T[i]!=null), n=M.length, last=idx[idx.length-1];
     const X=i=>40+(330-40)*i/(n-1), Yv=v=>262-(262-26)*(v-40)/(100-40), ir=M.indexOf("2022-04");
     return ptSvg([50,75,100].map(g=>`<line x1="40" x2="330" y1="${Yv(g).toFixed(1)}" y2="${Yv(g).toFixed(1)}" class="pt-g-gr"/><text x="32" y="${(Yv(g)+4).toFixed(1)}" text-anchor="end" class="pt-g-t">${g}${NB}%</text>`).join("")
