@@ -2529,3 +2529,23 @@ a.mm-card:hover .mm-go{text-decoration:underline}
   .mun-hero .mleg-t{flex-direction:column; align-items:flex-start}
 }
 @media (prefers-reduced-motion:reduce){ .mm-tools button,.mun-bar .bigsearch input{transition:none} }
+
+/* Cifras clave de la ficha: distribución de los municipios con el 80 % central, punto y marca de España (noviembre 2026) */
+.cp-kpis{border-top:1.5px solid var(--ink)}
+.cp-kpis .cp-key{padding:12px 0 6px; gap:6px 22px}
+@media (min-width:761px){ .cp-k{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr) 150px; gap:10px 36px; padding:30px 0} }
+.cp-k .cp-l{font-weight:500}
+.cp-k .cp-l .yr{color:var(--muted); opacity:.85}
+.cp-k .cp-t p{color:var(--ink-2); line-height:1.55; margin-top:7px} .cp-k .cp-t p b{font-weight:500; color:var(--ink)}
+.cp-trk.cp-dist{height:66px; margin:0 6px}
+.cp-dist::before{top:38px; left:-6px; right:-6px; background:var(--rule-2); z-index:1}
+.cp-dist svg{position:absolute; left:0; top:8px; width:100%; height:30px; display:block; overflow:visible}
+.cp-dist .cd-all{fill:var(--band)} .cp-dist .cd-mid{fill:var(--rule)} .cp-dist .cd-line{fill:none; stroke:var(--rule-2); stroke-width:1}
+.cp-dist .bk{position:absolute; top:44px; height:3px; border:1px solid var(--rule-2); border-top:0; box-sizing:border-box}
+.cp-dist .es{top:4px; height:38px; width:1px; margin-left:0; background:var(--ink-2); z-index:2}
+.cp-dist .me{top:30px; z-index:3; box-shadow:0 0 0 5px color-mix(in srgb,var(--rust) 14%,transparent)}
+.cp-dist .ax{top:50px; font-size:11.5px; color:var(--muted); opacity:.85}
+.cp-dist .ax.l{left:0} .cp-dist .ax.r{right:0}
+.cp-k .cp-vv b{font-size:36px; font-weight:400; letter-spacing:-.015em}
+.cp-k .cp-vv small{margin-top:7px}
+@media (max-width:760px){ .cp-k{grid-template-columns:minmax(0,1fr); gap:6px; padding:24px 0} .cp-trk.cp-dist{margin:12px 6px 0} .cp-k .cp-vv b{font-size:32px} }
