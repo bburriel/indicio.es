@@ -6,6 +6,7 @@ cifra: −65 %
 cifra_texto: menos que en 2009 en carreteras y trenes, en euros por año
 metodo: FIT-OCDE, Eurostat, Adif y auditoría de la AEC, 1995–2025
 evidencia: desc
+tema: estado
 publicado: 2026-11-04
 actualizado: 2026-11-04
 ---

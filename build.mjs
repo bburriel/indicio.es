@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
-import {SITE,QUICK,PAGES,EVIDENCE} from "./src/content.mjs";
+import {SITE,QUICK,PAGES,EVIDENCE,TEMAS} from "./src/content.mjs";
 import {ROWS as I18N_ROWS} from "./src/i18n-textos.mjs";
 import {faltan as i18nFaltan, validar as i18nValidar} from "./scripts/i18n-faltan.mjs";
 import {STUDIES,ALL,HIDDEN,MDBODY} from "./src/analisis.mjs";
@@ -47,7 +47,7 @@ fs.writeFileSync(path.join(OUT,CSS),css); fs.writeFileSync(path.join(OUT,JS),js)
 const ARTS=exists("art")?fs.readdirSync(path.join(ROOT,"art")).filter(f=>f.endsWith(".jpg")).map(f=>f.replace(/\.jpg$/,"")):[];
 // Los análisis con «oculto» no se publican: ni página, ni datos en content.js. Para revisarlos en local: MOSTRAR_OCULTOS=1 npm run build
 const SHOW_HIDDEN=!!process.env.MOSTRAR_OCULTOS;
-const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:SHOW_HIDDEN?HIDDEN:[],md:SHOW_HIDDEN?MDBODY:Object.fromEntries(Object.entries(MDBODY).filter(([id])=>STUDIES.some(S=>S.id===id))),quick:QUICK,arts:ARTS,evidence:EVIDENCE,illus:ILLUS,till:TILL,focus:FOCUS});
+const CONTENT_JSON=JSON.stringify({site:SITE,studies:STUDIES,hidden:SHOW_HIDDEN?HIDDEN:[],md:SHOW_HIDDEN?MDBODY:Object.fromEntries(Object.entries(MDBODY).filter(([id])=>STUDIES.some(S=>S.id===id))),quick:QUICK,arts:ARTS,evidence:EVIDENCE,temas:TEMAS,illus:ILLUS,till:TILL,focus:FOCUS});
 const CONTENTJS="/assets/content."+h8(CONTENT_JSON)+".js"; fs.writeFileSync(path.join(OUT,CONTENTJS),"window.__INDICIO="+CONTENT_JSON+";");
 const CONTENT=CONTENTJS;
 

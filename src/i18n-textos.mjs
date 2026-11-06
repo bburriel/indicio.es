@@ -1415,5 +1415,9 @@ export const ROWS=[
  ["Enviar mensaje", "Envia el missatge", "Enviar mensaxe", "Bidali mezua", "Send message"],
  ["Dime en qué página y qué dato. Lo arreglo y lo cuento en la web.","Digue'm en quina pàgina i quina dada és. Ho corregeixo i ho explico a la web.","Dime en que páxina e que dato. Arránxoo e cóntoo na web.","Esaidazu zein orritan dagoen eta zein datu den. Konpondu eta webgunean kontatuko dut.","Tell me which page and which figure. I'll fix it and note the correction on the site."],
  ["Tu correo", "El teu correu", "O teu correo", "Zure posta elektronikoa", "Your email"],
- ["Lo uso solo para responderte.","Només el faig servir per respondre't.","Úsoo só para responderche.","Zuri erantzuteko bakarrik erabiltzen dut.","I use it only to reply to you."]
+ ["Lo uso solo para responderte.","Només el faig servir per respondre't.","Úsoo só para responderche.","Zuri erantzuteko bakarrik erabiltzen dut.","I use it only to reply to you."],
+ // análisis: temas del filtro
+ ["Sueldos, precios y empleo","Sous, preus i ocupació","Soldos, prezos e emprego","Soldatak, prezioak eta enplegua","Pay, prices and jobs"],
+ ["Pensiones y gasto público","Pensions i despesa pública","Pensións e gasto público","Pentsioak eta gastu publikoa","Pensions and public spending"],
+ ["Política","Política","Política","Politika","Politics"]
 ];

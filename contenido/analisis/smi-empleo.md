@@ -4,6 +4,7 @@ entradilla: El salario mínimo ha subido un 61 % desde 2018. Qué dicen el Banco
 respuesta: Hay efecto, pero pequeño y concentrado. El Banco de España calcula que la subida de 2019 redujo el empleo total entre 0,6 y 1,1 puntos, y la AIReF estima entre 40.000 y 65.000 empleos menos en 2019. Aun así, el empleo total está en máximos: la subida frenó parte de la creación de empleo, no la tumbó.
 metodo: Banco de España, AIReF, Seguridad Social y EPA, 2019–2026
 evidencia: desc
+tema: trabajo
 publicado: 2026-11-03
 actualizado: 2026-11-03
 oculto: sí
