@@ -37,9 +37,9 @@ var NOTE={
 
 var AUTO={
  ca:'Aquesta web s\'ha traduït automàticament del castellà. Si hi trobes una errada de traducció, <a href="/quien-soy/contacto/">escriu-me</a>.',
- gl:'Esta web foi traducida automaticamente do castelán. Se atopas algún erro de tradución, <a href="/quien-soy/contacto/">escríbenos</a>.',
- eu:'Webgune hau automatikoki itzuli da gaztelaniatik. Itzulpen-errorerik aurkitzen baduzu, <a href="/quien-soy/contacto/">idatzi iezaguzu</a>.',
- en:'This site has been machine-translated from Spanish. If you spot a translation error, <a href="/quien-soy/contacto/">write to us</a>.'
+ gl:'Esta web foi traducida automaticamente do castelán. Se atopas algún erro de tradución, <a href="/quien-soy/contacto/">escríbeme</a>.',
+ eu:'Webgune hau automatikoki itzuli da gaztelaniatik. Itzulpen-akatsik aurkitzen baduzu, <a href="/quien-soy/contacto/">idatzi iezadazu</a>.',
+ en:'This site has been machine-translated from Spanish. If you spot a translation error, <a href="/quien-soy/contacto/">write to me</a>.'
 };
 
 var MAP={ca:{},gl:{},eu:{},en:{}};
