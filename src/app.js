@@ -4143,11 +4143,11 @@ function exCruce(out){
     <div class="czld" id="czladder"></div>
     <div class="czvc" id="czvc" aria-live="polite"></div>
     <div class="czacc" id="czacc">
-      <details class="czd" id="czd-q" open><summary><span><b>Qué más podría explicarlo</b><small id="czsq"></small></span></summary><div class="czdb"><p class="czhint">Igualar es quitar de en medio lo que podría explicar la relación. Conviene igualar lo que viene <b>antes</b>. Marca y se recalcula.</p><div class="czpickrow"><span class="czchips" id="cztags"></span></div><div id="cznotes" aria-live="polite"></div></div></details>
+      <details class="czd" id="czd-q" open><summary><span><b>Qué más podría explicarlo</b><small id="czsq"></small></span></summary><div class="czdb"><p class="czhint">Marca lo que quieras igualar${czIt("Igualar es quitar de en medio lo que podría explicar la relación. Conviene igualar lo que viene antes de los dos datos, no lo que viene después. Al marcar, todo se recalcula.","Qué es igualar")}</p><div class="czpickrow"><span class="czchips" id="cztags"></span></div><div id="cznotes" aria-live="polite"></div></div></details>
       <details class="czd" id="czd-n"><summary><span><b>Qué no conviene igualar</b><small id="czsn"></small></span></summary><div class="czdb" id="czno"></div></details>
       <details class="czd" id="czd-p"><summary><span><b>¿Pasa en todas partes?</b><small id="czsp"></small></span></summary><div class="czdb" id="czprov2"></div></details>
       <details class="czd" id="czd-t"><summary><span><b>Otras pruebas</b><small id="czst"></small></span></summary><div class="czdb" id="czhowb"></div></details>
-      <details class="czd" id="czd-m"><summary><span><b>Método y fuentes</b><small>Cómo se calcula el rango, la muestra y los datos</small></span></summary><div class="czdb" id="czmet"></div></details>
+      <details class="czd" id="czd-m"><summary><span><b>Método y fuentes</b><small>Cálculo, muestra y fuentes</small></span></summary><div class="czdb" id="czmet"></div></details>
     </div>
     </section>`;
   if(tst&&window.matchMedia&&matchMedia("(max-width:760px)").matches) tst.querySelectorAll("details.czd").forEach(d=>d.name="czacc");
@@ -4270,16 +4270,16 @@ function czSummary(cs){
   const xl=low(labK(x)), yl=low(labK(y)), stTxt=unitTxt(x,st).replace(/^1 punto$/,"punto"), sv=v=>(v<0?"−":"+")+unitTxt(y,v), shn=czShortF(y);
   const nm=use.map(k=>CSHORT[k]||low(labK(k))), nj=czJoin(nm), same=use.length?"Entre municipios "+czJoin(use.map(czSame)):"";
   const sn=e0.b<0?"menos":"más", sgnTxt=e0.b<0?"menos":"más";
-  let i, txt, h2="";
-  if(!czSig(e0)){ i=1; txt="Ya sin igualar nada, el rango incluye el 0: con estos datos no se puede asegurar que haya relación."; h2="Pero con estos datos no podemos asegurar que haya relación."; }
-  else if(!e1){ i=3; txt="No hemos encontrado nada que la explique de forma clara. Puedes probar con otro dato."; h2="¿Se debe a esto o a otra cosa?"; }
+  let i, txt, full, h2="";
+  if(!czSig(e0)){ i=1; txt="Ni sin igualar se distingue de «ningún efecto»."; full="Ya sin igualar nada, el rango incluye el 0: con estos datos no se puede asegurar que haya relación."; h2="Pero con estos datos no podemos asegurar que haya relación."; }
+  else if(!e1){ i=3; txt="No hemos encontrado nada que la explique."; full="No hemos encontrado nada que la explique de forma clara. Puedes probar con otro dato."; h2="¿Se debe a esto o a otra cosa?"; }
   else {
     const q=e1.b/e0.b; i=q<0.1?0:!czSig(e1)?1:q<0.5?2:3;
     const near=e1.ci?(e0.b<0?e1.ci[1]:e1.ci[0]):null, expl=czJoin(use.map(k=>CKNOWN[k]||low(labK(k))));
-    if(i===0){ txt=q<0&&czSig(e1)?`${same}, la diferencia cambia de sentido (${sv(e1.b)}). Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`:`${same}, la diferencia se esfuma. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, la diferencia desaparece."; }
-    else if(i===1){ txt=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, ya no podemos asegurar que haya relación."; }
-    else if(i===2){ txt=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, quedan ${unitTxt(y,e1.b)}.`; }
-    else { txt=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="Y resiste al compararlo entre municipios parecidos."; }
+    if(i===0){ const flip=q<0&&czSig(e1); txt=flip?"La diferencia cambia de sentido.":"La diferencia se esfuma."; full=`${same}, ${flip?`la diferencia cambia de sentido (${sv(e1.b)})`:"la diferencia se esfuma"}. Lo que parecía ir ligado a ${xl} lo explicaba otra cosa.`; h2="Entre municipios parecidos, la diferencia desaparece."; }
+    else if(i===1){ txt=`Quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad.`; full=`${same} quedan ${sv(e1.b)} por ${stTxt}, pero podría ser casualidad${near!=null?`: el rango llega hasta ${sv(near)}`:""}.`; h2="Entre municipios parecidos, ya no podemos asegurar que haya relación."; }
+    else if(i===2){ txt=`Baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}.`; full=`${same}, la diferencia baja de ${sv(e0.b)} a ${sv(e1.b)} por ${stTxt}. Hay efecto, pero más pequeño: parte la explicaba ${expl}.`; h2=`Entre municipios parecidos, quedan ${unitTxt(y,e1.b)}.`; }
+    else { txt=`Sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}).`; full=`${same}, la diferencia sigue en ${sv(e1.b)} por ${stTxt} (antes, ${sv(e0.b)}). No parece casualidad.`; h2="Y resiste al compararlo entre municipios parecidos."; }
   }
   CZ.e0=e0; CZ.e1=e1; CZ.st=st; CZ.use=use; CZ.prev=prev;
   // titular
@@ -4290,13 +4290,14 @@ function czSummary(cs){
   const tipCI=`<b>Rango probable</b> (intervalo del 95 %)<br>${e1?`Sin igualar: ${rng(e0)}<br>Igualando: ${rng(e1)}`:rng(e0)}<br>Si repitiéramos el cálculo con otras provincias, el resultado caería dentro de este rango 95 de cada 100 veces. Remuestreamos provincias enteras porque los municipios de una misma provincia se parecen entre sí.<br>Calculado con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias.${nTxt}${e.n<1000?" Son pocos: el rango sale muy amplio.":""}`;
   const rows=[{lab:"Sin igualar",b:e0.b,ci:e0.ci,cls:"a"}];
   if(e1) rows.push({lab:prev?`Si igualas ${esc(nj)} (lo que más pesa)`:`Igualando ${esc(nj)}`,b:e1.b,ci:e1.ci,cls:"b"});
-  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">${cap(esc(yl))} por cada ${esc(stTxt)} más de ${esc(xl)}. La línea es el rango probable${czIt(tipCI,"Qué es el rango probable")}; si cruza el 0, no se distingue de «ningún efecto».</p>`;
+  lad.innerHTML=czLadder(rows,y,sv)+`<p class="czcap">${cap(esc(yl))} por cada ${esc(stTxt)} más de ${esc(xl)}${czIt("La línea de cada fila es el rango probable. Si cruza el 0, no se distingue de «ningún efecto».<br>"+tipCI,"Qué es el rango probable")}</p>`;
   czTipBind(lad);
   // veredicto
+  const rule="<br><br><b>Cómo se decide.</b> Desaparece: cambia de signo o queda menos del 10 %. Dudosa: el rango toca el 0. Se reduce: queda menos de la mitad. Se mantiene: queda la mitad o más.<br><br>No demuestra que una cosa cause la otra.";
   vc.innerHTML=`<div class="czq">Entre municipios parecidos, ¿sigue habiendo ${sgnTxt} ${esc(yl)} donde hay más ${esc(xl)}?</div>
-    <div class="czpills" role="img" aria-label="Veredicto: ${CZST[i]}">${CZST.map((t,k)=>`<span class="${k===i?"act":""}">${t}</span>`).join("")}</div>
-    <p class="czvt">${txt}</p>
-    <p class="czvn">${prev?"Vista previa con lo que más pesa. Marca lo que quieras en «Qué más podría explicarlo». ":""}No demuestra que una cosa cause la otra.</p>`;
+    <div class="czscale" role="img" aria-label="Veredicto: ${CZST[i]}">${CZST.map((t,k)=>`<span class="${k===i?"act":""}"><i></i><em>${t}</em></span>`).join("")}</div>
+    <p class="czvt">${txt}${czIt(full+rule,"Qué significa este veredicto")}</p>`;
+  czTipBind(vc);
 }
 function czAcc(cs){
   if(!CZ||!CZ.e0) return; const {x,y,w,e0,st}=CZ, sv=v=>(v<0?"−":"+")+unitTxt(y,v), shn=czShortF(y), xl=low(labK(x)), yl=low(labK(y));
@@ -4308,7 +4309,7 @@ function czAcc(cs){
     CTAGS.map(t=>t[0]).filter(k=>k!==x&&k!==y).forEach(k=>{ if(vf.has(k)) items.push({k,t:"ya está dentro del cálculo",m:`Está dentro del cálculo de ${listY(own)}: la relación saldría deformada.`}); else { const rk=ctrlRisk(x,y,k); if(rk) items.push({k,t:T[rk.t]||"cuidado",m:rk.m}); } });
     const sn=document.getElementById("czsn"), bx=document.getElementById("czno");
     if(sn) sn.textContent=items.length?`${items.length===1?"1 dato":items.length+" datos"}: ${items.map(o=>CSHORT[o.k]||low(labK(o.k))).join(", ")}`:"Ninguno de los que ofrecemos da problemas aquí";
-    if(bx) bx.innerHTML=items.length?items.map(o=>`<div class="czno"><span class="czic" aria-hidden="true">!</span><div><b>${esc(cap(CSHORT[o.k]||low(labK(o.k))))}</b> · ${o.t}<div class="muted">${o.m}</div></div></div>`).join(""):`<p class="muted">Con estos dos datos, ninguno de los que ofrecemos para igualar se calcula con ellos ni parece consecuencia suya.</p>`; }
+    if(bx) bx.innerHTML=items.length?items.map(o=>`<div class="czno"><span class="czic" aria-hidden="true">!</span><span><b>${esc(cap(CSHORT[o.k]||low(labK(o.k))))}</b> · ${o.t}</span>${czIt(o.m,"Por qué no conviene igualar "+(CSHORT[o.k]||low(labK(o.k))))}</div>`).join(""):`<p class="muted">Nada que evitar con estos dos datos.</p>`; czTipBind(bx); }
   // ¿pasa en todas partes?
   { const sp=document.getElementById("czsp"), bx=document.getElementById("czprov2"); if(sp&&bx){
     const vf=vForbid(x,y); let D=null;
@@ -4323,16 +4324,15 @@ function czAcc(cs){
         const q1=d3.quantile(vs,.04), q2=d3.quantile(vs,.96), sc=d3.scaleLinear().domain([Math.min(q1,0),Math.max(q2,0)]).nice(4), [lo,hi]=sc.domain(), pos=v=>Math.max(1,Math.min(99,(v-lo)/(hi-lo)*100));
         const out=S.filter(o=>o.b<lo||o.b>hi).length, lv=[]; const dots=S.slice().sort((a,b)=>a.b-b.b).map(o=>{ const l=pos(o.b); let k=0; while(lv[k]!==undefined&&l-lv[k]<2.4) k++; lv[k]=l; return `<i class="${Math.sign(o.b)===sgn?"s":"o"}" style="left:${l.toFixed(1)}%;top:${8+k*11}px" title="${esc(PROVS[o.p]||o.p)}: ${shn(o.b)}"></i>`; }).join("");
         const H=Math.max(60,16+11*(lv.length));
-        bx.innerHTML=`<p class="muted czhint">Cada punto es una provincia: cuánto cambia ${esc(yl)} por cada ${esc(stTxt)} más de ${esc(xl)} dentro de ella${cs.length?", igualando "+esc(czJoin(cs.map(k=>CSHORT[k]||low(labK(k))))):""}. Los rellenos son las que van en el mismo sentido que el resultado general.</p>
+        bx.innerHTML=`<p class="muted czhint">Cada punto es una provincia${czIt("Cuánto cambia "+esc(yl)+" por cada "+esc(stTxt)+" más de "+esc(xl)+" dentro de ella"+(cs.length?", igualando "+esc(czJoin(cs.map(k=>CSHORT[k]||low(labK(k))))):"")+". Los rellenos van en el mismo sentido que el resultado general. La línea discontinua es la mediana."+(out?" "+(out===1?"Una provincia queda":nf0.format(out)+" provincias quedan")+" fuera del dibujo, en los extremos.":""),"Qué muestra cada punto")}</p>
           <div class="czstrip" style="height:${H}px"><i class="z" style="left:${pos(0)}%"></i><i class="m" style="left:${pos(med)}%"></i>${dots}</div>
           <div class="czax czax2" aria-hidden="true">${sc.ticks(4).filter(t=>pos(t)>4&&pos(t)<96).map(t=>`<span class="${t===0?"z0":""}" style="left:${pos(t)}%">${t===0?"0":shn(t)}</span>`).join("")}</div>
-          <p class="muted czhint">La línea discontinua es la mediana.${out?` ${out===1?"Una provincia queda":nf0.format(out)+" provincias quedan"} fuera del dibujo, en los extremos.`:""}</p>`; } } } }
+          `; czTipBind(bx); } } } }
   // método y fuentes
   { const bx=document.getElementById("czmet"); if(bx){ const base=CZ.base, pf=cs.length?partialR(x,y,cs,w):null, sx=srcSplit(CATK[x].src), sy=srcSplit(CATK[y].src), e=CZ.e1||CZ.e0;
-    bx.innerHTML=`<p>Se compara ${esc(low(labK(y)))} con ${esc(low(labK(x)))} en ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias, con una regresión lineal ponderada por población. Igualar es hacer la misma regresión después de quitar de los dos datos lo que explican las variables marcadas; el efecto es la pendiente que queda.</p>
-      <p>El rango probable es un intervalo del 95 %. Se calcula remuestreando provincias enteras (200 veces), porque los municipios de una provincia se parecen entre sí y remuestrear municipios sueltos daría un rango demasiado estrecho.</p>
-      <p>Correlación (r): ${rFmt(base.r)} sin igualar${pf?` y ${rFmt(pf.r)} igualando`:""}. De ahí sale que ${esc(low(labK(x)))} explica el ${nf0.format(base.r*base.r*100)}${NB}% de las diferencias de ${esc(low(labK(y)))} sin igualar${pf?` y el ${nf0.format(pf.r*pf.r*100)}${NB}% igualando`:""}.</p>
-      <p class="muted">Fuentes: ${esc(sx[0])}${sy[0]!==sx[0]?" y "+esc(sy[0]):""}. <a href="/laboratorio/metodo/">Cómo saber si una cosa causa la otra →</a></p>`; } }
+    bx.innerHTML=`<p>Regresión lineal ponderada por población de ${esc(low(labK(y)))} sobre ${esc(low(labK(x)))}, con ${nf0.format(e.n)} municipios de ${nf0.format(e.ng)} provincias. Igualar es repetirla después de quitar de los dos datos lo que explican las variables marcadas; el efecto es la pendiente que queda.</p>
+      <p>El rango es un intervalo del 95 %, remuestreando provincias enteras (200 veces): los municipios de una provincia se parecen entre sí y, sueltos, darían un rango demasiado estrecho.${czIt("Correlación (r): "+rFmt(base.r)+" sin igualar"+(pf?" y "+rFmt(pf.r)+" igualando":"")+". Equivale a que "+esc(low(labK(x)))+" explica el "+nf0.format(base.r*base.r*100)+NB+"% de las diferencias de "+esc(low(labK(y)))+" sin igualar"+(pf?" y el "+nf0.format(pf.r*pf.r*100)+NB+"% igualando":"")+".","Correlación")}</p>
+      <p class="muted">Fuentes: ${esc(sx[0])}${sy[0]!==sx[0]?" y "+esc(sy[0]):""}. <a href="/laboratorio/metodo/">Cómo saber si una cosa causa la otra →</a></p>`; czTipBind(bx); } }
 }
 function adjScatter(box,x,y,cs,w,animate){
   const D=adjData(x,y,cs,w), D0=adjData(x,y,[],w); if(!D){ box.innerHTML='<p class="loading">No hay datos suficientes.</p>'; return; }
@@ -4649,13 +4649,11 @@ function exCausal(x,y){
   { const stx=document.getElementById("czst"), tT=T.find(t=>t.k==="tw"), tS=T.find(t=>t.k==="st"), tC=T.find(t=>t.k==="chg");
     if(stx) stx.textContent=[tC&&!tC.na?(tC.ok?"Tiempo ✓":"Tiempo ✗"):null,tT&&!tT.na?`Parejas ${tT.v.replace(" de cada "," de ")}`:null,tS?`Tramos ${tS.v}`:null].filter(Boolean).join(" · ")||"Sin datos suficientes"; }
   const hb=document.getElementById("czhowb"); box.innerHTML="";
-  if(hb) hb.innerHTML=`<p class="lbhow">Hemos mirado si lo mismo se ve de otras maneras:</p>
-    <ul class="czrows" aria-label="Comprobaciones">${rows}</ul>
+  if(hb) hb.innerHTML=`<ul class="czrows" aria-label="Comprobaciones">${rows}</ul>
     <p class="czact">Más pruebas: ${cx2&&cy2&&cx2!==cy2?`<button type="button" class="ctag" data-a="chg">📈 Mirar los cambios, no los niveles</button> `:""}<button type="button" class="ctag" data-a="big" aria-pressed="${EX.t==="g10"}">Solo municipios de más de 10.000 hab.</button></p>
     <details class="czmore"><summary>Por qué importa cada prueba${ex.length?" y parejas de gemelos":""}</summary>
       <dl class="czwhy">${T.map(t=>`<dt>${em(t)} ${t.t}</dt><dd>${t.why}${t.extra&&!t.na?t.extra:""}</dd>`).join("")}</dl>${twinsH}</details>
     ${evs.length?`<div class="czhit"><b>Con un suceso real:</b> Indicio mide una relación de este tipo antes y después de una medida. ${evs.map(k=>`<a href="/preguntas/${CZSTUDY[k]}/">${ADEV[k].l}</a>`).join("; ")} →</div>`:""}
-    <p class="lbnote">Que dos cosas vayan juntas no prueba que una cause la otra.</p>
     <p class="czlk"><a href="/laboratorio/metodo/">Cómo saber si una cosa causa la otra →</a></p>`;
   const root=hb||box;
   const chb=root.querySelector('[data-a="chg"]'); if(chb) chb.addEventListener("click",()=>{ EX.d=[cx2,cy2,...EX.d.slice(2).filter(k=>k!==cx2&&k!==cy2)]; EX.c=[]; exUpdate(); });
