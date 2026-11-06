@@ -36,6 +36,8 @@ Desde el entorno en la nube no se puede descargar directamente de INE ni de Euro
 - **«Evolución»:** añadidas las series de afiliación, contratos, paro desde 2006, compraventas, valor tasado y deuda municipal (municipio, provincia y España). Pendiente: series de `data/regional.json` (EPA, IPV, hipotecas) para provincia y España, y Eurostat para comparar con Europa.
 - **«Antes y después»:** añadir como resultado los contratos temporales mensuales por municipio desde 2019 (ya están en `cache/out_series_sepe.json`, clave `mensual`) para la reforma laboral.
 
+- **Causalidad (6 nov. 2026):** el bloque del cruce usa una escalera en unidades con rango por provincias y un veredicto de cuatro estados (ver el registro `08zzo`). Pendiente: animar la escalera al marcar controles, revisar si «estudios» debe salir como dato a no igualar (lo marca `ctrlRisk`) y barrer otras parejas de datos para ver cuántas cambian de veredicto con el rango por provincias.
+
 ## Análisis de políticas
 
 ### Propuestos con los datos de octubre de 2026 (para hacer más adelante)
