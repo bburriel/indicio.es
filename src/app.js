@@ -6639,7 +6639,7 @@ function heroLab(root){
 function homeReveal(root){
   if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{threshold:.12,rootMargin:"0px 0px -8% 0px"});
-  [[".pt-all",0],[".pt-labx-tx",0],[".pt-labx-map",.14],[".pt-mun .pt-land-tx",0],[".pt-mun .pt-mun-q",.1],[".pt-mun .pt-mun-art",.18],[".pt-why",0],[".ed-sec",0]].forEach(([q,d])=>root.querySelectorAll(q).forEach(el=>{
+  [[".pt-all",0],[".pt-labx-tx",0],[".pt-labx-map",.14],[".pt-mun .pt-land-tx",0],[".pt-mun .pt-mun-q",.1],[".pt-why",0],[".ed-sec",0]].forEach(([q,d])=>root.querySelectorAll(q).forEach(el=>{
     if(el.getBoundingClientRect().top<innerHeight) return; el.classList.add("entra"); el.style.setProperty("--d",d+"s"); io.observe(el); }));
 }
 async function renderInicio(){
@@ -6679,7 +6679,7 @@ async function renderInicio(){
   munHome();
   // la nube de municipios: imagen fija y, encima, qué municipio es cada punto
   const ar=document.getElementById("qhart");
-  if(ar&&ARTS.has("hero-campo")){ const mob=view.clientWidth<700, im=el("img"); im.src="/art/hero-campo"+(mob?"-m":"")+".jpg"; im.width=mob?720:1120; im.height=mob?520:380; im.alt=""; im.decoding="async"; im.loading="lazy"; im.className="qimg"; ar.appendChild(im); heroHover(ar,mob?"m":"d"); }
+  if(ar&&ARTS.has("hero-campo")){ const mob=view.clientWidth<700, im=el("img"); im.src="/art/hero-campo"+(mob?"-m":"")+".jpg"; im.width=mob?720:1120; im.height=mob?520:380; im.alt=""; im.decoding="async"; im.loading="lazy"; im.className="qimg"; ar.appendChild(im); heroHover(ar,mob?"m":"d"); heroGrow(ar,mob?"m":"d"); }
   else if(ar) ar.closest("figure").remove();
   if(GOMUN||location.hash==="#municipios"){ GOMUN=false; requestAnimationFrame(()=>scrollToId("municipios")); }
 }
@@ -6750,6 +6750,50 @@ const ptIll=S=>{ const I=window.__INDICIO||{}, sv=(I.illus||{})[S.id];
 // la nube de la portada responde al ratón: qué municipio es cada punto y, al pulsar, su ficha.
 // Las posiciones salen de art/hero-campo.json (scripts/hero-swarm.mjs), las mismas del dibujo.
 let HERO_PTS=null;
+// El dibujo de municipios «se llena» al llegar a él: una capa del color de la banda tapa el JPG y se va borrando círculo a círculo, del centro
+// hacia los lados (con algo de azar), usando la posición de cada municipio de art/hero-campo.json. Al acabar se funde la capa y salen las
+// etiquetas. Sin IntersectionObserver, con «reducir movimiento» o si falla el JSON, se ve el dibujo tal cual.
+function heroGrow(ar,key){
+  if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const fig=ar.closest("figure"), im=ar.querySelector("img"); if(!fig||!im) return;
+  fig.classList.add("gw");   // la imagen espera oculta hasta que la capa esté puesta
+  if(!HERO_PTS) HERO_PTS=getJSON("/art/hero-campo.json").catch(()=>null);
+  const fallback=()=>{ fig.classList.remove("gw","gr"); };
+  const io=new IntersectionObserver(es=>{ if(!es[0].isIntersecting) return; io.disconnect(); run(); },{threshold:.25});
+  io.observe(ar);
+  const run=()=>{
+    const wait=new Promise(r=>setTimeout(r,4000,null));
+    Promise.race([HERO_PTS,wait]).then(J=>{
+      if(!J||!J[key]||!document.body.contains(ar)){ fallback(); return; }
+      const L=J[key], N=L.x.length, W=L.W, X=L.x.map(v=>v/10), Y=L.y.map(v=>v/10), R=L.r.map(v=>v/10);
+      const cv=document.createElement("canvas"); cv.className="qgrow"; cv.setAttribute("aria-hidden","true");
+      const band=getComputedStyle(fig.closest("section")||document.body).backgroundColor||"#f1f1ee";
+      const ctx=cv.getContext("2d"); let k=1, dpr=1, done=0;
+      // orden de aparición: del centro del dibujo hacia los lados, con algo de azar
+      let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+      const ord=d3.range(N).sort((a,b)=>(Math.abs(X[a]-W/2)/(W/2)+rnd()*.45)-(Math.abs(X[b]-W/2)/(W/2)+rnd()*.45));
+      const cover=()=>{ ctx.globalCompositeOperation="source-over"; ctx.fillStyle=band; ctx.fillRect(0,0,cv.width,cv.height); };
+      const erase=(a,b)=>{ ctx.globalCompositeOperation="destination-out"; ctx.beginPath();
+        for(let j=a;j<b;j++){ const i=ord[j], x=X[i]*k*dpr, y=Y[i]*k*dpr, r=(R[i]*k+.8)*dpr; ctx.moveTo(x+r,y); ctx.arc(x,y,r,0,6.2832); } ctx.fill(); };
+      const place=()=>{ const b=im.getBoundingClientRect(), a=ar.getBoundingClientRect(); if(!b.width) return;
+        dpr=Math.min(2,devicePixelRatio||1); k=b.width/W;
+        Object.assign(cv.style,{left:(b.left-a.left)+"px",top:(b.top-a.top)+"px",width:b.width+"px",height:b.height+"px"});
+        const w=Math.round(b.width*dpr), h=Math.round(b.height*dpr); if(cv.width!==w||cv.height!==h){ cv.width=w; cv.height=h; cover(); erase(0,done); } };
+      ar.appendChild(cv); place(); cover();
+      fig.classList.add("gr"); fig.classList.remove("gw");
+      const ro=window.ResizeObserver?new ResizeObserver(place):null; if(ro) ro.observe(im);
+      const T=key==="m"?2400:2800, t0=performance.now();
+      const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      const step=now=>{
+        if(!document.body.contains(ar)){ if(ro) ro.disconnect(); return; }
+        const t=Math.min(1,(now-t0)/T), n=Math.round(ease(t)*N); if(n>done){ erase(done,n); done=n; }
+        if(t<1){ requestAnimationFrame(step); return; }
+        cv.style.transition="opacity .6s ease"; cv.style.opacity="0"; fig.classList.remove("gr");
+        setTimeout(()=>{ if(ro) ro.disconnect(); cv.remove(); },700); };
+      requestAnimationFrame(step);
+    });
+  };
+}
 function heroHover(ar,key){
   let P=null, cur=null; const tip=add(ar,"a","spot hv"), ring=add(ar,"div","hv-ring"); tip.hidden=true; ring.hidden=true;
   const load=()=>{ if(!HERO_PTS) HERO_PTS=getJSON("/art/hero-campo.json").catch(()=>null); return HERO_PTS.then(J=>{ if(!J||P) return; const L=J[key]; P={W:L.W,c:J.c,x:L.x.map(v=>v/10),y:L.y.map(v=>v/10),r:L.r.map(v=>v/10)}; P.q=d3.quadtree().x(i=>P.x[i]).y(i=>P.y[i]).addAll(d3.range(P.c.length)); }); };
