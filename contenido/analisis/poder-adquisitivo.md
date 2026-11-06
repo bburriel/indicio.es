@@ -4,6 +4,7 @@ entradilla: Sueldos, precios y fin de mes antes y después de la pandemia, la gu
 respuesta: De media, ya no. El coste salarial por trabajador ha subido un 21,6 % desde 2019 y los precios un 21,7 %, tras tres años por debajo. Pero la comida ha subido un 37,9 %, comprar piso exige un 19 % más de sueldo, y los hogares dicen llegar a fin de mes igual que entonces: un 20,3 % con dificultad, frente al 21,0 % de 2019.
 metodo: INE (IPC, coste laboral, EPA, ECV), 2019–2026
 evidencia: desc
+tema: trabajo
 publicado: 2026-11-03
 actualizado: 2026-11-03
 oculto: sí

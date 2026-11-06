@@ -4,6 +4,7 @@ entradilla: Déficit, deuda, gasto, paro y pobreza de España frente a la median
 respuesta: España sostuvo el empleo con un déficit alto y puntual, y lo pagó con una deuda que sigue casi donde estaba en 2019. El paro ha bajado 3,6 puntos mientras el del vecino mediano ha bajado 0,2, pero España parte de más arriba y sigue siendo la que más paro tiene, y la segunda con más pobreza y exclusión de los 14 países.
 metodo: Eurostat y Banco Mundial, 2015–2025
 evidencia: desc
+tema: estado
 publicado: 2026-11-03
 actualizado: 2026-11-03
 oculto: sí

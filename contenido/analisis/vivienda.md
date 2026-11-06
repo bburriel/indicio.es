@@ -6,6 +6,7 @@ cifra: +40 %
 cifra_texto: el alquiler desde 2015; el sueldo, +26 %
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
+tema: vivienda
 publicado: 2026-10-25
 actualizado: 2026-11-05
 orden: -1

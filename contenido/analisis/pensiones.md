@@ -6,6 +6,7 @@ cifra: 13,2 %
 cifra_texto: del PIB en pensiones hoy; 24,9 % en 2050 solo con la demografía
 metodo: Eurostat, INE y escenarios hasta 2070
 evidencia: desc
+tema: estado
 publicado: 2026-10-22
 actualizado: 2026-11-03
 ---

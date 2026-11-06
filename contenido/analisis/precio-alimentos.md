@@ -6,6 +6,7 @@ cifra: +35 %
 cifra_texto: la comida desde 2019; el sueldo, +20 %
 metodo: Presupuestos Familiares, IPC, Estructura Salarial y comparación del IVA con otros países, 2002–2026
 evidencia: desc
+tema: trabajo
 publicado: 2026-10-25
 actualizado: 2026-11-05
 ---

@@ -6,6 +6,7 @@ cifra: +3,1 %
 cifra_texto: el alquiler con tope en 2024; sin tope, +3,7 %
 metodo: Alquiler declarado a Hacienda, INE, 2015–2024
 evidencia: natural
+tema: vivienda
 publicado: 2026-10-22
 actualizado: 2026-11-03
 ---

@@ -6,6 +6,7 @@ cifra: 24.500 €
 cifra_texto: sueldo bruto anual: la mitad cobra menos
 metodo: Estructura Salarial, EPA y ECV, 2008–2025
 evidencia: desc
+tema: trabajo
 publicado: 2026-10-25
 actualizado: 2026-11-05
 orden: 0
