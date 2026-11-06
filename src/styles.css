@@ -2467,9 +2467,9 @@ details.chk > section{margin-top:18px}
 .lbnote{margin:12px 0 0; font-size:15px; color:var(--muted)}
 @media (max-width:560px){ .czbar2{grid-template-columns:1fr; row-gap:4px} }
 
-/* Municipios en la portada: el gráfico entra sin pasar por blanco. El JPG se funde con «darken» sobre la banda gris, y eso solo funciona si
-   la figura no es un grupo aislado; con opacity/transform en la figura salía blanco hasta acabar la animación. Aquí la entrada la hace la imagen. */
-.pt-mun-art.entra{opacity:1; transform:none; transition:none}
-.pt-mun-art.entra .qimg{opacity:0; transition:opacity .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
-.pt-mun-art.entra.in .qimg{opacity:1}
-@media (prefers-reduced-motion:reduce){ .pt-mun-art.entra .qimg{opacity:1; transition:none} }
+/* Municipios en la portada: el dibujo se llena círculo a círculo (heroGrow). El JPG se funde con «darken» sobre la banda gris, así que la figura
+   no puede llevar opacity ni transform: la capa .qgrow, del color de la banda, es la que tapa y destapa. */
+.pt-mun-art.gw .qimg{opacity:0}
+.pt-mun-art .hv-mine{transition:opacity .6s ease}
+.pt-mun-art.gr .hv-mine{opacity:0}
+.qgrow{position:absolute; z-index:1; pointer-events:none}
