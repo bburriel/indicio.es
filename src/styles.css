@@ -2069,7 +2069,7 @@ details.chk > section{margin-top:18px}
 .ho-sub{font-family:var(--serif); font-size:clamp(20px,2.6vw,30px); line-height:1.25; color:var(--brand); margin:22px 0 0}
 .ho-p{font-family:var(--serif); font-size:clamp(18px,1.9vw,21px); line-height:1.55; color:var(--ink-2); max-width:40em; margin:18px 0 0}
 .ho-go{display:flex; flex-wrap:wrap; gap:14px 26px; align-items:center; margin:28px 0 0}
-@media (max-width:720px){ .ho-lk{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--brand); padding-bottom:2px; font-size:15px}
+.ho-lk{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--brand); padding-bottom:2px; font-size:15px}
 .ho-lk:hover{color:var(--brand)}
 /* las pestañas del carrusel se deslizan con el dedo cuando no caben */
 .pt-tabs{overflow-x:auto; scroll-snap-type:x mandatory}
@@ -2341,7 +2341,7 @@ details.chk > section{margin-top:18px}
 .pt-mun-q .chipsq a{border-radius:999px!important; padding:5px 15px}
 
 /* Municipios en la portada: tres frases que explican qué hay en cada ficha */
-@media (max-width:760px){ .pt-tools button.btn{font-family:inherit; cursor:pointer; line-height:inherit}
+.pt-tools button.btn{font-family:inherit; cursor:pointer; line-height:inherit}
 .mf-acts #mychip-on{display:inline-flex; align-items:center; gap:7px; min-height:40px; padding:0; border-radius:0; box-shadow:none; background:transparent!important; color:var(--brand)!important; font-weight:600!important; cursor:default; user-select:none}
 .mf-acts #mychip-on:hover{background:transparent!important}
 :root[data-theme="dark"] .mf-acts #mychip-on{color:var(--ink)!important; box-shadow:none}
