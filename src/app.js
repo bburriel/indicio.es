@@ -3430,7 +3430,7 @@ async function renderExplorar(h){
   if(!/^explorar/.test(pathToKey())) return;   // el lector ya se ha ido a otra página mientras cargaban los datos
   const blank=/^explorar\/?$/.test(h);
   // /laboratorio/ abre directamente el lienzo con una relación de ejemplo; la guía de arriba propone por dónde empezar
-  if(blank) EX={...EX,v:"cruce",d:["paroReg","renta"],t:"g1",p:"",c:[],o:null};
+  if(blank) EX={...EX,v:"cruce",d:["paroReg","renta"],t:"",p:"",c:[],o:null};
   exParse(h); if(!/[?&]m=/.test(h)&&myOk(lastMun)) EX.m=lastMun; exSync();
   document.title="Laboratorio · Indicio";
   view.innerHTML=LABNAV("explorar")+`<div class="lbq" role="group" aria-label="Ideas para empezar"><span class="lbq-l">Prueba con</span><div class="lbq-c">${EXQ.map(([l],i)=>`<button type="button" data-gq="${i}">${l}</button>`).join("")}</div></div><div class="lb">
