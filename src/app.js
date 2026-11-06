@@ -1818,7 +1818,7 @@ function res(B,title,html){ if(!B.querySelector(".psec-res")) sec(B,"res"); cons
 const MDB=(window.__INDICIO&&window.__INDICIO.md)||{};
 const MDFMT={n0:v=>nf0.format(v),n1:v=>nf1.format(v),n2:v=>nf2.format(v),pct0:v=>nf0.format(v)+NB+"%",pct1:v=>nf1.format(v)+NB+"%",
   pcts0:v=>(v>0?"+":v<0?"−":"")+nf0.format(Math.abs(v))+NB+"%",pcts1:v=>sgn(v),eur:v=>nf0.format(v)+NB+"€",eur2:v=>nf2.format(v)+NB+"€",
-  mil:v=>nf0.format(Math.round(v/1000)*1000),pts0:v=>nf0.format(v)+" puntos",pts1:v=>nf1.format(v)+" puntos",veces:v=>nf1.format(v)+" veces",
+  mil:v=>nf0.format(Math.round(v/1000)*1000),pts0:v=>nf0.format(v)+" puntos",pts1:v=>nf1.format(v)+" puntos",ptss1:v=>(v>0?"+":v<0?"−":"")+nf1.format(Math.abs(v))+" puntos",veces:v=>nf1.format(v)+" veces",
   abs:v=>Math.abs(v),r100:v=>Math.round(v/100)*100,r1000:v=>Math.round(v/1000)*1000};
 function mdVars(src,V,id){
   return src.replace(/\{\{\s*([\p{L}\p{N}_.]+)\s*((?:\|\s*\w+\s*)*)\}\}/gu,(m,k,pipes)=>{
@@ -5510,6 +5510,18 @@ async function studySueldos(B){
   const HG=D.hogares, HY=HG.años, HK=["h0","h1","h2","h3","h4","h5"], hh=(k,y)=>HG[k][HY.indexOf(y)], hTot=y=>d3.sum(HK,k=>hh(k,y));
   const hOcu=y=>d3.sum(HK,(k,i)=>i*hh(k,y)), hPer=y=>hOcu(y)/hTot(y), hSin=y=>hh("h0",y)/hTot(y)*100, hDos=y=>d3.sum(HK.slice(2),k=>hh(k,y))/hTot(y)*100;
   const hMin=d3.minIndex(HY,hPer), sMax=d3.maxIndex(HY,hSin), dMin=d3.minIndex(HY,hDos);
+  // la misma cuenta para otros factores: sexo, nacionalidad (EPA, tablas 66201 y 66205) y estudios (EPA, tablas 66209 y 66242).
+  // mezcla(w,m,y0,y1): crecimiento real del sueldo medio, el que tendría con el reparto de y0 y la diferencia (puntos que vienen de cambiar el reparto).
+  const mez=(gs,w,m,y0,y1)=>{ const wm=y=>d3.sum(gs,g=>w(g,y)*m(g,y))/d3.sum(gs,g=>w(g,y)), tot=(wm(y1)/wm(y0)-1)*100, fija=(d3.sum(gs,g=>w(g,y0)*m(g,y1))/d3.sum(gs,g=>w(g,y0))/wm(y0)-1)*100; return {tot,fija,mezcla:tot-fija}; };
+  const SX=D.asalariadosSexo.grupos, SXK=Object.keys(SX), NC=D.asalariadosNac.grupos, NCK=Object.keys(NC), ES=D.estudios, ESY=ES.años, ESK=Object.keys(ES.asalariados);
+  const mEPA=(tab,g,y)=>EP[tab][g]["0"][PY.indexOf(y)]/ipc(y)*ipc(2008);
+  const wSx=(g,y)=>SX[g][AY.indexOf(y)], wNc=(g,y)=>NC[g][AY.indexOf(y)], wEs=(g,y)=>ES.asalariados[g][ESY.indexOf(y)], mEs=(g,y)=>ES.sueldo[g][ESY.indexOf(y)]/ipc(y)*ipc(2008);
+  const mzEdad=(y0,y1)=>mez(GR,nAs,(g,y)=>mReal(g,y),y0,y1), mzSexo=(y0,y1)=>mez(SXK,wSx,(g,y)=>mEPA("sexo",g,y),y0,y1), mzNac=(y0,y1)=>mez(NCK,wNc,(g,y)=>mEPA("nacionalidad",g,y),y0,y1), mzEst=(y0,y1)=>mez(ESK,wEs,mEs,y0,y1);
+  const eX=mzEdad(2008,eY), sX=mzSexo(2008,eY), nX=mzNac(2008,eY), e14=mzEdad(2014,eY), s14=mzSexo(2014,eY), n14=mzNac(2014,eY), st14=mzEst(2014,eY);
+  const shSx=(g,y)=>wSx(g,y)/d3.sum(SXK,k=>wSx(k,y))*100, shNc=(gs,y)=>d3.sum(gs,g=>wNc(g,y))/d3.sum(NCK,k=>wNc(k,y))*100, shEs=(gs,y)=>d3.sum(gs,g=>wEs(g,y))/d3.sum(ESK,k=>wEs(k,y))*100;
+  const EPRIM=ESK.slice(0,3), ESUP=["Superior"], EMED=["Bachillerato","FP"], EESO=["Secundaria 1ª etapa"];
+  const mGr=(gs,y)=>d3.sum(gs,g=>wEs(g,y)*mEs(g,y))/d3.sum(gs,g=>wEs(g,y)), estCh=gs=>(mGr(gs,eY)/mGr(gs,2014)-1)*100;
+  const eurHoy=g=>ES.sueldo[g][ESY.indexOf(eY)];
   const V={
     año:eY, añoIni:EY[0], ...Object.fromEntries(Object.keys(K).map(k=>[k,at(es[k],eY)])),
     medMes:at(es.med,eY)/14, saltoAbajo:at(es.med,eY)-at(es.p10,eY), saltoArriba:at(es.p90,eY)-at(es.med,eY), mediaSobreMed:(at(es.media,eY)/at(es.med,eY)-1)*100,
@@ -5531,6 +5543,14 @@ async function studySueldos(B){
     rentaMed:creal(C.limite["Sexto decil"],cLast,2019), rentaP10:creal(C.limite["Segundo decil"],cLast,2019), rentaP90:creal(C.limite["Décimo decil"],cLast,2019),
     nomMed19:nom(es.med,eY,2019), ipc19:(ipc(eY)/ipc(2019)-1)*100, ali19:(ali(eY)/ali(2019)-1)*100,
     medAli19:(at(es.med,eY)/at(es.med,2019)/(ali(eY)/ali(2019))-1)*100, p10Ali19:(at(es.p10,eY)/at(es.p10,2019)/(ali(eY)/ali(2019))-1)*100,
+    rQ1_08:real(es.q1,eY,2008), rQ3_08:real(es.q3,eY,2008), rP10_08:real(es.p10,eY,2008), rP90_08:real(es.p90,eY,2008), med08Hoy:at(es.med,2008)*ipc(eY)/ipc(2008), medEn08:at(es.med,2008),
+    mezEdad08:eX.mezcla, mezSexo08:sX.mezcla, mezNac08:nX.mezcla, tot08:eX.tot,
+    tot14:preal(EP.edad.Total["0"],eY,2014), mezEdad14:e14.mezcla, mezSexo14:s14.mezcla, mezNac14:n14.mezcla, mezEst14:st14.mezcla, fijaEst14:st14.fija,
+    muj08:shSx("Mujeres",2008), mujAño:shSx("Mujeres",eY), sueldoMujEPA:EP.sexo.Mujeres["0"][PY.indexOf(eY)], sueldoHomEPA:EP.sexo.Hombres["0"][PY.indexOf(eY)],
+    ext08:shNc(["Extranjera","Española y doble nacionalidad"],2008), extAño:shNc(["Extranjera","Española y doble nacionalidad"],eY), sueldoExt:d3.sum(["Extranjera","Española y doble nacionalidad"],g=>wNc(g,eY)*EP.nacionalidad[g]["0"][PY.indexOf(eY)])/d3.sum(["Extranjera","Española y doble nacionalidad"],g=>wNc(g,eY)), sueldoEsp:EP.nacionalidad["Española"]["0"][PY.indexOf(eY)],
+    sup14:shEs(ESUP,2014), supAño:shEs(ESUP,eY), prim14:shEs(EPRIM,2014), primAño:shEs(EPRIM,eY), eso14:shEs(EESO,2014), esoAño:shEs(EESO,eY), med14:shEs(EMED,2014), medAño:shEs(EMED,eY),
+    sueldoSup:eurHoy("Superior"), sueldoESO:eurHoy("Secundaria 1ª etapa"), sueldoPrim:d3.sum(EPRIM,g=>wEs(g,eY)*eurHoy(g))/d3.sum(EPRIM,g=>wEs(g,eY)),
+    chSup:estCh(ESUP), chMed:estCh(EMED), chESO:estCh(EESO), chPrim:estCh(EPRIM),
     ccaaMax:CC[0].v, ccaaMaxN:CC[0].n, ccaaMin:CC[CC.length-1].v, ccaaMinN:CC[CC.length-1].n,
     mujMed:at(E.mujeres.Mediana,eY), homMed:at(E.hombres.Mediana,eY),
     ratioMuj08:at(E.mujeres.Mediana,2008)/at(E.hombres.Mediana,2008)*100, ratioMujUlt:at(E.mujeres.Mediana,eY)/at(E.hombres.Mediana,eY)*100 };
@@ -5541,19 +5561,49 @@ async function studySueldos(B){
     for(let i=1;i<pts.length;i++) if(x<=pts[i][1]){ const [p0,x0]=pts[i-1],[p1,x1]=pts[i]; return p0+(p1-p0)*Math.log(x/x0)/Math.log(x1/x0); }
     const a=Math.log(25/10)/Math.log(V.p90/V.q3); return Math.min(99.9,100-10*Math.pow(x/V.p90,-a)); };
   const G={
-    calculadora:el=>{ const c=add(el,"div","calc");
-      c.innerHTML=`<div class="ctl"><label>Tu sueldo bruto<input class="sel" type="number" id="sq" min="0" step="100" inputmode="numeric" value="${Math.round(V.med/100)*100}"></label>
+    distribucion:el=>{ const c=add(el,"div","calc dist");
+      // sueldo que corresponde a cada percentil (inversa de pctOf)
+      const aP=Math.log(25/10)/Math.log(V.p90/V.q3);
+      const salOf=p=>{ if(p<=10) return V.p10*p/10; if(p>=90) return V.p90*Math.pow((100-p)/10,-1/aP);
+        for(let i=1;i<pts.length;i++) if(p<=pts[i][0]){ const [p0,x0]=pts[i-1],[p1,x1]=pts[i]; return x0*Math.pow(x1/x0,(p-p0)/(p1-p0)); } };
+      const PMAX=96, XMAX=Math.ceil(salOf(PMAX)/5000)*5000;
+      c.innerHTML=`<div class="ctl"><label>Un sueldo bruto de…<input class="sel" type="number" id="sq" min="0" step="100" inputmode="numeric"></label>
         <div class="seg sm" role="group" aria-label="Periodo"><button type="button" data-p="1" aria-pressed="true">Al año</button><button type="button" data-p="14" aria-pressed="false">Al mes, 14 pagas</button><button type="button" data-p="12" aria-pressed="false">Al mes, 12 pagas</button></div>
-        <small>Antes de impuestos y cotizaciones. Es lo que pone tu contrato o tu nómina como «total devengado».</small></div><div class="res" aria-live="polite"></div>`;
-      let per=1; const inp=c.querySelector("#sq"), res=c.querySelector(".res");
+        <label>…o, al revés, el puesto en la fila<input type="range" id="sp" min="1" max="${PMAX}" step="1" aria-label="Porcentaje de asalariados que cobra menos"></label>
+        <small>Antes de impuestos y cotizaciones: el «total devengado» de la nómina o del contrato. Mueve la barra o escribe tu cifra.</small></div>
+        <div class="res" aria-live="polite"></div><div class="distg"></div>`;
+      let per=1; const inp=c.querySelector("#sq"), sl=c.querySelector("#sp"), res=c.querySelector(".res"), gbox=c.querySelector(".distg");
+      const W=560, H=230, m={t:12,r:14,b:30,l:42}, X=d3.scaleLinear().domain([0,XMAX]).range([m.l,W-m.r]), Y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);
+      const svg=d3.select(gbox).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label","Porcentaje de asalariados que cobra menos de cada sueldo");
+      svg.append("g").attr("class","grid").selectAll("line").data([0,25,50,75,100]).join("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",Y).attr("y2",Y);
+      svg.append("g").attr("class","axis").selectAll("text").data([0,25,50,75,100]).join("text").attr("x",m.l-6).attr("y",v=>Y(v)+4).attr("text-anchor","end").text(v=>v+"%");
+      svg.append("g").attr("class","axis").selectAll("text").data(X.ticks(5)).join("text").attr("x",X).attr("y",H-9).attr("text-anchor","middle").text(v=>nf0.format(v));
+      const cur=d3.range(1,PMAX+1).map(p=>[salOf(p),p]);
+      const area=svg.append("path").attr("fill",css("--rust")).attr("opacity",.14), line=svg.append("path").attr("d",d3.line().x(d=>X(d[0])).y(d=>Y(d[1]))(cur)).attr("fill","none").attr("stroke",css("--ink")).attr("stroke-width",2.4);
+      const gv=svg.append("line").attr("stroke",css("--rust")).attr("stroke-dasharray","3 3"), gh=svg.append("line").attr("stroke",css("--rust")).attr("stroke-dasharray","3 3"), dot=svg.append("circle").attr("r",5.5).attr("fill",css("--rust")).attr("stroke",css("--bg")).attr("stroke-width",2);
+      svg.append("g").attr("class","axis").append("text").attr("x",W-m.r).attr("y",H-m.b-6).attr("text-anchor","end").text("sueldo bruto anual, €");
+      const ann=x=>nf0.format(Math.round(x/100)*100);
       const draw=()=>{ const x=+inp.value*per, p=pctOf(x);
-        if(p==null){ res.innerHTML='<p>Escribe una cantidad.</p>'; return; }
-        const pr=Math.round(p), pos=Math.max(0,Math.min(100,p));
-        res.innerHTML=`<div class="big">${p>=99.5?"más del 99":nf0.format(pr)}${NB}%</div><p>Cobras más que ${p>=99.5?"casi todos los":`el ${nf0.format(pr)}${NB}% de los`} asalariados de España${per!==1?` (${eur(x)} al año)`:""}. ${p<50?`Para llegar al sueldo mediano te faltan unos ${eur(Math.max(100,Math.round((V.med-x)/100)*100))} al año.`:p<90?`Para entrar en el 10${NB}% de arriba harían falta unos ${eur(Math.round((V.p90-x)/100)*100)} más al año.`:`Estás en el 10${NB}% que más cobra.`}</p>
-          <div class="ruler" aria-hidden="true"><i style="left:${pos}%"></i>${[10,25,50,75,90].map(q=>`<b style="left:${q}%"></b>`).join("")}</div><div class="ruler-l" aria-hidden="true"><span>0</span><span>mitad</span><span>100</span></div>`; };
+        if(p==null||!isFinite(p)){ res.innerHTML='<p>Escribe una cantidad.</p>'; return; }
+        const pr=Math.round(p), top=100-pr, xc=Math.min(x,XMAX), yc=Math.min(p,100);
+        sl.value=Math.max(1,Math.min(PMAX,pr));
+        res.innerHTML=`<div class="big">${top<=0?"menos del 1":nf0.format(top)}${NB}%</div><p>de los asalariados de España <b>cobra más</b> de ${eur(x)} al año${per!==1?` (${nf0.format(+inp.value)}${NB}€ al mes)`:""}. ${pr>=100?"Estás en la cima de la fila.":`El ${nf0.format(pr)}${NB}% cobra menos.`}</p><p class="muted">${p<50?`Para llegar al sueldo mediano, ${eur(V.med)}, faltan unos ${eur(Math.max(100,Math.round((V.med-x)/100)*100))} al año.`:p<90?`Para entrar en el 10${NB}% que más cobra, ${eur(V.p90)}, harían falta unos ${eur(Math.round((V.p90-x)/100)*100)} más al año.`:`Estás en el 10${NB}% que más cobra: ${eur(V.p90)} o más.`}</p>`;
+        const pts2=cur.filter(d=>d[0]<=xc); pts2.push([xc,yc]);
+        area.attr("d",d3.area().x(d=>X(d[0])).y0(Y(0)).y1(d=>Y(d[1]))(pts2));
+        gv.attr("x1",X(xc)).attr("x2",X(xc)).attr("y1",Y(yc)).attr("y2",Y(0)); gh.attr("x1",X(0)).attr("x2",X(xc)).attr("y1",Y(yc)).attr("y2",Y(yc)); dot.attr("cx",X(xc)).attr("cy",Y(yc)); };
+      inp.value=Math.round(V.med/100)*100;
       inp.addEventListener("input",draw);
+      sl.addEventListener("input",()=>{ const x=salOf(+sl.value); inp.value=Math.round(x/per/(per===1?100:10))*(per===1?100:10); draw(); });
       c.querySelectorAll("button[data-p]").forEach(b=>b.addEventListener("click",()=>{ const np=+b.dataset.p; inp.value=Math.round(+inp.value*per/np/(np===1?100:10))*(np===1?100:10); per=np; c.querySelectorAll("button[data-p]").forEach(z=>z.setAttribute("aria-pressed",String(z===b))); draw(); }));
       draw(); },
+    poder:el=>{ const f=fig(el,{title:`Qué compra hoy cada sueldo, comparado con 2008`,sub:`Cambio del sueldo anual de cada escalón, descontada la inflación, 2008–${eY}`,source:SRC+" IPC del INE."});
+      hbars(f.body,[["El 10 % de abajo",V.rP10_08],["Cuarto de abajo",V.rQ1_08],["Mediano",V.rMed08,"--rust"],["Cuarto de arriba",V.rQ3_08],["El 10 % de arriba",V.rP90_08]].map(([l,v,c])=>({l,v,c})),{fmt:v=>sgn(v),wide:true}); },
+    factores:el=>{ const f=fig(el,{title:`Cuánto cambia la media solo por quién trabaja, 2014–${eY}`,sub:"Puntos de sueldo medio (descontada la inflación) que se explican por el cambio en el reparto de cada grupo, sin que ningún sueldo cambie",source:"Fuente: INE, EPA (asalariados y sueldo medio por edad, sexo, nacionalidad y estudios) e IPC. Cálculo propio."});
+      hbars(f.body,[["Estudios",V.mezEst14,"--rust"],["Edad",V.mezEdad14],["Sexo",V.mezSexo14],["Nacionalidad",V.mezNac14]].map(([l,v,c])=>({l,v,c})),{fmt:v=>(Math.abs(v)<0.05?"":v>0?"+":"−")+nf1.format(Math.abs(v))+" pts",wide:true}); },
+    formacion:el=>lineChart(el,{title:"Quién cobra una nómina: reparto de los asalariados por estudios",sub:"% de los asalariados de cada año",source:"Fuente: INE, EPA (asalariados por nivel de formación).",years:ESY,xticks:[2014,2019,eY],tickFmt:v=>nf0.format(v)+"%",fmt:pc,
+      series:[{n:"Superior",v:ESY.map(y=>shEs(ESUP,y)),c:"--rust",main:true},{n:"Bach. y FP",v:ESY.map(y=>shEs(EMED,y)),c:"--slate"},{n:"Hasta ESO",v:ESY.map(y=>shEs([...EPRIM,...EESO],y)),c:"--mustard"}]}),
+    estudios:el=>{ const f=fig(el,{title:`Sueldo medio por nivel de estudios, 2014–${eY}`,sub:"Cambio descontada la inflación",source:"Fuente: INE, EPA (sueldo mensual medio por nivel de formación) e IPC."});
+      hbars(f.body,[["Hasta primaria",V.chPrim],["Secundaria (ESO)",V.chESO],["Bach. y FP",V.chMed],["Superior",V.chSup],["Todos",V.tot14,"--rust"]].map(([l,v,c])=>({l,v,c})),{fmt:v=>sgn(v),wide:true}); },
     escalones:el=>{ const f=fig(el,{title:`Cuánto hay que cobrar para estar en cada punto de la fila (${eY})`,sub:"Sueldo bruto anual por asalariado",source:SRC});
       hbars(f.body,[["Más que el 10 %",V.p10],["Más que el 25 %",V.q1],["La mitad (mediano)",V.med,"--rust"],["Sueldo medio",V.media,"--slate"],["Más que el 75 %",V.q3],["Más que el 90 %",V.p90]].map(([l,v,c])=>({l,v,c})),{fmt:eur,wide:true}); },
     evolucion:el=>{ const yy=EY; lineChart(el,{title:"Cada escalón, descontada la inflación (2008 = 100)",sub:"Sueldo bruto anual en euros constantes",source:SRC+" IPC del INE.",years:yy,index:true,xticks:[2008,2014,2019,eY],
