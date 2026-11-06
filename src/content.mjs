@@ -81,5 +81,5 @@ export const TEMAS={
 export const EVIDENCE={
   desc:{l:"Descriptivo",d:"Cuenta qué pasa y dónde. No dice por qué."},
   igual:{l:"Comparación entre iguales",d:"Descarta las explicaciones que se han medido (tamaño, edad, renta…), no las demás, ni que la causa vaya al revés."},
-  natural:{l:"Experimento natural",d:"Compara antes y después de una ley o un suceso con lugares que no lo vivieron, o elecciones decididas por poco. Es lo más cerca de una causa que permiten estos datos, si se cumple su supuesto."}
+  natural:{l:"Experimento natural",d:"Compara antes y después de una ley o un suceso con lugares que no lo vivieron, o elecciones decididas por poco. Es lo más cerca de una causa que permiten estos datos, si se cumple su supuesto; cada análisis lo cuenta en «Supuesto y límites»."}
 };
