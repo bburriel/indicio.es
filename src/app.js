@@ -6725,7 +6725,7 @@ async function renderInicio(){
   const nMun=String(rowsAll().length).replace(/\B(?=(\d{3})+(?!\d))/g,".");
   view.innerHTML=`<section class="ho"><h1 class="ho-h"><span class="ho-sr">Indicio: preguntas reales, respuestas con datos públicos</span><span class="ho-vis" aria-hidden="true"><span class="ho-l1">Bienvenid<span class="ho-oa" data-ho="oa">o</span> a</span><span class="ho-l2"><span data-ho="w">tu estudio.</span><i class="ho-cur"></i></span></span></h1>
     <p class="ho-sub">Los datos públicos, a tu alcance.</p>
-    <p class="ho-p">Qué pasó con el alquiler, dónde se dejó de invertir: preguntas de la calle que Indicio contesta con datos de los ${nMun} municipios de España. Si dudas de una respuesta, el laboratorio te deja comprobarla.</p></section>
+    <p class="ho-p">Indicio responde con datos públicos a las dudas sobre cómo vivimos en España. Sin pedir el certificado digital.</p></section>
   <div class="pt-carband">${heroCarHTML(D)}
   <p class="pt-more pt-all"><a class="ed-go" href="/preguntas/">Ver todas las preguntas →</a></p></div>
   <section class="pt-labx" id="laboratorio-portada"><div class="pt-labx-in"><div class="pt-labx-tx"><div class="ed-k">Laboratorio</div><h2>Tu duda, <em>con los datos delante.</em></h2>
