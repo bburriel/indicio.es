@@ -197,7 +197,7 @@ const mrows=f=>ROWS.filter(f);
   const lf=d3.line().x(d=>X(d.t)).y(d=>Y(d.f)).curve(d3.curveMonotoneX)(idx).replace(/\d+\.\d+/g,m=>r1(+m)), lw=d3.line().x(d=>X(d.t)).y(d=>Y(d.w)).curve(d3.curveMonotoneX)(idx).replace(/\d+\.\d+/g,m=>r1(+m));
   let s=svgOpen(W,H)+[100,120,140,160].filter(v=>v<Y.domain()[1]).map(v=>line(30,Y(v),W-30,Y(v),LIGHT,1,` stroke-dasharray="2 4"`)).join("");
   s+=`<path d="${area}" fill="${WASH}"/><path d="${lw}" fill="none" stroke="${DARK}" stroke-width="1.8"/><path d="${lf}" fill="none" stroke="${WINE}" stroke-width="2.4"/>`;
-  add("precio-alimentos","El precio de los alimentos (granate) y los sueldos (gris) desde 2008; sombreado, lo que la comida se ha adelantado",s+"</svg>"); }
+  add("llegar-a-fin-de-mes","El precio de los alimentos (granate) y los sueldos (gris) desde 2008; sombreado, lo que la comida se ha adelantado",s+"</svg>"); }
 
 // 22. Infraestructuras: una columna por año con lo invertido en carreteras (gris) y, encima, en ferrocarril (granate)
 { const [W,H]=B, I=J("infra.json").itf, Yr=I.years, T=Yr.map((y,i)=>I.road_q[i]+I.rail_q[i]), w=(W-60)/Yr.length, Y=d3.scaleLinear().domain([0,d3.max(T)]).range([0,H-60]);
