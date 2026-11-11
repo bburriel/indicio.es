@@ -37,7 +37,7 @@ Desde el entorno en la nube no se puede descargar directamente de INE ni de Euro
 - **«Antes y después»:** añadir como resultado los contratos temporales mensuales por municipio desde 2019 (ya están en `cache/out_series_sepe.json`, clave `mensual`) para la reforma laboral.
 
 - **Causalidad (6 nov. 2026):** el bloque del cruce usa una escalera en unidades con rango por provincias y un veredicto de cuatro estados (ver el registro `08zzo`). Pendiente: animar la escalera al marcar controles, revisar si «estudios» debe salir como dato a no igualar (lo marca `ctrlRisk`) y barrer otras parejas de datos para ver cuántas cambian de veredicto con el rango por provincias.
-- **Supuestos de identificación (6 nov. 2026):** revisados los análisis de antes y después y de discontinuidad; ahora cada uno cuenta su «Supuesto y límites». Faltan: placebo con otros años y grupo sin afectar en `smi-empleo-hogar`; placebo y tendencias previas con prueba formal en `ave`; revisar `llegar-a-fin-de-mes` (está marcado «natural», contenido en markdown) y los análisis del tipo `igual`; sensibilidad (Oster o E-value) también en los experimentos naturales que usan regresión.
+- **Supuestos de identificación (6 nov. 2026):** revisados los análisis de antes y después y de discontinuidad; ahora cada uno cuenta su «Supuesto y límites». Faltan: placebo con otros años y grupo sin afectar en `smi-empleo-hogar`; placebo y tendencias previas con prueba formal en `ave`; revisar `precio-alimentos` (está marcado «natural», contenido en markdown) y los análisis del tipo `igual`; sensibilidad (Oster o E-value) también en los experimentos naturales que usan regresión.
 
 ## Análisis de políticas
 

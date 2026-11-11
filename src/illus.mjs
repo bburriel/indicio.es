@@ -198,6 +198,15 @@ ILLUS["llegar-a-fin-de-mes"]=svg("llegar-a-fin-de-mes","Un carro de la compra co
   tree(170,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
 FOCUS["llegar-a-fin-de-mes"]=300;
 
+ILLUS["precio-alimentos"]=svg("precio-alimentos","Un carro de la compra con alimentos junto a una balanza con monedas",
+  hills(255,"k8",22,0.2)+R(0,300,1200,60,"k9")+
+  G("translate(330 120)",P("M0 30 L40 30 L70 140 L240 140 L270 50 L55 50","sk",` fill="none" stroke-width="7" stroke-linejoin="round"`)+C(95,168,14,"ki")+C(220,168,14,"ki")+
+    R(80,10,50,60,"k7")+R(80,10,50,16,"k1")+E(170,40,40,24,"k3")+C(220,30,20,"k2")+C(245,44,16,"k5")+R(140,-20,18,70,"k4",` rx="4"`))+
+  G("translate(820 80)",R(96,0,8,200,"ki")+R(40,196,120,10,"ki")+L(10,40,190,20,"sk",` stroke-width="5"`)+
+    P("M-20 40 L40 40 L30 80 L-10 80 Z","k7")+stack(10,72,2,22,"k3","k8")+P("M160 20 L220 20 L210 60 L170 60 Z","k7")+E(190,46,24,12,"k2")+C(180,36,10,"k5"))+
+  tree(170,300,1.2)+tree(1100,300,1.1)+C(140,70,26,"k3"));
+FOCUS["precio-alimentos"]=300;
+
 // ---------- Ilustraciones de datos (octubre de 2026) ----------
 // Sustituyen a los dibujos vectoriales de arriba: cada análisis tiene su propio gráfico, dibujado con sus datos
 // (mapas de puntos, olas, pirámides, escaleras…), todos con el mismo acabado. Son SVG en /art/il/ que genera
