@@ -1,8 +1,8 @@
 ---
 titulo: ¿Por qué cuesta tanto pagar una casa?
 entradilla: El alquiler sube más que los sueldos casi en todas partes. ¿Es la gente que llega, los pisos turísticos, las casas vacías? Lo miramos en ciudades, en la costa y en los pueblos.
-respuesta: Porque llega más gente de la que se construye para alojarla. En los cinco tipos de municipio que separamos el alquiler declarado ha subido entre un 35 % (pueblos) y un 47 % (costa), y en todos lo que más distingue a unos sitios de otros es cuánta gente ha llegado. Las viviendas vacías y los pisos turísticos pesan bastante menos; la costa, con más compradores de fuera y más casas que no son hogar de nadie, es donde más sube. Desde 2015 el alquiler medio ha subido un 40 % y el sueldo mediano, un 26 %.
-cifra: +40 %
+respuesta: Porque llega más gente de la que se construye para alojarla. En los cinco tipos de municipio que separamos el alquiler declarado ha subido entre un 35 % (pueblos) y un 47 % (costa), y en todos lo que más distingue a unos sitios de otros es cuánta gente ha llegado. Las viviendas vacías y los pisos turísticos pesan bastante menos; la costa, con más compradores de fuera y más casas que no son hogar de nadie, es donde más sube. Desde 2015 el alquiler mediano ha subido un 37 % y el sueldo mediano, un 26 %.
+cifra: +37 %
 cifra_texto: el alquiler desde 2015; el sueldo, +26 %
 metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
@@ -12,13 +12,13 @@ actualizado: 2026-11-05
 orden: -1
 ---
 
-Desde 2015, el alquiler medio en España ha subido un **{{alq15|pct0}}**. El sueldo mediano, un {{sal15|pct0}}. En València, el alquiler medio ha pasado de {{vlc15|eur}} a {{vlc24|eur}} al mes; en Málaga, de {{mlg15|eur}} a {{mlg24|eur}}.
+Desde 2015, el alquiler mediano en España ha subido un **{{alq15|pct0}}**. El sueldo mediano, un {{sal15|pct0}}. (El alquiler mediano es el que deja a la mitad de los inquilinos por debajo y a la otra mitad por encima; no lo tira hacia arriba un puñado de pisos de lujo.) En València, el alquiler mediano ha pasado de {{vlc15|eur}} a {{vlc24|eur}} al mes; en Málaga, de {{mlg15|eur}} a {{mlg24|eur}}.
 
 Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a una pregunta: por qué. Primero, cuánto ha subido de verdad; después, qué explica la subida y si es lo mismo en una gran ciudad, en la costa o en un pueblo; y al final, qué dicen los datos de lo que se propone.
 
 ## Lo que ha subido
 
-Pon el año 2015 como punto de partida. Desde entonces y hasta {{añoCom}}, el precio de compra de la vivienda ha subido un {{ipv15|pct0}}, el alquiler medio un {{alq15|pct0}}, el sueldo mediano un {{sal15|pct0}} y el resto de precios, un {{ipc15|pct0}}.
+Pon el año 2015 como punto de partida. Desde entonces y hasta {{añoCom}}, el precio de compra de la vivienda ha subido un {{ipv15|pct0}}, el alquiler mediano un {{alq15|pct0}}, el sueldo mediano un {{sal15|pct0}} y el resto de precios, un {{ipc15|pct0}}.
 
 [[grafico:carrera]]
 
@@ -192,7 +192,7 @@ Cada uno de estos análisis responde a una pregunta concreta, con el método a l
 
 - **Precio de compra:** Índice de Precios de Vivienda (INE) y valor tasado medio de la vivienda libre (Ministerio de Vivienda), en €/m², media de los cuatro trimestres de cada año.
 - **Anuncios de alquiler:** precio medio de los anuncios de idealista, euros por metro cuadrado, diciembre de 2015 y de 2024. **Contratos nuevos y en vigor:** INE, Índice de Precios de Vivienda en Alquiler por antigüedad del contrato (desde 2021). **Renta por persona:** INE, Atlas de Distribución de Renta. **Hogares de alquiler por provincia:** Censo de 2021. **Viviendas turísticas:** INE, estadística experimental, mayo de 2026.
-- **Alquiler:** alquiler mensual medio de los contratos declarados a Hacienda (Índice de Precios de Vivienda en Alquiler e indicadores urbanos del INE), 2011–{{añoAlq}}.
+- **Alquiler:** mediana del alquiler mensual de la vivienda (Ministerio de Vivienda, SERPAVI: alquiler declarado en el IRPF por los propietarios, todos los contratos vivos), 2015–{{añoAlq}}. El fichero no da el total de España, así que Indicio lo calcula mezclando las distribuciones de cada comunidad de territorio fiscal común (sin Navarra ni País Vasco, que no tienen la serie completa); con los municipios sale casi igual. En las ciudades es la mediana del propio municipio, con pisos y casas. Con la media del INE, que pesa más los alquileres altos, la subida de España desde 2015 sería del 40 %. Código: `scripts/datos/serpavi_series.py`.
 - **Sueldo:** sueldo mediano bruto anual (Encuesta Anual de Estructura Salarial).
 - **Comprar, tres medidas:** (1) años de sueldo = valor tasado medio × 80 m² entre el sueldo mediano bruto; (2) la misma cuenta con el Índice de Precios de Vivienda del INE: se parte de los años de 2019 con la tasación y se aplica la subida relativa del índice frente a la del sueldo; (3) cuota entre salario: Colegio de Registradores, Estadística Registral Inmobiliaria del 4.º trimestre de 2025 (cuota media 796,6 €, 33,8 % del coste salarial, plazo medio 25,6 años, importe medio 171.177 €) y Banco de España, Informe de Estabilidad Financiera de la primavera de 2026 (capítulo 4: cuota sobre ingresos de las hipotecas nuevas, indicador de desajuste entre precios, rentas y tipos, préstamo sobre precio). Las cifras de Registradores y del Banco de España están escritas a mano; la cuota al 2 % es un cálculo de Indicio con la fórmula de amortización francesa.
 - **Ciudad por ciudad:** años de sueldo = valor tasado medio del año (Ministerio de Vivienda) × 80 m² entre el sueldo mediano bruto de la comunidad (INE, Encuesta Anual de Estructura Salarial; no hay sueldo mediano por municipio). Hogares nuevos: cambio del padrón entre 2019 y 2025 entre las personas por hogar del Censo de 2021, repartido en seis años. Viviendas no habituales: vacías y segundas residencias del Censo de 2021. Hogares en alquiler: Censo de 2021. Compraventas: media de 2023 a 2025 (Ministerio de Vivienda). Compras de extranjeros: media 2023–2025 de la provincia (Ministerio de Vivienda). Viviendas iniciadas: media 2019–2024 de la provincia. Código: `scripts/datos/vivienda_esfuerzo.py`.

@@ -73,11 +73,11 @@ copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
     poder:r2((med[EY.indexOf(eY)]/m19/(yav(al,P,eY,12)/f19)-1)*100)};
   // la casa: cuánto ha subido cada cosa desde 2015, las tres hasta el mismo año (el último en que están las tres)
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>(o[b]/o[a]-1)*100, ees=Object.fromEntries(EY.map((y,i)=>[String(y),med[i]]));
-  const aY=lastK(VI.alqMes), vY=lastK(VI.ipv), cY=String(Math.min(+aY,+vY,eY)), ipcG=y=>yav(A.ipc.es.general,P,y,12);
-  const casa={compra:[r2(g(VI.ipv,"2015",cY)),+cY],alquiler:[r2(g(VI.alqMes,"2015",cY)),+cY],sueldo:[r2(g(ees,"2015",cY)),+cY],precios:[r2((ipcG(+cY)/ipcG(2015)-1)*100),+cY]};
+  const aY=lastK(VI.alqMed), vY=lastK(VI.ipv), cY=String(Math.min(+aY,+vY,eY)), ipcG=y=>yav(A.ipc.es.general,P,y,12);
+  const casa={compra:[r2(g(VI.ipv,"2015",cY)),+cY],alquiler:[r2(g(VI.alqMed,"2015",cY)),+cY],sueldo:[r2(g(ees,"2015",cY)),+cY],precios:[r2((ipcG(+cY)/ipcG(2015)-1)*100),+cY]};
   // la misma cuenta año a año (2015 = 100), para dibujar la evolución de cada cosa
   const sr=(o,a,b)=>{ const r=[]; for(let y=2015;y<=+b;y++){ const v=o[String(y)]; if(v!=null&&o[a]) r.push([y,r2(v/o[a]*100)]); } return r; };
-  casa.serie={compra:sr(VI.ipv,"2015",cY),alquiler:sr(VI.alqMes,"2015",cY),sueldo:sr(ees,"2015",cY),precios:(()=>{ const r=[]; for(let y=2015;y<=+cY;y++){ const v=ipcG(y); if(v) r.push([y,r2(v/ipcG(2015)*100)]); } return r; })()};
+  casa.serie={compra:sr(VI.ipv,"2015",cY),alquiler:sr(VI.alqMed,"2015",cY),sueldo:sr(ees,"2015",cY),precios:(()=>{ const r=[]; for(let y=2015;y<=+cY;y++){ const v=ipcG(y); if(v) r.push([y,r2(v/ipcG(2015)*100)]); } return r; })()};
   // los contratos: parte de los contratos iniciales que son temporales, media móvil de tres meses
   const tm=RF.periodos.map((p,i)=>{ let ind=0,tem=0; for(const gr of RF.grupos){ const m=gr.mes[i]; if(m){ ind+=m[0]; tem+=m[1]; } } return ind+tem?100*tem/(ind+tem):null; });
   const tm3=tm.map((v,i)=>{ const w=tm.slice(Math.max(0,i-2),i+1).filter(x=>x!=null); return w.length?r1(mean(w)):null; });
