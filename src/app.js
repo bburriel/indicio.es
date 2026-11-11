@@ -5734,8 +5734,8 @@ async function studySueldos(B){
 // ---------- vivienda: por qué cuesta tanto pagar una casa ----------
 // El texto está en contenido/analisis/vivienda.md; aquí las cifras (V) y los gráficos (G).
 async function studyVivienda(B){
-  const [D,S,A,PW,VC,VCI,TP]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null),getJSON("/data/vivienda_censo.json"),getJSON("/data/vivienda_ciudades.json"),getJSON("/data/vivienda_tipos.json").catch(()=>null)]);
-  const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
+  const [D,S,A,PW,VC,VCI,TP,HP]=await Promise.all([getJSON("/data/vivienda.json"),getJSON("/data/sueldos.json"),getJSON("/data/alimentos.json"),getJSON("/data/vivienda_pesos.json").catch(()=>null),getJSON("/data/vivienda_censo.json"),getJSON("/data/vivienda_ciudades.json"),getJSON("/data/vivienda_tipos.json").catch(()=>null),getJSON("/data/hipotecas.json")]);
+  const E=D.es, EU=D.eu, HA=HP.anual, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
   const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
   const aY=+lastK(E.alqMed), tY=+lastK(E.valorTasado), vY=+lastK(E.ipv), cY=Math.min(aY,vY,eY);
@@ -5765,10 +5765,20 @@ async function studyVivienda(B){
   // Hogares nuevos y viviendas terminadas desde 2021 (Banco de España: déficit de unas 750.000 en 2021–2025, Informe Anual 2025)
   const hog21=(hog[hY]-hog["2020"])*1000, term21=d3.sum(d3.range(2021,+hY+1),y=>termTot(y)||0), termAño5=term21/(+hY-2020);
   const proy10=(proy["2036"]-proy["2026"])/10;
+  // Entrada, tipos y cuota (scripts/datos/hipotecas.py): el banco financiaba más del 100 % del precio hasta 2007 (Banco de España);
+  // entrada = precio de 80 m² × (impuestos y gastos, 10 % − lo que el banco presta por encima del precio, o + lo que no presta).
+  const ent=(y,ltv)=>vt[y]?vt[y]*80*Math.max(0,1.10-(ltv!=null?ltv:HA[y]&&HA[y].ltv)/100):null, entA=y=>ent(y)!=null&&ees[y]?ent(y)/ees[y]:null;
+  const cuo=(P,t,n)=>{ const i=t/1200, m=n*12; return P*i/(1-Math.pow(1+i,-m)); }, cuP=y=>HA[y]&&HA[y].cuota&&ees[y]?HA[y].cuota/(ees[y]/12)*100:null;
+  const AHORRO=0.118, hy=lastK(HA), hyE=String(Math.min(+hy,tYs));
   const V={
     alq15:g(E.alqMed,"2015",String(cY)), sal15:g(ees,"2015",String(cY)), ipv15:g(E.ipv,"2015",String(cY)), ipc15:(ipcY(cY)/ipcY(2015)-1)*100, añoAlq:aY, añoCom:cY,
     vlc15:city("València")["2015"], vlc24:city("València")[aY], mlg15:city("Málaga")["2015"], mlg24:city("Málaga")[aY],
     ciudad1:CIT[0].n, ciudad1v:CIT[0].v, ciudad2:CIT[1].n, ciudad2v:CIT[1].v, ciudad3:CIT[2].n, ciudad3v:CIT[2].v,
+    ent06:ent("2006"), ent08:ent("2008"), ent08A:entA("2008"), ent11:ent("2011"), ent24:ent(hyE), ent24A:entA(hyE), ent24ltv:ent(hyE,105), entMax:d3.max(d3.range(2008,tYs+1),y=>entA(String(y))), ahorroAños:ent(hyE)/(AHORRO*ees[hyE]), añoEnt:hyE,
+    tedr08:HA["2008"].tedr, tedr21:HA["2021"].tedr, tedr24:HA["2024"].tedr, tedr25:HA["2025"].tedr, eur21:HA["2021"].euribor, eur23:HA["2023"].euribor, eur08:HA["2008"].euribor,
+    cu08:HA["2008"].cuota, cu15:HA["2015"].cuota, cu21:HA["2021"].cuota, cu24:HA["2024"].cuota, cu25:HA["2025"].cuota, cuP08:cuP("2008"), cuP15:cuP("2015"), cuP21:cuP("2021"), cuP24:cuP("2024"), imp24:HA["2024"].importe, imp08:HA["2008"].importe, imp21:HA["2021"].importe,
+    cu24t21:cuo(HA["2024"].importe,HA["2021"].tedr,HA["2024"].plazo), cu24dif:HA["2024"].cuota-cuo(HA["2024"].importe,HA["2021"].tedr,HA["2024"].plazo), cu21t24:cuo(HA["2021"].importe,HA["2024"].tedr,HA["2021"].plazo),
+    cuAlq24:E.alqMed[String(aY)]*12/ees[String(aY)]*100,
     añoT:tYs, precio80:vt[tYs]*80, años80:yrs80(tYs), años80_08:yrs80("2008"), años80_19:yrs80("2019"), ipv19:g(E.ipv,"2019",String(vY)), sal19:g(ees,"2019",String(eY)),
     vt25:g(vt,String(tYs),lastK(vt)), añoVt:lastK(vt), ipv1924:g(E.ipv,"2019",String(tYs)), vt1924:g(vt,"2019",String(tYs)), años80_ipv:yrs80("2019")*(E.ipv[String(tYs)]/E.ipv["2019"])/(ees[String(tYs)]/ees["2019"]), ipv25:g(E.ipv,String(tYs),String(vY)), añoIpv:vY, entrada:vt[tYs]*80*0.3, entradaAños:vt[tYs]*80*0.3/ees[tYs],
     prop08:ten.prop["2008"], propUlt:ten.prop[tenY], alq08:ten.alqMercado["2008"], alqUlt:ten.alqMercado[tenY], añoTen:tenY,
@@ -5791,7 +5801,7 @@ async function studyVivienda(B){
     ...(PW?(()=>{ const m=PW.municipios, T=m.todos, pe=(o,g)=>o.pesos.find(x=>x.g===g)||{}, dem=pe(T,"Demanda"), P=PW.provincias;
       return {mN:m.n, mPob:m.pob/m.pobTotal*100, r2m:T.añaden*100, pDem:dem.v, pDemLo:dem.lo, pDemHi:dem.hi, pTur:pe(T,"Pisos turísticos").v, pVac:pe(T,"Vacías o secundarias").v,
         pCom:pe(T,"Compraventas").v, pCon:pe(T,"Construcción nueva").v, pConHi:pe(T,"Construcción nueva").hi, pDemP:pe(m.provincia,"Demanda").v, pDemPr:pe(P,"Demanda").v, pConPr:pe(P,"Construcción nueva").v, nPr:P.n}; })():{}),
-    ...(()=>{ const d0=Math.round((hog21-term21)/50000)*50000, need=d0+Math.max(0,proy10-termAño5)*10, bu=60000*8, mv=vacZ*.13+vtZ*.25; return {cenNeed:need,cenB:bu,cenM:mv,cenCov:(bu+mv)/need*100,cenRat:bu/mv}; })(),
+    ...(()=>{ const d0=Math.round((hog21-term21)/50000)*50000, need=d0+Math.max(0,proy10-termAño5)*10, bu=60000*8, mv=vacZ*.13+vtZ*.25; return {cenNeed:need,cenB:bu,cenM:mv,cenCov:(bu+mv)/need*100,cenRat:bu/mv,cenMP:mv/need*100,cenBP:bu/need*100,cenRP:Math.max(0,need-mv-bu)/need*100,cenAnual:termAño5+(need-mv)/10}; })(),
     hpiES:hpi("ES"), hpiEU:hpi("EU27_2020"), hpiNL:hpi("NL"), hpiPT:hpi("PT"),
     inv06:(EU.ES.inversionVivienda||{})["2006"], invES:euL("ES","inversionVivienda").v, invEU:euL("EU27_2020","inversionVivienda").v,
     socialES:ten.alqSocial[tenY], socialAT:euL("AT","alquilerReducido").v, socialNL:euL("NL","alquilerReducido").v };
@@ -5804,6 +5814,19 @@ async function studyVivienda(B){
       hbars(f.body,CIT.map(x=>({l:x.n,v:x.v})),{fmt:v=>sgn(v),ref:V.alq15,refLabel:"España",wide:true}); },
     compra:el=>{ const Y=d3.range(2004,tYs+1).map(String); lineChart(el,{title:"Años de sueldo mediano bruto para pagar 80 m²",sub:"Valor tasado medio de la vivienda libre × 80 m², entre el sueldo mediano anual",source:"Fuente: Ministerio de Vivienda (valor tasado) e INE (Encuesta de Estructura Salarial).",years:Y.map(Number),xticks:[2008,2013,2019,tYs],tickFmt:v=>nf0.format(v),fmt:v=>nf1.format(v)+" años",
       series:[{n:"Años de sueldo",v:Y.map(y=>yrs80(y)),c:"--rust",main:true}]}); },
+    entrada:el=>{ const Y=d3.range(2004,+hyE+1);
+      lineChart(el,{title:"Lo que hay que tener ahorrado para comprar un piso de 80 m²",sub:"Entrada más impuestos y gastos, en euros; la línea gris, lo que costaría con el 80 % de financiación de hoy",source:"Fuente: elaboración propia con Banco de España (préstamo sobre el precio de compra) y Ministerio de Vivienda (valor tasado). Impuestos y gastos: 10 % del precio, supuesto de Indicio.",years:Y,xticks:[2004,2008,2012,2019,+hyE],tickFmt:v=>nf0.format(v/1000)+" mil",fmt:v=>eur(Math.round(v/100)*100),
+        series:[{n:"Entrada real",v:Y.map(y=>ent(String(y))),c:"--rust",main:true},{n:"Con el 80 % de hoy",v:Y.map(y=>vt[y]?vt[y]*80*0.3:null),c:"--stone",dash:true}]}); },
+    tiposInteres:el=>{ const Y=d3.range(2003,+hy+1);
+      lineChart(el,{title:"Tipo de interés de las hipotecas nuevas y Euríbor",sub:"España, media anual, %",source:"Fuente: Banco de España (boletín estadístico, capítulo 19: tipo de las nuevas operaciones de crédito a la vivienda y Euríbor a 12 meses).",years:Y,xticks:[2003,2008,2014,2021,+hy],tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>nf1.format(v)+NB+"%",
+        series:[{n:"Hipotecas nuevas",v:Y.map(y=>HA[y].tedr),c:"--rust",main:true},{n:"Euríbor a 12 meses",v:Y.map(y=>HA[y].euribor),c:"--ink"}]}); },
+    cuota:el=>{ const Y=d3.range(2008,+hyE+1);
+      lineChart(el,{title:"Qué parte del sueldo mediano se va en la cuota de la hipoteca",sub:"Cuota mensual de una hipoteca media firmada cada año, % del sueldo mediano bruto mensual",source:"Fuente: elaboración propia con INE (importe y plazo medios de las hipotecas sobre vivienda, Encuesta de Estructura Salarial) y Banco de España (tipo).",years:Y,xticks:[2008,2012,2016,2021,+hyE],tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>nf0.format(v)+NB+"%",
+        series:[{n:"Cuota / sueldo",v:Y.map(y=>cuP(String(y))),c:"--rust",main:true},{n:"Alquiler / sueldo",v:Y.map(y=>y>=2015&&E.alqMed[y]&&ees[y]?E.alqMed[y]*12/ees[y]*100:null),c:"--plum"}]}); },
+    balance:el=>{ const need=V.cenNeed, a=V.cenM, b=V.cenB, r=Math.max(0,need-a-b), W=100, T=[["Lo que ya existe",a,"--olive"],["Obra nueva: 60.000 más al año",b,"--rust"],["Sigue sin cubrirse",r,"--stone"]];
+      const f=fig(el,{title:"De dónde pueden salir las viviendas que faltan en diez años",sub:`${nf0.format(Math.round(need/1000)*1000)} viviendas; suposiciones centrales`,source:"Fuente: elaboración propia con Eurostat, INE (Censo de 2021, proyección de hogares), Ministerio de Vivienda y Banco de España. Supuestos: 13 % de las vacías (como Francia) y una cuarta parte de las turísticas de los municipios con demanda."});
+      f.body.innerHTML=`<div style="display:flex;height:34px;border-radius:3px;overflow:hidden;margin:10px 0 12px">${T.map(([l,v,c])=>`<div title="${l}" style="width:${v/need*100}%;background:var(${c})"></div>`).join("")}</div>`
+        +`<div style="display:grid;gap:6px;font-size:14.5px">${T.map(([l,v,c])=>`<div style="display:flex;gap:8px;align-items:baseline"><i style="flex:none;width:12px;height:12px;background:var(${c});display:inline-block"></i><span style="flex:1">${l}</span><b>${nf0.format(Math.round(v/1000)*1000)}</b><span class="muted">(${nf0.format(v/need*100)}${NB}%)</span></div>`).join("")}</div>`; },
     tenencia:el=>{ const Y=Object.keys(ten.prop).sort(); lineChart(el,{title:"Hogares según el régimen de su vivienda",sub:"% de los hogares",source:"Fuente: INE, Encuesta de Condiciones de Vida.",years:Y.map(Number),xticks:[+Y[0],2008,2014,2019,+Y[Y.length-1]],tickFmt:v=>nf0.format(v)+NB+"%",fmt:pc,
       series:[{n:"En propiedad",v:Y.map(y=>ten.prop[y]),c:"--slate"},{n:"Alquiler de mercado",v:Y.map(y=>ten.alqMercado[y]),c:"--rust",main:true},{n:"Alquiler reducido",v:Y.map(y=>ten.alqSocial[y]),c:"--mustard"}]}); },
     padres:el=>{ const C=[["ES","España"],["IT","Italia"],["PT","Portugal"],["IE","Irlanda"],["EU27_2020","Unión Europea"],["AT","Austria"],["FR","Francia"],["DE","Alemania"],["NL","Países Bajos"],["DK","Dinamarca"]];
