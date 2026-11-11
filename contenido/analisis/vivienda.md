@@ -1,61 +1,64 @@
 ---
 titulo: ¿Por qué cuesta tanto pagar una casa?
-entradilla: El alquiler sube más que los sueldos casi en todas partes. ¿Es la gente que llega, los pisos turísticos, las casas vacías? Lo miramos en ciudades, en la costa y en los pueblos.
-respuesta: Porque llega más gente de la que se construye para alojarla. En los cinco tipos de municipio que separamos el alquiler declarado ha subido entre un 35 % (pueblos) y un 47 % (costa), y en todos lo que más distingue a unos sitios de otros es cuánta gente ha llegado. Las viviendas vacías y los pisos turísticos pesan bastante menos; la costa, con más compradores de fuera y más casas que no son hogar de nadie, es donde más sube. Desde 2015 el alquiler mediano ha subido un 37 % y el sueldo mediano, un 26 %.
-cifra: +37 %
-cifra_texto: el alquiler desde 2015; el sueldo, +26 %
-metodo: IPV, IPVA, ECV, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
+entradilla: La casa ha subido el doble que el sueldo, los bancos ya no prestan el precio entero y los tipos bajos que lo tapaban se han acabado. Y faltan más de un millón de viviendas. Primero, cuánto cuesta; después, de dónde pueden salir.
+respuesta: Porque la casa se ha encarecido el doble que los sueldos, porque la entrada ya no la financia el banco (hace falta casi el doble de sueldo ahorrado que en 2008) y porque los tipos bajos que disimulaban la subida se acabaron en 2022. Detrás hay una cuenta sencilla: cada año se forman más hogares que viviendas se terminan. De lo que falta, lo que ya existe (vacías y pisos turísticos de las zonas con demanda) puede cubrir una quinta parte; el resto hay que construirlo.
+cifra: +60 %
+cifra_texto: el precio de compra desde 2015; el sueldo, +26 %
+metodo: IPV, Banco de España, INE, Censo 2021, Catastro, Ministerio de Vivienda y Eurostat, 1991–2026
 evidencia: desc
 tema: vivienda
 publicado: 2026-10-25
-actualizado: 2026-11-05
+actualizado: 2026-11-11
 orden: -1
 ---
 
-Desde 2015, el alquiler mediano en España ha subido un **{{alq15|pct0}}**. El sueldo mediano, un {{sal15|pct0}}. (El alquiler mediano es el que deja a la mitad de los inquilinos por debajo y a la otra mitad por encima; no lo tira hacia arriba un puñado de pisos de lujo.) En València, el alquiler mediano ha pasado de {{vlc15|eur}} a {{vlc24|eur}} al mes; en Málaga, de {{mlg15|eur}} a {{mlg24|eur}}.
+Un piso de 80 metros cuesta hoy unos **{{precio80|r1000|eur}}**. Para comprarlo hace falta tener ahorrados unos **{{ent24|r1000|eur}}**, y después comprometer cada mes el **{{cuP24|pct0}} del sueldo mediano**. La cuota pesa menos que en 2008; la entrada, más. Y las dos cosas suben mientras los sueldos casi no se mueven.
 
-Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a una pregunta: por qué. Primero, cuánto ha subido de verdad; después, qué explica la subida y si es lo mismo en una gran ciudad, en la costa o en un pueblo; y al final, qué dicen los datos de lo que se propone.
+Este otoño ha habido manifestaciones por la vivienda en decenas de ciudades. Aquí intentamos responder con datos a una pregunta, y lo hacemos en dos partes. La primera cuenta **cuánto cuesta** hoy pagar una casa y por qué ha subido el esfuerzo: el precio, la entrada, la cuota y el alquiler. La segunda cuenta **cuántas casas faltan** y de dónde pueden salir: de las que ya existen o de las que hay que construir.
 
-## Lo que ha subido
+## Primera parte: cuánto cuesta pagar una casa
 
-Pon el año 2015 como punto de partida. Desde entonces y hasta {{añoCom}}, el precio de compra de la vivienda ha subido un {{ipv15|pct0}}, el alquiler mediano un {{alq15|pct0}}, el sueldo mediano un {{sal15|pct0}} y el resto de precios, un {{ipc15|pct0}}.
+El precio, la entrada, la cuota y el alquiler.
+
+## El precio: la casa ha subido el doble que el sueldo
+
+Pon el año 2015 como punto de partida. Hasta {{añoCom}}, el precio de compra de la vivienda ha subido un **{{ipv15|pct0}}**. El alquiler mediano, un {{alq15|pct0}}. El sueldo mediano, un {{sal15|pct0}}. El resto de precios, un {{ipc15|pct0}}. La casa se ha alejado del bolsillo de casi todos.
 
 [[grafico:carrera]]
 
-La subida no es igual en todas partes, y más abajo vemos de dónde viene en cada tipo de sitio. Pero casi en ninguno ha sido pequeña.
-
-
-## Alquilar: quien busca piso paga mucho más que quien ya tiene contrato
-
-Hay dos formas de medir el alquiler y no cuentan lo mismo. El **alquiler declarado** es lo que pagan todos los inquilinos según Hacienda (INE): incluye contratos de hace años, con subidas limitadas, y deja fuera los no declarados. Ha subido un {{r_decl|pct0}} desde 2015. Los **anuncios** (idealista, euros por metro cuadrado) son lo que piden los pisos que salen al mercado, es decir, lo que paga quien busca casa hoy: han subido un {{r_anun|pct0}}, más de tres veces lo que el sueldo mediano ({{r_sal|pct0}}).
-
-[[grafico:subidas]]
-
-El INE solo separa los contratos nuevos de los antiguos desde 2021. Desde entonces, el alquiler de los contratos nuevos ha subido un {{r_nuevos|pct0}} y el sueldo mediano, un {{r_sal21|pct0}}.
-
-[[grafico:contratosNuevos]]
-
-Los datos de alquiler por municipio que usa el resto del análisis son los del alquiler declarado: sirven para ver **dónde** sube más, no cuánto le cuesta a quien busca piso.
-
-## Comprar: caro, pero no como en 2008
-
-Si comprar cuesta mucho o poco depende de qué se mida, y las tres formas habituales de medirlo cuentan historias distintas. Coinciden en una cosa: no estamos en 2008.
-
-**Primero, el precio frente al sueldo.** Un piso de 80 m² al precio medio de tasación costaba en {{añoT}} unos {{precio80|r1000|eur}}: **{{años80|n1}} años del sueldo mediano bruto íntegro**. En 2008, en lo más alto de la burbuja, eran {{años80_08|n1}} años. En 2019, {{años80_19|n1}}. Con esta cuenta, comprar está lejos de la burbuja y más o menos donde estaba antes de la pandemia.
+Traducido a sueldos: un piso de 80 m² al precio medio de tasación costaba en {{añoT}} **{{años80|n1}} años del sueldo mediano bruto**. En 2019 eran {{años80_19|n1}}; en 2008, en lo más alto de la burbuja, {{años80_08|n1}}. Con esta cuenta comprar sigue lejos de la burbuja. Pero la tasación va con retraso: con el índice del INE, que sale de las compraventas, el piso de {{añoT}} equivale a {{años80_ipv|n1}} años de sueldo, más que en 2019, y en {{añoIpv}} el precio sube otro {{ipv25|pct0}}.
 
 [[grafico:compra]]
 
-**Pero el precio de tasación va con retraso.** De 2019 a {{añoT}}, el valor tasado subió un {{vt1924|pct0}}; el índice de precios del INE, que sale de las compraventas, un {{ipv1924|pct0}}; y el sueldo mediano, un {{sal19|pct0}}. Con el índice del INE, un piso de 80 m² equivaldría en {{añoT}} a unos {{años80_ipv|n1}} años de sueldo, más que en 2019. Y en {{añoIpv}} el precio sube otro {{ipv25|pct0}} según el INE (y {{vt25|pct0}} según la tasación). Por eso el gráfico no debe leerse como una mejora desde 2019: con otra fuente de precios, el esfuerzo sube.
+## La entrada: antes la ponía el banco
 
-**Segundo, la cuota.** Lo que se paga cada mes depende también del tipo de interés. Según los Registradores, en el cuarto trimestre de 2025 la cuota media de una hipoteca era de 797 € al mes, el 33,8 % del coste salarial medio, por encima del 30 % que suele considerarse prudente. Pero va de un 23 % en Extremadura a un 44 % en Madrid y un 55 % en Baleares. Con el mismo préstamo medio (171.000 € a unos 25 años) y un tipo del 2 % en lugar del 3 %, la cuota sería de unos 710 €: 85 € al mes menos solo por los tipos (cuenta de Indicio).
+Aquí está el cambio más grande, y el que menos se cuenta. Antes de la crisis, los bancos prestaban el precio de la casa entero, e incluso algo más: la hipoteca mediana cubría un 105 % del precio de compra. Quien compraba en 2006 ponía, en la práctica, solo una parte de los impuestos y los gastos: unos **{{ent06|r1000|eur}}**.
 
-**Tercero, quién compra de verdad.** El Banco de España mide la cuota de las hipotecas concedidas: el 23,5 % de los ingresos de quienes las firmaron a finales de 2025. Sale menos que el 33,8 % porque quien consigue hipoteca gana más que la media y tiene ahorros, y quien se queda fuera no cuenta en esa cifra. Su indicador de desajuste entre precios, rentas y tipos está entre el 10 % y el 15 %, parecido al de 2004 y muy por debajo del 24 % de finales de 2007. Y los precios, descontada la inflación, siguen un 14,7 % por debajo del máximo de 2007, aunque subieron un 9,7 % en 2025.
+Después de 2008, los bancos cerraron el grifo. El préstamo mediano bajó del 96 % del precio en 2008 al 86 % en 2011 y desde 2012 es el 80 %, el máximo habitual. Con impuestos y gastos, hoy la entrada es de unos **{{ent24|r1000|eur}}**: {{ent24A|n1}} años de sueldo mediano, frente a {{ent08A|n1}} en 2008. Con la financiación de 2007, el mismo piso pediría hoy {{ent24ltv|r1000|eur}}. Es decir: la casa ha subido, pero lo que ha subido más es lo que hay que reunir **antes** de empezar a pagarla.
 
-> Las tres medidas coinciden en que comprar cuesta menos esfuerzo que en 2008. Discrepan en lo que ha pasado desde 2019: según el precio y el tipo que se use, el esfuerzo medio queda parecido o claramente más alto. Y ninguna dice si a ti te llega, porque eso depende de tu sueldo, tus ahorros y dónde compres.
+[[grafico:entrada]]
 
-**La entrada, un obstáculo que depende de cada hogar.** Lo habitual es que el banco financie hasta el 80 % del precio y que el comprador ponga el resto más los impuestos y gastos: eso son unos {{entrada|r1000|eur}} ahorrados de antemano, **{{entradaAños|n1}} años de sueldo mediano íntegro**. Para quien paga un alquiler alto, reunir esa cantidad es casi imposible. Pero no es un muro para todos: el Banco de España cuenta que el 43,8 % de las hipotecas nuevas (a finales de 2025) ya financia más del 80 % del precio, y que el préstamo medio cubre el 80,4 %. La entrada frena sobre todo a quien no tiene ahorros ni familia que avale.
+Para quien paga un alquiler, ese dinero es difícil de juntar. Si ahorrase el 11,8 % de su sueldo, que es lo que ahorra de media un hogar español, tardaría **unos {{ahorroAños|n0}} años** en reunir la entrada, sin contar lo que sube la casa mientras tanto (cuenta de Indicio, con el sueldo mediano bruto). La entrada no es un muro para todos: el Banco de España cuenta que el 43,8 % de las hipotecas nuevas ya financia más del 80 % del precio. Pero deja fuera, antes que nada, a quien no tiene ahorros ni ayuda.
 
-## A quién le golpea
+## La cuota: los tipos bajos taparon la subida
+
+Lo que se paga cada mes depende del precio, pero sobre todo del tipo de interés. En 2008, con las hipotecas al **{{tedr08|n1}} %**, la cuota de una hipoteca media era de {{cu08|eur}} al mes: el {{cuP08|pct0}} del sueldo mediano. Luego los tipos se hundieron (el Euríbor llegó a estar en negativo) y en 2021, con un tipo del {{tedr21|n1}} %, la cuota media bajó a {{cu21|eur}}, el {{cuP21|pct0}} del sueldo. Durante esos años la casa subía, pero la cuota casi no se movía: el tipo bajo se comía la subida.
+
+[[grafico:tiposInteres]]
+
+Ese colchón se acabó en 2022. Con el Euríbor al {{eur23|n1}} % en 2023 y las hipotecas nuevas al {{tedr24|n1}} % en {{añoEnt}}, la cuota media es ya de **{{cu24|eur}}**, el {{cuP24|pct0}} del sueldo. Si hoy se firmara la hipoteca media con el tipo de 2021, la cuota sería {{cu24dif|r100|eur}} menos al mes. La cuota media de los Registradores del último trimestre de 2025 es de 797 €, el 33,8 % del coste salarial; va del 23 % en Extremadura al 44 % en Madrid y el 55 % en Baleares.
+
+[[grafico:cuota]]
+
+Hay una cifra que suaviza esto. El Banco de España mide la cuota de las hipotecas concedidas: el 23,5 % de los ingresos de quienes las firmaron a finales de 2025. Sale menos porque quien consigue hipoteca gana más que la media y tiene ahorros, y quien se queda fuera no cuenta. Es la misma historia de la entrada: la cuota pesa menos que en 2008, pero el filtro para llegar a ella es más estricto.
+
+## Alquilar tampoco sale barato
+
+Quien no puede comprar, alquila, y el alquiler ha subido más que el sueldo. El alquiler mediano pesa hoy un {{cuAlq24|pct0}} del sueldo mediano bruto, y eso es lo que pagan **todos** los inquilinos, incluidos los de contratos antiguos. Quien busca piso hoy paga bastante más: los anuncios (idealista) han subido un {{r_anun|pct0}} desde 2015, y los contratos nuevos, un {{r_nuevos|pct0}} desde 2021, frente a un {{r_sal21|pct0}} del sueldo mediano.
+
+Alquilar con un precio creciente tiene un coste doble: se paga más cada mes y es más difícil ahorrar para la entrada. El resultado se ve en el reparto de los hogares.
+
+## A quién le golpea más
 
 España ha sido siempre un país de propietarios, y lo sigue siendo, pero cada vez menos. En 2008, el {{prop08|pct0}} de los hogares vivía en una casa propia; en {{añoTen}}, el {{propUlt|pct0}}. Los que alquilan a precio de mercado han pasado del {{alq08|pct0}} al {{alqUlt|pct0}}.
 
@@ -63,41 +66,36 @@ A los inquilinos les cuesta mucho más que en el resto de Europa. En {{añoEU}},
 
 Los que más lo notan son los jóvenes. **La mitad de los españoles de 25 a 34 años ({{padresES|pct0}}) vive todavía con sus padres**; en la Unión Europea, menos de un tercio ({{padresEU|pct0}}), y en Francia o Alemania, uno de cada siete. La edad media a la que se van de casa es de {{edadES|n1}} años, frente a {{edadEU|n1}} en la UE.
 
-## Por qué: más hogares que casas
+
+> La primera parte, en una frase: pagar una casa cuesta más porque el precio ha subido más que el sueldo, porque el banco ya no presta el precio entero y porque los tipos bajos dejaron de taparlo. La cuota pesa menos que en 2008; la entrada, más. Y todo esto empieza con un problema que no se arregla con crédito: **hay menos casas que hogares**.
+
+
+## Segunda parte: cuántas casas faltan y de dónde pueden salir
+
+Lo que falta, lo que ya existe y lo que habría que construir.
+
+## Cada año se forman más hogares que casas
 
 La explicación de fondo es aritmética. Entre 2019 y {{añoHog}}, el número de hogares en España creció en **{{hog19|mil}}**, unos {{hogAño|r1000|n0}} al año. En ese tiempo se terminaron unas {{termAño|r1000|n0}} viviendas al año. Cada año se forman decenas de miles de hogares más que casas nuevas, y esos hogares compiten por las que ya hay.
 
 [[grafico:oferta]]
 
-¿De dónde salen tantos hogares? De dos cosas. La población ha crecido en {{pob19|mil}} personas desde 2019, casi todo por inmigración: gente que viene a trabajar a las mismas ciudades donde se crea empleo. Y los hogares son cada vez más pequeños: más gente vive sola o en pareja sin hijos, así que hacen falta más viviendas para el mismo número de personas. El INE calcula que habrá unos {{proyAño|r1000|n0}} hogares más al año en los próximos años.
+¿De dónde salen tantos hogares? De dos cosas. La población ha crecido en {{pob19|mil}} personas desde 2019, casi todo por inmigración: gente que viene a trabajar a las mismas ciudades donde se crea empleo. Y los hogares son cada vez más pequeños: más gente vive sola o en pareja sin hijos, así que hacen falta más viviendas para el mismo número de personas.
 
 Mientras, se construye una fracción de lo que se construía. En 2006 se terminaron {{term06|mil}} viviendas; desde 2013, nunca más de {{termMax|r1000|n0}} en un año. Y la vivienda protegida, la que se vende o alquila a precio limitado, casi ha desaparecido: de unas {{prot0009|r1000|n0}} al año entre 2000 y 2009 a unas {{prot1925|r1000|n0}} desde 2019.
 
 > La burbuja de los 2000 dejó una lección que pesa todavía: se construyó mucho, en sitios donde nadie quería vivir, con crédito barato. Tras el estallido, la construcción se hundió y no se ha recuperado, aunque ahora la demanda sí está, y está en las ciudades.
 
-## Según el sitio, la subida viene de otra parte
 
-La subida media esconde sitios muy distintos. Para verlos separamos los {{tpN|n0}} municipios con dato de alquiler del Ministerio de Vivienda en cinco tipos, con reglas sencillas: **grandes ciudades** (100.000 habitantes o más), **coronas** de las grandes ciudades (a 30 km o menos), **costa** con muchos extranjeros, pisos turísticos o segundas residencias, **ciudades medianas** y **pueblos y villas**.
+Desde 2021 se han formado unos {{hog21|r1000|n0}} hogares y se han terminado {{term21|r1000|n0}} viviendas: faltan unas **{{def21|r1000|n0}}** (el Banco de España, con otra cuenta, eleva el déficit a unas 750.000). Y el INE espera unos {{proy10|r1000|n0}} hogares nuevos al año durante la próxima década, cuando hoy se terminan unas {{termAño5|r1000|n0}} viviendas al año. La pregunta es de dónde sacarlas.
+
+## Según el sitio, el problema es distinto
+
+La subida del alquiler no es igual en todas partes. Para verlo separamos los {{tpN|n0}} municipios con dato de alquiler del Ministerio de Vivienda en cinco tipos: **grandes ciudades** (100.000 habitantes o más), **coronas** de las grandes ciudades (a 30 km o menos), **costa** (muchos extranjeros, pisos turísticos o segundas residencias), **ciudades medianas** y **pueblos y villas**.
 
 [[grafico:tiposMun]]
 
-La subida se parece más de lo que cabría esperar: de un {{tp_pueblo_sub|pct0}} mediano en los pueblos y un {{tp_mediana_sub|pct0}} en las ciudades medianas a un {{tp_gran_sub|pct0}} en las grandes ciudades, un {{tp_corona_sub|pct0}} en las coronas y un {{tp_costa_sub|pct0}} en la costa. Dentro de cada tipo hay más diferencia que entre tipos: la mitad central de las coronas va del {{tp_corona_p25|pct0}} al {{tp_corona_p75|pct0}}. Lo que cambia de un tipo a otro no es tanto cuánto sube como por qué, y eso se ve mirando, dentro de cada tipo, qué distingue a los sitios donde más ha subido de los demás.
-
-[[grafico:motores]]
-
-La tabla se lee por columnas. En los cinco tipos, lo que más se asocia a una subida mayor es lo mismo: que haya llegado gente o que haya crecido el empleo. El resto cambia.
-
-**En las grandes ciudades, donde hay empleo, sube.** El alquiler ha subido un {{tp_gran_sub|pct0}}. Lo que más separa a unas ciudades de otras es el empleo (correlación de {{mo_gran_emp|n2}}) y la población ({{mo_gran_pob|n2}}): subió más donde más crecieron los afiliados y los vecinos. Las viviendas vacías o secundarias no distinguen a unas de otras ({{mo_gran_np|n2}}): hay pocas, el {{tp_gran_np|pct0}}. Los pisos turísticos se asocian algo ({{mo_gran_vt|n2}}), con un margen que apenas se separa del cero. Si se mira solo a las ciudades de 50.000 habitantes o más que ganan población, llegan {{atrae_hog|n1}} hogares nuevos al año por cada 1.000 habitantes y se empiezan {{atrae_ini|n1}} viviendas: no sobran casas. **Lo que apuntan los datos:** aquí el motor es la gente que llega a trabajar frente a una oferta que no la sigue; lo que más margen da es construir, y que lo que se construya sea asequible.
-
-**En las coronas, el alquiler sube casi igual que en la ciudad.** Son {{tp_corona_n|n0}} municipios (Las Rozas, Sant Cugat, Guadalajara…) con {{tp_corona_pob|n1}} millones de vecinos, que han crecido un {{tp_corona_vp|pct0}} desde 2015, más que las propias ciudades ({{tp_gran_vp|pct0}}). El alquiler ha subido un {{tp_corona_sub|pct0}}, y lo que más separa a unas coronas de otras es la gente que llega ({{mo_cor_pob|n2}}) y el peso de los llegados del extranjero ({{mo_cor_inm|n2}}). Que crezcan más que la ciudad y que la subida sea casi igual encaja con que parte de la demanda no cabe o no puede pagar el centro. Es una hipótesis: estos datos no ven de dónde viene cada vecino. **Lo que apuntan los datos:** el problema no se queda dentro de la ciudad: las coronas suman {{tp_corona_pob|n1}} millones de vecinos, frente a los {{tp_gran_pob|n1}} de las grandes ciudades, y su alquiler sube igual.
-
-**En la costa, además de gente, hay muchas casas que no son hogar de nadie.** Es donde más ha subido el alquiler ({{tp_costa_sub|pct0}}) y el tipo más distinto: {{tp_costa_ex|pct0}} de extranjeros, {{tp_costa_np|pct0}} de viviendas que no son hogar de nadie (en las grandes ciudades, {{tp_gran_np|pct0}}), {{tp_costa_vt|pct1}} de pisos turísticos y casi el doble de compraventas por habitante ({{tp_costa_cp|n0}} al año por cada 1.000, frente a {{tp_gran_cp|n0}}). También es donde más ha crecido la población ({{tp_costa_vp|pct0}} desde 2015). Dentro de la costa, lo que separa a unos municipios de otros vuelve a ser la gente que llega ({{mo_cos_pob|n2}}); las vacías ({{mo_cos_np|n2}}) y los pisos turísticos ({{mo_cos_vt|n2}}) no distinguen porque casi todos los tienen. Eso no los absuelve: la costa puede ser la más cara porque todos esos usos son altos a la vez, y esta comparación no puede separar un efecto de otro. Los datos tampoco distinguen entre quien compra para vivir y quien compra para invertir o para pasar el invierno. **Lo que apuntan los datos:** aquí pesa más que en otros sitios lo que no es hogar de nadie, así que movilizar lo que hay puede aportar más que en la ciudad.
-
-**En las ciudades medianas, donde llega poca gente, sube menos.** Han crecido un {{tp_mediana_vp|pct0}} desde 2015 y el alquiler ha subido un {{tp_mediana_sub|pct0}}, la menor subida entre las ciudades. Pero las medianas que sí han crecido se parecen a las grandes, y aquí la población ({{mo_med_pob|n2}}) y los llegados del extranjero ({{mo_med_inm|n2}}) separan a unas de otras tanto como en las grandes ciudades. **Lo que apuntan los datos:** el mecanismo es el mismo que en las grandes ciudades, con menos intensidad.
-
-**En los pueblos y villas, donde sobran casas, sube menos.** Son {{tp_pueblo_n|n0}} municipios de menos de 20.000 habitantes y lejos de una gran ciudad, donde el alquiler ha subido un {{tp_pueblo_sub|pct0}}. La gente que llega sigue siendo lo que más se asocia a una subida mayor ({{mo_pue_pob|n2}}), pero los llegados del extranjero casi no distinguen ({{mo_pue_inm|n2}}), y las viviendas vacías o secundarias se asocian a una subida menor ({{mo_pue_np|n2}}), una relación débil pero clara. **Lo que apuntan los datos:** una casa vacía en un pueblo que se vacía no es la que falta en una gran ciudad.
-
-Los pueblos más pequeños y lejanos no salen en esta lista, porque casi no hay contratos declarados. En los {{rurN|n0}} municipios de menos de 2.000 habitantes a 45 km o más de una gran ciudad, la mediana ha perdido un {{rurPob|abs|pct0}} de población desde 2015, el {{rurNp|pct0}} de las viviendas no es el hogar de nadie y solo el {{rurAlq|pct0}} de los hogares vive de alquiler. Casi no hay mercado, ni para comprar ni para alquilar: la casa es barata y lo que falta es gente y trabajo.
+El alquiler declarado ha subido entre un {{tp_pueblo_sub|pct0}} en los pueblos y un {{tp_costa_sub|pct0}} en la costa, y en los cinco tipos lo que más distingue a unos sitios de otros es lo mismo: **cuánta gente ha llegado**. Lo que cambia es lo demás. En las grandes ciudades y en las coronas, la oferta no sigue a la gente. En la costa pesan más las casas que no son hogar de nadie ({{tp_costa_np|pct0}} de las viviendas, frente al {{tp_gran_np|pct0}} de las grandes ciudades). Y en los pueblos que se vacían, las casas desocupadas no son las que faltan en la ciudad.
 
 ### Cuánto pesa cada explicación
 
@@ -115,51 +113,52 @@ Tres avisos para leerlo bien:
 
 Las dos miradas apuntan a lo mismo: el alquiler sube sobre todo donde llega gente. Lo que se construye y las viviendas sin habitar han pesado poco en las diferencias entre unos sitios y otros, porque en casi ninguno han ido al ritmo de esa llegada.
 
-Hay cosas que faltan en el cuadro. **La obra terminada** solo se publica por provincia, así que comparamos con las viviendas iniciadas de cada provincia y no con las de cada ciudad. **La multipropiedad** (quién tiene varias casas) solo está para el conjunto de España: el Catastro publica el detalle por municipio, pero todavía no lo hemos incorporado. Y **la edad de quien llega** o el peso de los inversores no se pueden medir con datos públicos municipales; por eso no afirmamos que en Barcelona suba el alquiler por los jóvenes o por la inversión, aunque sea plausible. Tampoco medimos los tipos de interés, que encarecen comprar y empujan a más hogares al alquiler, ni las reglas que limitan cuánto puede subir un contrato en vigor.
+El cuadro tiene límites: compara municipios entre sí, no mide los tipos de interés (primera parte) ni la edad de quien llega o el peso de los inversores, que con datos públicos municipales no se pueden medir; por eso no afirmamos que en Barcelona suba el alquiler por los jóvenes o por la inversión, aunque sea plausible.
 
 Si vives en un municipio que no sale entre los citados, o en un pueblo, búscalo aquí y compara sus cifras de vivienda con las de España:
 
 [[grafico:miMunicipio]]
 
-## Dos ideas: construir más o que cada casa sea para vivir
 
-Con esto en la cabeza, vuelve la pregunta de qué hacer. Cuando se discute, aparecen dos ideas. Una dice que faltan casas y que hay que construir más. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas y cada vez más se acumulan en manos de quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál de las dos, sino cuánto puede aportar cada una.
+## De dónde pueden salir
 
-### Construir más
+Cuando se discute, aparecen dos ideas. Una dice que faltan casas y que hay que construir. La otra, que casas hay, pero no todas sirven para vivir: unas están vacías, otras se alquilan a turistas, otras las compra quien ya tiene otra. Las dos tienen parte de razón. La pregunta útil no es cuál, sino **cuánto puede aportar cada una**.
 
-Desde 2021 se han formado unos **{{hog21|r1000|n0}} hogares** y se han terminado {{term21|r1000|n0}} viviendas: faltan unas {{def21|r1000|n0}}. El Banco de España, con otra cuenta, eleva el déficit a unas 750.000. Y el INE prevé unos {{proy10|r1000|n0}} hogares más al año durante la próxima década, cuando hoy se terminan unas {{termAño5|r1000|n0}} viviendas al año.
+### Las vacías
 
-Construir es lo único que suma año tras año. Pero tarda: entre la licencia y la entrega de llaves pasan dos o tres años, y choca con el suelo disponible, la falta de mano de obra y la oposición de los vecinos.
-
-### Que cada casa sea para vivir
-
-Esta idea tiene tres piezas, y no pesan lo mismo.
-
-**Las vacías.** El censo de 2021 contó 3,8 millones de viviendas vacías y otros 2,5 millones de uso esporádico. Muchas están donde no hay demanda. En los municipios de menos de 1.000 habitantes, el {{npPeq|pct0}} de las viviendas no es residencia habitual de nadie; en las ciudades de más de 100.000, el {{npGr|pct0}}. Y los pueblos pequeños son justo los que pierden vecinos: desde 2015, los de menos de 1.000 habitantes han perdido un {{vpPeq|abs|pct0}}, mientras las ciudades grandes han ganado un {{vpGr|pct0}}.
+El censo de 2021 contó 3,8 millones de viviendas vacías y otros 2,5 millones de uso esporádico. Muchas están donde no hay demanda. En los municipios de menos de 1.000 habitantes, el {{npPeq|pct0}} de las viviendas no es residencia habitual de nadie; en las ciudades de más de 100.000, el {{npGr|pct0}}. Y los pueblos pequeños son justo los que pierden vecinos: desde 2015, los de menos de 1.000 habitantes han perdido un {{vpPeq|abs|pct0}}, mientras las ciudades grandes han ganado un {{vpGr|pct0}}.
 
 [[grafico:vacias]]
 
 Donde sí hay demanda, en los {{nZ}} municipios de 20.000 habitantes o más que ganan población (el {{pobZ|pct0}} de los españoles), el censo cuenta **{{npZ|r1000|n0}} viviendas que no son residencia habitual**. De ellas, {{vacZ|r1000|n0}} están vacías (el {{vacZP|pct0}} de todas las viviendas de esos municipios) y {{espZ|r1000|n0}} se usan solo de forma esporádica; el resto son otras segundas residencias, sobre todo en la costa. No todas las vacías se pueden ocupar mañana: en cualquier momento hay pisos en venta, en obras, pendientes de una herencia o en mal estado. En Francia, gravar las viviendas vacías redujo su número un 13 %. Aquí serían unas {{vac13|r1000|n0}}.
 
-**Las turísticas.** En el conjunto de España son en torno al {{vtES|pct1}} de las viviendas; en esos mismos municipios con demanda, unas {{vtZ|r1000|n0}}. En algunos barrios del centro y en la costa pesan mucho: el estudio más citado, en Barcelona, encontró que el alquiler subía un 1,9 % por los pisos de Airbnb en el barrio medio y un 7 % en los de más actividad. Fuera de esos barrios, los datos por municipio no muestran una relación clara.
+### Los pisos turísticos
+
+En el conjunto de España son en torno al {{vtES|pct1}} de las viviendas; en esos mismos municipios con demanda, unas {{vtZ|r1000|n0}}. En algunos barrios del centro y en la costa pesan mucho: el estudio más citado, en Barcelona, encontró que el alquiler subía un 1,9 % por los pisos de Airbnb en el barrio medio y un 7 % en los de más actividad. Fuera de esos barrios, los datos por municipio no muestran una relación clara.
 
 Los pisos turísticos tocaron techo en {{t_maxMes}} de {{t_maxAño}}, con {{t_max|n0}} anuncios, y desde entonces han bajado un {{t_drop|pct0}}. Coinciden varias cosas: las prohibiciones municipales, el registro único estatal obligatorio desde julio de 2025 (cada anuncio necesita un número de registro) y la retirada de anuncios ilegales por parte de las plataformas.
 
 [[grafico:turisticas]]
 
-**Las que se acumulan.** Cada vez hay menos propietarios de un solo inmueble y más de varios. Según el Catastro, entre 2015 y {{añoCat}} los titulares de un solo bien urbano bajaron en unos {{t1d|abs|r1000|n0}}, los de dos subieron en unos {{t2d|r1000|n0}}, los de tres crecieron un {{t3p|pct0}} y los de seis a diez, un {{t6p|pct0}}. Son bienes de todo tipo, no solo viviendas: el Catastro solo separa el uso residencial desde 2024. Con ese detalle, en {{añoRes}} había {{pfMulti|r1000|n0}} personas con dos o más inmuebles residenciales (el {{pfMultiP|pct0}} de las que tienen alguno) que reunían el {{pfMultiInmP|pct0}} de los {{resInm|r1000|n0}} que hay; las personas jurídicas tenían el {{pjInmP|pct0}}. Según el Banco de España, en 2022 el 46,8 % de los hogares tenía algún inmueble además de su vivienda habitual, contando solares, garajes y locales. Y el 61 % de las viviendas alquiladas pertenece a alguien que alquila más de una o a una empresa o administración, según un estudio del Ministerio de Derechos Sociales y el CSIC con datos de Hacienda de 2023.
 
-**Quién compra.** Las personas jurídicas fueron el comprador del {{cpPJ|pct0}} de las compraventas de vivienda de {{añoCp}}, frente al {{cpPJ15|pct0}} en 2015, según el INE; la cifra incluye a promotoras y a quien compra a otra empresa. Los Registradores dan casi lo mismo para 2024 (10,9 %), con más peso en Canarias (16,5 %), Castilla-La Mancha (14,2 %), Madrid (14,1 %) y Cataluña (12,5 %). Los extranjeros fueron el 14,6 % de las compras registradas en 2024 (el 15,0 % en 2023) y el 13,5 % en el último trimestre de 2025, también según los Registradores, pero con diferencias enormes: en 2024, el 44 % en Alicante, el 33 % en Santa Cruz de Tenerife y el 32 % en Baleares y en Málaga. Comprar para vivir, para invertir o para pasar el invierno no deja la misma huella en el mercado, y estos datos no separan una cosa de otra.
 
-Aquí está el matiz. Una vivienda acumulada que se alquila sigue alojando a un hogar: no resta casas. Las resta cuando se queda vacía, se usa unas semanas al año o se alquila a turistas, y eso ya está en las dos piezas anteriores. Lo que sí puede hacer la acumulación es empujar los precios: quien compra para invertir compite con quien compra para vivir, y concentrar la propiedad puede dar más poder para fijar el alquiler. Es un efecto plausible, pero con los datos públicos no se puede medir bien, y por eso no entra en la cuenta de abajo.
+### Segundas residencias, extranjeros e inversores
 
-### Entre el blanco y el negro: ¿cuánto puede aportar cada idea?
+Aquí los datos llegan menos lejos. En los municipios con demanda hay {{espZ|r1000|n0}} viviendas de uso esporádico, una segunda residencia o una casa que se usa unas semanas al año. Las personas jurídicas (empresas, promotoras, fondos) compraron el {{cpPJ|pct0}} de las viviendas vendidas en {{añoCp}}, y los extranjeros, el 14,6 % de las compras registradas en 2024: el 44 % en Alicante, el 33 % en Santa Cruz de Tenerife y el 32 % en Baleares y en Málaga. Y cada vez hay menos propietarios de un solo inmueble: según el Catastro, en {{añoRes}} había {{pfMulti|r1000|n0}} personas con dos o más inmuebles residenciales, el {{pfMultiP|pct0}} de las que tienen alguno, que reunían el {{pfMultiInmP|pct0}} de las viviendas. Las personas jurídicas tenían el {{pjInmP|pct0}}.
 
-Mueve los mandos. Lo que faltaría es lo que falta hoy más los hogares nuevos que no cubre el ritmo actual de obra. Los porcentajes de vacías y turísticas que vuelven a ser vivienda no salen de los datos: son supuestos, y por eso puedes cambiarlos.
+Una vivienda que se compra para alquilar sigue alojando a una familia: no resta casas. Las resta cuando se queda vacía, se usa unas semanas al año o se alquila a turistas, y eso ya está contado arriba. Lo que sí puede hacer quien compra para invertir es competir con quien compra para vivir y empujar el precio. Es plausible, pero con datos públicos no se puede medir bien, y por eso esta pieza **no entra en la cuenta de abajo**.
+
+## Entre el blanco y el negro: cuánto cubre cada idea
+
+Sumamos lo que falta hoy y los hogares nuevos que el ritmo actual de obra no cubre: unas **{{cenNeed|r1000|n0}} viviendas** en diez años. Con supuestos prudentes (un 13 % de las vacías de los municipios con demanda, como logró Francia, y una cuarta parte de los pisos turísticos), **lo que ya existe puede aportar unas {{cenM|r1000|n0}}**, el {{cenMP|pct0}}. Terminar 60.000 viviendas más al año aportaría en el mismo plazo otras **{{cenB|r1000|n0}}**, el {{cenBP|pct0}}. Quedaría sin cubrir el {{cenRP|pct0}}.
+
+[[grafico:balance]]
+
+Movilizar llega antes y es más barato, pero es una vez: cuando una vacía se ocupa, no vuelve a sumar. Construir tarda dos o tres años en dar las primeras llaves, pero sigue sumando cada año. Para cubrirlo todo, habría que terminar cerca de **{{cenAnual|r1000|n0}} viviendas al año** en vez de las {{termAño5|r1000|n0}} de hoy, casi el doble. Ninguna de las dos ideas basta sola.
+
+Los porcentajes de vacías y de turísticas que vuelven a ser vivienda no salen de los datos: son supuestos. Muévelos aquí:
 
 [[grafico:grises]]
-
-Con supuestos centrales (terminar 60.000 viviendas más al año, un 13 % de las vacías como en Francia y una cuarta parte de las turísticas), construir aporta en diez años unas {{cenB|r1000|n0}} viviendas, {{cenRat|veces}} lo que aporta movilizar lo que hay (unas {{cenM|r1000|n0}}). Entre las dos cubren el {{cenCov|pct0}} de las {{cenNeed|r1000|n0}} que faltarían. Movilizar llega antes y es más barato, pero es una vez: cuando una vacía se ocupa, no vuelve a sumar. Construir tarda, pero sigue sumando cada año. Ninguna de las dos basta sola.
 
 ## España frente a Europa
 
@@ -193,6 +192,7 @@ Cada uno de estos análisis responde a una pregunta concreta, con el método a l
 - **Precio de compra:** Índice de Precios de Vivienda (INE) y valor tasado medio de la vivienda libre (Ministerio de Vivienda), en €/m², media de los cuatro trimestres de cada año.
 - **Anuncios de alquiler:** precio medio de los anuncios de idealista, euros por metro cuadrado, diciembre de 2015 y de 2024. **Contratos nuevos y en vigor:** INE, Índice de Precios de Vivienda en Alquiler por antigüedad del contrato (desde 2021). **Renta por persona:** INE, Atlas de Distribución de Renta. **Hogares de alquiler por provincia:** Censo de 2021. **Viviendas turísticas:** INE, estadística experimental, mayo de 2026.
 - **Alquiler:** mediana del alquiler mensual de la vivienda (Ministerio de Vivienda, SERPAVI: alquiler declarado en el IRPF por los propietarios, todos los contratos vivos), 2015–{{añoAlq}}. El fichero no da el total de España, así que Indicio lo calcula mezclando las distribuciones de cada comunidad de territorio fiscal común (sin Navarra ni País Vasco, que no tienen la serie completa); con los municipios sale casi igual. En las ciudades es la mediana del propio municipio, con pisos y casas. Con la media del INE, que pesa más los alquileres altos, la subida de España desde 2015 sería del 40 %. Código: `scripts/datos/serpavi_series.py`.
+- **Entrada, tipos y cuota:** préstamo sobre el precio de compra (mediana) y tipo de las hipotecas nuevas sobre vivienda (TEDR, media de los 12 meses) y Euríbor a 12 meses, del Banco de España (boletín estadístico, capítulo 19, cuadros 19.1 y 19.3); el préstamo medio pasa del 103–107 % del precio en 2004–2007 (se usa 105 %) al 96 % en 2008, el 89 % en 2009, el 88 % en 2010, el 86 % en 2011 y el 80 % desde 2012. Importe y plazo medios de las hipotecas sobre vivienda: INE, Estadística de Hipotecas (tablas 3223 y 24461). **Entrada** = valor tasado medio × 80 m² × (10 % de impuestos y gastos, supuesto de Indicio, menos lo que el banco presta por encima del precio, o más lo que no presta); con el 80 % de financiación equivale al 30 % del precio. **Cuota** = sistema de amortización francés con el importe y el plazo medios del INE y el tipo del Banco de España de cada año; es la cuota de quien firmó ese año, no la de un hogar medio, y se compara con el sueldo mediano bruto mensual (Encuesta de Estructura Salarial, sin dato de 2025). **Años para ahorrar la entrada:** entrada entre el 11,8 % del sueldo mediano bruto; la tasa de ahorro (11,8 % de la renta bruta disponible, cuatro trimestres hasta el primero de 2026) es de la Asociación Hipotecaria Española, y la cuenta ignora que el precio sube mientras tanto. Código: `scripts/datos/hipotecas.py`.
 - **Sueldo:** sueldo mediano bruto anual (Encuesta Anual de Estructura Salarial).
 - **Comprar, tres medidas:** (1) años de sueldo = valor tasado medio × 80 m² entre el sueldo mediano bruto; (2) la misma cuenta con el Índice de Precios de Vivienda del INE: se parte de los años de 2019 con la tasación y se aplica la subida relativa del índice frente a la del sueldo; (3) cuota entre salario: Colegio de Registradores, Estadística Registral Inmobiliaria del 4.º trimestre de 2025 (cuota media 796,6 €, 33,8 % del coste salarial, plazo medio 25,6 años, importe medio 171.177 €) y Banco de España, Informe de Estabilidad Financiera de la primavera de 2026 (capítulo 4: cuota sobre ingresos de las hipotecas nuevas, indicador de desajuste entre precios, rentas y tipos, préstamo sobre precio). Las cifras de Registradores y del Banco de España están escritas a mano; la cuota al 2 % es un cálculo de Indicio con la fórmula de amortización francesa.
 - **Ciudad por ciudad:** años de sueldo = valor tasado medio del año (Ministerio de Vivienda) × 80 m² entre el sueldo mediano bruto de la comunidad (INE, Encuesta Anual de Estructura Salarial; no hay sueldo mediano por municipio). Hogares nuevos: cambio del padrón entre 2019 y 2025 entre las personas por hogar del Censo de 2021, repartido en seis años. Viviendas no habituales: vacías y segundas residencias del Censo de 2021. Hogares en alquiler: Censo de 2021. Compraventas: media de 2023 a 2025 (Ministerio de Vivienda). Compras de extranjeros: media 2023–2025 de la provincia (Ministerio de Vivienda). Viviendas iniciadas: media 2019–2024 de la provincia. Código: `scripts/datos/vivienda_esfuerzo.py`.
