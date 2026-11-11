@@ -248,7 +248,7 @@ def _(p):
     o+=p.arrow([(780,300),(860,250),(920,272),(1000,190),(1080,150)],"wine",5)+p.line([(780,320),(1120,320)],1)+p.line([(780,320),(780,130)],1)
     return o
 
-@esc("precio-alimentos","Un carro de la compra y una balanza entre comida y sueldo",600)
+@esc("llegar-a-fin-de-mes","Un carro de la compra y una balanza entre comida y sueldo",600)
 def _(p):
     o=p.cloud(300,56,.9)+p.sun(1090,60,30)+p.ground(320,c="sand")
     o+=cart(p,340,330,1.3)

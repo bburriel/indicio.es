@@ -2774,7 +2774,7 @@ const evSpan=ev=>ev&&EVID[ev]?` <span class="ev ev-${ev}" title="${esc(EVID[ev].
 const CATP=["08","17","25","43"];
 // fuentes que usa cada estudio (para el pie de página)
 const STUDY_SRC={"tope-cataluna":["ipva","compr","padron","atlas","tensionadas"],"pisos-turisticos":["vt","ipva","atlas","padron"],"pensiones":["eurostat"],"convergencia":["atlas","padron"],"pandemia-turismo":["sepe","vt","atlas","padron","erte"],"crecer":["padron","atlas","censo","sepe","vt","geo","mig"],"votar-pueblos":["interior","atlas","padron"],
-  "quien-gobierna":["interior","padron","sepe","atlas","deuda"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"precio-alimentos":["ipcAlim","epf","ees","hicp"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"gobiernos":["eurostatPaises"],"infraestructuras":["fitInfra","eurostatInfra","ivieStock","aecCarr","adifMant"],"poder-adquisitivo":["ipcAlim","etcl","epaSal","ecvRenta","ipv","eurostatViv"],"gestion-vecinos":["eurostatPaises","ecvRenta"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
+  "quien-gobierna":["interior","padron","sepe","atlas","deuda"],"ave":["ave","padron","atlas","sepe","geo"],"prohibir-pisos-turisticos":["vut","vt","padron"],"vivienda-protegida":["mivau","padron"],"reforma-laboral":["contratos","afil"],"smi-empleo-hogar":["afil","atlas"],"llegar-a-fin-de-mes":["ipcAlim","epf","ees","hicp"],"sueldos":["ees","epaSal","ecvRenta","ipcAlim"],"gobiernos":["eurostatPaises"],"infraestructuras":["fitInfra","eurostatInfra","ivieStock","aecCarr","adifMant"],"poder-adquisitivo":["ipcAlim","etcl","epaSal","ecvRenta","ipv","eurostatViv"],"gestion-vecinos":["eurostatPaises","ecvRenta"],"vivienda":["ipv","ipva","mivauViv","ecvTen","eurostatViv","ees"]};
 const METODO=`<section class="finding"><h2>1. Compararse con quien se parece</h2><div class="txt"><p>Si comparas municipios grandes con pueblos, cualquier diferencia puede deberse al tamaño. Por eso se «descuentan» factores como el tamaño, la edad o la renta: es comparar entre iguales. En el <a href="/laboratorio/cruce/">gráfico de relación del laboratorio</a>, pulsa las etiquetas «A igual edad», «A igual renta»… y mira cómo se mueven los puntos y cuánto queda de la relación.</p></div></section>
 <section class="finding"><h2>1b. Buscar gemelos</h2><div class="txt"><p>Una forma aún más intuitiva de comparar entre iguales: buscar parejas de pueblos de la misma provincia casi idénticos en tamaño, edad y renta, que solo se diferencian en lo que te interesa. Si en la mayoría de parejas el que tiene más de una cosa tiene también más de la otra, la pista gana fuerza. El laboratorio lo hace solo en cada relación, y te enseña algunas parejas.</p></div></section>
 <section class="finding"><h2>2. Comparar dentro de cada zona</h2><div class="txt"><p>Muchas cosas son comunes a una provincia o una comunidad: el clima, las leyes autonómicas, la historia. Comparar solo municipios de la misma provincia las quita de en medio. Es la etiqueta «Dentro de cada provincia».</p></div></section>
@@ -2820,7 +2820,7 @@ function renderEstudios(id){
   if(id==="renta-fuentes"){ id="convergencia"; history.replaceState(null,"","/preguntas/convergencia/"); } // se fusionó con el de convergencia
   if(id==="cerca-ciudad"){ id="crecer"; history.replaceState(null,"","/preguntas/crecer/"); } // se fusionó con el de qué hace crecer a un pueblo
   if(id==="deuda-quien-gobierna"){ id="quien-gobierna"; history.replaceState(null,"","/preguntas/quien-gobierna/"); } // se fusionó con el de quién gobierna
-  if(id==="iva-alimentos"){ id="precio-alimentos"; history.replaceState(null,"","/preguntas/precio-alimentos/"); } // se fusionó con el de la cesta de la compra
+  if(id==="iva-alimentos"||id==="precio-alimentos"){ id="llegar-a-fin-de-mes"; history.replaceState(null,"","/preguntas/llegar-a-fin-de-mes/"); } // la cesta de la compra y el IVA se fusionaron en el análisis de fin de mes
   const S=STUDIES.find(s=>s.id===id)||STUDIES_HIDDEN.find(s=>s.id===id);
   if(id==="metodo"){ document.title="De la relación a la causa · Indicio"; view.innerHTML=LABNAV("metodo")+pageHead("De la relación a la causa","Una guía corta para pasar de «estas dos cosas van juntas» a «esto podría estar causando aquello», y saber cuándo no se puede.")+METODO+methodNote(); if(/^#[\w-]+$/.test(location.hash)){ const t=document.querySelector(location.hash); if(t) setTimeout(()=>t.scrollIntoView({block:"start"}),60); } return; }
   if(!S){ renderPreguntas(); return; }
@@ -2828,10 +2828,10 @@ function renderEstudios(id){
   view.innerHTML=studyHead(S)+`<div class="sx"><div id="shtoc"></div><div id="sbody"></div></div><p class="q-next"><a class="ed-go" href="/laboratorio/">Ponlo a prueba en el laboratorio →</a> <a class="ed-go" href="/preguntas/">Más preguntas →</a></p>${methodNote(STUDY_SRC[S.id])}`;
   studyCover(S);
   const fn=({"tope-cataluna":studyTope,"pisos-turisticos":studyVT,"pensiones":studyPens,"convergencia":studyConv,"pandemia-turismo":studyCovid,"crecer":studyGrow,"votar-pueblos":studyVotar,
-    "quien-gobierna":studyGobierna,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"precio-alimentos":studyAlimentos,"poder-adquisitivo":studyPoder,"gestion-vecinos":studyGestion,"sueldos":studySueldos,"vivienda":studyVivienda,"gobiernos":studyGobiernos,"infraestructuras":studyInfra})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
+    "quien-gobierna":studyGobierna,"ave":studyAve,"prohibir-pisos-turisticos":studyVutBan,"vivienda-protegida":studyVPO,"reforma-laboral":studyReforma,"smi-empleo-hogar":studyHogar,"llegar-a-fin-de-mes":studyFinDeMes,"poder-adquisitivo":studyPoder,"gestion-vecinos":studyGestion,"sueldos":studySueldos,"vivienda":studyVivienda,"gobiernos":studyGobiernos,"infraestructuras":studyInfra})[S.id]||(MDB[S.id]!=null?(B=>mdRender(B,S.id,{},{})):null);
   const B=document.getElementById("sbody");
   // los estudios que usan series por municipio (data/estudios.json) las cargan antes de pintar
-  const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","votar-pueblos","quien-gobierna","ave","prohibir-pisos-turisticos","precio-alimentos"].includes(S.id);
+  const needSeries=["tope-cataluna","pisos-turisticos","crecer","convergencia","pandemia-turismo","votar-pueblos","quien-gobierna","ave","prohibir-pisos-turisticos","llegar-a-fin-de-mes"].includes(S.id);
   const run=()=>Promise.resolve(fn(B)).catch(e=>{ console.error(e); B.insertAdjacentHTML("beforeend",'<p class="loading">No se pudo calcular una parte de este estudio.</p>'); }).then(studyToc);
   if(needSeries){ B.innerHTML='<p class="loading">Cargando los datos del estudio…</p>'; loadSeries().then(()=>{ B.innerHTML=""; return run(); }).catch(e=>{ console.error(e); B.innerHTML='<p class="loading">No se pudieron cargar los datos del estudio.</p>'; }); }
   else run();
@@ -5161,7 +5161,7 @@ function rdPlot(parent,o,H){
 // =====================================================================
 // IVA DE LOS ALIMENTOS: triple diferencia (alimentos con rebaja − sin rebaja; España − otros países; mes de la medida − mismo mes de otros años)
 // =====================================================================
-// Rebaja del IVA de los alimentos (2023–2025). Se pinta dentro de «precio-alimentos»: el texto está en contenido/analisis/precio-alimentos.md.
+// Rebaja del IVA de los alimentos (2023–2025). Se pinta dentro de «llegar-a-fin-de-mes»: el texto está en contenido/analisis/llegar-a-fin-de-mes.md.
 function ivaCalc(){
   const H=EXT.hicp, P=H.periods, S=H.series, O=["PT","FR","IT","DE"], ON={PT:"Portugal",FR:"Francia",IT:"Italia",DE:"Alemania"};
   const TR=[["CP0111","Pan y cereales"],["CP0114","Leche, queso y huevos"],["CP0116","Frutas"],["CP0117","Legumbres y hortalizas"]], CT=[["CP0112","Carne"],["CP0113","Pescado"]];
@@ -5505,10 +5505,12 @@ async function studyGestion(B){
       table(f.body,["","España 2019","Vecinos 2019","España 2025","Vecinos 2025"],L.map(([k,l])=>[l,nf1.format(row(k,2019).es),nf1.format(row(k,2019).med),`<b>${nf1.format(row(k,2025).es)}</b>`,nf1.format(row(k,2025).med)])); }};
   mdRender(B,"gestion-vecinos",V,G);
 }
-async function studyAlimentos(B){
-  // El texto está en contenido/analisis/precio-alimentos.md; aquí solo las cifras (V) y los gráficos (G).
+async function studyFinDeMes(B){
+  // El texto está en contenido/analisis/llegar-a-fin-de-mes.md; aquí solo las cifras (V) y los gráficos (G).
+  // Primera parte (gasto del hogar, sueldo medio, tramos, fin de mes, vivienda): gY es el último año de la Encuesta de Presupuestos Familiares por grupos.
+  // La parte de la comida y el IVA sigue con el sueldo mediano de la Encuesta Anual de Estructura Salarial, que llega un año antes (añoSueldo).
   await loadRegional();
-  const [A,D,EP]=await Promise.all([getJSON("/data/alimentos.json"),getJSON("/data/sueldos.json"),getJSON("/data/epf-alimentos.json")]);
+  const [A,D,EP,EGR,PQ]=await Promise.all([getJSON("/data/alimentos.json"),getJSON("/data/sueldos.json"),getJSON("/data/epf-alimentos.json"),getJSON("/data/epf-grupos.json"),padqLoad()]);
   const P=A.meses, I=A.ipc, mi=p=>+p.slice(5), my=p=>+p.slice(0,4);
   const yav=(v,per,y)=>{ const x=v?per.map((p,i)=>p.startsWith(String(y))?v[i]:null).filter(z=>z!=null):[]; return x.length?d3.mean(x):null; };
   const last12=(v,per)=>d3.mean(v.slice(-12).filter(x=>x!=null));
@@ -5552,8 +5554,42 @@ async function studyAlimentos(B){
     con1N:sh(con[0].n),con2N:sh(con[1].n),con3N:sh(con[2].n),con3:d3.sum(con.slice(0,3),r=>r.c)/tc*100,
     ccaaMejorN:CC[0].n,ccaaMejor:CC[0].b,ccaaPeorN:CC[CC.length-1].n,ccaaPeor:CC[CC.length-1].b};
   Object.assign(V,EF);
+  // ---- fin de mes: gasto del hogar por grupos y qué costaría repetir el de 2019 ----
+  const gY=EGR.años[1], pg=k=>(yav(I.es[k],P,gY)/yav(I.es[k],P,2019)-1)*100;
+  const GP=EGR.grupos.map(g=>({...g,d:g.h[1]-g.h[0],rep:g.ipc==="general"?null:g.h[0]*(1+pg(g.ipc)/100)})), gk=k=>GP.find(g=>g.k===k);
+  const cinco=GP.filter(g=>g.rep!=null), base5=d3.sum(cinco,g=>g.h[0]), rep5=d3.sum(cinco,g=>g.rep), real5=d3.sum(cinco,g=>g.h[1]);
+  const tot19=EGR.total[0], tot25=EGR.total[1], O=PQ, AC=Object.fromEntries(O.acumulado.map(r=>[r.k,r])), ecv=O.ecv, vv=O.vivienda, dec=O.deciles, rs=O.salarioReal;
+  const fmY=Math.max(...Object.keys(ecv.fin_de_mes).map(Number)), sobY=Math.max(...Object.keys(vv.sobrecargaInq.ES).map(Number)), emY=Math.max(...Object.keys(vv.emancipacion).map(Number)), mid=dec.slice(3,9).map(d=>d.real);
+  const mesTxt=m=>`${MES[+m.slice(5)]} de ${m.slice(0,4)}`;
+  Object.assign(V,{gY,tot19,tot25,tot25m:tot25/12,totDif:tot25-tot19,totSube:(tot25/tot19-1)*100,dViv:gk("04").d,dCom:gk("01").d,shareUp:(gk("04").d+gk("01").d)/(tot25-tot19)*100,
+    peso19:(gk("01").h[0]+gk("04").h[0])/tot19*100,peso25:(gk("01").h[1]+gk("04").h[1])/tot25*100,
+    pAli:pg("alimentos"),pRes:pg("restaurantes"),pViv:pg("vivienda"),pTra:pg("transporte"),pVes:pg("vestido"),pGen:pg("general"),
+    cov5:base5/tot19*100,rep5,real5,repSube:(rep5/base5-1)*100,repMes:Math.round((rep5-base5)/12/10)*10,repDif:(real5/rep5-1)*100,
+    sal:AC.salario.anyo,difSalRep:(rep5/base5-1)*100-AC.salario.anyo,
+    perd22:Math.abs(O.salarioRealT4["2022"]),perd23:Math.abs(O.salarioRealT4["2023"]),perd24:Math.abs(O.salarioRealT4["2024"]),minReal:Math.abs(O.salarioRealMin.real),minPer:trimTxt(O.salarioRealMin.p),
+    ipcMes:mesTxt(O.ipcUltimoMes),ipcUlt:O.interanual.ultimo,ipcHace12:O.interanual.hace12,
+    d1:dec[0].real,d2:dec[1].real,d10:dec[9].real,medMin:Math.min(...mid),medMax:Math.max(...mid),decAnyo:O.decilesAnyo,smiIni:O.smi.ini,smiFin:O.smi.fin,smiAnyo:O.smi.finAnyo,
+    fm13:ecv.fin_de_mes[2013],fm19:ecv.fin_de_mes[2019],fm22:ecv.fin_de_mes[2022],fmU:ecv.fin_de_mes[fmY],fmAnyo:fmY,pob19:ecv.pobreza_ecv[2019],pobU:ecv.pobreza_ecv[fmY],aro19:ecv.arope[2019],aroU:ecv.arope[fmY],
+    masSueldo:vv.masSueldo,alqIni:vv.alqIni,alqFin:vv.alqFin,alqAnyo:vv.alqAnyo,alqCambio:vv.alqCambio,salAlq:vv.salAlqCambio,inq19:vv.sobrecargaInq.ES[2019],inqU:vv.sobrecargaInq.ES[sobY],
+    em19:vv.emancipacion[2019],emU:vv.emancipacion[emY],emAnyo:emY});
   const SRC="Fuente: INE, IPC.", sg=v=>sgn(v);
   const G={
+    grupos:el=>{ const f=fig(el,{title:`Cuánto más gasta un hogar medio al año en cada cosa, 2019–${gY}`,sub:`Euros por hogar y año, gasto total de la Encuesta de Presupuestos Familiares (13 grupos). Total: ${eur(tot19)} en 2019 y ${eur(tot25)} en ${gY}`,source:"Fuente: INE, Encuesta de Presupuestos Familiares."});
+      const sr=GP.slice().sort((a,b)=>b.d-a.d); hbars(f.body,sr.map(g=>({l:g.n,v:g.d})),{fmt:v=>(v>=0?"+":"−")+eur(Math.abs(v)),wide:true});
+      table(f.body,["","2019",String(gY),"Diferencia"],sr.map(g=>[g.n,eur(g.h[0]),eur(g.h[1]),(g.d>=0?"+":"−")+eur(Math.abs(g.d))]).concat([["<b>Total</b>",`<b>${eur(tot19)}</b>`,`<b>${eur(tot25)}</b>`,`<b>+${eur(tot25-tot19)}</b>`]])); },
+    repetir:el=>{ const f=fig(el,{title:`Repetir el gasto de 2019 a precios de ${gY}`,sub:"Euros por hogar y año; solo las cinco partidas con índice de precios propio en el IPC",source:"Fuente: INE, Encuesta de Presupuestos Familiares e IPC. Cálculo de Indicio."});
+      const sr=cinco.slice().sort((a,b)=>b.h[0]-a.h[0]);
+      table(f.body,["","Gasto en 2019","Subida del precio","Repetirlo hoy",`Gasto real en ${gY}`],sr.map(g=>[g.n,eur(g.h[0]),sg(pg(g.ipc)),eur(g.rep),eur(g.h[1])]).concat([["<b>Las cinco partidas</b>",`<b>${eur(base5)}</b>`,`<b>${sg((rep5/base5-1)*100)}</b>`,`<b>${eur(rep5)}</b>`,`<b>${eur(real5)}</b>`],["Resto (sin índice propio)",eur(tot19-base5),"—","—",eur(tot25-real5)]])); },
+    real:el=>{ lineChart(el,{title:"Poder de compra del coste salarial medio frente al mismo trimestre de 2019",sub:"España, % de diferencia: coste salarial por trabajador entre el IPC general. Por encima de 0, se compra más que en 2019",source:"Fuente: INE, IPC y Encuesta Trimestral de Coste Laboral. Cálculo de Indicio.",years:rs.map(r=>r.p),xticks:rs.filter(r=>r.p.endsWith("T4")).map(r=>r.p),tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>sgn(v),
+      series:[{n:"Poder de compra",v:rs.map(r=>r.real),c:"--rust",main:true},{n:"Sueldo (sin descontar precios)",v:rs.map(r=>r.nominal),c:"--slate"}]}); },
+    deciles:el=>{ const f=fig(el,{title:`Poder de compra del sueldo por tramos, 2019–${O.decilesAnyo}`,sub:"EPA, sueldo mensual neto medio de cada décimo de trabajadores, descontado el IPC. Tramo 1: el 10 % que menos cobra",source:"Fuente: INE, Encuesta de Población Activa e IPC. Cálculo de Indicio."});
+      hbars(f.body,dec.map(d=>({l:d.d===1?"1 · cobra menos":d.d===10?"10 · cobra más":String(d.d),v:d.real})),{fmt:v=>sgn(v)}); },
+    finmes:el=>{ const Y=Object.keys(ecv.fin_de_mes).map(Number).filter(y=>y>=2013); lineChart(el,{title:"Hogares que llegan a fin de mes con dificultad, y pobreza",sub:"España, % de la población (o de los hogares, en fin de mes)",source:"Fuente: INE, Encuesta de Condiciones de Vida.",years:Y,xticks:[2013,2016,2019,2022,Y[Y.length-1]],tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>pc(v),
+      series:[{n:"Llegan con dificultad",v:Y.map(y=>ecv.fin_de_mes[y]),c:"--rust",main:true},{n:"Riesgo de pobreza",v:Y.map(y=>ecv.pobreza_ecv[y]),c:"--slate"},{n:"Pobreza o exclusión (AROPE)",v:Y.map(y=>ecv.arope[y]),c:"--ink"}]}); },
+    vivienda:el=>{ const f=fig(el,{title:"Vivienda, 2019 y ahora",sub:"Lo que cuesta ponerse un techo, frente a lo que se cobra",source:"Fuente: INE (IPV, IPVA y coste salarial) y Eurostat. Cálculo de Indicio."});
+      table(f.body,["","2019","Ahora","Cambio"],[["Comprar: precio de la vivienda (2025 = 100)",nf1.format(vv.ipvIni),nf1.format(vv.ipvFin),`<b>${sgn(vv.masSueldo)}</b> sobre el sueldo`],
+        [`Alquiler medio de los contratos vigentes, al mes (${vv.alqAnyo})`,eur(vv.alqIni),eur(vv.alqFin),`${sgn(vv.alqCambio)} (sueldo: ${sgn(vv.salAlqCambio)})`],
+        ["Inquilinos que gastan más del 40 % de su renta en vivienda",pc(vv.sobrecargaInq.ES[2019]),`${pc(vv.sobrecargaInq.ES[sobY])} (${sobY})`,`UE: ${pc(vv.sobrecargaInq.EU27_2020[2019])} → ${pc(vv.sobrecargaInq.EU27_2020[2024])} (2024)`]]); },
     olas:el=>{ const i0=P.indexOf("2019M01"), per=P.slice(i0).map(p=>MES[mi(p)].slice(0,3)+". "+my(p)); lineChart(el,{title:"Cuánto suben los precios respecto al mismo mes del año anterior",sub:"España, % mensual",source:SRC,years:per,xticks:per.filter(p=>p.startsWith("ene")),tickFmt:v=>nf0.format(v)+NB+"%",fmt:v=>pc(v),
       series:[{n:"Alimentos",v:yF.slice(i0),c:"--rust",main:true},{n:"Todos los precios",v:yG.slice(i0),c:"--slate"}]}); },
     carrera:el=>{ const Y=d3.range(2015,eY+1); lineChart(el,{title:"Alimentos, todos los precios y sueldo mediano (2019 = 100)",sub:`España, medias anuales hasta ${eY}, el último año con sueldos publicados`,source:"Fuente: INE, IPC y Encuesta Anual de Estructura Salarial.",years:Y,xticks:[2015,2019,2022,eY],
@@ -5581,7 +5617,7 @@ async function studyAlimentos(B){
         return `<div class="big">${pc_>=0?"+":"−"}${nf0.format(Math.abs(pc_))}${NB}% <span class="muted" style="font-size:16px;font-weight:400">de comida que compras con tu sueldo</span></div>
           <p>Hasta ${V.añoSueldo}, la comida ha subido un ${nf0.format(ali)}${NB}% y el conjunto de precios, un ${nf0.format(gen)}${NB}%. Con tu mezcla de gasto, tus precios han subido en torno a un ${nf0.format(propia)}${NB}%, así que para toda tu cesta tu poder de compra ha cambiado un <b>${pg>=0?"+":"−"}${nf0.format(Math.abs(pg))}${NB}%</b>.</p>
           <p class="muted" style="font-size:14px">Cálculo aproximado: el resto de tu gasto sube como el resto de precios. Tu cesta real puede ser distinta.</p>`; }}); };
-  mdRender(B,"precio-alimentos",V,G);
+  mdRender(B,"llegar-a-fin-de-mes",V,G);
 }
 
 // ---------- sueldos: dónde estás en la fila y cómo se ha movido cada escalón ----------
@@ -6529,8 +6565,8 @@ const HEROQ=[
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
     cap:N=>`Lo que ha subido cada cosa desde 2015 (2015 = 100): precio de compra, alquiler mediano de los contratos declarados y sueldo mediano, los tres hasta ${N.compraY}. Fuente: INE y Ministerio de Vivienda (SERPAVI).`},
-  {id:"precio-alimentos",tab:"Cesta",kk:"Precios y sueldos",em:"qué parte del sueldo se lleva?",chart:"cesta",cta:"Ver qué se encarece más →",
-    v:N=>N.doble?`La comida ha subido el doble que el sueldo.`:`La comida ha subido más que el sueldo.`,
+  {id:"llegar-a-fin-de-mes",tab:"Fin de mes",kk:"Precios y sueldos",em:"llegar a fin de mes?",chart:"cesta",cta:"Ver qué cuesta más →",
+    v:()=>`De media, el sueldo aguanta. La comida, no.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
     cap:N=>`Precio de los alimentos (media de cada año) y sueldo mediano, los dos hasta ${N.añoSueldo}, el último año con sueldos publicados, frente a 2019. Fuente: INE (IPC y Encuesta de Estructura Salarial).`},
   {id:"reforma-laboral",tab:"Contratos",kk:"Trabajo",em:"la reforma laboral?",chart:"contratos",cta:"Ver qué cambió en los contratos →",

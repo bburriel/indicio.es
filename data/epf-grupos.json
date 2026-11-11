@@ -1,0 +1,20 @@
+{
+  "fuente": "INE, Encuesta de Presupuestos Familiares, tabla 80325: gasto total medio por hogar y año, euros, por grupo de gasto (COICOP 2018). Resultados definitivos de 2025, publicados el 25 de junio de 2026. Escrito a mano; la suma de los 13 grupos coincide con el «Índice general» de la tabla (30.242,76 € en 2019 y 35.100,71 € en 2025, con 0,02 € de redondeo).",
+  "años": [2019, 2025],
+  "total": [30242.76, 35100.71],
+  "grupos": [
+    {"k": "01", "n": "Comida y bebidas sin alcohol", "ipc": "alimentos",    "h": [4286.79, 5626.32]},
+    {"k": "02", "n": "Alcohol y tabaco",             "ipc": "general",      "h": [515.5, 431.78]},
+    {"k": "03", "n": "Ropa y calzado",               "ipc": "vestido",      "h": [1417.49, 1416.0]},
+    {"k": "04", "n": "Vivienda, luz, agua y gas",    "ipc": "vivienda",     "h": [9470.39, 11664.65]},
+    {"k": "05", "n": "Muebles y mantenimiento del hogar", "ipc": "general", "h": [1305.89, 1247.88]},
+    {"k": "06", "n": "Sanidad",                      "ipc": "general",      "h": [1049.8, 1413.43]},
+    {"k": "07", "n": "Transporte",                   "ipc": "transporte",   "h": [3890.05, 4019.92]},
+    {"k": "08", "n": "Teléfono e internet",          "ipc": "general",      "h": [1090.14, 1078.53]},
+    {"k": "09", "n": "Ocio, deporte y cultura",      "ipc": "general",      "h": [1511.69, 1771.78]},
+    {"k": "10", "n": "Educación",                    "ipc": "general",      "h": [480.59, 570.48]},
+    {"k": "11", "n": "Restaurantes y hoteles",       "ipc": "restaurantes", "h": [2942.53, 3281.68]},
+    {"k": "12", "n": "Seguros y servicios financieros", "ipc": "general",   "h": [1068.27, 1285.56]},
+    {"k": "13", "n": "Cuidado personal y otros",     "ipc": "general",      "h": [1213.63, 1292.68]}
+  ]
+}

@@ -1,17 +1,85 @@
 ---
-titulo: ¿Cuánto cuesta llenar el carro y qué parte del sueldo se lleva?
-entradilla: Desde 2019 la comida ha subido más que el sueldo. Cuánto cuesta hoy llenar el carro, qué parte del sueldo se lleva y a quién le pesa más.
-respuesta: La comida ha subido un 35 % y el sueldo un 20 %: pagar la misma compra cuesta cuatro días más de sueldo al año.
-cifra: +35 %
-cifra_texto: la comida desde 2019; el sueldo, +20 %
-metodo: Presupuestos Familiares, IPC, Estructura Salarial y comparación del IVA con otros países, 2002–2026
+titulo: ¿Nos cuesta más llegar a fin de mes?
+entradilla: Desde 2019 los precios han subido en torno a un 22 % y el sueldo medio, lo mismo. Qué cuesta más, a quién le pesa y qué dicen los propios hogares sobre cómo llegan a fin de mes.
+respuesta: Repetir lo que un hogar gastaba en 2019 en comida, casa, transporte, restaurantes y ropa cuesta hoy un 24 % más, y el sueldo medio ha subido un 22 %: en conjunto, se llega casi igual. Lo que cambia es dónde se nota: de cada diez euros más que gasta un hogar, siete se van en la casa y la comida.
+cifra: +24 %
+cifra_texto: lo que cuesta repetir el gasto de 2019 en casa, comida y transporte; el sueldo, +22 %
+metodo: Presupuestos Familiares, IPC, coste laboral, Estructura Salarial, EPA y Condiciones de Vida, 2002–2026
 evidencia: desc
 tema: trabajo
 publicado: 2026-10-25
-actualizado: 2026-11-05
+actualizado: 2026-11-11
 ---
 
-Un hogar medio gastó **{{hogUlt|eur}}** en alimentos y bebidas no alcohólicas en {{epY}}, unos {{perUlt|eur}} por persona. En 2019 fueron {{hog19|eur}} por hogar y {{per19|eur}} por persona: un {{hogSube|pct0}} más. Son datos de la Encuesta de Presupuestos Familiares del INE, que mide lo que los hogares gastan de verdad, no el precio de una lista fija de productos.
+Desde 2019 han pasado la pandemia, la guerra de Ucrania, la crisis energética y la mayor subida de tipos en décadas. Los precios llegaron a subir un **{{picoGen|pct1}} en {{picoGenMes}}** respecto a un año antes. La pregunta que se hace casi todo el mundo es sencilla: **¿nos cuesta más llegar a fin de mes?**
+
+Tiene tres respuestas, y no coinciden del todo. Lo que cuesta vivir, que ha subido. Lo que se cobra, que ha ido detrás y casi ha alcanzado. Y lo que dicen los propios hogares, que es que llegan igual que antes. Después, la comida, donde más se nota, y el IVA que se quitó para aliviarla.
+
+## Un hogar medio gasta {{totDif|r100|eur}} más al año que en 2019
+
+Según la Encuesta de Presupuestos Familiares del INE, un hogar medio gastó **{{tot25|eur}}** en {{gY}}, unos {{tot25m|eur}} al mes. En 2019 fueron {{tot19|eur}}: {{totDif|r100|eur}} más al año, un {{totSube|pct0}} más. Siete de cada diez euros de esa diferencia ({{shareUp|pct0}}) están en dos partidas: la vivienda, con {{dViv|r100|eur}} más, y la comida, con {{dCom|r100|eur}} más.
+
+[[grafico:grupos]]
+
+La casa y la comida se llevaban el {{peso19|pct0}} del gasto de un hogar en 2019 y se llevan el {{peso25|pct0}} en {{gY}}. Es lo más difícil de recortar: el alquiler, la hipoteca y la luz se pagan igual se gaste lo que se gaste en lo demás.
+
+> [Para leerlo bien] Gastar más no es lo mismo que pagar más por lo mismo. El gasto de la vivienda incluye el alquiler que el INE estima para quien vive en casa propia, y mezcla precios con lo que cada hogar decide comprar y con cuánta gente vive en él. Para separar la parte de los precios, el siguiente paso repite el gasto de 2019.
+
+## Repetir el gasto de 2019 cuesta un {{repSube|pct0}} más
+
+Cinco partidas tienen índice de precios propio en el IPC y suman casi tres cuartas partes del gasto de un hogar ({{cov5|pct0}}): la comida, la vivienda con la luz, el agua y el gas, el transporte, los restaurantes y hoteles, y la ropa. Se toma lo que gastó un hogar medio en cada una en 2019 y se le aplica lo que ha subido su precio hasta {{gY}} (medias anuales): la comida un {{pAli|pct0}}, los restaurantes un {{pRes|pct0}}, la vivienda un {{pViv|pct0}}, el transporte un {{pTra|pct0}} y la ropa un {{pVes|pct0}}.
+
+El resultado: repetir esa compra cuesta **{{rep5|eur}}** al año, un **{{repSube|pct0}} más** que en 2019 y unos **{{repMes|eur}} más al mes**. Los hogares han gastado en esas cinco partidas {{real5|eur}}, un {{repDif|abs|pct0}} menos. No se sabe cuánto es porque compran menos, cuánto porque eligen más barato y cuánto porque los hogares son distintos, pero el gasto sube menos que los precios: parte del golpe se ha absorbido recortando.
+
+[[grafico:repetir]]
+
+El otro cuarto del presupuesto (sanidad, ocio, educación, seguros, teléfono, muebles, alcohol y cuidado personal) no tiene índice propio y no se ha estimado.
+
+## El sueldo medio ha alcanzado a los precios, con un valle en medio
+
+Desde la media de 2019 hasta {{gY}}, el coste salarial por trabajador sube un **{{sal|pct0}}** y el conjunto de los precios un {{pGen|pct0}}. Repetir las cinco partidas de un hogar medio sube un {{repSube|pct0}}, unos {{difSalRep|n1}} puntos más que el sueldo: una diferencia pequeña, que no es una pérdida grande pero tampoco es empate.
+
+Pero el final esconde un valle. Frente al mismo trimestre de 2019, el sueldo medio compraba un **{{perd22|pct1}} menos a finales de 2022**, un {{perd23|pct1}} menos a finales de 2023 y un {{perd24|pct1}} menos a finales de 2024. Lo recuperó en 2025. Son tres años con la cartera más ligera, aunque ahora estemos casi en tablas.
+
+[[grafico:real]]
+
+> [Para leerlo bien] El hueco de 2020 (hasta un {{minReal|pct1}} menos en el {{minPer}}) no es un recorte de sueldos: los trabajadores en ERTE cobraban menos horas y el coste salarial medio por trabajador se hundió, mientras los precios apenas se movían. Se cerró en cuanto acabaron los ERTE.
+
+La inflación interanual de {{ipcMes}} es del **{{ipcUlt|pct1}}**, frente al {{ipcHace12|pct1}} de un año antes, con una nueva subida de la energía. Los sueldos de 2026 aún no han digerido ese golpe.
+
+## El sueldo medio no es el de todos
+
+Con la Encuesta de Población Activa, el salario mensual neto por tramos, descontados los precios:
+
+[[grafico:deciles]]
+
+- El 10 % que menos cobra gana un **{{d1|pct1}}** más de poder de compra entre 2019 y {{decAnyo}}, y el siguiente tramo un {{d2|pct1}} más. Lo empuja el salario mínimo, que pasa de **{{smiIni|eur}} a {{smiFin|eur}} al mes** en catorce pagas entre 2019 y {{smiAnyo}}.
+- Entre el cuarto y el noveno tramo, el poder de compra está donde estaba: entre {{medMin|pcts1}} y {{medMax|pcts1}}.
+- El 10 % que más cobra gana un {{d10|pct1}} más.
+
+La subida del salario mínimo ha sostenido a quien menos cobra. La clase media del sueldo, la del medio de la fila, ha pasado cinco años corriendo para quedarse en el mismo sitio.
+
+## Según los propios hogares, se llega casi igual que en 2019
+
+En la Encuesta de Condiciones de Vida, los hogares que dicen llegar a fin de mes con dificultad o con mucha dificultad eran el **{{fm19|pct1}} en 2019**, el {{fm22|pct1}} en 2022 (el año del pico de precios) y el **{{fmU|pct1}} en {{fmAnyo}}**. Es poco más de la mitad de lo que era en 2013 ({{fm13|pct1}}). La pobreza pasa del {{pob19|pct1}} al {{pobU|pct1}} y la pobreza o exclusión (AROPE), del {{aro19|pct1}} al {{aroU|pct1}}.
+
+[[grafico:finmes]]
+
+Es una pregunta subjetiva y de media. Un descenso general es compatible con que haya golpeado más a quien alquila un piso nuevo, tiene una hipoteca variable o gasta mucho en comida. Los datos no dicen por qué. Solo que el aumento del coste de vida no se ha convertido en más hogares que lleguen justos.
+
+## La vivienda: lo que más pesa, y lo más difícil de medir
+
+[[grafico:vivienda]]
+
+Comprar exige hoy un **{{masSueldo|pct0}} más de sueldo** que en 2019 para el mismo piso. El alquiler medio de los contratos vigentes pasa de {{alqIni|eur}} a {{alqFin|eur}} al mes ({{alqAnyo}}), un {{alqCambio|pct0}} más, frente a un {{salAlq|pct0}} del sueldo. Y los inquilinos que gastan más del 40 % de su renta en vivienda han bajado del {{inq19|pct1}} al {{inqU|pct1}}.
+
+> [Para leerlo bien] Tres cautelas. El alquiler de los contratos vigentes sube menos que el de los contratos nuevos, que es el que paga quien busca piso hoy y esta serie no recoge. Que menos inquilinos gasten más del 40 % de su renta puede deberse a que quien no podía pagar ha dejado de alquilar: la edad media de emancipación pasa de {{em19|n1}} a {{emU|n1}} años entre 2019 y {{emAnyo}}. Y el IPC general pondera una cesta media que no es la de ningún hogar concreto.
+
+El detalle por ciudades y el esfuerzo de alquilar o comprar está en [Vivienda](/preguntas/vivienda/).
+
+## La comida: donde más se nota
+
+Si hay una partida donde la subida se ve a simple vista, es el carro de la compra. Un hogar medio gastó **{{hogUlt|eur}}** en alimentos y bebidas no alcohólicas en {{epY}}, unos {{perUlt|eur}} por persona. En 2019 fueron {{hog19|eur}} por hogar y {{per19|eur}} por persona: un {{hogSube|pct0}} más. Son datos de la Encuesta de Presupuestos Familiares del INE, que mide lo que los hogares gastan de verdad, no el precio de una lista fija de productos.
 
 [[grafico:gasto]]
 
@@ -110,10 +178,23 @@ Esto desmonta la idea de que la rebaja «se la quedaron los supermercados», al 
 Otra cosa es si era la mejor forma de gastar ese dinero. La rebaja llega a todos los hogares por igual y se ahorra más cuanta más comida se compra; quienes la criticaban defendían una ayuda directa a los hogares con menos renta, y quienes la defendían, que el efecto en los precios era inmediato y sin trámites. El análisis solo contesta a lo primero: si llegó al precio.
 ## Lo que todavía no se sabe
 
-Los sueldos publicados llegan a {{añoSueldo}} y los precios, a {{ultMes}}. En ese tiempo la comida ha seguido subiendo, más despacio, y todavía no se conoce cuánto ha subido el sueldo mediano. Cuando el INE publique la siguiente Encuesta Anual de Estructura Salarial se podrá ver si el hueco se ha cerrado o ha seguido creciendo.
+Los sueldos medianos publicados llegan a {{añoSueldo}} y los precios, a {{ultMes}}. En ese tiempo la comida ha seguido subiendo, más despacio, y todavía no se conoce cuánto ha subido el sueldo mediano. Cuando el INE publique la siguiente Encuesta Anual de Estructura Salarial se podrá ver si el hueco se ha cerrado o ha seguido creciendo. Por eso la comida se compara con el sueldo hasta {{añoSueldo}} y el resto de la página, con el coste salarial, hasta {{gY}}: el sueldo mediano y el coste salarial son datos distintos y los años no coinciden.
+
+## Lo que se puede decir y lo que no
+
+- **Que repetir el gasto de 2019 cuesta hoy en torno a un cuarto más y que el sueldo medio ha subido algo menos**: se puede decir, con series oficiales del INE.
+- **Que los hogares dicen llegar a fin de mes como en 2019**: se puede decir, es lo que contesta la Encuesta de Condiciones de Vida. Es una percepción y una media.
+- **Que los sueldos más bajos han ganado y los medios no**: se puede decir; es descriptivo.
+- **Que esto sea efecto del covid, de la guerra o de las medidas del Gobierno**: no se puede decir. Llegaron juntas y con estos datos ningún método las separa. Esta página cuenta lo que pasó, no por qué.
 
 ## Cómo está hecho
 
+- **Gasto del hogar por grupos:** gasto total medio por hogar de la Encuesta de Presupuestos Familiares del INE (tabla 80325), 13 grupos, 2019 y {{gY}}. La suma de los 13 grupos coincide con el total de la tabla. Incluye el alquiler imputado de quien vive en casa propia.
+- **Repetir el gasto de 2019:** el gasto de 2019 de cada una de las cinco partidas con índice propio (comida, vivienda, transporte, restaurantes y ropa), multiplicado por lo que ha subido ese grupo en el IPC entre la media de 2019 y la de {{gY}}. Las otras ocho partidas, un cuarto del gasto, no se estiman. Aplicar el IPC de la vivienda al alquiler imputado es una aproximación.
+- **Sueldo medio:** coste salarial total por trabajador y mes, de la Encuesta Trimestral de Coste Laboral del INE, entre el IPC general del mismo trimestre y comparado con el mismo trimestre de 2019 para quitar las pagas extra. La subida acumulada usa medias anuales.
+- **Por tramos:** salario neto mensual medio de cada décimo de la EPA, 2019 a {{decAnyo}}, descontado el IPC general.
+- **Fin de mes, pobreza y vivienda:** Encuesta de Condiciones de Vida del INE y Eurostat. Precio de la vivienda con el Índice de Precios de Vivienda y renta del alquiler con el Índice de Precios de Vivienda en Alquiler, ambos del INE, frente al coste salarial.
+- **Qué puede fallar:** el coste salarial medio cambia de composición con el ciclo (en 2020 se destruyó sobre todo empleo mal pagado, lo que sube el promedio). El gasto de los hogares mezcla precios con lo que se compra y con cuánta gente vive en cada hogar. Un hogar medio no existe: el que alquila, el que tiene hipoteca variable o el que gasta mucho en comida han vivido cosas distintas.
 - **Gasto en comida:** gasto total en alimentos y bebidas no alcohólicas por hogar y por persona de la Encuesta de Presupuestos Familiares del INE, de 2016 a {{epY}}.
 - **La misma compra a precios de cada año:** el gasto de 2019 multiplicado por lo que han subido los alimentos del IPC desde entonces, con la media de cada año.
 - **Parte del sueldo:** el gasto por persona de esa compra dividido entre el sueldo mediano bruto anual de la Encuesta Anual de Estructura Salarial del INE. Los días son esa proporción por 365. Con el salario mínimo se usan las 14 pagas. El esfuerzo es esa parte hoy dividida entre la de 2019, y es el inverso de la comida que compra el sueldo.
