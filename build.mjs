@@ -78,13 +78,17 @@ copyDir(path.join(ROOT,"data"),path.join(OUT,"data"));
   // la misma cuenta año a año (2015 = 100), para dibujar la evolución de cada cosa
   const sr=(o,a,b)=>{ const r=[]; for(let y=2015;y<=+b;y++){ const v=o[String(y)]; if(v!=null&&o[a]) r.push([y,r2(v/o[a]*100)]); } return r; };
   casa.serie={compra:sr(VI.ipv,"2015",cY),alquiler:sr(VI.alqMed,"2015",cY),sueldo:sr(ees,"2015",cY),precios:(()=>{ const r=[]; for(let y=2015;y<=+cY;y++){ const v=ipcG(y); if(v) r.push([y,r2(v/ipcG(2015)*100)]); } return r; })()};
+  // la vida: comida, precios en general y sueldo mediano, 2019 = 100, hasta el último año con sueldos
+  const vser=(f)=>{ const r=[]; for(let y=2019;y<=eY;y++){ const v=f(y); if(v) r.push([y,r2(v)]); } return r; };
+  const vida={serie:{comida:vser(y=>yav(al,P,y,12)/f19*100),precios:vser(y=>ipcG(y)/ipcG(2019)*100),sueldo:vser(y=>ees[String(y)]/ees["2019"]*100)},añoSueldo:eY};
+  vida.comidaS=r2(vida.serie.comida[vida.serie.comida.length-1][1]-100); vida.precios=r2(vida.serie.precios[vida.serie.precios.length-1][1]-100); vida.sueldoS=r2(vida.serie.sueldo[vida.serie.sueldo.length-1][1]-100);
   // los contratos: parte de los contratos iniciales que son temporales, media móvil de tres meses
   const tm=RF.periodos.map((p,i)=>{ let ind=0,tem=0; for(const gr of RF.grupos){ const m=gr.mes[i]; if(m){ ind+=m[0]; tem+=m[1]; } } return ind+tem?100*tem/(ind+tem):null; });
   const tm3=tm.map((v,i)=>{ const w=tm.slice(Math.max(0,i-2),i+1).filter(x=>x!=null); return w.length?r1(mean(w)):null; });
   const antes=tm.filter((v,i)=>/^20(19|20|21)-/.test(RF.periodos[i])&&v!=null);
   // infraestructuras: inversión anual en carreteras y ferrocarril (FIT-OCDE), en miles de millones de euros de 2015
   const IF=JSON.parse(rd("data/infra.json")).itf, infra={years:IF.years,road:IF.road_q.map(v=>Math.round(v)/1000),rail:IF.rail_q.map(v=>Math.round(v)/1000)};
-  fs.writeFileSync(path.join(OUT,"data","portada.json"),JSON.stringify({cesta,casa,contratos:{meses:RF.periodos,temporales:tm3,antes:r1(mean(antes))},infra}));
+  fs.writeFileSync(path.join(OUT,"data","portada.json"),JSON.stringify({cesta,casa,vida,contratos:{meses:RF.periodos,temporales:tm3,antes:r1(mean(antes))},infra}));
 }
 // el service worker lleva la versión del build
 fs.writeFileSync(path.join(OUT,"sw.js"),rd("src/sw.js").replace("__BUILD__",h8(css+js+i18n+CONTENT)).replace("__JS__",JS).replace("__I18N__",I18N).replace("__CSS__",CSS));
@@ -432,7 +436,7 @@ fs.writeFileSync(path.join(OUT,"feed.xml"),`<?xml version="1.0" encoding="UTF-8"
 // Netlify: el dominio antiguo redirige al nuevo; las rutas dinámicas que no tienen HTML propio caen en la app
 // Cloudflare Pages: las reglas de _redirects se aplican aunque exista el fichero, así que solo se reescriben rutas que no existen
 // (apartados de la ficha y comparaciones). La redirección de www y del dominio antiguo se hace en Cloudflare (reglas de redirección).
-fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/llegar-a-fin-de-mes/ 301","/preguntas/precio-alimentos/ /preguntas/llegar-a-fin-de-mes/ 301","/preguntas/precio-alimentos /preguntas/llegar-a-fin-de-mes/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301","/temas/ /preguntas/ 301","/temas /preguntas/ 301","/temas/* /preguntas/ 301"].join("\n")+"\n");
+fs.writeFileSync(path.join(OUT,"_redirects"),["/municipio/:m/:s/ /municipio/:m/ 200","/municipio/:m/:s /municipio/:m/ 200","/comparar/:p/ /comparar/ 200","/comparar/:p /comparar/ 200","/preguntas/tope-compraventas/ /preguntas/tope-cataluna/ 301","/preguntas/iva-alimentos/ /preguntas/precio-alimentos/ 301","/preguntas/deuda-quien-gobierna/ /preguntas/quien-gobierna/ 301","/preguntas/cerca-ciudad/ /preguntas/ 301","/preguntas/renta-fuentes/ /preguntas/ 301","/preguntas/tope-compraventas /preguntas/tope-cataluna/ 301","/temas/vivienda/ /preguntas/vivienda/ 301","/temas/vivienda /preguntas/vivienda/ 301","/temas/ /preguntas/ 301","/temas /preguntas/ 301","/temas/* /preguntas/ 301"].join("\n")+"\n");
 fs.writeFileSync(path.join(OUT,"_headers"),`/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/vendor/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=86400\n/art/*\n  Cache-Control: public, max-age=604800\n/og/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n`);
 
 fs.writeFileSync(path.join(OUT,"og-extra.json"),JSON.stringify(OGX));

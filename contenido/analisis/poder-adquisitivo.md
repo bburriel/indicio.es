@@ -33,7 +33,7 @@ El IPC general esconde que unas cosas han subido mucho y otras poco. Lo que se c
 
 [[grafico:acumulado]]
 
-Los alimentos suben un **{{alim|pct1}}** y los restaurantes un {{rest|pct1}}, frente a un {{trans|pct1}} del transporte y un {{vest|pct1}} del vestido. Quien gasta una parte mayor de su sueldo en comida, que son los hogares con menos ingresos, ha notado una inflación más alta que la media. La cesta de la compra se analiza con más detalle en [¿Qué ha pasado con la cesta de la compra?](/preguntas/llegar-a-fin-de-mes/).
+Los alimentos suben un **{{alim|pct1}}** y los restaurantes un {{rest|pct1}}, frente a un {{trans|pct1}} del transporte y un {{vest|pct1}} del vestido. Quien gasta una parte mayor de su sueldo en comida, que son los hogares con menos ingresos, ha notado una inflación más alta que la media. La cesta de la compra se analiza con más detalle en [¿Qué ha pasado con la cesta de la compra?](/preguntas/precio-alimentos/).
 
 ## A quién le ha tocado peor
 
