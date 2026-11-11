@@ -5774,8 +5774,8 @@ async function studyVivienda(B){
   const E=D.es, EU=D.eu, P=A.meses, ipcY=y=>{ const x=P.map((p,i)=>p.startsWith(String(y))?A.ipc.es.general[i]:null).filter(v=>v!=null); return x.length===12?d3.mean(x):null; };
   const ees=Object.fromEntries(S.ees.años.map((y,i)=>[y,S.ees.es.Mediana[i]])), eY=+S.ees.años[S.ees.años.length-1];
   const lastK=o=>Object.keys(o).sort().pop(), g=(o,a,b)=>o&&o[a]&&o[b]?(o[b]/o[a]-1)*100:null;
-  const aY=+lastK(E.alqMes), tY=+lastK(E.valorTasado), vY=+lastK(E.ipv), cY=Math.min(aY,vY,eY);
-  const city=n=>(D.ciudades[n]||{}).alqMes||{}, CN={"Alacant/Alicante":"Alicante","Hospitalet de Llobregat, L'":"L'Hospitalet","Palmas de Gran Canaria, Las":"Las Palmas","Palma de Mallorca":"Palma"}, cn=n=>CN[n]||n;
+  const aY=+lastK(E.alqMed), tY=+lastK(E.valorTasado), vY=+lastK(E.ipv), cY=Math.min(aY,vY,eY);
+  const city=n=>(D.ciudades[n]||{}).alqMed||{}, CN={"Alacant/Alicante":"Alicante","Hospitalet de Llobregat, L'":"L'Hospitalet","Palmas de Gran Canaria, Las":"Las Palmas","Palma de Mallorca":"Palma"}, cn=n=>CN[n]||n;
   const CIT=Object.keys(D.ciudades).map(n=>({n:cn(n),v:g(city(n),"2015",String(aY))})).filter(x=>x.v!=null).sort((a,b)=>b.v-a.v);
   const vt=E.valorTasado, yrs80=y=>vt[y]&&ees[y]?vt[y]*80/ees[y]:null, tYs=Math.min(tY,eY);
   const ten=E.tenencia, tenY=lastK(ten.prop);
@@ -5802,7 +5802,7 @@ async function studyVivienda(B){
   const hog21=(hog[hY]-hog["2020"])*1000, term21=d3.sum(d3.range(2021,+hY+1),y=>termTot(y)||0), termAño5=term21/(+hY-2020);
   const proy10=(proy["2036"]-proy["2026"])/10;
   const V={
-    alq15:g(E.alqMes,"2015",String(cY)), sal15:g(ees,"2015",String(cY)), ipv15:g(E.ipv,"2015",String(cY)), ipc15:(ipcY(cY)/ipcY(2015)-1)*100, añoAlq:aY, añoCom:cY,
+    alq15:g(E.alqMed,"2015",String(cY)), sal15:g(ees,"2015",String(cY)), ipv15:g(E.ipv,"2015",String(cY)), ipc15:(ipcY(cY)/ipcY(2015)-1)*100, añoAlq:aY, añoCom:cY,
     vlc15:city("València")["2015"], vlc24:city("València")[aY], mlg15:city("Málaga")["2015"], mlg24:city("Málaga")[aY],
     ciudad1:CIT[0].n, ciudad1v:CIT[0].v, ciudad2:CIT[1].n, ciudad2v:CIT[1].v, ciudad3:CIT[2].n, ciudad3v:CIT[2].v,
     añoT:tYs, precio80:vt[tYs]*80, años80:yrs80(tYs), años80_08:yrs80("2008"), años80_19:yrs80("2019"), ipv19:g(E.ipv,"2019",String(vY)), sal19:g(ees,"2019",String(eY)),
@@ -5834,9 +5834,9 @@ async function studyVivienda(B){
   const eur=v=>nf0.format(v)+NB+"€", SRC="Fuente: INE y Ministerio de Vivienda.";
   const G={
     carrera:el=>{ const Y=d3.range(2015,cY+1), ix=(o,y)=>o&&o[y]&&o["2015"]?o[y]/o["2015"]*100:null;
-      lineChart(el,{title:"Compra, alquiler, sueldos y precios (2015 = 100)",sub:`España, medias anuales hasta ${cY}`,source:"Fuente: INE (IPV, alquiler medio de los contratos declarados, Encuesta de Estructura Salarial, IPC).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
-        series:[{n:"Precio de compra",v:Y.map(y=>ix(E.ipv,y)),c:"--rust",main:true},{n:"Alquiler medio",v:Y.map(y=>ix(E.alqMes,y)),c:"--plum",main:true},{n:"Sueldo mediano",v:Y.map(y=>ix(ees,y)),c:"--ink"},{n:"IPC",v:Y.map(y=>ipcY(y)&&ipcY(2015)?ipcY(y)/ipcY(2015)*100:null),c:"--slate",dash:true}]}); },
-    ciudades:el=>{ const f=fig(el,{title:`Subida del alquiler medio, 2015–${aY}`,sub:"Grandes ciudades con datos; la raya es España",source:"Fuente: INE, indicadores urbanos (alquiler mensual medio de los contratos declarados)."});
+      lineChart(el,{title:"Compra, alquiler, sueldos y precios (2015 = 100)",sub:`España, medias anuales hasta ${cY}`,source:"Fuente: INE (IPV, Encuesta de Estructura Salarial, IPC) y Ministerio de Vivienda (SERPAVI, mediana del alquiler declarado).",years:Y,xticks:[2015,2019,2022,Y[Y.length-1]],
+        series:[{n:"Precio de compra",v:Y.map(y=>ix(E.ipv,y)),c:"--rust",main:true},{n:"Alquiler mediano",v:Y.map(y=>ix(E.alqMed,y)),c:"--plum",main:true},{n:"Sueldo mediano",v:Y.map(y=>ix(ees,y)),c:"--ink"},{n:"IPC",v:Y.map(y=>ipcY(y)&&ipcY(2015)?ipcY(y)/ipcY(2015)*100:null),c:"--slate",dash:true}]}); },
+    ciudades:el=>{ const f=fig(el,{title:`Subida del alquiler mediano, 2015–${aY}`,sub:"Grandes ciudades con datos; la raya es España",source:"Fuente: Ministerio de Vivienda, SERPAVI (mediana del alquiler mensual declarado en el IRPF)."});
       hbars(f.body,CIT.map(x=>({l:x.n,v:x.v})),{fmt:v=>sgn(v),ref:V.alq15,refLabel:"España",wide:true}); },
     compra:el=>{ const Y=d3.range(2004,tYs+1).map(String); lineChart(el,{title:"Años de sueldo mediano bruto para pagar 80 m²",sub:"Valor tasado medio de la vivienda libre × 80 m², entre el sueldo mediano anual",source:"Fuente: Ministerio de Vivienda (valor tasado) e INE (Encuesta de Estructura Salarial).",years:Y.map(Number),xticks:[2008,2013,2019,tYs],tickFmt:v=>nf0.format(v),fmt:v=>nf1.format(v)+" años",
       series:[{n:"Años de sueldo",v:Y.map(y=>yrs80(y)),c:"--rust",main:true}]}); },
@@ -6541,7 +6541,7 @@ const HEROQ=[
   {id:"vivienda",tab:"Vivienda",kk:"Vivienda",em:"pagar una casa?",chart:"casa",cta:"Ver por qué sube →",
     v:()=>`Faltan casas, y no todas las que hay se usan para vivir.`,
     a:N=>`Desde 2015 comprar una vivienda cuesta un ${N.compra}${NB}% más y alquilarla, un ${N.alquiler}${NB}% más, mientras el sueldo mediano ha subido un ${N.sueldo}${NB}%. Hay cada vez menos viviendas para vivir por cada hogar: se construye menos de lo que se necesita y una parte de las que ya existen se dedica a otros usos, como el turismo, la inversión o las segundas residencias, con mucha compra extranjera en la costa. Las dos cosas pesan, pero no igual: movilizar lo que hay da un empujón de una vez; construir es lo único que sigue sumando cada año.`,
-    cap:N=>`Lo que ha subido cada cosa desde 2015 (2015 = 100): precio de compra, alquiler medio de los contratos declarados y sueldo mediano, los tres hasta ${N.compraY}. Fuente: INE.`},
+    cap:N=>`Lo que ha subido cada cosa desde 2015 (2015 = 100): precio de compra, alquiler mediano de los contratos declarados y sueldo mediano, los tres hasta ${N.compraY}. Fuente: INE y Ministerio de Vivienda (SERPAVI).`},
   {id:"llegar-a-fin-de-mes",tab:"Fin de mes",kk:"Precios y sueldos",em:"llegar a fin de mes?",chart:"cesta",cta:"Ver qué cuesta más →",
     v:()=>`De media, el sueldo aguanta. La comida, no.`,
     a:N=>`De 2019 a ${N.añoSueldo}, el último año con sueldos publicados, la comida ha subido un ${N.fo}${NB}% y el sueldo mediano, un ${N.sa}${NB}%. Con lo que cobras se compra un ${N.poder}${NB}% menos de comida: una de cada ${N.cada} compras se queda en la tienda. La rebaja del IVA sí llegó al ticket, pero no ha compensado la subida.`,
